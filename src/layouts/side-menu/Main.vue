@@ -167,6 +167,18 @@ const updatedMenu = () => {
       }
     }
 
+    else if (element.title == 'Outil Factuel') {
+      if ($h.getPermission('read.indicateur') || $h.getPermission('write.indicateur')) {
+        updateMenu.push(element);
+      }
+    }
+
+    else if (element.title == 'Outil de Perception') {
+      if ($h.getPermission('read.indicateur') || $h.getPermission('write.indicateur')) {
+        updateMenu.push(element);
+      }
+    }
+
     else if (element.title == 'Programmation des Rapports') {
       if ($h.getPermission('read.rapport') || $h.getPermission('write.rapport')) {
         updateMenu.push(element);

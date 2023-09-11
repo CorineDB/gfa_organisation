@@ -25,6 +25,11 @@ import ErrorPage from "../views/error-page/Main.vue";
 import ProgramationRapport from "../views/dashboard/programmation_rapport.vue";
 import { Indent, QrCode } from "lucide-vue-next";
 import Voter from "../views/voter/voter.vue"
+import Tools from "../views/gfa/Tools.vue";
+import ToolsPerception from "../views/gfa/ToolsPerception.vue";
+import FicheFactuel from "../views/gfa/FicheFactuel.vue";
+import FicheFactuel from "../views/gfa/FichePerception.vue";
+
 
 
 
@@ -39,6 +44,16 @@ const routes = [
         path: "dashboard-overview-1",
         name: "side-menu-dashboard-overview-1",
         component: DashboardOverview1,
+      },
+      {
+        path: "tools",
+        name: "Tools",
+        component: Tools,
+      },
+      {
+        path: "ToolsPerception",
+        name: "ToolsPerception",
+        component: ToolsPerception,
       },
       {
         path: "bsd",
@@ -141,6 +156,16 @@ const routes = [
     ],
   },
 
+  {
+    path: "/ficheFactuel",
+    name: "FicheFactuel",
+    component: FicheFactuel,
+  },
+  {
+    path: "/fichePerception",
+    name: "FichePerception",
+    component: FichePerception,
+  },
   {
     path: "/voter/:code",
     name: "Voter",
