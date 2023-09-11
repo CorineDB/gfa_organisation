@@ -1,0 +1,16 @@
+const API_BASE_URL = "https://mybsd.shop"
+
+// const STAGGING_URL = "https://mybsd.shop:8000/"
+//d
+
+const DEPLOYMENT_URL = "https://mybsd.shop/"
+
+const PUSHER_BASE_URL = "127.0.0.1"
+
+const PUSHER_APP_KEY = "44c99c1fccbbcdb8d6fd"
+
+const PUSHER_APP_CLUSTER = "eu"
+
+const FRONT_BASE_URL = window.location.origin + "/"
+
+export  {API_BASE_URL , PUSHER_APP_CLUSTER, PUSHER_APP_KEY, PUSHER_BASE_URL,FRONT_BASE_URL}
