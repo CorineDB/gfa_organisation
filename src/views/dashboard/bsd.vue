@@ -375,52 +375,35 @@
 
 
 
-     <!-- BEGIN: Modal organisation -->
-     <Modal :show="organisationModal" @hidden="organisationModal = false">
+    <!-- BEGIN: Modal organisation -->
+    <Modal :show="organisationModal" @hidden="organisationModal = false">
       <ModalBody class="p-10 ">
-        <form v-if="!isUpdate" key="ajouter" @submit.prevent="storeBSD">
-          <div>
-            <label for="regular-form-1" class="form-label">Nom</label>
-            <input id="regular-form-1" type="text" required v-model="formData.nom" class="form-control"
-              placeholder="Nom équipement" />
-          </div>
+        <form key="ajouter" @submit.prevent="storeBSD" class="space-y-3">
           <div>
             <label for="regular-form-1" class="form-label">Organisation </label>
-
-
-            <TomSelect v-model="formData.type" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
+            <TomSelect v-model="formData.organisation" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
 
               <option v-for="(type, index) in types" :key="index" :value="type.id">{{ type.nom }}
               </option>
             </TomSelect>
-
           </div>
-          <button class="btn btn-primary py-3 px-4 w-full my-3  xl:mr-3 align-top">
-            <span class="text-sm font-semibold uppercase" v-if="!chargement">
-              Ajouter
-            </span>
-            <span v-else class="flex justify-center items-center space-x-2">
-              <span class=" px-4 font-semibold ">
-                chargement ...
-              </span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-center animate-spin" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </span>
-          </button>
-        </form>
 
-        <form v-else key="modifier" @submit.prevent="updateBSD">
           <div>
             <label for="regular-form-1" class="form-label">Nom</label>
-            <input id="regular-form-1" type="text" required v-model="saveUpdate.nom" class="form-control"
-              placeholder="Nom équipement" />
+            <input id="regular-form-1" type="text" required v-model="formData.nomResponsable" class="form-control"
+              placeholder="Nom chef organisation" />
           </div>
-          <button class="btn btn-primary py-3 px-4 w-full my-3  xl:mr-3 align-top">
+
+          <div>
+            <label for="regular-form-1" class="form-label">Prénom</label>
+            <input id="regular-form-1" type="text" required v-model="formData.prenomResponsable" class="form-control"
+              placeholder="prénom chef organisation" />
+          </div>
+
+          <a target="_blank" :href="FRONT_BASE_URL + 'voter/'"
+            class="btn btn-primary py-3 px-4 w-full my-3  xl:mr-3 align-top">
             <span class="text-sm font-semibold uppercase" v-if="!chargement">
-              modifier
+              Continuer
             </span>
             <span v-else class="flex justify-center items-center space-x-2">
               <span class=" px-4 font-semibold ">
@@ -432,8 +415,9 @@
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </span>
-          </button>
+          </a>
         </form>
+
       </ModalBody>
     </Modal>
 
@@ -591,25 +575,28 @@
             <td>{{ data.nom }}</td>
 
             <td v-if="data.type == 'tablette'">
-              <span :style="{'background':'blue'}" class="text-xs px-1 rounded-full bg-warning text-white mr-1">{{ data.type.toUpperCase() }}</span>
+              <span :style="{ 'background': 'blue' }" class="text-xs px-1 rounded-full bg-warning text-white mr-1">{{
+                data.type.toUpperCase() }}</span>
             </td>
 
             <td v-else-if="data.type == 'qr'">
-              <span :style="{'background':'red'}" class="text-xs px-1 rounded-full bg-warning text-white mr-1">{{ data.type.toUpperCase() }}</span>
+              <span :style="{ 'background': 'red' }" class="text-xs px-1 rounded-full bg-warning text-white mr-1">{{
+                data.type.toUpperCase() }}</span>
             </td>
 
             <td v-if="data.type == 'kit'">
-              <span :style="{'background':'green'}" class="text-xs px-1 rounded-full bg-warning text-white mr-1">{{ data.type.toUpperCase() }}</span>
+              <span :style="{ 'background': 'green' }" class="text-xs px-1 rounded-full bg-warning text-white mr-1">{{
+                data.type.toUpperCase() }}</span>
             </td>
 
             <td class="text-center" v-if="data.type.toLowerCase() == 'qr'">
-              <!-- <a target="_blank" class="text-blue-600" :href="FRONT_BASE_URL + 'voter/' + data.code">{{ data.code }} </a>
+              <a target="_blank" class="text-blue-600" :href="FRONT_BASE_URL + 'voter/' + data.code">{{ data.code }} </a>
               <button type="button" @click="showQRCodeModal(data.code)"
                 class="btn btn-elevated-danger py-1 px-1 w-full my-1  xl:mr-1 align-top">
                 Générer QR Code
-              </button> -->
-              <a @click="infoModal()" target="_blank" class="text-blue-600" :href="FRONT_BASE_URL + 'voter/' + data.code">
-               Cliquer pour répondre au sondage</a>
+              </button>
+              <a target="_blank" class="text-blue-600" :href="FRONT_BASE_URL + 'voter/' + data.code">
+                {{ FRONT_BASE_URL }}voter/{{ data.code }}</a>
               <img :src="data.qrCode" alt="QR Code" v-if="data.qrCode">
             </td>
             <td class="text-center" v-else> <a>{{ data.code }}</a></td>
@@ -873,11 +860,10 @@
     </div>
 
   </div>
-
 </template>
 
 <script setup>
-  import QrcodeVue from 'qrcode.vue'
+import QrcodeVue from 'qrcode.vue'
 
 import { ref, reactive, onMounted, provide, computed, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router'
@@ -1027,7 +1013,9 @@ const solaire = reactive({
 
 const isUpdate = ref(false)
 const formData = reactive({
-  nom: ''
+  nomResponsable: '',
+  prenomResponsable: '',
+  organisation: ''
 })
 const valideConctact = ref(false)
 const formDataPack = reactive({
@@ -1326,8 +1314,10 @@ function showReabonnementTarification(data) {
 
 const organisationModal = ref(false)
 
-const infoModal = function(){
+const infoModal = function () {
   organisationModal.value = true
+
+  // window.location('FRONT_BASE_URL + 'voter/' + data.code')
 }
 
 
