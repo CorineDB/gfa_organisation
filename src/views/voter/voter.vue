@@ -70,33 +70,33 @@
             <div class="mt-3">
               <div class="grid grid-cols-12 gap-4">
                 <div class="col-span-6 lg:col-span-4 mr-2">
-                  <input id="radio-switch-4" class="form-check-input" type="radio" name="horizontal_radio_button"
-                    value="horizontal-radio-chris-evans" />
+                  <input id="radio-switch-4" class="form-check-input" type="radio" :name="'option' + index "
+                    :value="item" />
                   <label class="form-check-label" for="radio-switch-4"> Ne peux répondre </label>
                 </div>
                 <div class="col-span-6 lg:col-span-4 mr-2 mt-2 sm:mt-0">
-                  <input id="radio-switch-5" class="form-check-input" type="radio" name="horizontal_radio_button"
-                    value="horizontal-radio-liam-neeson" />
+                  <input id="radio-switch-5" class="form-check-input" type="radio" :name="'option' + index "
+                  :value="item"   />
                   <label class="form-check-label" for="radio-switch-5"> Pas du tout </label>
                 </div>
                 <div class="col-span-6 lg:col-span-4 mr-2">
-                  <input id="radio-switch-4" class="form-check-input" type="radio" name="horizontal_radio_button"
-                    value="horizontal-radio-chris-evans" />
+                  <input id="radio-switch-4" class="form-check-input" type="radio" :name="'option' + index "
+                 :value="item" />
                   <label class="form-check-label" for="radio-switch-4"> Faiblement </label>
                 </div>
                 <div class="col-span-6 lg:col-span-4 mr-2 mt-2 sm:mt-0">
-                  <input id="radio-switch-5" class="form-check-input" type="radio" name="horizontal_radio_button"
-                    value="horizontal-radio-liam-neeson" />
+                  <input id="radio-switch-5" class="form-check-input" type="radio" :name="'option' + index "
+                   :value="item"  />
                   <label class="form-check-label" for="radio-switch-5"> Moyennement </label>
                 </div>
                 <div class="col-span-6 lg:col-span-4 mr-2">
-                  <input id="radio-switch-4" class="form-check-input" type="radio" name="horizontal_radio_button"
-                    value="horizontal-radio-chris-evans" />
+                  <input id="radio-switch-4" class="form-check-input" type="radio" :name="'option' + index "
+                   :value="item" value="item" />
                   <label class="form-check-label" for="radio-switch-4"> Dans une grande mesure </label>
                 </div>
                 <div class="col-span-6 lg:col-span-4 mr-2 mt-2 sm:mt-0">
-                  <input id="radio-switch-5" class="form-check-input" type="radio" name="horizontal_radio_button"
-                    value="horizontal-radio-liam-neeson" />
+                  <input id="radio-switch-5" class="form-check-input" type="radio" :name="'option' + index "
+                    :value="item" />
                   <label class="form-check-label" for="radio-switch-5"> Totalement </label>
                 </div>
               </div>
