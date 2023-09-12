@@ -5,13 +5,13 @@
         <!-- BEGIN: General Report -->
         <div class="col-span-12 mt-8">
           <div class="intro-y flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Principes de Perception</h2>
+            <h2 class="text-lg font-medium truncate mr-5">Principe de Perception</h2>
             <a href="" class="ml-auto flex items-center text-primary">
               <RefreshCcwIcon class="w-4 h-4 mr-3" /> Actualiser
             </a>
           </div>
           <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
               <div class="report-box zoom-in">
                 <div class="box p-5">
                   <div class="flex">
@@ -34,7 +34,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
               <div class="report-box zoom-in">
                 <div class="box p-5">
                   <div class="flex">
@@ -45,16 +45,17 @@
                         <ChevronDownIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
-                    <div class="ml-auto">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="100%">
+                    <div class="ml-auto z-10 font-medium">
+                      <Tippy tag="div" class="report-box__indicator bg-red-600 text-black cursor-pointer" content="100%">
                         100%
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
+                    <div class="w-full bg-red-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.excellent"> {{
                     statistique.excellent[0] }} </div>
-                  <p class="text-3xl font-medium leading-8 mt-6">2040</p>
+                  <p class="text-3xl font-medium leading-8 mt-6">720</p>
                   <div class="text-base text-slate-500 mt-1">Non Observé</div>
                   <!-- <div class="flex justify-between  items-center mt-2">
                   </div> -->
@@ -62,119 +63,235 @@
               </div>
             </div>
 
-            <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
               <div class="report-box zoom-in">
                 <div class="box p-5">
                   <div class="flex">
                     <!-- <MonitorIcon class="report-box__icon text-warning" /> -->
-                    <div class="ml-auto">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content=""
-                        v-if="statistique.passable">
+                    <div v-if="statistique.passable" class="ml-auto">
+                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
                         {{ statistique.passable[1] }}
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
-                    <div class="ml-auto">
+                    <div class="ml-auto z-10 font-medium">
+                      <Tippy tag="div" class="report-box__indicator bg-orange-500 cursor-pointer" content="100%">
+                        100%
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="w-full bg-orange-500 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                  </div>
+                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable"> {{
+                    statistique.passable[0] }} </div>
+                  <p class="text-3xl font-medium leading-8 mt-6">40</p>
+                  <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+              <div class="report-box zoom-in">
+                <div class="box p-5">
+                  <div class="flex">
+                    <!-- <UserIcon class="report-box__icon text-success" /> -->
+                    <div v-if="statistique.mediocre" class="ml-auto">
+                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                        {{ statistique.mediocre[1] }}
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="ml-auto z-10 font-medium">
+                      <Tippy tag="div" class="report-box__indicator bg-yellow-400 cursor-pointer" content="100%">
+                        100%
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="w-full bg-yellow-400 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                  </div>
+
+                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
+                    statistique.mediocre[0] }}</div>
+                  <p class="text-3xl font-medium leading-8 mt-6">440</p>
+                  <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+              <div class="report-box zoom-in">
+                <div class="box p-5">
+                  <div class="flex">
+                    <!-- <UserIcon class="report-box__icon text-success" /> -->
+                    <div v-if="statistique.mediocre" class="ml-auto">
+                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                        {{ statistique.mediocre[1] }}
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="ml-auto z-10">
                       <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="100%">
                         100%
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
-                  </div>
-                  <div class="flex justify-between  items-center m-2">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable"> {{
-                      statistique.passable[0] }} </div>
-                    <p class="text-3xl font-medium leading-8 mt-6">2040</p>
-                    <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-              <div class="report-box zoom-in">
-                <div class="box p-5">
-                  <div class="flex">
-                    <!-- <UserIcon class="report-box__icon text-success" /> -->
-                    <div class="ml-auto">
-
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content=""
-                        v-if="statistique.mediocre">
-                        {{ statistique.mediocre[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
+                    <div class="w-full bg-success absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
 
-                  <div class="flex justify-between  items-center m-2">
-                    <div>
-                      <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
-                        statistique.mediocre[0] }}</div>
-                      <div class="text-base text-slate-500 mt-1">
-                        Médiocre
-                      </div>
-                    </div>
-                    <div>
-                      <svg width="75" height="75" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <g clip-path="url(#clip0_1601_3429)">
-                          <path
-                            d="M45 90C69.8528 90 90 69.8528 90 45C90 20.1472 69.8528 0 45 0C20.1472 0 0 20.1472 0 45C0 69.8528 20.1472 90 45 90Z"
-                            fill="#BE1622" />
-                          <path
-                            d="M73.2456 9.97198C79.2736 17.8175 82.5345 27.4381 82.5192 37.332C82.5192 62.1846 62.3718 82.332 37.5192 82.332C27.2388 82.347 17.2659 78.8261 9.27362 72.36C13.4705 77.8503 18.8776 82.2982 25.074 85.3577C31.2705 88.4173 38.0894 90.0059 45 90C69.8526 90 90 69.8526 90 45C90.006 38.2798 88.5037 31.644 85.604 25.5817C82.7043 19.5194 78.4811 14.1851 73.2456 9.97198Z"
-                            fill="#A6151C" />
-                          <path
-                            d="M57.6864 58.203C61.8264 61.5096 64.224 65.8998 65.5506 70.9344C65.9898 72.6048 64.7046 73.8864 63.0036 73.5984L59.1192 72.9414C58.7376 72.6768 58.5648 72.2826 58.4226 71.8614C58.1166 70.9524 57.8538 70.0272 57.3966 69.1614C56.9752 68.3196 56.2434 67.6742 55.3554 67.3614C52.3242 66.2814 49.2354 65.5614 45.9954 65.412C41.9169 65.2408 37.8471 65.9149 34.0416 67.392C33.5469 67.5731 33.0956 67.8556 32.7165 68.2214C32.3373 68.5871 32.0389 69.0281 31.8402 69.516C31.4802 70.3476 31.194 71.2044 30.9186 72.0648C30.8309 72.436 30.6107 72.7624 30.2994 72.9828C29.0088 73.206 27.7236 73.4832 26.4258 73.638C25.0218 73.8072 23.8824 72.558 24.2496 71.082C25.4898 66.0798 27.7632 61.6554 31.8492 58.329C31.9958 58.3118 32.1441 58.3401 32.274 58.41C34.0074 59.8374 36.189 59.9814 38.2392 60.4944C40.23 60.9948 42.2838 61.137 44.3088 61.1532C48.1062 61.1923 51.8837 60.5998 55.4868 59.4C56.0222 59.2367 56.5142 58.9556 56.9268 58.5774C57.1209 58.3575 57.3938 58.223 57.6864 58.203Z"
-                            fill="#1D1D1B" />
-                          <path
-                            d="M30.2976 72.9828C30.58 71.6741 31.0024 70.3995 31.5576 69.1812C32.0382 68.085 32.8842 67.3812 34.011 66.9654C38.2746 65.336 42.8523 64.6953 47.3994 65.0916C50.2445 65.3631 53.038 66.0295 55.6992 67.0716C56.1929 67.2582 56.6425 67.5453 57.0196 67.9146C57.3967 68.2839 57.693 68.7275 57.8898 69.2172C58.4252 70.4128 58.8366 71.6601 59.1174 72.9396C53.5788 72.1926 48.0186 71.7912 42.426 71.9568C38.6879 72.0551 34.9587 72.37 31.257 72.9C30.9402 72.9486 30.618 72.9576 30.2976 72.9828Z"
-                            fill="#FEFEFE" />
-                          <path
-                            d="M57.6864 58.203C57.1464 59.0526 56.3742 59.5566 55.413 59.8536C48.3066 62.0556 41.2008 62.0634 34.0956 59.877C33.165 59.5908 32.3982 59.1336 31.8474 58.329C33.7048 56.6743 35.9091 55.4565 38.2986 54.765C45.3096 52.74 51.813 53.7282 57.6864 58.203Z"
-                            fill="#FEFEFE" />
-                          <path
-                            d="M45.1116 74.5596C46.1838 74.4684 47.2636 74.5807 48.294 74.8908C49.2426 75.2058 49.7664 75.9708 49.6152 76.7916C49.4352 77.7546 48.7998 78.3306 47.7324 78.2136C45.837 78.0048 43.9524 78.0732 42.0696 78.2136C40.9896 78.2964 40.3506 77.7258 40.2084 76.7736C40.0806 75.915 40.5684 75.1536 41.544 74.889C42.7069 74.5835 43.9124 74.4722 45.1116 74.5596Z"
-                            fill="#A6151C" />
-                          <path
-                            d="M75.7476 26.8578C77.7276 29.628 78.7158 32.688 78.5988 36.1242C78.3792 42.5898 73.1682 48.4182 66.753 49.2876C57.6666 50.517 50.1804 43.7238 50.5368 34.5636C50.5566 34.0704 50.6646 33.5808 50.733 33.0912C53.9064 31.4028 56.8008 29.187 60.3234 28.161C63.221 27.2891 66.1997 26.7137 69.2136 26.4438C70.9326 26.3052 72.6462 26.325 74.3616 26.3142C74.88 26.3106 75.42 26.3178 75.7476 26.8578Z"
-                            fill="#FEFEFE" />
-                          <path
-                            d="M75.7476 26.8578C71.7408 26.4096 67.7844 26.7876 63.8676 27.6192C59.8626 28.4688 56.16 30.0168 52.8372 32.4288C52.2126 32.8824 51.5592 33.2514 50.7402 33.0912C50.1428 32.8491 49.6509 32.4025 49.3524 31.8312C48.8394 30.9492 48.2724 30.1014 47.7486 29.2212C47.0772 28.0818 47.295 26.9622 48.267 26.388C49.203 25.8336 50.2362 26.154 50.967 27.2214C51.8418 28.5048 51.8382 28.4976 53.199 27.7146C57.699 25.1262 62.559 23.7168 67.6854 23.1408C70.3861 22.8628 73.1057 22.8176 75.8142 23.0058C76.7286 23.0598 77.4828 23.3946 77.8032 24.3072C78.066 25.0542 77.8716 25.7472 77.2974 26.3106C76.86 26.73 76.2948 26.7696 75.7476 26.8578Z"
-                            fill="#1D1D1B" />
-                          <path
-                            d="M63.9 34.5132C65.5231 34.5087 67.0816 35.1491 68.2325 36.2936C69.3835 37.4381 70.0326 38.993 70.0371 40.6161C70.0417 42.2392 69.4012 43.7977 68.2567 44.9486C67.1122 46.0995 65.5573 46.7487 63.9342 46.7532C60.5952 46.773 57.8052 44.001 57.78 40.6332C57.7548 37.2654 60.5322 34.5258 63.9 34.5132Z"
-                            fill="#1D1D1B" />
-                          <path
-                            d="M63.2916 37.5138C63.3096 38.3922 62.2008 39.5856 61.3026 39.654C60.6312 39.7044 60.2424 39.285 60.4134 38.619C60.5106 38.191 60.7141 37.7945 61.0051 37.466C61.2961 37.1376 61.6653 36.8878 62.0784 36.7398C62.7642 36.4842 63.279 36.8352 63.2916 37.5138Z"
-                            fill="#FCFCFC" />
-                          <path
-                            d="M39.0924 33.0876C40.4604 41.9796 33.714 49.7736 24.8184 49.4334C19.44 49.2282 15.3 46.6884 12.8268 41.8914C10.26 36.9 10.7046 31.9806 13.7844 27.297C13.8816 27.1512 13.977 27.0054 14.0742 26.8614C14.319 26.4132 14.7546 26.3358 15.1956 26.3214C21.6288 26.1288 27.8622 26.9874 33.6798 29.9214C34.861 30.4926 35.98 31.1845 37.0188 31.986C37.6452 32.4972 38.4336 32.6646 39.0924 33.0876Z"
-                            fill="#FEFEFE" />
-                          <path
-                            d="M39.0924 33.0876C38.2374 33.2676 37.5768 32.8428 36.9216 32.3838C30.168 27.6408 22.554 26.3394 14.5044 26.793C14.3598 26.8079 14.2162 26.8307 14.0742 26.8614C13.2696 26.7624 12.5136 26.577 12.1212 25.7526C11.9933 25.5054 11.9239 25.232 11.9184 24.9537C11.913 24.6753 11.9716 24.3995 12.0897 24.1474C12.2078 23.8953 12.3823 23.6738 12.5997 23.4998C12.8171 23.3259 13.0715 23.2043 13.3434 23.1444C14.5674 22.8456 15.84 22.8744 17.0856 22.8744C23.3856 22.8744 29.4336 24.0426 35.1054 26.8704C35.9406 27.2862 36.7452 27.7704 37.539 28.251C37.9296 28.4904 38.1384 28.44 38.3688 28.0476C38.6364 27.5631 38.9543 27.1082 39.3174 26.6904C39.6003 26.3906 39.9776 26.197 40.3862 26.1419C40.7947 26.0869 41.2098 26.1738 41.562 26.388C42.2694 26.8038 42.7122 27.7362 42.3918 28.5012C41.7744 29.9844 40.842 31.3002 39.8988 32.5962C39.7278 32.8302 39.366 32.9274 39.0924 33.0876Z"
-                            fill="#1D1D1B" />
-                          <path
-                            d="M25.8678 34.5114C27.4896 34.507 29.0477 35.1428 30.2034 36.2807C31.3591 37.4185 32.0191 38.9665 32.04 40.5882C32.094 43.9074 29.3256 46.7082 25.9452 46.7532C22.6026 46.8 19.8252 44.0532 19.7928 40.6674C19.7832 39.0458 20.4176 37.4867 21.5566 36.3325C22.6956 35.1783 24.2462 34.5233 25.8678 34.5114Z"
-                            fill="#1D1D1B" />
-                          <path
-                            d="M27.0954 36.675C28.2762 36.6444 29.5722 38.0484 29.4354 38.9736C29.3616 39.5028 29.0214 39.6936 28.5066 39.654C27.6426 39.5766 26.5554 38.4588 26.5266 37.5912C26.5212 37.0584 26.739 36.693 27.0954 36.675Z"
-                            fill="#FCFCFC" />
-                        </g>
-                        <defs>
-                          <clipPath id="clip0_1601_3429">
-                            <rect width="90" height="90" fill="white" />
-                          </clipPath>
-                        </defs>
-                      </svg>
-                    </div>
-                  </div>
-
+                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
+                    statistique.mediocre[0] }}</div>
+                  <p class="text-3xl font-medium leading-8 mt-6">400</p>
+                  <div class="text-base text-slate-500 mt-1">Observé</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- <pre>{{ allStats }}</pre> -->
         <!-- END: General Report -->
+
+        <!-- BEGIN: General Report -->
+        <div class="col-span-12 mt-8">
+          <div class="intro-y flex items-center h-10">
+            <h2 class="text-lg font-medium truncate mr-5">Principe Factuel</h2>
+            <a href="" class="ml-auto flex items-center text-primary">
+              <RefreshCcwIcon class="w-4 h-4 mr-3" /> Actualiser
+            </a>
+          </div>
+          <div class="grid grid-cols-12 gap-6 mt-5">
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+              <div class="report-box zoom-in">
+                <div class="box p-5">
+                  <div class="flex">
+                    <!-- <ShoppingCartIcon class="report-box__icon text-primary" /> -->
+                    <div class="ml-auto">
+                      <Tippy tag="div"
+                        class="_report-box__indicator bg-success cursor-pointer rounded-full text-white animate-pulse"
+                        content="100%">
+                        <CircleIcon class="w-6 h-6" />
+                      </Tippy>
+                    </div>
+                  </div>
+                  <div class="text-3xl font-medium leading-8 mt-6"
+                    v-if="statistique.passable && statistique.mediocre && statistique.excellent"> {{
+                      statistique.passable[0] + statistique.mediocre[0] +
+                      statistique.excellent[0] }}
+                  </div>
+                  <p class="text-3xl font-medium leading-8 mt-6">2040</p>
+                  <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+              <div class="report-box zoom-in">
+                <div class="box p-5">
+                  <div class="flex">
+                    <!-- <CreditCardIcon class="report-box__icon text-pending" /> -->
+                    <div v-if="statistique.excellent" class="ml-auto">
+                      <Tippy tag="div" class="report-box__indicator bg-danger cursor-pointer" content="">
+                        {{ statistique.excellent[1] }}
+                        <ChevronDownIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="ml-auto z-10 font-medium">
+                      <Tippy tag="div" class="report-box__indicator bg-red-600 text-black cursor-pointer" content="100%">
+                        100%
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="w-full bg-red-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                  </div>
+                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.excellent"> {{
+                    statistique.excellent[0] }} </div>
+                  <p class="text-3xl font-medium leading-8 mt-6">720</p>
+                  <div class="text-base text-slate-500 mt-1">Non Observé</div>
+                  <!-- <div class="flex justify-between  items-center mt-2">
+                  </div> -->
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+              <div class="report-box zoom-in">
+                <div class="box p-5">
+                  <div class="flex">
+                    <!-- <MonitorIcon class="report-box__icon text-warning" /> -->
+                    <div v-if="statistique.passable" class="ml-auto">
+                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                        {{ statistique.passable[1] }}
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="ml-auto z-10 font-medium">
+                      <Tippy tag="div" class="report-box__indicator bg-orange-500 cursor-pointer" content="100%">
+                        100%
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="w-full bg-orange-500 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                  </div>
+                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable"> {{
+                    statistique.passable[0] }} </div>
+                  <p class="text-3xl font-medium leading-8 mt-6">40</p>
+                  <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+              <div class="report-box zoom-in">
+                <div class="box p-5">
+                  <div class="flex">
+                    <!-- <UserIcon class="report-box__icon text-success" /> -->
+                    <div v-if="statistique.mediocre" class="ml-auto">
+                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                        {{ statistique.mediocre[1] }}
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="ml-auto z-10 font-medium">
+                      <Tippy tag="div" class="report-box__indicator bg-yellow-400 cursor-pointer" content="100%">
+                        100%
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="w-full bg-yellow-400 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                  </div>
+
+                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
+                    statistique.mediocre[0] }}</div>
+                  <p class="text-3xl font-medium leading-8 mt-6">440</p>
+                  <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+              <div class="report-box zoom-in">
+                <div class="box p-5">
+                  <div class="flex">
+                    <!-- <UserIcon class="report-box__icon text-success" /> -->
+                    <div v-if="statistique.mediocre" class="ml-auto">
+                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                        {{ statistique.mediocre[1] }}
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="ml-auto z-10">
+                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="100%">
+                        100%
+                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                      </Tippy>
+                    </div>
+                    <div class="w-full bg-success absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                  </div>
+
+                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
+                    statistique.mediocre[0] }}</div>
+                  <p class="text-3xl font-medium leading-8 mt-6">400</p>
+                  <div class="text-base text-slate-500 mt-1">Observé</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END: General Report -->
+
         <!-- BEGIN: Sales Report -->
 
         <!-- choix export excel -->
@@ -202,7 +319,7 @@
 
         <div class="col-span-12 lg:col-span-6 mt-8">
           <div class="intro-y block sm:flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Rapport Annuel des campagnes</h2>
+            <h2 class="text-lg font-medium truncate mr-5">Outil de Perception</h2>
             <div class="flex justify-center items-center ">
               <input class="mr-2" @click="isDisabled = !isDisabled" type="checkbox" name="multidate" id="multidate">
               <div class="sm:ml-auto mt-3 sm:mt-0 relative text-slate-500">
@@ -228,7 +345,7 @@
           <div class="intro-y box p-5 mt-12 sm:mt-5">
             <div class="flex justify-between space-x-1  ">
 
-              <div class="flex flex-col space-y-1 ">
+              <!-- <div class="flex flex-col space-y-1 ">
                 <div class="flex">
                   <span class="w-20">Code QR /C</span>
                   <span
@@ -251,7 +368,7 @@
                     {{ Tablette }}</span>
 
                 </div>
-              </div>
+              </div> -->
               <!-- bouton exporter -->
               <div>
                 <Dropdown :show="closeExport">
@@ -306,9 +423,9 @@
             </div>
 
             <div class="flex flex-col">
-              <div class="flex flex-wrap space-y-1 mt-2">
+              <div class="flex items-center flex-wrap gap-2 mt-2">
 
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
+                <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="btn btn-outline-secondary font-normal">
                     {{ selectedIndicateur.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
@@ -319,25 +436,226 @@
                         @click="choixIndicateur(indicateurOfCampagne)">
                         {{
                           indicateurOfCampagne.nom }}</DropdownItem>
-
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
+
+                <!-- <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="btn btn-outline-secondary font-normal">
                     {{ selectedType.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
                     <DropdownContent class="overflow-y-auto h-32">
-
                       <DropdownItem v-for="(type, index ) in types" :key="index" @click="choixtype(type)">{{
                         type.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown> -->
+
+                <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
+                    {{ selectedSite.name }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem v-for="(siteOfCampagne, index ) in siteOfCampagnes" :key="index"
+                        @click="choixSite(siteOfCampagne)">{{
+                          siteOfCampagne.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+
+                <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="truncate btn btn-outline-secondary font-normal">
+                    {{ selectedCampagne.name }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem class="truncate" v-for="(campagne, index ) in campagnes" :key="index"
+                        @click="choixCampagne(campagne)">
+                        {{
+                          campagne.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+
+                <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
+                    {{ selectedYear }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem v-for="(year, index ) in years" :key="index" @click="choixAnnee(year)">{{
+                        year }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+
+
+                <!-- <div class="flex">
+                  <div
+                    class="z-30 rounded-l w-12 flex items-center justify-center bg-gray-100 border text-gray-600 dark:bg-dark-1 dark:border-dark-4 -mr-1 p-1">
+                    Année
+                  </div>
+                  <TomSelect v-model="selectedYear" :options="{
+                    placeholder: 'Veuillez choisir une année',
+                  }" class="w-20">
+                    <option v-for="(year, index ) in years" :key="index" :value="year">{{ year }}</option>
+                  </TomSelect>
+
+                </div> -->
+              </div>
+              <p v-if="messageForUser" class="border text-right text-red-500 inline p-1 w-auto">Veuillez choisir une
+                campagne</p>
+            </div>
+            <div class="report-chart">
+              <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" />
+            </div>
+          </div>
+        </div>
+
+        <!-- graph 2 -->
+        <div class="col-span-12 lg:col-span-6 mt-8">
+          <div class="intro-y block sm:flex items-center h-10">
+            <h2 class="text-lg font-medium truncate mr-5">Outil Factuel</h2>
+            <div class="flex justify-center items-center ">
+              <input class="mr-2" @click="isDisabled = !isDisabled" type="checkbox" name="multidate" id="multidate">
+              <div class="sm:ml-auto mt-3 sm:mt-0 relative text-slate-500">
+                <CalendarIcon class="w-4 h-4 z-10 absolute my-auto inset-y-0 ml-3 left-0" />
+                <Litepicker :disabled="isDisabled" v-model="salesReportFilter" @update:modelValue="filterDate(a)"
+                  :options="{
+                    autoApply: false,
+                    singleMode: false,
+                    numberOfColumns: 2,
+                    numberOfMonths: 2,
+                    showWeekNumbers: true,
+                    dropdowns: {
+                      minYear: 1990,
+                      maxYear: null,
+                      months: true,
+                      years: true,
+                    },
+                  }" class="form-control sm:w-56 box pl-10" />
+              </div>
+            </div>
+
+          </div>
+          <div class="intro-y box p-5 mt-12 sm:mt-5">
+            <div class="flex justify-between space-x-1  ">
+
+              <!-- <div class="flex flex-col space-y-1 ">
+                <div class="flex">
+                  <span class="w-20">Code QR /C</span>
+                  <span
+                    class="text-xs px-1 rounded-full bg-green-500 text-white mr-1 flex items-center justify-center w-4 h-4 cursor-pointer">
+                    {{ Qr }}</span>
+
+                </div>
+                <div class="flex">
+                  <span class="w-20">Kit BSD /C</span>
+                  <span
+                    class="text-xs px-1 rounded-full flex items-center justify-center w-4 h-4 cursor-pointer bg-orange-300 text-white mr-1">
+                    {{ kits }}</span>
+
+                </div>
+                <div class="flex">
+                  <span class="w-20">Tablette /C</span>
+
+                  <span
+                    class="text-xs px-1 rounded-full bg-danger text-white mr-1 flex items-center justify-center w-4 h-4 cursor-pointer">
+                    {{ Tablette }}</span>
+
+                </div>
+              </div> -->
+              <!-- bouton exporter -->
+              <div>
+                <Dropdown :show="closeExport">
+                  <DropdownToggle class="btn btn-primary flex justify-evenly items-center space-x-1">
+                    <svg class="mr-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                      style="fill: rgba(255, 255, 255, 1);transform: ;msFilter:;">
+                      <path d="M11 16h2V7h3l-4-5-4 5h3z"></path>
+                      <path
+                        d="M5 22h14c1.103 0 2-.897 2-2v-9c0-1.103-.897-2-2-2h-4v2h4v9H5v-9h4V9H5c-1.103 0-2 .897-2 2v9c0 1.103.897 2 2 2z">
+                      </path>
+                    </svg>
+                    Exporter
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-48">
+                    <DropdownContent>
+
+                      <!-- exportation excel avec option -->
+                      <!-- @click="exportToExcel()" -->
+                      <DropdownItem @click="voirOptionExcel = true">
+
+                        <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                          style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                          <path
+                            d="M4 21h15.893c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zm0-2v-5h4v5H4zM14 7v5h-4V7h4zM8 7v5H4V7h4zm2 12v-5h4v5h-4zm6 0v-5h3.894v5H16zm3.893-7H16V7h3.893v5z">
+                          </path>
+                        </svg>
+
+                        Excel
+
+                      </DropdownItem>
+
+                      <!-- exportation pdf  -->
+                      <DropdownItem @click="generateReport()">
+                        <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                          style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                          <path
+                            d="M8.267 14.68c-.184 0-.308.018-.372.036v1.178c.076.018.171.023.302.023.479 0 .774-.242.774-.651 0-.366-.254-.586-.704-.586zm3.487.012c-.2 0-.33.018-.407.036v2.61c.077.018.201.018.313.018.817.006 1.349-.444 1.349-1.396.006-.83-.479-1.268-1.255-1.268z">
+                          </path>
+                          <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM9.498 16.19c-.309.29-.765.42-1.296.42a2.23 2.23 0 0 1-.308-.018v1.426H7v-3.936A7.558 7.558 0 0 1 8.219 14c.557 0 .953.106 1.22.319.254.202.426.533.426.923-.001.392-.131.723-.367.948zm3.807 1.355c-.42.349-1.059.515-1.84.515-.468 0-.799-.03-1.024-.06v-3.917A7.947 7.947 0 0 1 11.66 14c.757 0 1.249.136 1.633.426.415.308.675.799.675 1.504 0 .763-.279 1.29-.663 1.615zM17 14.77h-1.532v.911H16.9v.734h-1.432v1.604h-.906V14.03H17v.74zM14 9h-1V4l5 5h-4z">
+                          </path>
+                        </svg>
+                        Pdf
+                      </DropdownItem>
 
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
+              </div>
+              <!-- fin bouton exporter -->
+            </div>
+
+            <div class="flex flex-col">
+              <div class="flex items-center flex-wrap gap-2 mt-2">
+
+                <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="btn btn-outline-secondary font-normal">
+                    {{ selectedIndicateur.name }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem v-for="(indicateurOfCampagne, index ) in indicateurOfCampagnes" :key="index"
+                        @click="choixIndicateur(indicateurOfCampagne)">
+                        {{
+                          indicateurOfCampagne.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+
+                <!-- <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="btn btn-outline-secondary font-normal">
+                    {{ selectedType.name }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem v-for="(type, index ) in types" :key="index" @click="choixtype(type)">{{
+                        type.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown> -->
+
+                <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
                     {{ selectedSite.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
@@ -351,7 +669,7 @@
                   </DropdownMenu>
                 </Dropdown>
 
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
+                <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="truncate btn btn-outline-secondary font-normal">
                     {{ selectedCampagne.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
@@ -367,8 +685,7 @@
                   </DropdownMenu>
                 </Dropdown>
 
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
-
+                <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
                     {{ selectedYear }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
@@ -400,13 +717,14 @@
                 campagne</p>
             </div>
             <div class="report-chart">
-              <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" />
+              <!-- <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" /> -->
+              <ReportBarChart1 id="rapportAnnuel" :graphData="graphDataFac" :height="290" class="mt-6 -mb-6" />
             </div>
           </div>
         </div>
-        <!-- END: Sales Report -->
+
         <!-- BEGIN: Weekly Top Seller -->
-        <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
+        <!-- <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
           <div class="intro-y flex items-center h-10">
             <h2 class="text-lg font-medium truncate mr-5">Résolution</h2>
             <a href="http://localhost:3000/dashboard/resolution" class="ml-auto text-primary truncate">Voir plus</a>
@@ -434,10 +752,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- END: Weekly Top Seller -->
         <!-- BEGIN: Sales Report -->
-        <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
+        <!-- <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
           <div class="intro-y flex items-center h-10">
             <h2 class="text-lg font-medium truncate mr-5">Statistique journalier</h2>
             <a href="" class="ml-auto text-primary truncate">Voir plus</a>
@@ -464,7 +782,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- END: Sales Report -->
 
 
@@ -731,6 +1049,7 @@ import { ref, provide, reactive, onMounted, onBeforeMount, computed, watch } fro
 import ReportLineChart from "@/components/report-line-chart/Main.vue";
 import ReportDonutChart from "@/components/report-donut-chart/Main.vue";
 import ReportPieChart from "@/components/report-pie-chart/Main.vue";
+import ReportBarChart1 from "@/components/report-bar-chart-1/Main.vue";
 import SimpleLineChart1 from "@/components/simple-line-chart-1/Main.vue";
 import BsdService from "@/services/modules/bsd.service";
 import CampagneService from "@/services/modules/campagne.service";
@@ -773,6 +1092,7 @@ const showPicker = ref(false)
 const selectedYear = ref()
 const years = ref([])
 const graphData = ref({})
+const graphDataFac = ref({})
 const resolutionEncour = ref(0)
 const resolutionTerminer = ref(0)
 const resolutionEnretard = ref(0)
@@ -923,6 +1243,52 @@ graphData.value = {
     {
       label: "Excellent",
       data: [0, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+      borderWidth: 3,
+      borderColor: '#3AAA35',
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+  ],
+}
+
+graphDataFac.value = {
+  labels: [
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+  ],
+  datasets: [
+
+    {
+      markers: {
+        size: 0,
+      },
+
+
+
+      label: "Mediocre",
+      data: [0, 200, 250, 200, 700],
+      borderWidth: 3,
+      borderColor: '#F39200',
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+    {
+      label: "Passable",
+      data: [0, 300, 400, 560, 320],
+      borderWidth: 3,
+      borderColor: '#BE1622',
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+    {
+      label: "Excellent",
+      data: [0, 100, 100, 100, 100],
       borderWidth: 3,
       borderColor: '#3AAA35',
       backgroundColor: "transparent",
