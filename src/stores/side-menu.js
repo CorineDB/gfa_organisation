@@ -30,7 +30,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
       },
       {
         icon: "SettingsIcon",
-        pageName: "Tools",
+        pageName: "ToolsFactuel",
         title: "Outil Factuel",
       },
       {
