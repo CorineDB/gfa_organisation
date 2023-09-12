@@ -7,7 +7,8 @@ import Roles from "../views/dashboard/roles.vue";
 import Promotions from "../views/dashboard/promotions.vue";
 import Packs from "../views/dashboard/packs.vue";
 import Sites from "../views/dashboard/sites.vue";
-import Groupes from "../views/dashboard/groupes.vue";
+import Principes from "../views/dashboard/principes.vue";
+import Gouvernement from "../views/dashboard/gouvernement.vue";
 import Qr_Code from "../views/dashboard/qr_code.vue";
 import Api_client from "../views/dashboard/api_client.vue";
 import Campagnes from "../views/dashboard/campagnes.vue";
@@ -117,9 +118,14 @@ const routes = [
         component: Sites,
       },
       {
-        path: "groupes",
-        name: "Groupes",
-        component: Groupes,
+        path: "principes",
+        name: "Principes",
+        component: Principes,
+      },
+      {
+        path: "gouvernement",
+        name: "Gouvernement",
+        component: Gouvernement,
       },
       {
         path: "groupe/:id/indicateur",

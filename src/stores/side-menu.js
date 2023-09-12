@@ -25,8 +25,13 @@ export const useSideMenuStore = defineStore("sideMenu", {
       },
       {
         icon: "GlobeIcon",
-        pageName: "Groupes",
+        pageName: "Principes",
         title: "Principes",
+      },
+      {
+        icon: "GlobeIcon",
+        pageName: "Gouvernement",
+        title: "Gouvernement",
       },
       {
         icon: "SettingsIcon",

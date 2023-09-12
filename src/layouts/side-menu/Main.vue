@@ -166,6 +166,11 @@ const updatedMenu = () => {
         updateMenu.push(element);
       }
     }
+    else if (element.title == 'Gouvernement') {
+      if ($h.getPermission('read.indicateur') || $h.getPermission('write.indicateur')) {
+        updateMenu.push(element);
+      }
+    }
 
     else if (element.title == 'Outil Factuel') {
       if ($h.getPermission('read.indicateur') || $h.getPermission('write.indicateur')) {
