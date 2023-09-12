@@ -56,15 +56,15 @@
           <tbody>
             <tr class="border-b border-slate-300">
               <td class="font-medium p-2">Structure :</td>
-              <td>lvkdfnkvdf</td>
+              <td>Lorem ipsum dolor sit amet.</td>
             </tr>
             <tr class="border-b border-slate-300">
               <td class="font-medium p-2">Nom, Prénom et qualité du point focal Gouvernance :</td>
-              <td>lvkdfnkvdf</td>
+              <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
             </tr>
             <tr class="border-b border-slate-300">
               <td class="font-medium p-2">Date d’auto-évaluation :</td>
-              <td>lvkdfnkvdf</td>
+              <td>Lorem ipsum dolor sit.</td>
             </tr>
           </tbody>
         </table>
@@ -106,14 +106,15 @@
               <th scope="col" class="w-full p-2 text-white">Indicateurs</th>
               <th scope="col" class="p-2 text-white whitespace-nowrap">Réponse <br>(Oui / Non)</th>
               <th scope="col" class="p-2 text-white">Note</th>
+              <th scope="col" class="p-2 text-white whitespace-nowrap">Sources de vérification</th>
             </tr>
             <tr class="bg-white border-t-8 border-white">
-              <th class="p-2 my-2 bg-yellow-300 text-center" colspan="4">INDICE FACTUEL DE GOUVERNANCE</th>
-              <th class="p-2 bg-yellow-300">0.59</th>
+              <th class="p-2 my-2 bg-yellow-300 text-center" colspan="5">INDICE FACTUEL DE GOUVERNANCE</th>
+              <th class="p-2 bg-yellow-300 text-center">0.59</th>
             </tr>
             <tr class="bg-white border-t-8 border-white">
-              <th class="p-2 my-2 bg-yellow-300" colspan="4">Gouvernance politique</th>
-              <th class="p-2 bg-yellow-300">0.59</th>
+              <th class="p-2 my-2 bg-yellow-300" colspan="5">Gouvernance politique</th>
+              <th class="p-2 bg-yellow-300 text-center">0.59</th>
             </tr>
           </thead>
 
