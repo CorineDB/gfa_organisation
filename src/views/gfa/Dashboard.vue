@@ -319,7 +319,7 @@
 
         <div class="col-span-12 lg:col-span-6 mt-8">
           <div class="intro-y block sm:flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Rapport Annuel des campagnes</h2>
+            <h2 class="text-lg font-medium truncate mr-5">Outil de Perception</h2>
             <div class="flex justify-center items-center ">
               <input class="mr-2" @click="isDisabled = !isDisabled" type="checkbox" name="multidate" id="multidate">
               <div class="sm:ml-auto mt-3 sm:mt-0 relative text-slate-500">
@@ -345,7 +345,7 @@
           <div class="intro-y box p-5 mt-12 sm:mt-5">
             <div class="flex justify-between space-x-1  ">
 
-              <div class="flex flex-col space-y-1 ">
+              <!-- <div class="flex flex-col space-y-1 ">
                 <div class="flex">
                   <span class="w-20">Code QR /C</span>
                   <span
@@ -368,7 +368,7 @@
                     {{ Tablette }}</span>
 
                 </div>
-              </div>
+              </div> -->
               <!-- bouton exporter -->
               <div>
                 <Dropdown :show="closeExport">
@@ -423,9 +423,9 @@
             </div>
 
             <div class="flex flex-col">
-              <div class="flex flex-wrap space-y-1 mt-2">
+              <div class="flex items-center flex-wrap gap-2 mt-2">
 
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
+                <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="btn btn-outline-secondary font-normal">
                     {{ selectedIndicateur.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
@@ -436,25 +436,226 @@
                         @click="choixIndicateur(indicateurOfCampagne)">
                         {{
                           indicateurOfCampagne.nom }}</DropdownItem>
-
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
+
+                <!-- <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="btn btn-outline-secondary font-normal">
                     {{ selectedType.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
                     <DropdownContent class="overflow-y-auto h-32">
-
                       <DropdownItem v-for="(type, index ) in types" :key="index" @click="choixtype(type)">{{
                         type.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown> -->
+
+                <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
+                    {{ selectedSite.name }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem v-for="(siteOfCampagne, index ) in siteOfCampagnes" :key="index"
+                        @click="choixSite(siteOfCampagne)">{{
+                          siteOfCampagne.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+
+                <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="truncate btn btn-outline-secondary font-normal">
+                    {{ selectedCampagne.name }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem class="truncate" v-for="(campagne, index ) in campagnes" :key="index"
+                        @click="choixCampagne(campagne)">
+                        {{
+                          campagne.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+
+                <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
+                    {{ selectedYear }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem v-for="(year, index ) in years" :key="index" @click="choixAnnee(year)">{{
+                        year }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+
+
+                <!-- <div class="flex">
+                  <div
+                    class="z-30 rounded-l w-12 flex items-center justify-center bg-gray-100 border text-gray-600 dark:bg-dark-1 dark:border-dark-4 -mr-1 p-1">
+                    Année
+                  </div>
+                  <TomSelect v-model="selectedYear" :options="{
+                    placeholder: 'Veuillez choisir une année',
+                  }" class="w-20">
+                    <option v-for="(year, index ) in years" :key="index" :value="year">{{ year }}</option>
+                  </TomSelect>
+
+                </div> -->
+              </div>
+              <p v-if="messageForUser" class="border text-right text-red-500 inline p-1 w-auto">Veuillez choisir une
+                campagne</p>
+            </div>
+            <div class="report-chart">
+              <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" />
+            </div>
+          </div>
+        </div>
+
+        <!-- graph 2 -->
+        <div class="col-span-12 lg:col-span-6 mt-8">
+          <div class="intro-y block sm:flex items-center h-10">
+            <h2 class="text-lg font-medium truncate mr-5">Outil Factuel</h2>
+            <div class="flex justify-center items-center ">
+              <input class="mr-2" @click="isDisabled = !isDisabled" type="checkbox" name="multidate" id="multidate">
+              <div class="sm:ml-auto mt-3 sm:mt-0 relative text-slate-500">
+                <CalendarIcon class="w-4 h-4 z-10 absolute my-auto inset-y-0 ml-3 left-0" />
+                <Litepicker :disabled="isDisabled" v-model="salesReportFilter" @update:modelValue="filterDate(a)"
+                  :options="{
+                    autoApply: false,
+                    singleMode: false,
+                    numberOfColumns: 2,
+                    numberOfMonths: 2,
+                    showWeekNumbers: true,
+                    dropdowns: {
+                      minYear: 1990,
+                      maxYear: null,
+                      months: true,
+                      years: true,
+                    },
+                  }" class="form-control sm:w-56 box pl-10" />
+              </div>
+            </div>
+
+          </div>
+          <div class="intro-y box p-5 mt-12 sm:mt-5">
+            <div class="flex justify-between space-x-1  ">
+
+              <!-- <div class="flex flex-col space-y-1 ">
+                <div class="flex">
+                  <span class="w-20">Code QR /C</span>
+                  <span
+                    class="text-xs px-1 rounded-full bg-green-500 text-white mr-1 flex items-center justify-center w-4 h-4 cursor-pointer">
+                    {{ Qr }}</span>
+
+                </div>
+                <div class="flex">
+                  <span class="w-20">Kit BSD /C</span>
+                  <span
+                    class="text-xs px-1 rounded-full flex items-center justify-center w-4 h-4 cursor-pointer bg-orange-300 text-white mr-1">
+                    {{ kits }}</span>
+
+                </div>
+                <div class="flex">
+                  <span class="w-20">Tablette /C</span>
+
+                  <span
+                    class="text-xs px-1 rounded-full bg-danger text-white mr-1 flex items-center justify-center w-4 h-4 cursor-pointer">
+                    {{ Tablette }}</span>
+
+                </div>
+              </div> -->
+              <!-- bouton exporter -->
+              <div>
+                <Dropdown :show="closeExport">
+                  <DropdownToggle class="btn btn-primary flex justify-evenly items-center space-x-1">
+                    <svg class="mr-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                      style="fill: rgba(255, 255, 255, 1);transform: ;msFilter:;">
+                      <path d="M11 16h2V7h3l-4-5-4 5h3z"></path>
+                      <path
+                        d="M5 22h14c1.103 0 2-.897 2-2v-9c0-1.103-.897-2-2-2h-4v2h4v9H5v-9h4V9H5c-1.103 0-2 .897-2 2v9c0 1.103.897 2 2 2z">
+                      </path>
+                    </svg>
+                    Exporter
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-48">
+                    <DropdownContent>
+
+                      <!-- exportation excel avec option -->
+                      <!-- @click="exportToExcel()" -->
+                      <DropdownItem @click="voirOptionExcel = true">
+
+                        <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                          style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                          <path
+                            d="M4 21h15.893c1.103 0 2-.897 2-2V5c0-1.103-.897-2-2-2H4c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zm0-2v-5h4v5H4zM14 7v5h-4V7h4zM8 7v5H4V7h4zm2 12v-5h4v5h-4zm6 0v-5h3.894v5H16zm3.893-7H16V7h3.893v5z">
+                          </path>
+                        </svg>
+
+                        Excel
+
+                      </DropdownItem>
+
+                      <!-- exportation pdf  -->
+                      <DropdownItem @click="generateReport()">
+                        <svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                          style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;">
+                          <path
+                            d="M8.267 14.68c-.184 0-.308.018-.372.036v1.178c.076.018.171.023.302.023.479 0 .774-.242.774-.651 0-.366-.254-.586-.704-.586zm3.487.012c-.2 0-.33.018-.407.036v2.61c.077.018.201.018.313.018.817.006 1.349-.444 1.349-1.396.006-.83-.479-1.268-1.255-1.268z">
+                          </path>
+                          <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM9.498 16.19c-.309.29-.765.42-1.296.42a2.23 2.23 0 0 1-.308-.018v1.426H7v-3.936A7.558 7.558 0 0 1 8.219 14c.557 0 .953.106 1.22.319.254.202.426.533.426.923-.001.392-.131.723-.367.948zm3.807 1.355c-.42.349-1.059.515-1.84.515-.468 0-.799-.03-1.024-.06v-3.917A7.947 7.947 0 0 1 11.66 14c.757 0 1.249.136 1.633.426.415.308.675.799.675 1.504 0 .763-.279 1.29-.663 1.615zM17 14.77h-1.532v.911H16.9v.734h-1.432v1.604h-.906V14.03H17v.74zM14 9h-1V4l5 5h-4z">
+                          </path>
+                        </svg>
+                        Pdf
+                      </DropdownItem>
 
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
+              </div>
+              <!-- fin bouton exporter -->
+            </div>
+
+            <div class="flex flex-col">
+              <div class="flex items-center flex-wrap gap-2 mt-2">
+
+                <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="btn btn-outline-secondary font-normal">
+                    {{ selectedIndicateur.name }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem v-for="(indicateurOfCampagne, index ) in indicateurOfCampagnes" :key="index"
+                        @click="choixIndicateur(indicateurOfCampagne)">
+                        {{
+                          indicateurOfCampagne.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+
+                <!-- <Dropdown class="md:ml-auto md:mt-0">
+                  <DropdownToggle class="btn btn-outline-secondary font-normal">
+                    {{ selectedType.name }}
+                    <ChevronDownIcon class="w-4 h-4 ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent class="overflow-y-auto h-32">
+                      <DropdownItem v-for="(type, index ) in types" :key="index" @click="choixtype(type)">{{
+                        type.nom }}</DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown> -->
+
+                <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
                     {{ selectedSite.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
@@ -468,7 +669,7 @@
                   </DropdownMenu>
                 </Dropdown>
 
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
+                <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="truncate btn btn-outline-secondary font-normal">
                     {{ selectedCampagne.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
@@ -484,8 +685,7 @@
                   </DropdownMenu>
                 </Dropdown>
 
-                <Dropdown class="md:ml-auto mt-5 md:mt-0">
-
+                <Dropdown class="md:ml-auto md:mt-0">
                   <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
                     {{ selectedYear }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
@@ -517,13 +717,14 @@
                 campagne</p>
             </div>
             <div class="report-chart">
-              <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" />
+              <!-- <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" /> -->
+              <ReportBarChart1 id="rapportAnnuel" :graphData="graphDataFac" :height="290" class="mt-6 -mb-6" />
             </div>
           </div>
         </div>
-        <!-- END: Sales Report -->
+
         <!-- BEGIN: Weekly Top Seller -->
-        <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
+        <!-- <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
           <div class="intro-y flex items-center h-10">
             <h2 class="text-lg font-medium truncate mr-5">Résolution</h2>
             <a href="http://localhost:3000/dashboard/resolution" class="ml-auto text-primary truncate">Voir plus</a>
@@ -551,10 +752,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- END: Weekly Top Seller -->
         <!-- BEGIN: Sales Report -->
-        <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
+        <!-- <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
           <div class="intro-y flex items-center h-10">
             <h2 class="text-lg font-medium truncate mr-5">Statistique journalier</h2>
             <a href="" class="ml-auto text-primary truncate">Voir plus</a>
@@ -581,7 +782,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- END: Sales Report -->
 
 
@@ -848,6 +1049,7 @@ import { ref, provide, reactive, onMounted, onBeforeMount, computed, watch } fro
 import ReportLineChart from "@/components/report-line-chart/Main.vue";
 import ReportDonutChart from "@/components/report-donut-chart/Main.vue";
 import ReportPieChart from "@/components/report-pie-chart/Main.vue";
+import ReportBarChart1 from "@/components/report-bar-chart-1/Main.vue";
 import SimpleLineChart1 from "@/components/simple-line-chart-1/Main.vue";
 import BsdService from "@/services/modules/bsd.service";
 import CampagneService from "@/services/modules/campagne.service";
@@ -890,6 +1092,7 @@ const showPicker = ref(false)
 const selectedYear = ref()
 const years = ref([])
 const graphData = ref({})
+const graphDataFac = ref({})
 const resolutionEncour = ref(0)
 const resolutionTerminer = ref(0)
 const resolutionEnretard = ref(0)
@@ -1040,6 +1243,52 @@ graphData.value = {
     {
       label: "Excellent",
       data: [0, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+      borderWidth: 3,
+      borderColor: '#3AAA35',
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+  ],
+}
+
+graphDataFac.value = {
+  labels: [
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+  ],
+  datasets: [
+
+    {
+      markers: {
+        size: 0,
+      },
+
+
+
+      label: "Mediocre",
+      data: [0, 200, 250, 200, 700],
+      borderWidth: 3,
+      borderColor: '#F39200',
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+    {
+      label: "Passable",
+      data: [0, 300, 400, 560, 320],
+      borderWidth: 3,
+      borderColor: '#BE1622',
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+    {
+      label: "Excellent",
+      data: [0, 100, 100, 100, 100],
       borderWidth: 3,
       borderColor: '#3AAA35',
       backgroundColor: "transparent",
