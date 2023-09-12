@@ -38,10 +38,142 @@
     <!-- END: Modal Content -->
 
 
+
+
+
+
+
+
     <!-- BEGIN: Modal Content -->
-    <Modal :show="showModal" @hidden="close">
-      <ModalBody class="p-10 ">
-        <form v-if="!isUpdate" key="ajouter" @submit.prevent="storeGroupe">
+    <Modal size="modal-xxl" :show="showModal" @hidden="close">
+      <ModalBody class="lg:p-10 ">
+        <table class="border-collapse table-fixed w-full text-sm mt-12">
+          <tbody>
+            <tr class="border-b border-slate-300">
+              <td class="font-medium p-2">Structure :</td>
+              <td>lvkdfnkvdf</td>
+            </tr>
+            <tr class="border-b border-slate-300">
+              <td class="font-medium p-2">Nom, Prénom et qualité du point focal Gouvernance :</td>
+              <td>lvkdfnkvdf</td>
+            </tr>
+            <tr class="border-b border-slate-300">
+              <td class="font-medium p-2">Date d’auto-évaluation :</td>
+              <td>lvkdfnkvdf</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="border-collapse table-auto w-full text-sm mt-12">
+          <thead class="bg-green-200 text-left">
+            <th class="pl-2">Principe</th>
+            <th>Indice Factuel</th>
+          </thead>
+          <tbody>
+            <tr class="border-b border-slate-300">
+              <td class="font-medium p-2">Redevabilité</td>
+              <td>0.56</td>
+            </tr>
+            <tr class="border-b border-slate-300">
+              <td class="font-medium p-2">Transparence</td>
+              <td>0.56</td>
+            </tr>
+            <tr class="border-b border-slate-300">
+              <td class="font-medium p-2">Participation</td>
+              <td>0.56</td>
+            </tr>
+            <tr class="border-b border-slate-300">
+              <td class="font-medium p-2">Egalité et non-discrimination / inclusion</td>
+              <td>0.56</td>
+            </tr>
+            <tr class="border-b border-slate-300">
+              <td class="font-medium p-2">Efficacité et efficience</td>
+              <td>0.56</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="w-full table-auto border-collapse mt-12" border="0" cellpadding="0" cellspacing="0">
+          <thead class="bg-green-200 text-left">
+            <tr>
+              <th scope="col" class="p-2">Principes</th>
+              <th scope="col" class="p-2">Critères</th>
+              <th scope="col" class="w-full p-2">Indicateurs</th>
+              <th scope="col" class="p-2 whitespace-nowrap">Réponse <br>(Oui / Non)</th>
+              <th scope="col" class="p-2">Note</th>
+            </tr>
+            <tr class="bg-white border-t-8 border-white">
+              <th class="p-2 my-2 bg-yellow-300 text-center" colspan="4">INDICE FACTUEL DE GOUVERNANCE</th>
+              <th class="p-2 bg-yellow-300">0.59</th>
+            </tr>
+            <tr class="bg-white border-t-8 border-white">
+              <th class="p-2 my-2 bg-yellow-300" colspan="4">Gouvernance politique</th>
+              <th class="p-2 bg-yellow-300">0.59</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td class="p-2 font-bold bg-yellow-500" rowspan="5">Redevabilité</td>
+              <td class="p-2 bg-yellow-500" rowspan="4">Légitimité/légalité</td>
+              <td class="p-2 bg-green-600">Rôles et responsabilité clairement définis</td>
+              <td class="p-2 bg-green-600 text-center">1</td>
+              <td class="p-2 bg-green-600">10</td>
+            </tr>
+            <tr class="bg-red-600 text-white">
+              <td class="p-2 ">Organes statutaires fonctionnels</td>
+              <td class="p-2 text-center">2</td>
+              <td class="p-2">15</td>
+            </tr>
+            <tr class="bg-yellow-500">
+              <td class="p-2">Existence de statuts et règlement intérieur</td>
+              <td class="p-2 text-center">3</td>
+              <td class="p-2">6</td>
+            </tr>
+            <tr class="bg-green-500">
+              <td class="p-2">Rédaction et validation des rapports d’activités</td>
+              <td class="p-2 text-center">3</td>
+              <td class="p-2">6</td>
+            </tr>
+            <tr class=" bg-yellow-500 font-bold">
+              <td colspan="2" class="px-2"></td>
+              <td class="px-2 text-xs whitespace-nowrap">Score Factuel</td>
+              <td class="px-2">0.43</td>
+            </tr>
+            <!-- row 2 -->
+            <tr>
+              <td class="p-2 font-bold" rowspan="5">Redevabilité</td>
+              <td class="p-2" rowspan="4">Légitimité/légalité</td>
+              <td class="p-2">Rôles et responsabilité clairement définis</td>
+              <td class="p-2 text-center">1</td>
+              <td class="p-2">10</td>
+            </tr>
+            <tr>
+              <td class="p-2">Organes statutaires fonctionnels</td>
+              <td class="p-2 text-center">2</td>
+              <td class="p-2">15</td>
+            </tr>
+            <tr>
+              <td class="p-2">Existence de statuts et règlement intérieur</td>
+              <td class="p-2 text-center">3</td>
+              <td class="p-2">6</td>
+            </tr>
+            <tr>
+              <td class="p-2">Rédaction et validation des rapports d’activités</td>
+              <td class="p-2 text-center">3</td>
+              <td class="p-2">6</td>
+            </tr>
+            <tr class="subTotatlRow">
+              <td colspan="2" class="px-2 sub-total-text"> ->\ </td>
+              <td class="px-2 font-bold text-xs whitespace-nowrap">Score Factuel</td>
+              <td class="px-2">0.43</td>
+            </tr>
+
+          </tbody>
+        </table>
+
+
+        <!-- <form v-if="!isUpdate" key="ajouter" @submit.prevent="storeGroupe">
           <div class="my-2">
             <label for="regular-form-1" class="form-label">Structure</label>
             <input id="regular-form-1" type="text" required v-model="formData.nom" class="form-control"
@@ -67,11 +199,11 @@
               </svg>
             </span>
           </button>
-        </form>
+        </form> -->
 
-        <form v-else key="modifier" @submit.prevent="updateGroupe">
+        <!-- <form v-else key="modifier" @submit.prevent="updateGroupe">
           <div class="my-2">
-            <label for="regular-form-1" class="form-label">Structure</label>
+            <label for="regular-form-1" class="form-label">Structure affiche fiche</label>
             <input id="regular-form-1" type="text" required v-model="saveUpdate.nom" class="form-control"
               placeholder="libellé" />
           </div>
@@ -95,7 +227,7 @@
               </svg>
             </span>
           </button>
-        </form>
+        </form> -->
       </ModalBody>
     </Modal>
     <!-- END: Modal Content -->
@@ -112,8 +244,8 @@
       </div>
 
     </div>
-
     <!-- END: Modal Toggle -->
+
     <div class="overflow-x-auto mt-5">
       <table class="table mt-5">
         <thead class="table-light">
@@ -503,7 +635,55 @@ const voirIndicateur = function (index, id) {
 }
 const toBack = function () {
   router.go(-1)
-}
+};
+
 </script>
 
-<style lang="scss" scoped></style>
+<style>
+.modal-body {
+    padding: 0.50rem!important;
+}
+.modal.overflow-y-auto.show {
+ padding-left: 0%!important;
+}
+.modal.show>.modal-dialog {
+  width: 100%!important;
+}
+.modal.show>.modal-dialog.modal-dialog.modal-xxl {
+  margin-top: 1% !important;
+}
+
+@media (min-width: 1024px) {
+  .modal .modal-dialog.modal-xxl {
+    width: 100% !important;
+    height: 100%;
+  }
+}
+
+@media (min-width: 640px) {
+  .modal .modal-dialog.modal-xxl {
+    width: 100% !important;
+    height: 100%;
+  }
+}
+
+/* table {
+  width: 100%;
+  border-width: 0 0 1px 1px;
+  border-style: solid;
+  border-color: #b4b4b4;
+}  */
+
+/* table th {
+  background: #b4b4b4;
+  color: #fff;
+} */
+
+table td {
+  border-width: 1px 1px 0 0;
+  border-style: solid;
+  border-color: #111111;
+  padding: 3px 5px;
+}
+
+</style>
