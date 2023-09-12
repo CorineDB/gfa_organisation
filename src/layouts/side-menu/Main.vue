@@ -166,7 +166,7 @@ const updatedMenu = () => {
         updateMenu.push(element);
       }
     }
-    else if (element.title == 'Gouvernement') {
+    else if (element.title == 'Gouvernance') {
       if ($h.getPermission('read.indicateur') || $h.getPermission('write.indicateur')) {
         updateMenu.push(element);
       }

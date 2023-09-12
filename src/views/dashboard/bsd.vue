@@ -551,7 +551,6 @@
           placeholder="Recherche..." />
         <SearchIcon class="search__icon dark:text-slate-500" />
       </div>
-
     </div>
     <!-- END: Modal Toggle -->
     <div class="overflow-x-auto mt-5">
@@ -589,14 +588,19 @@
                 data.type.toUpperCase() }}</span>
             </td>
 
-            <td class="text-center" v-if="data.type.toLowerCase() == 'qr'">
+            <td class="text-center space-y-3" v-if="data.type.toLowerCase() == 'qr'">
               <a target="_blank" class="text-blue-600" :href="FRONT_BASE_URL + 'voter/' + data.code">{{ data.code }} </a>
+
               <button type="button" @click="showQRCodeModal(data.code)"
                 class="btn btn-elevated-danger py-1 px-1 w-full my-1  xl:mr-1 align-top">
                 Générer QR Code
               </button>
+
               <a target="_blank" class="text-blue-600" :href="FRONT_BASE_URL + 'voter/' + data.code">
-                {{ FRONT_BASE_URL }}voter/{{ data.code }}</a>
+                {{ FRONT_BASE_URL }}voter/{{ data.code }}</a> <br/>
+
+              <a target="_blank" class="text-blue-600" :href="FRONT_BASE_URL + 'formulaireFactuel/' + data.code">
+                {{ FRONT_BASE_URL }}formulaireFactuel/{{ data.code }}</a>
               <img :src="data.qrCode" alt="QR Code" v-if="data.qrCode">
             </td>
             <td class="text-center" v-else> <a>{{ data.code }}</a></td>
@@ -1487,4 +1491,5 @@ input::-o-inner-spin-button,
 input::-o-outer-spin-button {
   -o-appearance: none;
   margin: 0
-}</style>
+}
+</style>

@@ -8,7 +8,7 @@ import Promotions from "../views/dashboard/promotions.vue";
 import Packs from "../views/dashboard/packs.vue";
 import Sites from "../views/dashboard/sites.vue";
 import Principes from "../views/dashboard/principes.vue";
-import Gouvernement from "../views/dashboard/gouvernement.vue";
+import Gouvernance from "../views/dashboard/gouvernement.vue";
 import Qr_Code from "../views/dashboard/qr_code.vue";
 import Api_client from "../views/dashboard/api_client.vue";
 import Campagnes from "../views/dashboard/campagnes.vue";
@@ -16,6 +16,8 @@ import Tarifications from "../views/dashboard/tarifications.vue";
 import CampagnesByBsd from "../views/dashboard/campagne-bsd.vue";
 import Resolution from "../views/dashboard/resolution.vue";
 import Indicateurs from "../views/dashboard/indicateurs.vue";
+import Principe from "../views/dashboard/principe.vue";
+import Critere from "../views/dashboard/critere.vue";
 import Utilisateur from "../views/dashboard/utilisateur.vue";
 import Login from "../views/login/Main.vue";
 import ResetPassword from "../views/reset-password/Main.vue"
@@ -26,6 +28,7 @@ import ErrorPage from "../views/error-page/Main.vue";
 import ProgramationRapport from "../views/dashboard/programmation_rapport.vue";
 import { Indent, QrCode } from "lucide-vue-next";
 import Voter from "../views/voter/voter.vue"
+import FormulaireFactuel from "../views/voter/formulaireFactuel.vue"
 import ToolsFactuel from "../views/gfa/ToolsFactuel.vue";
 import ToolsPerception from "../views/gfa/ToolsPerception.vue";
 import FicheFactuel from "../views/gfa/FicheFactuel.vue";
@@ -133,9 +136,19 @@ const routes = [
         component: Principes,
       },
       {
-        path: "gouvernement",
-        name: "Gouvernement",
-        component: Gouvernement,
+        path: "gouvernance",
+        name: "Gouvernance",
+        component: Gouvernance,
+      },
+      {
+        path: "gouvernance/:id/principe",
+        name: "Principe",
+        component: Principe,
+      },
+      {
+        path: "gouvernance/:id/principe/:id/critere",
+        name: "Critere",
+        component: Critere,
       },
       {
         path: "groupe/:id/indicateur",
@@ -177,6 +190,11 @@ const routes = [
     path: "/voter/:code",
     name: "Voter",
     component: Voter,
+  },
+  {
+    path: "/formulaireFactuel/:code",
+    name: "FormulaireFactuel",
+    component: FormulaireFactuel,
   },
   {
     path: "/ok/:code/ok",
