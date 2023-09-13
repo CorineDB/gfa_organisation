@@ -1,5 +1,4 @@
 <template>
-  
   <div class="flex items-center mt-4">
 
     <h2 class="text-lg font-medium mr-5 whitespace-nowrap">Filtre :</h2>
@@ -51,7 +50,7 @@
       </Dropdown>
     </div>
   </div>
-  
+
   <div class="grid grid-cols-12 gap-6">
     <div class="col-span-12">
       <div class="grid grid-cols-12 gap-6">
@@ -71,18 +70,21 @@
                   <div class="flex">
                     <div class="ml-auto z-10 font-medium">
                       <Tippy tag="div"
-                        class="_report-box__indicator bg-success cursor-pointer rounded-full text-white animate-pulse"
+                        class="_report-box__indicator bg-green-600 cursor-pointer rounded-full text-white animate-pulse"
                         content="100%">
                         <CircleIcon class="w-6 h-6" />
                       </Tippy>
                     </div>
                   </div>
-                  <div class="text-3xl font-medium leading-8 mt-6"
-                    v-if="statistique.passable && statistique.mediocre && statistique.excellent"> {{
-                      statistique.passable[0] + statistique.mediocre[0] +
-                      statistique.excellent[0] }}
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 "
+                      v-if="statistique.passable && statistique.mediocre && statistique.excellent"> {{
+                        statistique.passable[0] + statistique.mediocre[0] +
+                        statistique.excellent[0] }}
+                    </div>
+
+                    <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
                   </div>
-                  <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
                 </div>
               </div>
             </div>
@@ -91,17 +93,19 @@
                 <div class="box p-5 min-card-height">
                   <div class="flex">
                     <div v-if="statistique.excellent" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-danger cursor-pointer" content="">
+                      <Tippy tag="div" class="report-box__indicator bg-red-600 cursor-pointer" content="">
                         {{ statistique.excellent[1] }}
-                        <ChevronDownIcon class="w-4 h-4 ml-0.5" />
+                        <!-- <ChevronDownIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
                     </div>
                     <div class="w-full bg-red-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
-                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.excellent"> {{
-                    statistique.excellent[0] }} </div>
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 " v-if="statistique.excellent"> {{
+                      statistique.excellent[0] }} </div>
 
-                  <div class="text-base text-slate-500 mt-1">Non Observé</div>
+                    <div class="text-base text-slate-500 mt-1">Non Observé</div>
+                  </div>
 
                 </div>
               </div>
@@ -113,17 +117,20 @@
                   <div class="flex">
 
                     <div v-if="statistique.passable" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                      <Tippy tag="div" class="report-box__indicator bg-red-800 cursor-pointer" content="">
                         {{ statistique.passable[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                        <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
                     </div>
 
-                    <div class="w-full bg-orange-500 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                    <div class="w-full bg-red-800 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
-                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable"> {{
-                    statistique.passable[0] }} </div>
-                  <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 " v-if="statistique.passable"> {{
+                      statistique.passable[0] }} </div>
+
+                    <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -133,19 +140,22 @@
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
                     <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                      <Tippy tag="div" class="report-box__indicator bg-yellow-500 cursor-pointer" content="">
                         {{ statistique.mediocre[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                        <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
                     </div>
 
-                    <div class="w-full bg-yellow-400 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                    <div class="w-full bg-yellow-500 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
 
-                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
-                    statistique.mediocre[0] }}</div>
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 " v-if="statistique.mediocre"> {{
+                      statistique.mediocre[0] }}</div>
 
-                  <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
+
+                    <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -155,18 +165,21 @@
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
                     <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                      <Tippy tag="div" class="report-box__indicator bg-green-600 cursor-pointer" content="">
                         {{ statistique.mediocre[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                        <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
                     </div>
-                    <div class="w-full bg-success absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                    <div class="w-full bg-green-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
 
-                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
-                    statistique.mediocre[0] }}</div>
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 " v-if="statistique.mediocre"> {{
+                      statistique.mediocre[0] }}</div>
 
-                  <div class="text-base text-slate-500 mt-1">Observé</div>
+
+                    <div class="text-base text-slate-500 mt-1">Observé</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -189,18 +202,21 @@
                   <div class="flex">
                     <div class="ml-auto z-10 font-medium">
                       <Tippy tag="div"
-                        class="_report-box__indicator bg-success cursor-pointer rounded-full text-white animate-pulse"
+                        class="_report-box__indicator bg-green-600 cursor-pointer rounded-full text-white animate-pulse"
                         content="100%">
                         <CircleIcon class="w-6 h-6" />
                       </Tippy>
                     </div>
                   </div>
-                  <div class="text-3xl font-medium leading-8 mt-6"
-                    v-if="statistique.passable && statistique.mediocre && statistique.excellent"> {{
-                      statistique.passable[0] + statistique.mediocre[0] +
-                      statistique.excellent[0] }}
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 "
+                      v-if="statistique.passable && statistique.mediocre && statistique.excellent"> {{
+                        statistique.passable[0] + statistique.mediocre[0] +
+                        statistique.excellent[0] }}
+                    </div>
+
+                    <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
                   </div>
-                  <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
                 </div>
               </div>
             </div>
@@ -209,17 +225,20 @@
                 <div class="box p-5 min-card-height">
                   <div class="flex">
                     <div v-if="statistique.excellent" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-danger cursor-pointer" content="">
+                      <Tippy tag="div" class="report-box__indicator bg-red-600 cursor-pointer" content="">
                         {{ statistique.excellent[1] }}
-                        <ChevronDownIcon class="w-4 h-4 ml-0.5" />
+                        <!-- <ChevronDownIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
                     </div>
                     <div class="w-full bg-red-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
-                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.excellent"> {{
-                    statistique.excellent[0] }} </div>
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 " v-if="statistique.excellent"> {{
+                      statistique.excellent[0] }} </div>
 
-                  <div class="text-base text-slate-500 mt-1">Non Observé</div>
+
+                    <div class="text-base text-slate-500 mt-1">Non Observé</div>
+                  </div>
 
                 </div>
               </div>
@@ -231,17 +250,20 @@
                   <div class="flex">
 
                     <div v-if="statistique.passable" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                      <Tippy tag="div" class="report-box__indicator bg-red-800 cursor-pointer" content="">
                         {{ statistique.passable[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                        <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
                     </div>
 
-                    <div class="w-full bg-orange-500 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                    <div class="w-full bg-red-800 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
-                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable"> {{
-                    statistique.passable[0] }} </div>
-                  <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 " v-if="statistique.passable"> {{
+                      statistique.passable[0] }}
+                    </div>
+                    <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -251,19 +273,22 @@
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
                     <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                      <Tippy tag="div" class="report-box__indicator bg-yellow-500 cursor-pointer" content="">
                         {{ statistique.mediocre[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                        <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
                     </div>
 
-                    <div class="w-full bg-yellow-400 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                    <div class="w-full bg-yellow-500 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
 
-                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
-                    statistique.mediocre[0] }}</div>
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 " v-if="statistique.mediocre"> {{
+                      statistique.mediocre[0] }}</div>
 
-                  <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
+
+                    <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -272,18 +297,21 @@
                 <div class="box p-5 min-card-height">
                   <div class="flex">
                     <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
+                      <Tippy tag="div" class="report-box__indicator bg-green-600 cursor-pointer" content="">
                         {{ statistique.mediocre[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
+                        <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
                     </div>
-                    <div class="w-full bg-success absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
+                    <div class="w-full bg-green-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
 
-                  <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
-                    statistique.mediocre[0] }}</div>
+                  <div class="min-h-[62px] flex flex-col items-start justify-end">
+                    <div class="text-3xl font-medium leading-8 mt-6 " v-if="statistique.mediocre"> {{
+                      statistique.mediocre[0] }}</div>
 
-                  <div class="text-base text-slate-500 mt-1">Observé</div>
+
+                    <div class="text-base text-slate-500 mt-1">Observé</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1652,4 +1680,8 @@ function generateReport() {
 .min-card-height {
   min-height: 100px;
 }
-</style>
+
+.report-box .report-box__indicator {
+  padding-right: 0.7rem !important;
+  padding-left: 0.7rem !important;
+}</style>
