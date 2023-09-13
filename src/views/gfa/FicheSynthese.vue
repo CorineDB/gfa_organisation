@@ -221,6 +221,49 @@
               </tbody>
             </table>
 
+            <h2 class="text-lg font-medium mr-5 py-4">Indice de Gouvernace</h2>
+
+            <table class="w-full table-auto border-collapse mb-12" cellpadding="0" cellspacing="0">
+              <thead class="bg-blue-900 text-left">
+                <tr class="bg-slate-600 text-white border-t border-white">
+                  <th class="p-2 text-left" _colspan="11">Principes</th>
+                  <th class="p-2 text-center">Indice de Perception</th>
+                  <th class="p-2 text-center">Indice Synthétique</th>
+                </tr>
+              </thead>
+
+              <tbody class=" bg-white">
+                <tr class=" bg-blue-900 text-white border-t-8 border-white font-bold">
+                  <td class="px-2 " colspan="12">Gouvernance politique</td>
+                </tr>
+                <tr class="border-l-2 border-b pb-2">
+                  <td class="px-4 py-1 bg-sky-500 font-medium">Redevabilité</td>
+                  <td class="p-2 text-center">0.8</td>
+                  <td class="p-2 text-center">0.15</td>
+                </tr>
+
+                <tr class="border-l-2 border-b pb-2">
+                  <td class="px-4 py-1 bg-sky-500 font-medium">Transparence</td>
+                  <td class="p-2 text-center">0.8</td>
+                  <td class="p-2 text-center">0.15</td>
+                </tr>
+
+                <tr class="border-l-2 border-b pb-2">
+                  <td class="px-4 py-1 bg-sky-500 font-medium">Participation</td>
+                  <td class="p-2 text-center">0.8</td>
+                  <td class="p-2 text-center">0.15</td>
+                </tr>
+
+                <tr class="border-l-2 border-b pb-2">
+                  <td class="px-4 py-1 bg-sky-500 font-medium">Egalité et non-discrimination / inclusion</td>
+                  <td class="p-2 text-center">0.8</td>
+                  <td class="p-2 text-center">0.15</td>
+                </tr>
+              </tbody>
+            </table>
+
+
+
           </TabPanel>
         </TabPanels>
       </TabGroup>

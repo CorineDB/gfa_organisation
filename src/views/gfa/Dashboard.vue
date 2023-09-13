@@ -1,7 +1,61 @@
 <template>
+  
+  <div class="flex items-center mt-4">
+
+    <h2 class="text-lg font-medium mr-5 whitespace-nowrap">Filtre :</h2>
+    <div class="w-full flex items-center gap-2">
+
+      <Dropdown class="md:ml-auto md:mt-0 w-full">
+        <DropdownToggle class="btn btn-outline-secondary font-normal w-full text-left">
+          {{ selectedIndicateur.name }}
+          <ChevronDownIcon class="w-4 h-4 ml-2" />
+        </DropdownToggle>
+        <DropdownMenu class="w-40">
+          <DropdownContent class="overflow-y-auto h-32">
+            <DropdownItem v-for="(indicateurOfCampagne, index ) in indicateurOfCampagnes" :key="index"
+              @click="choixIndicateur(indicateurOfCampagne)">
+              {{
+                indicateurOfCampagne.nom }}</DropdownItem>
+          </DropdownContent>
+        </DropdownMenu>
+      </Dropdown>
+
+      <Dropdown class="md:ml-auto md:mt-0 w-full">
+        <DropdownToggle class="btn btn-outline-secondary font-normal w-full text-left">
+          {{ selectedIndicateur.name }}
+          <ChevronDownIcon class="w-4 h-4 ml-2" />
+        </DropdownToggle>
+        <DropdownMenu class="w-40">
+          <DropdownContent class="overflow-y-auto h-32">
+            <DropdownItem v-for="(indicateurOfCampagne, index ) in indicateurOfCampagnes" :key="index"
+              @click="choixIndicateur(indicateurOfCampagne)">
+              {{
+                indicateurOfCampagne.nom }}</DropdownItem>
+          </DropdownContent>
+        </DropdownMenu>
+      </Dropdown>
+
+      <Dropdown class="md:ml-auto md:mt-0 w-full">
+        <DropdownToggle class="btn btn-outline-secondary font-normal w-full text-left">
+          {{ selectedIndicateur.name }}
+          <ChevronDownIcon class="w-4 h-4 ml-2" />
+        </DropdownToggle>
+        <DropdownMenu class="w-40">
+          <DropdownContent class="overflow-y-auto h-32">
+            <DropdownItem v-for="(indicateurOfCampagne, index ) in indicateurOfCampagnes" :key="index"
+              @click="choixIndicateur(indicateurOfCampagne)">
+              {{
+                indicateurOfCampagne.nom }}</DropdownItem>
+          </DropdownContent>
+        </DropdownMenu>
+      </Dropdown>
+    </div>
+  </div>
+  
   <div class="grid grid-cols-12 gap-6">
     <div class="col-span-12">
       <div class="grid grid-cols-12 gap-6">
+
         <!-- BEGIN: General Report -->
         <div class="col-span-12 mt-8">
           <div class="intro-y flex items-center h-10">
@@ -10,13 +64,12 @@
               <RefreshCcwIcon class="w-4 h-4 mr-3" /> Actualiser
             </a>
           </div>
-          <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+          <div class="grid grid-cols-12 lg:grid-cols-10 gap-6 mt-5">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
-                    <!-- <ShoppingCartIcon class="report-box__icon text-primary" /> -->
-                    <div class="ml-auto">
+                    <div class="ml-auto z-10 font-medium">
                       <Tippy tag="div"
                         class="_report-box__indicator bg-success cursor-pointer rounded-full text-white animate-pulse"
                         content="100%">
@@ -29,107 +82,81 @@
                       statistique.passable[0] + statistique.mediocre[0] +
                       statistique.excellent[0] }}
                   </div>
-                  <p class="text-3xl font-medium leading-8 mt-6">2040</p>
                   <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
-                    <!-- <CreditCardIcon class="report-box__icon text-pending" /> -->
-                    <div v-if="statistique.excellent" class="ml-auto">
+                    <div v-if="statistique.excellent" class="ml-auto z-10 font-medium">
                       <Tippy tag="div" class="report-box__indicator bg-danger cursor-pointer" content="">
                         {{ statistique.excellent[1] }}
                         <ChevronDownIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
-                    <div class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-red-600 text-black cursor-pointer" content="100%">
-                        100%
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
                     <div class="w-full bg-red-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.excellent"> {{
                     statistique.excellent[0] }} </div>
-                  <p class="text-3xl font-medium leading-8 mt-6">720</p>
+
                   <div class="text-base text-slate-500 mt-1">Non Observé</div>
-                  <!-- <div class="flex justify-between  items-center mt-2">
-                  </div> -->
+
                 </div>
               </div>
             </div>
 
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
-                    <!-- <MonitorIcon class="report-box__icon text-warning" /> -->
-                    <div v-if="statistique.passable" class="ml-auto">
+
+                    <div v-if="statistique.passable" class="ml-auto z-10 font-medium">
                       <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
                         {{ statistique.passable[1] }}
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
-                    <div class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-orange-500 cursor-pointer" content="100%">
-                        100%
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
+
                     <div class="w-full bg-orange-500 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable"> {{
                     statistique.passable[0] }} </div>
-                  <p class="text-3xl font-medium leading-8 mt-6">40</p>
                   <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
-                    <div v-if="statistique.mediocre" class="ml-auto">
+                    <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
                       <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
                         {{ statistique.mediocre[1] }}
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
-                    <div class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-yellow-400 cursor-pointer" content="100%">
-                        100%
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
+
                     <div class="w-full bg-yellow-400 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
 
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
                     statistique.mediocre[0] }}</div>
-                  <p class="text-3xl font-medium leading-8 mt-6">440</p>
+
                   <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
-                    <div v-if="statistique.mediocre" class="ml-auto">
+                    <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
                       <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
                         {{ statistique.mediocre[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
-                    <div class="ml-auto z-10">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="100%">
-                        100%
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
@@ -138,7 +165,7 @@
 
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
                     statistique.mediocre[0] }}</div>
-                  <p class="text-3xl font-medium leading-8 mt-6">400</p>
+
                   <div class="text-base text-slate-500 mt-1">Observé</div>
                 </div>
               </div>
@@ -155,13 +182,12 @@
               <RefreshCcwIcon class="w-4 h-4 mr-3" /> Actualiser
             </a>
           </div>
-          <div class="grid grid-cols-12 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+          <div class="grid grid-cols-12 lg:grid-cols-10 gap-6 mt-5">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
-                    <!-- <ShoppingCartIcon class="report-box__icon text-primary" /> -->
-                    <div class="ml-auto">
+                    <div class="ml-auto z-10 font-medium">
                       <Tippy tag="div"
                         class="_report-box__indicator bg-success cursor-pointer rounded-full text-white animate-pulse"
                         content="100%">
@@ -174,107 +200,80 @@
                       statistique.passable[0] + statistique.mediocre[0] +
                       statistique.excellent[0] }}
                   </div>
-                  <p class="text-3xl font-medium leading-8 mt-6">2040</p>
                   <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
-                    <!-- <CreditCardIcon class="report-box__icon text-pending" /> -->
-                    <div v-if="statistique.excellent" class="ml-auto">
+                    <div v-if="statistique.excellent" class="ml-auto z-10 font-medium">
                       <Tippy tag="div" class="report-box__indicator bg-danger cursor-pointer" content="">
                         {{ statistique.excellent[1] }}
                         <ChevronDownIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
-                    <div class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-red-600 text-black cursor-pointer" content="100%">
-                        100%
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
                     <div class="w-full bg-red-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.excellent"> {{
                     statistique.excellent[0] }} </div>
-                  <p class="text-3xl font-medium leading-8 mt-6">720</p>
+
                   <div class="text-base text-slate-500 mt-1">Non Observé</div>
-                  <!-- <div class="flex justify-between  items-center mt-2">
-                  </div> -->
+
                 </div>
               </div>
             </div>
 
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
-                    <!-- <MonitorIcon class="report-box__icon text-warning" /> -->
-                    <div v-if="statistique.passable" class="ml-auto">
+
+                    <div v-if="statistique.passable" class="ml-auto z-10 font-medium">
                       <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
                         {{ statistique.passable[1] }}
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
-                    <div class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-orange-500 cursor-pointer" content="100%">
-                        100%
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
+
                     <div class="w-full bg-orange-500 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable"> {{
                     statistique.passable[0] }} </div>
-                  <p class="text-3xl font-medium leading-8 mt-6">40</p>
                   <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
-                    <div v-if="statistique.mediocre" class="ml-auto">
+                    <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
                       <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
                         {{ statistique.mediocre[1] }}
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
-                    <div class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-yellow-400 cursor-pointer" content="100%">
-                        100%
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
+
                     <div class="w-full bg-yellow-400 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
 
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
                     statistique.mediocre[0] }}</div>
-                  <p class="text-3xl font-medium leading-8 mt-6">440</p>
+
                   <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 xl:col-span-3 intro-y relative">
+            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
               <div class="report-box zoom-in">
-                <div class="box p-5">
+                <div class="box p-5 min-card-height">
                   <div class="flex">
-                    <!-- <UserIcon class="report-box__icon text-success" /> -->
-                    <div v-if="statistique.mediocre" class="ml-auto">
+                    <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
                       <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="">
                         {{ statistique.mediocre[1] }}
-                        <ChevronUpIcon class="w-4 h-4 ml-0.5" />
-                      </Tippy>
-                    </div>
-                    <div class="ml-auto z-10">
-                      <Tippy tag="div" class="report-box__indicator bg-success cursor-pointer" content="100%">
-                        100%
                         <ChevronUpIcon class="w-4 h-4 ml-0.5" />
                       </Tippy>
                     </div>
@@ -283,7 +282,7 @@
 
                   <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre"> {{
                     statistique.mediocre[0] }}</div>
-                  <p class="text-3xl font-medium leading-8 mt-6">400</p>
+
                   <div class="text-base text-slate-500 mt-1">Observé</div>
                 </div>
               </div>
@@ -1649,4 +1648,8 @@ function generateReport() {
 }
 
 .mediocre {}
+
+.min-card-height {
+  min-height: 100px;
+}
 </style>
