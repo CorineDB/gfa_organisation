@@ -8,6 +8,7 @@ import Promotions from "../views/dashboard/promotions.vue";
 import Packs from "../views/dashboard/packs.vue";
 import Sites from "../views/dashboard/sites.vue";
 import Principes from "../views/dashboard/principes.vue";
+import CHOIX from "../views/dashboard/choix.vue";
 import Gouvernance from "../views/dashboard/gouvernement.vue";
 import Qr_Code from "../views/dashboard/qr_code.vue";
 import Api_client from "../views/dashboard/api_client.vue";
@@ -146,6 +147,11 @@ const routes = [
         path: "principes",
         name: "Principes",
         component: Principes,
+      },
+      {
+        path: "choix",
+        name: "CHOIX",
+        component: CHOIX,
       },
       {
         path: "gouvernance",

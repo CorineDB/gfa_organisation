@@ -19,7 +19,7 @@
       <ModalBody class="p-0">
         <div class="p-5 text-center">
           <XCircleIcon class="w-16 h-16 text-danger mx-auto mt-3" />
-          <div class="text-3xl mt-5">Vous etes sur de supprimer {{ deleteData.nom }} ?</div>
+          <div class="text-3xl mt-5">Vous etes sur supprimer {{ deleteData.nom }} ?</div>
           <div class="text-slate-500 mt-2">
             Cette operation est irreverssible ? <br />Cliquer
             sur annuler pour annuler l'operation
@@ -29,7 +29,7 @@
           <button type="button" @click="deleteModalPreview = false" class="btn btn-outline-secondary w-24 mr-1">
             Annuler
           </button>
-          <button type="button" @click="deleteIndicateur" class="btn btn-danger w-24">
+          <button type="button" @click="deleteGroupe" class="btn btn-danger w-24">
             Supprimer
           </button>
         </div>
@@ -41,47 +41,16 @@
     <!-- BEGIN: Modal Content -->
     <Modal :show="showModal" @hidden="close">
       <ModalBody class="p-10 ">
-        <form v-if="!isUpdate" key="ajouter" @submit.prevent="storeIndicateur">
+        <form v-if="!isUpdate" key="ajouter" @submit.prevent="storeGroupe">
           <div class="my-2">
             <label for="regular-form-1" class="form-label">Nom</label>
             <input id="regular-form-1" type="text" required v-model="formData.nom" class="form-control"
-              placeholder="libellé de l'indicateur" />
+              placeholder="libellé du groupe" />
           </div>
           <div class="my-2">
             <label for="regular-form-1" class="form-label"> Description </label>
             <input id="regular-form-1" type="text" required v-model="formData.description" class="form-control"
               placeholder="Description" />
-          </div>
-          <div class="my-2">
-            <label for="regular-form-1" class="form-label">Outils </label>
-            <TomSelect v-model="formData.outil" :options="{ placeholder: 'Selectionez un groupe' }" class="w-full">
-              <option value="">Veuillez choisir un outil</option>
-              <option :value="true">Perception</option>
-              <option :value="false">Factuel</option>
-            </TomSelect>
-
-          </div>
-          <div class="my-2">
-            <label for="regular-form-1" class="form-label">Type de réponse</label>
-            <TomSelect v-model="formData.multipleAns" :options="{ placeholder: 'Selectionez un groupe' }" class="w-full">
-              <option value="">Veuillez choisir un type de réponse</option>
-              <option :value="true">Multiple</option>
-              <option :value="false">Unique</option>
-            </TomSelect>
-
-          </div>
-          <div class="my-2">
-            <label for="regular-form-1" class="form-label">Type de réponse</label>
-            <TomSelect v-model="formData.typeAns" :options="{ placeholder: 'Selectionez un groupe' }" class="w-full">
-              <option value="">Veuillez choisir un type de réponse</option>
-              <option value="boolean"> Vrai/Faux</option>
-              <option value="checkbox">Réponse multiple</option>
-              <option value="feedBack">Commentaire</option>
-              <option value="list">List</option>
-              <option value="rate">Vote</option>
-              <option value="image">Image</option>
-              <option value="text">Text</option>
-            </TomSelect>
           </div>
           <button class="btn btn-primary py-3 px-4 w-full my-3  xl:mr-3 align-top">
             <span class="text-sm font-semibold uppercase" v-if="!chargement">
@@ -100,7 +69,7 @@
           </button>
         </form>
 
-        <form v-else key="modifier" @submit.prevent="updateIndicateur">
+        <form v-else key="modifier" @submit.prevent="updateGroupe">
           <div class="my-2">
             <label for="regular-form-1" class="form-label">Nom</label>
             <input id="regular-form-1" type="text" required v-model="saveUpdate.nom" class="form-control"
@@ -111,17 +80,6 @@
             <input id="regular-form-1" type="text" required v-model="saveUpdate.description" class="form-control"
               placeholder="description" />
           </div>
-
-          <div class="my-2">
-            <label for="regular-form-1" class="form-label">Groupes </label>
-
-            <TomSelect v-model="saveUpdate.groupeId" :options="{ placeholder: 'Selectionez un groupe' }" class="w-full">
-              <option :value="saveUpdate.promotionId"> {{ saveUpdate.groupeNom }} </option>
-              <option v-for="(groupe, index) in groupes" :key="index" :value="groupe.id">{{ groupe.nom }}</option>
-            </TomSelect>
-
-          </div>
-
           <button class="btn btn-primary py-3 px-4 w-full my-3  xl:mr-3 align-top">
             <span class="text-sm font-semibold uppercase" v-if="!chargement">
               modifier
@@ -143,7 +101,7 @@
     <!-- END: Modal Content -->
     <!-- BEGIN: Modal Toggle -->
     <div class=" flex justify-between ">
-      <button @click="addIndicateur" class="btn btn-primary flex space-x-2 items-center">
+      <button @click="addGroupe" class="btn btn-primary flex space-x-2 items-center">
         <PlusSquareIcon />
         <span class="uppercase font-semibold"> ajouter</span>
       </button>
@@ -154,14 +112,7 @@
       </div>
 
     </div>
-    <div class="my-4 flex justify-between items-center ">
-      <span class="text-xl uppercase font-bold">indicateurs {{ groupe }} </span>
-      <button @click="toBack"
-        class="bg-indigo-500 text-white rounded-lg font-semibold px-3 py-2 outline-none flex space-x-2 items-center">
-        <CornerUpLeftIcon />
-        <span class="uppercase font-semibold">Critères</span>
-      </button>
-    </div>
+
     <!-- END: Modal Toggle -->
     <div class="overflow-x-auto mt-5">
       <table class="table mt-5">
@@ -170,13 +121,8 @@
             <th class="whitespace-nowrap">#</th>
             <th class="whitespace-nowrap">Nom </th>
             <th class="whitespace-nowrap">Description </th>
-            <th class="whitespace-nowrap">Outils </th>
-            <th class="whitespace-nowrap">Choix multiple</th>
-            <th class="whitespace-nowrap">Source de véfification</th>
-            <th class="whitespace-nowrap">Type de réponse</th>
-            <th class="whitespace-nowrap">Date creation</th>
-            <th class="whitespace-nowrap">Date mise à jours</th>
-            <th class="whitespace-nowrap">Actions</th>
+
+            <th v-if="$h.getPermission('write.indicateur')" class="whitespace-nowrap">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -184,32 +130,86 @@
             <td> {{ index + 1 }} </td>
             <td>{{ data.nom }}</td>
             <td>{{ data.description }}</td>
-            <td>
-              <span v-if="data.justifyAns == 0">Perception </span>
-              <span v-else> Factuel </span>
-            </td>
-            <td>
-              <span v-if="data.multipleAns == 0">Non </span>
-              <span v-else> Oui </span>
-            </td>
-            <td>
-              <span v-if="data.justifyAns == 0">Non </span>
-              <span v-else> Oui </span>
-            </td>
-            <td>{{ data.typeAns }}</td>
-            <td> {{ data.created_at }} </td>
-            <td> {{ data.updated_at }}</td>
-            <td class="flex space-x-2 items-center">
-              <Tippy tag="a" href="javascript:;" class="tooltip " content="cliquez pour modifier">
-                <span @click="modifier(index, data)" class="text-blue-500 cursor-pointer">
-                  <EditIcon />
-                </span>
-              </Tippy>
-              <Tippy tag="a" href="javascript:;" class="tooltip " content="cliquez pour supprimer">
-                <span @click="supprimer(index, data)" class="text-red-500 cursor-pointer">
-                  <Trash2Icon />
-                </span>
-              </Tippy>
+            <!-- <td> {{ data.created_at }} </td>
+            <td> {{ data.updated_at }}</td> -->
+            <td v-if="$h.getPermission('write.indicateur')" class="flex space-x-2 items-center">
+
+
+              <Dropdown class="inline-block" placement="top-end">
+                <DropdownToggle class="mr-1">
+                  <AlignJustifyIcon />
+                </DropdownToggle>
+                <DropdownMenu class="w-40">
+                  <DropdownContent>
+                    <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2" content="cliquez pour modifier">
+                      <span @click="modifier(index, data)"
+                        class="text-black cursor-pointer flex justify-start items-center">
+                        <EditIcon class="mr-2" />Modifier
+                      </span>
+                    </Tippy>
+                    <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2" content="cliquez pour supprimer">
+                      <span @click="supprimer(index, data)"
+                        class="text-black cursor-pointer flex justify-start items-center">
+                        <Trash2Icon class="mr-2" />Supprimer
+                      </span>
+                    </Tippy>
+
+                    <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2"
+                      content="cliquez pour ajouter ou voir les indicateurs">
+                      <span @click="voirIndicateur(index, data.id)"
+                        class="text-black cursor-pointer flex justify-start items-center"><svg
+                          xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="feather feather-plus-circle mr-2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <line x1="12" y1="8" x2="12" y2="16"></line>
+                          <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>Ajouter Indicateur</span>
+                    </Tippy>
+                    <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2"
+                      content="cliquez pour voir les stats de ce indicateur">
+                      <span class="text-black cursor-pointer flex justify-start items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="feather feather-trending-up mr-2">
+                          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                          <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>Voir Stats</span>
+                    </Tippy>
+                    <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2"
+                      content="cliquez pour exporter les stats de ce indicateur">
+                      <span class="text-black cursor-pointer flex justify-start items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="feather feather-upload mr-2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>Exporter</span>
+                    </Tippy>
+                  </DropdownContent>
+                </DropdownMenu>
+              </Dropdown>
+
+
+              <div class="text-center">
+                <InfoIcon href="javascript:;" :name="'custom-tooltip-content' + index" class="tooltip" />
+              </div>
+              <!-- END: Custom Tooltip Toggle -->
+              <!-- BEGIN: Custom Tooltip Content -->
+              <div class="tooltip-content">
+                <TippyContent :to="'custom-tooltip-content' + index">
+                  <div :id="'custom-content-tooltip' + index" class="relative">
+                    <div class="my-1">
+                      Date de création : {{ data.created_at }}
+                    </div>
+                    <div class="my-1">
+                      Date de mise à jour : {{ data.updated_at }}
+                    </div>
+
+                  </div>
+                </TippyContent>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -295,20 +295,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, provide, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router'
-import IndicateurService from "@/services/modules/indicateur.service";
-import GroupeService from "@/services/modules/groupe.service";
+import { ref, reactive, onMounted, provide, computed } from 'vue'; import { helper as $h } from "@/utils/helper";
 
+import { useRouter, useRoute } from 'vue-router'
+import GroupeService from "@/services/modules/groupe.service";
 
 const router = useRouter()
 const route = useRoute()
 const showModal = ref(false)
 const deleteModalPreview = ref(false)
 const successNotification = ref();
-const groupe = ref('')
 const search = ref('')
-const indicateurs = ref([])
 const groupes = ref([])
 const deleteData = reactive({})
 const saveUpdate = reactive({})
@@ -318,11 +315,7 @@ const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const formData = reactive({
   nom: '',
-  description: '',
-  critere_id: '',
-  multipleAns: Boolean,
-  outil: '',
-  typeAns: ''
+  description: ''
 })
 
 const message = reactive({
@@ -332,45 +325,48 @@ const message = reactive({
 
 const resultQuery = computed(() => {
   if (search.value) {
-    return indicateurs.value.filter((item) => {
+    return groupes.value.filter((item) => {
       return search.value.toLowerCase().split(' ').every(v => item.nom.toLowerCase().includes(v)) ||
         search.value.toLowerCase().split(' ').every(v => item.description.toString().toLowerCase().includes(v)) ||
         search.value.toLowerCase().split(' ').every(v => item.created_at.toLowerCase().includes(v))
     })
   } else {
-
-    // return indicateurs.value;
+    // return groupes.value;
 
     const startIndex = (currentPage.value - 1) * itemsPerPage.value;
     const endIndex = startIndex + itemsPerPage.value;
-    return indicateurs.value.slice(startIndex, endIndex);
+    return groupes.value.slice(startIndex, endIndex);
   }
 })
 
 onMounted(function () {
 
-  getData()
+  if (!$h.getPermission('read.indicateur')) {
+    router.push('/error-page')
+  }
 
-  // getGroupe()
+  getData()
 })
 
 const getData = function () {
-  IndicateurService.get(route.params.id).then((data) => {
-    indicateurs.value = data.data.data
-    // groupe.value = indicateurs.value[0].groupe.nom
+  GroupeService.getGroupeByEntreprise().then((data) => {
+    groupes.value = data.data.data
   }).catch((e) => {
     // disabled()
     alert(e)
   })
 }
-// const getGroupe = function () {
-//   GroupeService.getGroupeByEntreprise().then((data) => {
-//     groupes.value = data.data.data
-//   }).catch((e) => {
-//     // disabled()
-//     alert(e)
-//   })
-// }
+
+function totalPages() {
+  return Math.ceil(groupes.value.length / itemsPerPage.value);
+}
+
+const goToPage = (pageNumber) => {
+  if (pageNumber < 1 || pageNumber > totalPages()) {
+    return;
+  }
+  currentPage.value = pageNumber;
+}
 function close() {
   formData.nom = ''
   formData.description = ''
@@ -388,36 +384,18 @@ const successNotificationToggle = () => {
 };
 
 
-const addIndicateur = function () {
+const addGroupe = function () {
   showModal.value = true
   isUpdate.value = false
 }
 
-function totalPages() {
-  return Math.ceil(indicateurs.value.length / itemsPerPage.value);
-}
 
-const goToPage = (pageNumber) => {
-  if (pageNumber < 1 || pageNumber > totalPages()) {
-    return;
-  }
-  currentPage.value = pageNumber;
-}
-
-
-const storeIndicateur = function () {
-
-
-
+const storeGroupe = function () {
   if (chargement.value == false) {
     chargement.value = true
-    formData.critere_id = route.params.id
-
-    console.log(formData)
-
-    IndicateurService.create(formData).then((data) => {
+    GroupeService.create(formData).then((data) => {
       message.type = 'success'
-      message.message = 'Nouveaux indicateur créee'
+      message.message = 'Nouveaux groupe créee'
       successNotificationToggle()
       close()
       getData()
@@ -447,10 +425,11 @@ const supprimer = function (index, data) {
   deleteData.nom = data.nom
   deleteData.index = index
 }
-const deleteIndicateur = function () {
+
+const deleteGroupe = function () {
   deleteModalPreview.value = false
-  indicateurs.value.splice(indicateurs.value.indexOf(deleteData.index), 1);
-  IndicateurService.destroy(deleteData.id).then((data) => {
+  groupes.value.splice(groupes.value.indexOf(deleteData.index), 1);
+  GroupeService.destroy(deleteData.id).then((data) => {
     message.type = 'success'
     message.message = 'Operation éffectué avec success'
     successNotificationToggle()
@@ -473,26 +452,20 @@ const deleteIndicateur = function () {
 }
 
 const modifier = function (index, data) {
-
-  console.log(data)
-
   saveUpdate.nom = data.nom
   saveUpdate.description = data.description
   saveUpdate.id = data.id
-  saveUpdate.groupeId = data.critere.id
-  saveUpdate.critereNom = data.critere.nom
   showModal.value = true
   isUpdate.value = true
 }
-const updateIndicateur = function () {
+const updateGroupe = function () {
   if (chargement.value == false) {
     chargement.value = true
     const formData = {
       nom: saveUpdate.nom,
-      description: saveUpdate.description,
-      groupeId: saveUpdate.groupeId
+      description: saveUpdate.description
     }
-    IndicateurService.update(saveUpdate.id, formData).then((data) => {
+    GroupeService.update(saveUpdate.id, formData).then((data) => {
       chargement.value = false
       message.type = 'success'
       message.message = 'Mise à jours éffectué avec succèss'
@@ -517,6 +490,9 @@ const updateIndicateur = function () {
       }
     })
   }
+}
+const voirIndicateur = function (index, id) {
+  router.push({ name: 'Indicateurs', params: { id: id } })
 }
 const toBack = function () {
   router.go(-1)

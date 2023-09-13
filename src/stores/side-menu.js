@@ -23,11 +23,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
         pageName: "Campagnes",
         title: "Campagne",
       },
-      {
-        icon: "GiftIcon",
-        pageName: "Api Client",
-        title: "API Client",
-      },
+    
       {
         icon: "GlobeIcon",
         pageName: "Principes",
@@ -39,50 +35,49 @@ export const useSideMenuStore = defineStore("sideMenu", {
         title: "Gouvernance",
       },
       {
+        icon: "GlobeIcon",
+        pageName:"CHOIX",
+        title: "Choix",
+      },
+      {
         icon: "SettingsIcon",
-        pageName: "ToolsFactuel",
+        pageName:"ToolsFactuel",
         title: "Outil Factuel",
       },
       {
         icon: "SettingsIcon",
-        pageName: "ToolsPerception",
+        pageName:"ToolsPerception",
         title: "Outil de Perception",
       },
       {
         icon: "FileIcon",
-        pageName: "FicheSynthese",
+        pageName:"FicheSynthese",
         title: "Fiche de Synthèse",
       },
       {
         icon: "WatchIcon",
-        pageName: "ProgrammationRapport",
+        pageName:"ProgrammationRapport",
         title: "Programmation des Rapports",
       },
       {
         icon: "LinkIcon",
-        pageName: "Sites",
+        pageName:"Sites",
         title: "Sites",
-      },
-      {
-        icon: "MehIcon",
-        pageName: "Feedback",
-        title: "Feedbacks",
-      },
-       
+      },    
       {
         icon: "CodepenIcon",
-        pageName: "Resolution",
+        pageName:"Resolution",
         title: "Resolution",
       },
 
       {
         icon: "UnlockIcon",
-        pageName: "Roles",
+        pageName:"Roles",
         title: "Roles & Permissions",
       },
       {
         icon: "UsersIcon",
-        pageName: "Utilisateur",
+        pageName:"Utilisateur",
         title: "Utilisateurs",
       },
 
