@@ -1,3 +1,9 @@
+<script setup>
+
+
+
+</script>
+
 <template>
   <!-- BEGIN: Boxed Tab -->
   <PreviewComponent class="intro-y _box mt-5">
@@ -11,8 +17,92 @@
 
           <TabPanel class="leading-relaxed">
 
+
+            <div class="w-full bg-blue-900 text-white text-center p-4 font-bold rounded">
+              FICHE SYNTHESE SCORE FACTUEL GOUVERNANCE
+            </div>
+
+            <table class="border-collapse table-fixed w-full text-sm mt-12">
+              <tbody>
+                <tr class="border-b border-slate-300 bg-slate-300 rounded-sm">
+                  <td class="font-medium p-2">Structure :</td>
+                  <td>
+                    <TomSelect v-model="select" :options="{
+                      placeholder: 'Sélectionner la structure',
+                    }" class="w-full">
+                      <option value="1">Leonardo DiCaprio</option>
+                      <option value="2">Johnny Deep</option>
+                      <option value="3">Robert Downey, Jr</option>
+                      <option value="4">Samuel L. Jackson</option>
+                      <option value="5">Morgan Freeman</option>
+                    </TomSelect>
+                    <!-- <div class="">
+                      <TomSelect id="crud-form-2" v-model="categories" class="w-full" multiple>
+                        <option value="1">Sport & Outdoor</option>
+                        <option value="2">PC & Laptop</option>
+                        <option value="3">Smartphone & Tablet</option>
+                        <option value="4">Photography</option>
+                      </TomSelect>
+                    </div> -->
+                    <!-- <Dropdown class="md:ml-auto md:mt-0 w-full">
+                      <DropdownToggle class="btn btn-outline-secondary font-normal w-full text-left">
+                        {{ selectedIndicateur.name }}
+                        <ChevronDownIcon class="w-4 h-4 ml-2" />
+                      </DropdownToggle>
+                      <DropdownMenu class="w-40">
+                        <DropdownContent class="overflow-y-auto h-32">
+                          <DropdownItem v-for="(indicateurOfCampagne, index ) in indicateurOfCampagnes" :key="index"
+                            @click="choixIndicateur(indicateurOfCampagne)">
+                            {{
+                              indicateurOfCampagne.nom }}</DropdownItem>
+                        </DropdownContent>
+                      </DropdownMenu>
+                    </Dropdown> -->
+                  </td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Nom, Prénom et qualité du point focal Gouvernance :</td>
+                  <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Date d’auto-évaluation :</td>
+                  <td>Lorem ipsum dolor sit.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table class="border-collapse table-auto w-full text-sm mt-12">
+              <thead class="bg-green-200 text-left">
+                <th class="pl-2">Principe</th>
+                <th>Indice Factuel</th>
+              </thead>
+              <tbody>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Redevabilité</td>
+                  <td>0.56</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Transparence</td>
+                  <td>0.56</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Participation</td>
+                  <td>0.56</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Egalité et non-discrimination / inclusion</td>
+                  <td>0.56</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Efficacité et efficience</td>
+                  <td>0.56</td>
+                </tr>
+              </tbody>
+            </table>
+
+
             <!-- Figure 3 : Grille de notation des indicateurs de la gouvernance politique -->
-            <table class="w-full table-auto border-collapse mb-12" cellpadding="0" cellspacing="0">
+            <table class="w-full table-auto border-collapse my-12" cellpadding="0" cellspacing="0">
               <thead class="bg-blue-900 text-left">
                 <tr class="">
                   <th class="p-2 my-2 bg-yellow-300" _colspan="5">Indice factuel de Gouvernance politique (IFGP)</th>
@@ -70,57 +160,7 @@
               </tbody>
             </table>
 
-            <div class="w-full bg-blue-900 text-white text-center p-4 font-bold rounded">
-              FICHE SYNTHESE SCORE FACTUEL GOUVERNANCE
-            </div>
-
-            <table class="border-collapse table-fixed w-full text-sm mt-12">
-              <tbody>
-                <tr class="border-b border-slate-300">
-                  <td class="font-medium p-2">Structure :</td>
-                  <td>Lorem ipsum dolor sit amet.</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="font-medium p-2">Nom, Prénom et qualité du point focal Gouvernance :</td>
-                  <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="font-medium p-2">Date d’auto-évaluation :</td>
-                  <td>Lorem ipsum dolor sit.</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <table class="border-collapse table-auto w-full text-sm mt-12">
-              <thead class="bg-green-200 text-left">
-                <th class="pl-2">Principe</th>
-                <th>Indice Factuel</th>
-              </thead>
-              <tbody>
-                <tr class="border-b border-slate-300">
-                  <td class="font-medium p-2">Redevabilité</td>
-                  <td>0.56</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="font-medium p-2">Transparence</td>
-                  <td>0.56</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="font-medium p-2">Participation</td>
-                  <td>0.56</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="font-medium p-2">Egalité et non-discrimination / inclusion</td>
-                  <td>0.56</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="font-medium p-2">Efficacité et efficience</td>
-                  <td>0.56</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <table class="w-full table-auto border-collapse mt-12" border="0" cellpadding="0" cellspacing="0">
+            <!-- <table class="w-full table-auto border-collapse mt-12" border="0" cellpadding="0" cellspacing="0">
               <thead class="bg-blue-900 text-left">
                 <tr>
                   <th scope="col" class="p-2 text-white">Principes</th>
@@ -168,11 +208,9 @@
                   <td class="px-2 text-xs whitespace-nowrap">Score Factuel</td>
                   <td class="px-2">0.43</td>
                 </tr>
-                <!-- row 2 -->
-
 
               </tbody>
-            </table>
+            </table> -->
 
           </TabPanel>
           <!-- tab 2 -->
@@ -317,7 +355,3 @@
   </PreviewComponent>
   <!-- END: Boxed Tab -->
 </template>
-
-<script setup>
-
-</script>
