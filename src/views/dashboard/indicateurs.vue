@@ -51,7 +51,7 @@
             </TomSelect>
           </div>
           <div class="my-2">
-            <label for="regular-form-1" class="form-label">Nombres de réponse</label>
+            <label for="regular-form-1" class="form-label">Nombres de choix sumultané</label>
             <TomSelect v-model="formData.multipleAns" :options="{ placeholder: 'Selectionez un groupe' }" class="w-full">
               <option value="">Veuillez choisir un type de réponse</option>
               <option :value="true">Plusieurs</option>
@@ -71,14 +71,11 @@
               <option value="text">Text</option>
             </TomSelect>
           </div>
-           <div class="my-2">
+          <div class="my-2">
             <label for="regular-form-1" class="form-label">Choix</label>
-            <TomSelect v-model="formData.choises" multiple  :options="{ placeholder: 'Selectionez un groupe' }" class="w-full">
-              <option v-for="(element, index) in choix" :key="index" :value="element.id">{{ element.nom }}
-                <option value=""> Rajouter des choix </option>
-              </option>
+            <TomSelect v-model="formData.choises" multiple :options="{ placeholder: 'Selectionez un groupe' }" class="w-full">
+              <option v-for="(element, index) in choix" :key="index" :value="element.id">{{ element.nom }}</option>
             </TomSelect>
-
           </div>
           <button class="btn btn-primary py-3 px-4 w-full my-3 xl:mr-3 align-top">
             <span class="text-sm font-semibold uppercase" v-if="!chargement"> Ajouter </span>
@@ -99,18 +96,6 @@
           <div class="my-2">
             <label for="regular-form-1" class="form-label">Description</label>
             <input id="regular-form-1" type="text" required v-model="saveUpdate.description" class="form-control" placeholder="description" />
-          </div>
-
-          <div class="my-2">
-            <label for="regular-form-1" class="form-label">Choix</label>
-            <TomSelect v-model="saveUpdate.choises" :options="{ placeholder: 'Selectionez un groupe' }" class="w-full">
-              <option :value="saveUpdate.promotionId">
-                {{ saveUpdate.groupeNom }}
-              </option>
-              <option v-for="(groupe, index) in groupes" :key="index" :value="groupe.id">
-                {{ groupe.nom }}
-              </option>
-            </TomSelect>
           </div>
 
           <button class="btn btn-primary py-3 px-4 w-full my-3 xl:mr-3 align-top">
@@ -156,6 +141,7 @@
             <th class="whitespace-nowrap">Choix multiple</th>
             <th class="whitespace-nowrap">Source de véfification</th>
             <th class="whitespace-nowrap">Type de réponse</th>
+            <th class="whitespace-nowrap">Liste des Choix</th>
             <th class="whitespace-nowrap">Date creation</th>
             <th class="whitespace-nowrap">Date mise à jours</th>
             <th class="whitespace-nowrap">Actions</th>
@@ -181,6 +167,11 @@
             <td>{{ data.typeAns }}</td>
             <td>{{ data.created_at }}</td>
             <td>{{ data.updated_at }}</td>
+            <td>
+              <div v-for="e in data.choises" class="inline-block p-1">
+                {{ e.nom }}
+              </div>
+            </td>
             <td class="flex space-x-2 items-center">
               <Tippy tag="a" href="javascript:;" class="tooltip" content="cliquez pour modifier">
                 <span @click="modifier(index, data)" class="text-blue-500 cursor-pointer">
@@ -271,8 +262,8 @@ const formData = reactive({
   multipleAns: Boolean,
   outil: "",
   typeAns: "",
-  poid:'',
-  choises : []
+  poid: "",
+  choises: [],
 });
 
 const message = reactive({
@@ -280,7 +271,7 @@ const message = reactive({
   message: "",
 });
 
-const choix = ref([])
+const choix = ref([]);
 const getChoix = function () {
   ChoixService.get()
     .then((data) => {
@@ -321,7 +312,7 @@ const resultQuery = computed(() => {
 
 onMounted(function () {
   getData();
-  getChoix()
+  getChoix();
 });
 
 const getData = function () {
