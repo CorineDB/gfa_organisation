@@ -45,7 +45,7 @@
 
 
     <!-- BEGIN: Modal Content -->
-    <Modal size="modal-xxl" :show="showModal" @hidden="close">
+    <Modal size="modal-xl" :show="showModal" @hidden="close" id="modxxl">
       <ModalBody class="lg:p-10 ">
 
         <div class="w-full bg-blue-900 text-white text-center p-4 font-bold rounded">
@@ -589,32 +589,32 @@ const toBack = function () {
 
 </script>
 
-<style scoped>
-.modal-body {
+<style>
+#modxxl>.modal-body {
   padding: 0.50rem !important;
 }
 
-.modal.overflow-y-auto.show {
+#modxxl>.modal.overflow-y-auto.show {
   padding-left: 0% !important;
 }
 
-.modal.show>.modal-dialog {
+#modxxl>.modal.show>.modal-dialog {
   width: 100% !important;
 }
 
-.modal.show>.modal-dialog.modal-dialog.modal-xxl {
+#modxxl> .modal.show>.modal-dialog.modal-dialog {
   margin-top: 1% !important;
 }
 
 @media (min-width: 1024px) {
-  .modal .modal-dialog.modal-xxl {
+  #modxxl>.modal .modal-dialog {
     width: 100% !important;
     height: 100%;
   }
 }
 
 @media (min-width: 640px) {
-  .modal .modal-dialog.modal-xxl {
+  #modxxl>.modal .modal-dialog {
     width: 100% !important;
     height: 100%;
   }

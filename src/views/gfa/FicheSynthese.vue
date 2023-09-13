@@ -70,62 +70,107 @@
               </tbody>
             </table>
 
-            <!-- Figure 3 : Grille de notation des indicateurs de la gouvernance politique -->
-            <table class="w-full table-auto border-collapse mb-12" cellpadding="0" cellspacing="0">
+            <div class="w-full bg-blue-900 text-white text-center p-4 font-bold rounded">
+              FICHE SYNTHESE SCORE FACTUEL GOUVERNANCE
+            </div>
+
+            <table class="border-collapse table-fixed w-full text-sm mt-12">
+              <tbody>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Structure :</td>
+                  <td>Lorem ipsum dolor sit amet.</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Nom, Prénom et qualité du point focal Gouvernance :</td>
+                  <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Date d’auto-évaluation :</td>
+                  <td>Lorem ipsum dolor sit.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table class="border-collapse table-auto w-full text-sm mt-12">
+              <thead class="bg-green-200 text-left">
+                <th class="pl-2">Principe</th>
+                <th>Indice Factuel</th>
+              </thead>
+              <tbody>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Redevabilité</td>
+                  <td>0.56</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Transparence</td>
+                  <td>0.56</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Participation</td>
+                  <td>0.56</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Egalité et non-discrimination / inclusion</td>
+                  <td>0.56</td>
+                </tr>
+                <tr class="border-b border-slate-300">
+                  <td class="font-medium p-2">Efficacité et efficience</td>
+                  <td>0.56</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table class="w-full table-auto border-collapse mt-12" border="0" cellpadding="0" cellspacing="0">
               <thead class="bg-blue-900 text-left">
-                <tr class="">
-                  <th class="p-2 my-2 bg-yellow-300" _colspan="5">Indice factuel de Gouvernance politique (IFGP)</th>
+                <tr>
+                  <th scope="col" class="p-2 text-white">Principes</th>
+                  <th scope="col" class="p-2 text-white">Critères</th>
+                  <th scope="col" class="w-full p-2 text-white">Indicateurs</th>
+                  <th scope="col" class="p-2 text-white whitespace-nowrap">Réponse <br>(Oui / Non)</th>
+                  <th scope="col" class="p-2 text-white">Note</th>
+                  <th scope="col" class="p-2 text-white whitespace-nowrap">Sources de vérification</th>
+                </tr>
+                <tr class="bg-white border-t-8 border-white">
+                  <th class="p-2 my-2 bg-yellow-300 text-center" colspan="5">INDICE FACTUEL DE GOUVERNANCE</th>
                   <th class="p-2 bg-yellow-300 text-center">0.59</th>
                 </tr>
-                <!-- <tr class=" bg-slate-200 border-t-8 border-white">
-                  <th class="p-2 my-2" _colspan="5">Score Factuel Redevabilité</th>
-                  <th class="p-2 text-center">0.59</th>
-                </tr> -->
+                <tr class="bg-white border-t-8 border-white">
+                  <th class="p-2 my-2 bg-yellow-300" colspan="5">Gouvernance politique</th>
+                  <th class="p-2 bg-yellow-300 text-center">0.59</th>
+                </tr>
               </thead>
 
-              <tbody class=" bg-white">
-                <tr class=" bg-slate-200 border-t-8 border-white font-bold">
-                  <td class="p-2">Score Factuel Redevabilité</td>
-                  <td class="p-2 text-center">0.59</td>
+              <tbody>
+                <tr>
+                  <td class="p-2 font-bold bg-yellow-500" rowspan="5">Redevabilité</td>
+                  <td class="p-2 bg-yellow-500" rowspan="4">Légitimité/légalité</td>
+                  <td class="p-2 bg-green-600">Rôles et responsabilité clairement définis</td>
+                  <td class="p-2 bg-green-600 text-center">1</td>
+                  <td class="p-2 bg-green-600">10</td>
                 </tr>
-                <tr class="border-l-2">
-                  <td class="px-4 py-1">Rôles et responsabilité clairement définis</td>
-                  <!-- <td class="p-2 text-center">10</td> -->
+                <tr class="bg-red-600 text-white">
+                  <td class="p-2 ">Organes statutaires fonctionnels</td>
+                  <td class="p-2 text-center">2</td>
+                  <td class="p-2">15</td>
                 </tr>
-                <tr class="border-l-2">
-                  <td class="px-4 py-1 ">Organes statutaires fonctionnels</td>
-                  <!-- <td class="p-2 text-center">15</td> -->
+                <tr class="bg-yellow-500">
+                  <td class="p-2">Existence de statuts et règlement intérieur</td>
+                  <td class="p-2 text-center">3</td>
+                  <td class="p-2">6</td>
                 </tr>
-                <tr class="border-l-2">
-                  <td class="px-4 py-1">Existence de statuts et règlement intérieur</td>
-                  <!-- <td class="p-2 text-center">6</td> -->
+                <tr class="bg-green-500">
+                  <td class="p-2">Rédaction et validation des rapports d’activités</td>
+                  <td class="p-2 text-center">3</td>
+                  <td class="p-2">6</td>
                 </tr>
-                <tr class="border-l-2">
-                  <td class="px-4 py-1">Rédaction et validation des rapports d’activités</td>
-                  <!-- <td class="p-2 text-center">6</td> -->
+                <tr class=" bg-yellow-500 font-bold">
+                  <td colspan="2" class="px-2"></td>
+                  <td class="px-2 text-xs whitespace-nowrap">Score Factuel</td>
+                  <td class="px-2">0.43</td>
                 </tr>
-
                 <!-- row 2 -->
-                <tr class=" bg-slate-200 border-t-8 border-white font-bold">
-                  <td class="p-2">Score Factuel Transparence</td>
-                  <td class="p-2 text-center">0.59</td>
-                </tr>
-                <tr class="border-l-2">
-                  <td class="px-4 py-1">Informations accessibles</td>
-                  <!-- <td class="p-2 text-center">10</td> -->
-                </tr>
-                <tr class="border-l-2">
-                  <td class="px-4 py-1 ">Rapports publiés</td>
-                  <!-- <td class="p-2 text-center">15</td> -->
-                </tr>
-                <tr class="border-l-2">
-                  <td class="px-4 py-1">Procédures de prise de décision formalisées</td>
-                  <!-- <td class="p-2 text-center">6</td> -->
-                </tr>
-                <tr class="border-l-2">
-                  <td class="px-4 py-1">Procédures de prise de décision respectées</td>
-                  <!-- <td class="p-2 text-center">6</td> -->
-                </tr>
+
+
               </tbody>
             </table>
 
