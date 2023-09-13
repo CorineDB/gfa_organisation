@@ -173,6 +173,18 @@
               </div>
             </td>
             <td class="flex space-x-2 items-center">
+              <Tippy tag="a" href="javascript:;" class="tooltip btn btn-secondary w-24 mr-1 mb-2" content="cliquez pour modifier">
+                <span @click="modifier(index, data)" class="text-blue-500 cursor-pointer">
+                  Modifier
+                </span>
+              </Tippy>
+              <Tippy tag="a" href="javascript:;" class="tooltip btn btn-secondary w-24 mr-1 mb-2" content="cliquez pour supprimer">
+                <span @click="supprimer(index, data)" class="text-red-500 cursor-pointer">
+                  Supprimer
+                </span>
+              </Tippy>
+            </td>
+            <td class="flex space-x-2 items-center">
               <Tippy tag="a" href="javascript:;" class="tooltip" content="cliquez pour modifier">
                 <span @click="modifier(index, data)" class="text-blue-500 cursor-pointer">
                   <EditIcon />

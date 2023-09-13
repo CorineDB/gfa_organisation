@@ -122,18 +122,19 @@
             <td>{{ data.description }}</td>
             <td>{{ data.created_at }}</td>
             <td>{{ data.updated_at }}</td>
-            <td class="flex space-x-2 items-center">
-              <Tippy tag="a" href="javascript:;" class="tooltip" content="cliquez pour modifier">
+           <td class="flex space-x-2 items-center">
+             
+              <Tippy tag="a" href="javascript:;" class="tooltip btn btn-secondary w-24 mr-1 mb-2" content="cliquez pour ajouter ou voir les critère">
+                <span @click="voirCritere(index, data.id)" class="text-blue-500 cursor-pointer">Critères</span>
+              </Tippy>
+               <Tippy tag="a" href="javascript:;" class="tooltip btn btn-secondary w-24 mr-1 mb-2" content="cliquez pour modifier">
                 <span @click="modifier(index, data)" class="text-blue-500 cursor-pointer">
-                  <EditIcon />
+                  Modifier
                 </span>
               </Tippy>
-              <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2" content="cliquez pour ajouter ou voir les indicateurs">
-                <span @click="voirCritere(index, data.id)" class="text-blue-500 cursor-pointer"> <PlusCircleIcon /> </span>
-              </Tippy>
-              <Tippy tag="a" href="javascript:;" class="tooltip" content="cliquez pour supprimer">
+              <Tippy tag="a" href="javascript:;" class="tooltip btn btn-secondary w-24 mr-1 mb-2" content="cliquez pour supprimer">
                 <span @click="supprimer(index, data)" class="text-red-500 cursor-pointer">
-                  <Trash2Icon />
+                  Supprimer
                 </span>
               </Tippy>
             </td>
