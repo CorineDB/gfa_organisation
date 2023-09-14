@@ -3874,3 +3874,6 @@ principeTab
         "updated_at": "2023-09-13 10:32:11"
     }
 ]
+
+continuer() ; getPrincipe ; principeTab.value ; onMounted ; storeInfoOrganisation ;  showValue ; [structure_id,indicateur_id,choise_id,nom,prospect] ,champVide ,
+dataTable 

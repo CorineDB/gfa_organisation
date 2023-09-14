@@ -47,99 +47,103 @@
 
       <!-- DEBUT CARD indicateurs -->
       <div v-if="principeTab.length" class="w-2/3 mx-auto rounded-md">
-        <div class="intro-x" v-for="(element, index) in principeTab[0].indicateurs" :key="index">
-          <div class="flex flex-col items-center justify-between mb-5 px-5 py-4 box zoom-in relative">
-            <hr class="h-full w-2 bg-[#0E74BC] absolute left-0 top-0 rounded-l-xl" />
-            <div>
-              <h1 class="text-xl w-2/3 sm:w-full sm:text-xl intro-x font-black text-center border-blue-700 inline-block mx-auto text-blue-500">{{ element.nom }}</h1>
-            </div>
-            <div class="mt-3">
-              <div class="grid grid-cols-12 gap-4" v-if="element.choises.length">
-                <div class="col-span-6 lg:col-span-4 mr-2">
-                  <input id="radio-switch-4" class="form-check-input" type="radio" :name="'option' + index" :value="element.choises[0].id" @change="showValue()" />
-                  <label class="form-check-label" for="radio-switch-4"> {{ element.choises[0].nom }} </label>
-                </div>
-                <div class="col-span-6 lg:col-span-4 mr-2 mt-2 sm:mt-0">
-                  <input id="radio-switch-5" class="form-check-input" type="radio" :name="'option' + index" :value="element.choises[1].id" @change="showValue()" />
-                  <label class="form-check-label" for="radio-switch-5"> {{ element.choises[1].nom }} </label>
+        <form @submit.prevent="continuer()">
+          <div class="intro-x" v-for="(element, index) in principeTab[0].indicateurs" :key="index">
+            <div class="flex flex-col items-center justify-between mb-5 px-5 py-4 box zoom-in relative">
+              <hr class="h-full w-2 bg-[#0E74BC] absolute left-0 top-0 rounded-l-xl" />
+              <div>
+                <h1 class="text-xl w-2/3 sm:w-full sm:text-xl intro-x font-black text-center border-blue-700 inline-block mx-auto text-blue-500">{{ element.nom }}</h1>
+              </div>
+              <div class="mt-3">
+                <div class="grid grid-cols-12 gap-4" v-if="element.choises.length">
+                  <div class="col-span-6 lg:col-span-4 mr-2">
+                    <input id="radio-switch-4" class="form-check-input" type="radio" :name="'option' + index" :value="element.choises[0].id" @change="showValue(element.choises[0].id, element.id, index)" />
+
+                    <label class="form-check-label" for="radio-switch-4"> {{ element.choises[0].nom }} </label>
+                  </div>
+                  <div class="col-span-6 lg:col-span-4 mr-2 mt-2 sm:mt-0">
+                    <input id="radio-switch-5" class="form-check-input" type="radio" :name="'option' + index" :value="element.choises[1].id" @change="showValue(element.choises[1].id, element.id , index )" />
+
+                    <label class="form-check-label" for="radio-switch-5"> {{ element.choises[1].nom }} </label>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="w-2/3 mx-auto text-center">
-        <!-- Responsive Arrow Progress Bar -->
-        <div class="">
-          <div class="arrow-steps clearfix">
-            <div class="step current">
-              <span> <a href="#">1</a></span>
-            </div>
-            <div class="step">
-              <span><a href="#">2</a></span>
-            </div>
-            <div class="step">
-              <span><a href="#">3</a></span>
-            </div>
-            <div class="step">
-              <span><a href="#">4</a></span>
+          <div class="w-2/3 mx-auto text-center">
+            <!-- Responsive Arrow Progress Bar -->
+            <div class="">
+              <div class="arrow-steps clearfix">
+                <div class="step current">
+                  <span> <a href="#">1</a></span>
+                </div>
+                <div class="step">
+                  <span><a href="#">2</a></span>
+                </div>
+                <div class="step">
+                  <span><a href="#">3</a></span>
+                </div>
+                <div class="step">
+                  <span><a href="#">4</a></span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="intro-y w-2/3 my-6 mx-auto flex items-center justify-center mt-5">
-        <button class="btn btn-secondary w-24 prev">Previous</button>
-        <button class="btn btn-primary w-24 ml-2 next pull-right">Next</button>
-      </div>
-
-      <div class="text-xs sm:text-sm w-full items-center text-center bg-[#0E74BC] p-1 border flex bottom-0 flex-col text-white">
-        <img class="w-[50px] inline-block" src="../../assets/images/logo.png" alt="" />
-        <span class="text-[11px] text-white inline-block font-medium">Made by CELERITE HOLDING ioz</span>
+          <div class="intro-y w-2/3 my-6 mx-auto flex items-center justify-center mt-5">
+            <button class="btn btn-secondary w-24 prev">Previous</button>
+            <button type="submit" :disabled="desableNext" class="btn btn-primary w-24 ml-2 next pull-right">Next</button>
+          </div>
+        </form>
       </div>
     </div>
 
-    <svg class="hidden absolute bottom-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-      <path fill="#0099ff" fill-opacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,250.7C1248,256,1344,288,1392,304L1440,320L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-    </svg>
-
-    <Modal backdrop="static" :show="organisationModal" @hidden="organisationModal = false">
-      <ModalBody class="p-10">
-        <form key="ajouter" @submit.prevent="storeInfoOrganisation" class="space-y-3">
-          <div>
-            <label for="regular-form-1" class="form-label">Nom</label>
-            <input id="regular-form-1" type="text" required v-model="infoOrganisation.nom" class="form-control" placeholder="Nom chef organisation" />
-          </div>
-          <div>
-            <label for="regular-form-1" class="form-label">Structures </label>
-            <TomSelect v-model="infoOrganisation.structureId" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
-              <option v-for="(element, index) in structures" :key="index" :value="element.id">{{ element.nom }}</option>
-            </TomSelect>
-          </div>
-          <div>
-            <label for="regular-form-1" class="form-label">Types de prospect </label>
-            <TomSelect v-model="infoOrganisation.prospect" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
-              <option value="0">Membre association</option>
-              <option value="1">Membre conseil d'administration</option>
-              <option value="2">Employé</option>
-              <option value="3">Partenaire</option>
-            </TomSelect>
-          </div>
-
-          <button type="submit" class="btn btn-primary py-3 px-4 w-full my-3 xl:mr-3 align-top">
-            <span class="text-sm font-semibold uppercase" v-if="!chargement"> Continuer </span>
-            <span v-else class="flex justify-center items-center space-x-2">
-              <span class="px-4 font-semibold"> chargement ... </span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-center animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </span>
-          </button>
-        </form>
-      </ModalBody>
-    </Modal>
+    <div class="text-xs sm:text-sm w-full items-center text-center bg-[#0E74BC] p-1 border flex bottom-0 flex-col text-white">
+      <img class="w-[50px] inline-block" src="../../assets/images/logo.png" alt="" />
+      <span class="text-[11px] text-white inline-block font-medium">Made by CELERITE HOLDING ioz</span>
+    </div>
   </div>
+
+  <svg class="hidden absolute bottom-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+    <path fill="#0099ff" fill-opacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,250.7C1248,256,1344,288,1392,304L1440,320L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+  </svg>
+
+  <Modal backdrop="static" :show="organisationModal" @hidden="organisationModal = false">
+    <ModalBody class="p-10">
+      <form key="ajouter" @submit.prevent="storeInfoOrganisation" class="space-y-3">
+        <div>
+          <label for="regular-form-1" class="form-label">Nom</label>
+          <input id="regular-form-1" type="text" required v-model="infoOrganisation.nom" class="form-control" placeholder="Nom chef organisation" />
+        </div>
+        <div>
+          <label for="regular-form-1" class="form-label">Structures </label>
+          <TomSelect v-model="infoOrganisation.structureId" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
+            <option v-for="(element, index) in structures" :key="index" :value="element.id">{{ element.nom }}</option>
+          </TomSelect>
+        </div>
+        <div>
+          <label for="regular-form-1" class="form-label">Types de prospect </label>
+          <TomSelect v-model="infoOrganisation.prospect" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
+            <option value="0">Membre association</option>
+            <option value="1">Membre conseil d'administration</option>
+            <option value="2">Employé</option>
+            <option value="3">Partenaire</option>
+          </TomSelect>
+        </div>
+        <p v-if="champVide" class="text-red-500 font-bold text-xs text-left">Veuillez remplir les champs structure et type les champs pour continuer</p>
+
+        <button type="submit" class="btn btn-primary py-3 px-4 w-full my-3 xl:mr-3 align-top">
+          <span class="text-sm font-semibold uppercase" v-if="!chargement"> Continuer </span>
+          <span v-else class="flex justify-center items-center space-x-2">
+            <span class="px-4 font-semibold"> chargement ... </span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-center animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </span>
+        </button>
+      </form>
+    </ModalBody>
+  </Modal>
 </template>
 
 <script setup>
@@ -160,6 +164,9 @@ const router = useRouter();
 const route = useRoute();
 const factuelStore = useFactuelStore();
 const principeTab = ref([]);
+const champVide = ref(false);
+
+const desableNext = ref(true)
 
 const organisationModal = ref(false);
 const infoOrganisation = reactive({
@@ -168,14 +175,47 @@ const infoOrganisation = reactive({
   nom: "",
 });
 
+const dataTable = ref([]);
+const modeleTab = ref([]);
 const storeInfoOrganisation = function () {
   localStorage.setItem("infoStructure", JSON.stringify(infoOrganisation));
-  organisationModal.value = false;
+  if (infoOrganisation.prospect == "" || infoOrganisation.nom == "") {
+    champVide.value = true;
+    setTimeout(() => {
+      champVide.value = false;
+    }, 2000);
+  } else {
+    organisationModal.value = false;
+  }
 };
 
-const showValue = function () {
-  console.log(responseTab.value);
+const showValue = function (choixId, indicateurId, index) {
+  modeleTab.value = [];
+
+  const info = JSON.parse(localStorage.getItem("infoStructure"));
+
+  modeleTab.value = [info.structureId, indicateurId, choixId, info.nom, info.prospect];
+
+  dataTable.value[index] = modeleTab.value;
+
+  factuelStore.setDataTable(dataTable.value);
+
+  
 };
+
+watch( dataTable.value , (newValue , oldValue)=>{
+
+  console.log(dataTable.value)
+  for ( let i = 0 ; i < dataTable.value.length ; i++ ){
+
+     console.log(dataTable.value[i].length === 0)
+    if(dataTable.value[i].length === 0){
+      desableNext.value = true
+    }else {
+       desableNext.value = false
+    }
+  }
+})
 
 const structures = ref([]);
 const getStructure = function () {
@@ -220,6 +260,15 @@ function getPrincipe() {
   PrincipeService.getAll()
     .then((data) => {
       principeTab.value = data.data.data;
+
+      if (principeTab.value[0]) {
+        const nbrePrincipe = principeTab.value[0].indicateurs.length;
+        for (let i = 0; i < nbrePrincipe; i++) {
+          dataTable.value.push([]);
+        }
+        factuelStore.setDataTable(dataTable.value);
+       
+      }
     })
     .catch((e) => {
       // disabled()
@@ -232,11 +281,15 @@ const getLocalStorageInfo = ref({});
 onMounted(function () {
   getPrincipe();
   getStructure();
-  organisationModal.value = true;
+  // organisationModal.value = true;
 });
 
 const entrepriseLogo = ref("");
 const responseTab = ref([]);
+
+const continuer = function () {
+  modeleTab.value.push();
+};
 
 // function getCampagne() {
 //   BsdService.campagnes(route.params.code)
@@ -261,10 +314,10 @@ const responseTab = ref([]);
 //         responseTab.value.push({ indicateurId: "", reponseId: "" });
 //       }
 
-//       console.log(responseTab.value);
+//       
 //       factuelStore.setDataTable(responseTab.value);
 
-//       console.log(factuelStore.getDataTable);
+//      
 //     })
 //     .catch((e) => {
 //       // disabled()
