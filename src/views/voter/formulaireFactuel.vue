@@ -46,8 +46,8 @@
       </div>
 
       <!-- DEBUT CARD indicateurs -->
-      <div  v-if="principeTab.length" class="w-2/3 mx-auto rounded-md">
-        <div   class="intro-x" v-for="(element, index) in principeTab[0].indicateurs" :key="index">
+      <div v-if="principeTab.length" class="w-2/3 mx-auto rounded-md">
+        <div class="intro-x" v-for="(element, index) in principeTab[0].indicateurs" :key="index">
           <div class="flex flex-col items-center justify-between mb-5 px-5 py-4 box zoom-in relative">
             <hr class="h-full w-2 bg-[#0E74BC] absolute left-0 top-0 rounded-l-xl" />
             <div>
@@ -68,8 +68,6 @@
           </div>
         </div>
       </div>
-
-      
 
       <div class="w-2/3 mx-auto text-center">
         <!-- Responsive Arrow Progress Bar -->
@@ -106,27 +104,30 @@
       <path fill="#0099ff" fill-opacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,250.7C1248,256,1344,288,1392,304L1440,320L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
     </svg>
 
-    <Modal :show="organisationModal" @hidden="organisationModal = false">
+    <Modal backdrop="static" :show="organisationModal" @hidden="organisationModal = false">
       <ModalBody class="p-10">
-        <form key="ajouter" @submit.prevent="storeBSD" class="space-y-3">
+        <form key="ajouter" @submit.prevent="storeInfoOrganisation" class="space-y-3">
           <div>
-            <label for="regular-form-1" class="form-label">Organisation </label>
-            <TomSelect v-model="formData.organisation" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
-              <option v-for="(type, index) in types" :key="index" :value="type.id">{{ type.nom }}</option>
+            <label for="regular-form-1" class="form-label">Nom</label>
+            <input id="regular-form-1" type="text" required v-model="infoOrganisation.nom" class="form-control" placeholder="Nom chef organisation" />
+          </div>
+          <div>
+            <label for="regular-form-1" class="form-label">Structures </label>
+            <TomSelect v-model="infoOrganisation.structureId" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
+              <option v-for="(element, index) in structures" :key="index" :value="element.id">{{ element.nom }}</option>
+            </TomSelect>
+          </div>
+          <div>
+            <label for="regular-form-1" class="form-label">Types de prospect </label>
+            <TomSelect v-model="infoOrganisation.prospect" :options="{ placeholder: 'Selectionez le type' }" class="w-full">
+              <option value="0">Membre association</option>
+              <option value="1">Membre conseil d'administration</option>
+              <option value="2">Employé</option>
+              <option value="3">Partenaire</option>
             </TomSelect>
           </div>
 
-          <div>
-            <label for="regular-form-1" class="form-label">Nom</label>
-            <input id="regular-form-1" type="text" required v-model="formData.nomResponsable" class="form-control" placeholder="Nom chef organisation" />
-          </div>
-
-          <div>
-            <label for="regular-form-1" class="form-label">Prénom</label>
-            <input id="regular-form-1" type="text" required v-model="formData.prenomResponsable" class="form-control" placeholder="prénom chef organisation" />
-          </div>
-
-          <button @click="organisationModal == false" class="btn btn-primary py-3 px-4 w-full my-3 xl:mr-3 align-top">
+          <button type="submit" class="btn btn-primary py-3 px-4 w-full my-3 xl:mr-3 align-top">
             <span class="text-sm font-semibold uppercase" v-if="!chargement"> Continuer </span>
             <span v-else class="flex justify-center items-center space-x-2">
               <span class="px-4 font-semibold"> chargement ... </span>
@@ -144,6 +145,7 @@
 <script setup>
 import { ref, reactive, onMounted, provide, computed, watch } from "vue";
 import { helper as $h } from "@/utils/helper";
+import StructureService from "@/services/modules/structure.service";
 
 import { useRouter, useRoute } from "vue-router";
 import BsdService from "@/services/modules/bsd.service";
@@ -160,13 +162,31 @@ const factuelStore = useFactuelStore();
 const principeTab = ref([]);
 
 const organisationModal = ref(false);
+const infoOrganisation = reactive({
+  structureId: "",
+  prospect: "",
+  nom: "",
+});
 
-const infoModal = function () {
-  organisationModal.value = true;
+const storeInfoOrganisation = function () {
+  localStorage.setItem("infoStructure", JSON.stringify(infoOrganisation));
+  organisationModal.value = false;
 };
 
 const showValue = function () {
   console.log(responseTab.value);
+};
+
+const structures = ref([]);
+const getStructure = function () {
+  StructureService.get()
+    .then((data) => {
+      structures.value = data.data.data;
+    })
+    .catch((e) => {
+      // disabled()
+      alert(e);
+    });
 };
 
 const chargement = ref(false);
@@ -211,7 +231,8 @@ const getLocalStorageInfo = ref({});
 
 onMounted(function () {
   getPrincipe();
-  // organisationModal.value = true
+  getStructure();
+  organisationModal.value = true;
 });
 
 const entrepriseLogo = ref("");
