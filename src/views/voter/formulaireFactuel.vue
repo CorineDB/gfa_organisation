@@ -41,35 +41,38 @@
               </div>
             </div>
           </div>
-          <p v-if="principeTab.length" class="text-3xl w-2/3 mx-auto font-black text-center intro-x my-3">{{ principeTab[0].nom }}</p>
+          <p v-if="principeTab.length" class="text-3xl w-2/3 mx-auto font-black text-center intro-x my-3">{{ principeTab[etape].nom }}</p>
         </div>
       </div>
 
       <!-- DEBUT CARD indicateurs -->
       <div v-if="principeTab.length" class="w-2/3 mx-auto rounded-md">
-        <form @submit.prevent="continuer()">
-          <div class="intro-x" v-for="(element, index) in principeTab[0].indicateurs" :key="index">
-            <div class="flex flex-col items-center justify-between mb-5 px-5 py-4 box zoom-in relative">
-              <hr class="h-full w-2 bg-[#0E74BC] absolute left-0 top-0 rounded-l-xl" />
-              <div>
-                <h1 class="text-xl w-2/3 sm:w-full sm:text-xl intro-x font-black text-center border-blue-700 inline-block mx-auto text-blue-500">{{ element.nom }}</h1>
-              </div>
-              <div class="mt-3">
-                <div class="grid grid-cols-12 gap-4" v-if="element.choises.length">
-                  <div class="col-span-6 lg:col-span-4 mr-2">
-                    <input id="radio-switch-4" class="form-check-input" type="radio" :name="'option' + index" :value="element.choises[0].id" @change="showValue(element.choises[0].id, element.id, index)" />
+        <div>
+          <div v-for="(principe, bigIndex) in principeTab" :key="bigIndex">
+            <div v-if="etape == bigIndex" class="intro-x" v-for="(element, index) in principe.indicateurs" :key="index">
+              <div class="flex flex-col items-center justify-between mb-5 px-5 py-4 box zoom-in relative">
+                <hr class="h-full w-2 bg-[#0E74BC] absolute left-0 top-0 rounded-l-xl" />
+                <div>
+                  <h1 class="text-xl w-2/3 sm:w-full sm:text-xl intro-x font-black text-center border-blue-700 inline-block mx-auto text-blue-500">{{ element.nom }}</h1>
+                </div>
+                <div class="mt-3">
+                  <div class="grid grid-cols-12 gap-4" v-if="element.choises.length">
+                    <div class="col-span-6 lg:col-span-4 mr-2">
+                      <input id="radio-switch-4" class="form-check-input" type="radio" :name="'option' + index" :value="element.choises[0].id" @change="showValue(element.choises[0].id, element.id, index)" />
 
-                    <label class="form-check-label" for="radio-switch-4"> {{ element.choises[0].nom }} </label>
-                  </div>
-                  <div class="col-span-6 lg:col-span-4 mr-2 mt-2 sm:mt-0">
-                    <input id="radio-switch-5" class="form-check-input" type="radio" :name="'option' + index" :value="element.choises[1].id" @change="showValue(element.choises[1].id, element.id , index )" />
+                      <label class="form-check-label" for="radio-switch-4"> {{ element.choises[0].nom }} </label>
+                    </div>
+                    <div class="col-span-6 lg:col-span-4 mr-2 mt-2 sm:mt-0">
+                      <input id="radio-switch-5" class="form-check-input" type="radio" :name="'option' + index" :value="element.choises[1].id" @change="showValue(element.choises[1].id, element.id, index)" />
 
-                    <label class="form-check-label" for="radio-switch-5"> {{ element.choises[1].nom }} </label>
+                      <label class="form-check-label" for="radio-switch-5"> {{ element.choises[1].nom }} </label>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
           <div class="w-2/3 mx-auto text-center">
             <!-- Responsive Arrow Progress Bar -->
             <div class="">
@@ -91,10 +94,11 @@
           </div>
 
           <div class="intro-y w-2/3 my-6 mx-auto flex items-center justify-center mt-5">
-            <button class="btn btn-secondary w-24 prev">Previous</button>
-            <button type="submit" :disabled="desableNext" class="btn btn-primary w-24 ml-2 next pull-right">Next</button>
+            <button @click="precedent()" class="btn btn-secondary w-24 prev">Previous</button>
+            <button v-if="!submitTable" @click="continuer()" :disabled="desableNext" class="btn btn-primary w-24 ml-2 next pull-right">Next</button>
+            <button v-else @click="soumettre()" :disabled="desableNext" class="btn btn-primary w-24 ml-2 next pull-right">Soumettre</button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
 
@@ -165,8 +169,9 @@ const route = useRoute();
 const factuelStore = useFactuelStore();
 const principeTab = ref([]);
 const champVide = ref(false);
+const etape = ref(0);
 
-const desableNext = ref(true)
+const desableNext = ref(true);
 
 const organisationModal = ref(false);
 const infoOrganisation = reactive({
@@ -196,26 +201,12 @@ const showValue = function (choixId, indicateurId, index) {
 
   modeleTab.value = [info.structureId, indicateurId, choixId, info.nom, info.prospect];
 
-  dataTable.value[index] = modeleTab.value;
+  bigTable.value[etape.value][index] = modeleTab.value;
 
-  factuelStore.setDataTable(dataTable.value);
+  factuelStore.setDataTable(bigTable.value[etape.value]);
 
-  
+  factuelStore.setBigTable(bigTable.value);
 };
-
-watch( dataTable.value , (newValue , oldValue)=>{
-
-  console.log(dataTable.value)
-  for ( let i = 0 ; i < dataTable.value.length ; i++ ){
-
-     console.log(dataTable.value[i].length === 0)
-    if(dataTable.value[i].length === 0){
-      desableNext.value = true
-    }else {
-       desableNext.value = false
-    }
-  }
-})
 
 const structures = ref([]);
 const getStructure = function () {
@@ -256,18 +247,24 @@ const formData = reactive({
   commentaire: "",
 });
 
+const bigTable = ref([]);
 function getPrincipe() {
   PrincipeService.getAll()
     .then((data) => {
       principeTab.value = data.data.data;
+      if (principeTab.value) {
+        const nbrePrincipe = principeTab.value.length - 1;
 
-      if (principeTab.value[0]) {
-        const nbrePrincipe = principeTab.value[0].indicateurs.length;
         for (let i = 0; i < nbrePrincipe; i++) {
-          dataTable.value.push([]);
+          bigTable.value.push([]);
         }
-        factuelStore.setDataTable(dataTable.value);
-       
+
+        for (let y = 0; y < bigTable.value.length; y++) {
+          for (let x = 0; x < principeTab.value[y].indicateurs.length; x++) {
+            bigTable.value[y].push([]);
+          }
+        }
+        factuelStore.setBigTable(bigTable.value);
       }
     })
     .catch((e) => {
@@ -275,6 +272,46 @@ function getPrincipe() {
       //alert(e)
     });
 }
+const submitTable = ref(false);
+watch(bigTable.value, (newValue, oldValue) => {
+  for (let i = 0; i < newValue[etape.value].length; i++) {
+    if (newValue[etape.value][i].length === 0) {
+      desableNext.value = true;
+    } else {
+      desableNext.value = false;
+    }
+  }
+
+  for (let i = 0; i < newValue[newValue.length - 1].length; i++) {
+    if (newValue[newValue.length - 1][i].length === 0) {
+      submitTable.value = false;
+    } else {
+      submitTable.value = true;
+    }
+  }
+});
+
+watch(etape.value, (newValue, oldValue) => {
+  console.log(newValue);
+});
+
+const soumettre = function () {
+  console.log(bigTable.value);
+  const submit = [];
+  for (let element = 0; element < bigTable.value.length; element++) {
+    for (let y = 0; y < bigTable.value[element].length; y++) {
+      submit.push(bigTable.value[element][y]);
+    }
+  }
+
+  console.log(Object.prototype.toString.apply(submit));
+  PrincipeService.submit(submit)
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((e) => {});
+  factuelStore.setSubmitTable(submit);
+};
 
 const getLocalStorageInfo = ref({});
 
@@ -288,42 +325,18 @@ const entrepriseLogo = ref("");
 const responseTab = ref([]);
 
 const continuer = function () {
-  modeleTab.value.push();
+  if (etape.value < bigTable.value.length - 1) {
+    etape.value++;
+  }
+  factuelStore.setEtape(etape.value);
 };
 
-// function getCampagne() {
-//   BsdService.campagnes(route.params.code)
-//     .then((data) => {
-//       campagnes.value = data.data.data;
-
-//       entrepriseLogo.value = API_BASE_URL + campagnes.value[0].entreprise.admin.profil;
-
-//       bsdCampagnes.value = data.data.data[1];
-
-//       bsdId.value = data.data.data[2];
-
-//       i.value = 0;
-
-//       campagneEnCours.nom = campagnes.value[0].nom;
-//       campagneEnCours.id = campagnes.value[0].id;
-//       campagneEnCours.entreprise.nom = campagnes.value[0].entreprise.nom;
-//       campagneEnCours.entreprise.refresh = campagnes.value[0].entreprise.refresh;
-//       campagneEnCours.indicateurSelect = campagnes.value[0].indicateurSelect;
-
-//       for (let i = 0; i < campagneEnCours.indicateurSelect.length; i++) {
-//         responseTab.value.push({ indicateurId: "", reponseId: "" });
-//       }
-
-//       
-//       factuelStore.setDataTable(responseTab.value);
-
-//      
-//     })
-//     .catch((e) => {
-//       // disabled()
-//       //alert(e)
-//     });
-// }
+const precedent = function () {
+  if (etape.value > 0) {
+    etape.value--;
+    factuelStore.setEtape(etape.value);
+  }
+};
 
 $(document).ready(function () {
   var back = $(".prev");

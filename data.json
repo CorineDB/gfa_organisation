@@ -3875,5 +3875,128 @@ principeTab
     }
 ]
 
-continuer() ; getPrincipe ; principeTab.value ; onMounted ; storeInfoOrganisation ;  showValue ; [structure_id,indicateur_id,choise_id,nom,prospect] ,champVide ,
-dataTable 
+showValue ; dataTable ; factuelStore ; desableNext ; onMounted ; watch ; etape ; continuer ; storeInfoOrganisation
+precedent ; factuelStore.setEtape ; factuelStore.getEtape ; dataTa
+
+[
+    [
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "inddn6EAWNyv7Qwzq25Xmog",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indo56pOVvRP7pODrnG0WLJ",
+            "chox8Qg0vNyqjZQ7ZRK3WAd",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indWGXp0xJBPjxYzAyYLm5k",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indkBReO3rLxjOn7YqWNpQV",
+            "chox8Qg0vNyqjZQ7ZRK3WAd",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indM9Vo3Z45A7EA7OXye2Bq",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indkyd9lYeMKzBl76PA5Gw8",
+            "chox8Qg0vNyqjZQ7ZRK3WAd",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "ind5GOergE8nDnw7v4MlW9V",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ]
+    ],
+    [
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indxB8yGAl2ZzLGj0qgYV6J",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indLn2JvdNxGj6E7mXQ63pZ",
+            "chox8Qg0vNyqjZQ7ZRK3WAd",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indWqYw8KnGVzVKDBpPQ3oZ",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indqdvx9PwYN7KEzepJmkXy",
+            "chox8Qg0vNyqjZQ7ZRK3WAd",
+            "Gouvernance administrative et managériale",
+            "1"
+        ]
+    ],
+    [
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "ind2XgE3G9dLjoJ7KZY8Nmv",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "ind6keMNELV97Aq734AmKRn",
+            "chox8Qg0vNyqjZQ7ZRK3WAd",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indKJB59V0yljqBzPX8Gdmo",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ]
+    ],
+    [
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "indqBO8n5xdPjlW7Qkp9Zmy",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ],
+        [
+            "strkqYZeLgoNjw3jE0MBX2A",
+            "ind4v0ByMlRZ7NKjY32d6pQ",
+            "chokqYZeLgoNjw3jE0MBX2A",
+            "Gouvernance administrative et managériale",
+            "1"
+        ]
+    ]
+]
