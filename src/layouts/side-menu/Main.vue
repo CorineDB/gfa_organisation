@@ -131,79 +131,87 @@ watch(
 
 const updatedMenu = () => {
   sideMenu.value.forEach((element) => {
-    if (element.title == "Dashboard") {
-      if ($h.getPermission("read.statistique")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Dashboard GFA") {
-      if ($h.getPermission("read.equipement") || $h.getPermission("write.equipement")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Association") {
-      if ($h.getPermission("read.equipement") || $h.getPermission("write.equipement")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Campagne") {
-      if ($h.getPermission("read.campagne") || $h.getPermission("write.campagne")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "API Client") {
-      if ($h.getPermission("read.api.client") || $h.getPermission("write.api.client")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Choix") {
-      if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Principes") {
-      if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Structure") {
-      if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Gouvernance") {
-      if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Outil Factuel") {
-      if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Outil de Perception") {
-      if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Fiche de Synthèse") {
-      if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Programmation des Rapports") {
-      if ($h.getPermission("read.rapport") || $h.getPermission("write.rapport")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Sites") {
-      if ($h.getPermission("read.site") || $h.getPermission("write.site")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Feedbacks") {
-      if ($h.getPermission("read.feedback") || $h.getPermission("write.feedback")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Resolution") {
-      if ($h.getPermission("read.resolution") || $h.getPermission("write.resolution")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Roles & Permissions") {
-      if ($h.getPermission("read.role") || $h.getPermission("write.role")) {
-        updateMenu.push(element);
-      }
-    } else if (element.title == "Utilisateurs") {
-      if ($h.getPermission("read.utilisateur") || $h.getPermission("write.utilisateur")) {
-        updateMenu.push(element);
-      }
+    if (element.title == "Anos") {
+      updateMenu.push(element);
     }
+
+    if (element.title == "Dashboard") {
+      updateMenu.push(element);
+    }
+
+    // if (element.title == "Dashboard") {
+    //   if ($h.getPermission("read.statistique")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Dashboard GFA") {
+    //   if ($h.getPermission("read.equipement") || $h.getPermission("write.equipement")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Association") {
+    //   if ($h.getPermission("read.equipement") || $h.getPermission("write.equipement")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Campagne") {
+    //   if ($h.getPermission("read.campagne") || $h.getPermission("write.campagne")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "API Client") {
+    //   if ($h.getPermission("read.api.client") || $h.getPermission("write.api.client")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Choix") {
+    //   if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Principes") {
+    //   if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Structure") {
+    //   if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Gouvernance") {
+    //   if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Outil Factuel") {
+    //   if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Outil de Perception") {
+    //   if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Fiche de Synthèse") {
+    //   if ($h.getPermission("read.indicateur") || $h.getPermission("write.indicateur")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Programmation des Rapports") {
+    //   if ($h.getPermission("read.rapport") || $h.getPermission("write.rapport")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Sites") {
+    //   if ($h.getPermission("read.site") || $h.getPermission("write.site")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Feedbacks") {
+    //   if ($h.getPermission("read.feedback") || $h.getPermission("write.feedback")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Resolution") {
+    //   if ($h.getPermission("read.resolution") || $h.getPermission("write.resolution")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Roles & Permissions") {
+    //   if ($h.getPermission("read.role") || $h.getPermission("write.role")) {
+    //     updateMenu.push(element);
+    //   }
+    // } else if (element.title == "Utilisateurs") {
+    //   if ($h.getPermission("read.utilisateur") || $h.getPermission("write.utilisateur")) {
+    //     updateMenu.push(element);
+    //   }
+    // }
   });
 };
 const usersProfileImage = ref("");
@@ -215,8 +223,8 @@ onMounted(() => {
   //   usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
   // }
 
-  // dom("body").removeClass("error-page").removeClass("login").addClass("main");
-  // updatedMenu();
+  dom("body").removeClass("error-page").removeClass("login").addClass("main");
+  updatedMenu();
   formattedMenu.value = $h.toRaw(lastMenu.value);
 });
 </script>

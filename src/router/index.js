@@ -34,6 +34,7 @@ import FormulaireFactuel from "../views/voter/formulaireFactuel.vue"
 import ToolsFactuel from "../views/gfa/ToolsFactuel.vue";
 import ToolsPerception from "../views/gfa/ToolsPerception.vue";
 import FicheFactuel from "../views/gfa/FicheFactuel.vue";
+import Ano from "../views/gfa/Ano.vue";
 import FichePerception from "../views/gfa/FichePerception.vue";
 import FicheSynthese from "../views/gfa/FicheSynthese.vue";
 import DashboardGfa from "../views/gfa/Dashboard.vue"
@@ -54,6 +55,11 @@ const routes = [
         path: "Dashboard",
         name: "DashboardGfa",
         component: DashboardGfa,
+      },
+      {
+        path: "ano",
+        name: "Anos",
+        component: Ano,
       },
       {
         path: "toolsFactuel",

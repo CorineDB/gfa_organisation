@@ -1,0 +1,17 @@
+Module ESP 32 TTGO avec antenne
+LECTEUR RFID
+antenne rfid 
+TAG RFID
+BUZZER
+BATTERIE 18650 3,7v
+button poursoir
+led       vert rouge 
+resistance  220ohm
+sim 
+moteur pas a pas pour simuler la barriere 
+stepper
+afficheur lcd 16x2 
+arduino uno 
+market 
+impression 3d du boitier 
+
