@@ -12,6 +12,8 @@
 // import ReponseAnos from '@/components/ReponseAnos.vue'
 // import PermissionsService from "@/services/modules/permission.service.js";
 //import DeleteAlert from "@/components/DeleteAlert.vue";
+// import { createIcons, icons } from "lucide";
+// import dom from "@left4code/tw-starter/dist/js/dom";
 
 import AnosService from "@/services/modules/ano.service.js";
 import BailleurService from "@/services/modules/bailleur.service";
@@ -19,10 +21,7 @@ import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
 import extractFormData from "@/utils/extract-data";
 import { advancedTable } from "../../constant/basic-tablle-data";
 import xlsx from "xlsx";
-import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
 import Tabulator from "tabulator-tables";
-import { createIcons, icons } from "lucide";
-import dom from "@left4code/tw-starter/dist/js/dom";
 
 export default {
   components: {},
@@ -120,28 +119,18 @@ export default {
   },
 
   computed: {
-    //importation des variables du module auths
-    ...mapState({
-      loading: (state) => state.loading,
-      errors: (state) => state.errors,
-    }),
-    ...mapGetters({
-      hasErrors: "GET_ERREURS",
-      isLoading: "IS_LOADING",
-      ano: "anos/getAno",
-      typeAnos: "typeAnos/getTypeAnos",
-      currentUser: "auths/GET_AUTHENTICATE_USER",
-    }),
-    /*filteredAno() {
-      var self = this;
-      return this.anos.filter(function (ano) {
-        return ano.bailleur.sigle.toLowerCase().indexOf(self.search.toLowerCase()) >= 0 ||
-          ano.type.toLowerCase().indexOf(self.search.toLowerCase()) >= 0 ||
-          ano.destinataire.toLowerCase().indexOf(self.search.toLowerCase()) >= 0 ||
-          ano.dateDeSoumission.toLowerCase().indexOf(self.search.toLowerCase()) >= 0 ||
-          ano.dossier.toLowerCase().indexOf(self.search.toLowerCase()) >= 0;
-      });
-    },*/
+    //  importation des variables du module auths
+    // ...mapState({
+    //   loading: (state) => state.loading,
+    //   errors: (state) => state.errors,
+    // }),
+    // ...mapGetters({
+    //   hasErrors: "GET_ERREURS",
+    //   isLoading: "IS_LOADING",
+    //   ano: "anos/getAno",
+    //   typeAnos: "typeAnos/getTypeAnos",
+    //   currentUser: "auths/GET_AUTHENTICATE_USER",
+    // }),
   },
 
   methods: {
@@ -152,15 +141,17 @@ export default {
       this.$store.dispatch("disabled");
     },
     fetchAnos() {
-      this.active();
+      // this.active();
       AnosService.get()
         .then((data) => {
           const datas = data.data.data;
           this.anos = datas;
-          this.disabled();
+
+          this.initTabulator();
+          // this.disabled();
         })
         .catch((error) => {
-          this.disabled();
+          // this.disabled();
           if (error.response) {
             // Requête effectuée mais le serveur a répondu par une erreur.
             const message = error.response.data.message;
@@ -277,6 +268,157 @@ export default {
           this.bailleurVisible = true;
         }
       });
+    },
+    customFilter(data) {
+      return data.car && data.rating < 3;
+    },
+    updateFilter() {
+      this.tabulator.setFilter(this.filterField, this.filterType, this.filterValue);
+    },
+    clearFilter() {
+      this.filterField = "nom";
+      this.filterType = "like";
+      this.filterValue = "";
+      this.updateFilter();
+    },
+    initTabulator() {
+      alert("ok");
+      console.log(this.anos);
+      this.tabulator = new Tabulator("#tabulator", {
+        data: this.anos,
+        rowClickMenu: [
+          {
+            label: "Modifier",
+            action: function (e, row) {
+              console.log(row);
+              row.delete();
+            },
+          },
+          {
+            label: "Suprimer",
+            action: function (e, row) {
+              row.delete();
+            },
+          },
+        ],
+        // printHeader: "<h1 class='pdfPrint' >TABLEAU DE LA PAGE PROJET</h1>",
+        selectableRows: true, //assign data to table
+        layout: "fitColumns",
+        columns: [
+          //Define Table Columns
+          {
+            title: "Dossier",
+            field: "dossier",
+            minWidth: 125,
+            hozAlign: "left",
+          },
+          {
+            title: "Bailleur",
+            field: "bailleur",
+            minWidth: 150,
+            hozAlign: "left",
+            formatter(cell) {
+              return `${cell.getData().bailleur.sigle}`;
+            },
+          },
+          // { title: "AGE", field: "age", minWidth: 150, hozAlign: "left" },
+          {
+            title: "Date de soumissions",
+            field: "dateDeSoumission",
+            minWidth: 150,
+            hozAlign: "left",
+          },
+          {
+            title: "Destinataire",
+            field: "destinataire",
+            minWidth: 150,
+            hozAlign: "left",
+          },
+          {
+            title: "Date de création",
+            field: "created_at",
+            minWidth: 150,
+            hozAlign: "left",
+          },
+          {
+            title: "STATUT",
+            minWidth: 200,
+            field: "statut",
+            hozAlign: "center",
+            vertAlign: "middle",
+            print: false,
+            download: false,
+            formatter(cell) {
+              return `<div class="flex items-center lg:justify-center ${cell.getData().statut ? "text-success" : "text-danger"}">
+                <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> ${cell.getData().statut ? "Active" : "Inactive"}
+              </div>`;
+            },
+          },
+          {
+            title: "ACTIONS",
+            minWidth: 200,
+            field: "actions",
+            responsive: 1,
+            hozAlign: "center",
+            vertAlign: "middle",
+            print: false,
+            download: false,
+
+            formatter() {
+              // Créer un conteneur pour le bouton et le menu dropdown
+              const div = document.createElement("div");
+              div.className = "relative inline-block text-left";
+
+              // Créer le bouton pour ouvrir le menu dropdown
+              const button = document.createElement("button");
+              button.className = "px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none";
+              button.innerHTML = "Options";
+
+              // Créer le menu dropdown caché
+              const menu = document.createElement("div");
+              menu.className = "absolute right-0 -mt-6 w-48 bg-white border border-gray-300 rounded shadow-lg hidden z-50";
+              // menu.style.zIndex = "9999"; // Définir un z-index élevé pour le menu dropdown
+              menu.innerHTML = `
+            <ul class="py-1">
+              <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a></li>
+              <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Delete</a></li>
+            </ul>
+          `;
+
+              div.appendChild(button);
+
+              return div;
+            },
+          },
+        ],
+      });
+    },
+    // Export
+    onExportCsv() {
+      this.tabulator.download("csv", "data.csv");
+    },
+
+    onExportJson() {
+      this.tabulator.download("json", "data.json");
+    },
+
+    onExportXlsx() {
+      const win = window;
+      win.XLSX = xlsx;
+      this.tabulator.download("xlsx", "data.xlsx", {
+        sheetName: "Products",
+      });
+    },
+
+    onExportHtml() {
+      this.tabulator.download("html", "data.html", {
+        style: true,
+      });
+    },
+
+    // Print
+    onPrint() {
+      this.tabulator.print();
     },
 
     // call action
@@ -506,18 +648,25 @@ export default {
       localStorage.setItem("formData", parsed);
     },
   },
+  mounted() {
+    // this.initTabulator();
+  },
 
   created() {
-    this.getPermission();
-    if (!this.anoVisible) {
-      this.$router.push("/401-non-autorise");
-    } else {
-      if (this.bailleurVisible) {
-        this.programmeId = this.currentUser.programme.id;
-        this.fetchBailleurs(this.programmeId);
-      }
-      this.fetchAnos();
-    }
+    // this.getPermission();
+    // if (!this.anoVisible) {
+    //   this.$router.push("/401-non-autorise");
+    // } else {
+    //   if (this.bailleurVisible) {
+    //     this.programmeId = this.currentUser.programme.id;
+    //     this.fetchBailleurs(this.programmeId);
+    //   }
+    //   this.fetchAnos();
+    // }
+    //this.programmeId = this.currentUser.programme.id;
+    this.programmeId = "Kl4ankW8vn18AZDLmoaqz3YdgwkG5RE9AEMKBQOP2y9le4pXrj60Wbx71mr7dxLq";
+    this.fetchBailleurs(this.programmeId);
+    this.fetchAnos();
 
     //.then((value) => { console.log(value), console.log('content bailleur ' + this.bailleurs) });
   },
@@ -630,180 +779,3 @@ export default {
   </div>
   <!-- END: HTML Table Data -->
 </template>
-
-<script>
-
-
-
-export default {
- 
-  methods: {
-    
-
-    customFilter(data) {
-      return data.car && data.rating < 3;
-    },
-    updateFilter() {
-      this.tabulator.setFilter(this.filterField, this.filterType, this.filterValue);
-     
-    },
-    clearFilter() {
-      this.filterField = "nom";
-      this.filterType = "like";
-      this.filterValue = "";
-      this.updateFilter();
-    },
-    initTabulator() {
-      this.tabulator = new Tabulator("#tabulator", {
-        data: this.tableExemple,
-        rowClickMenu: [
-          {
-            label: "Modifier",
-            action: function (e, row) {
-              console.log(row);
-              row.delete();
-            },
-          },
-          {
-            label: "Suprimer",
-            action: function (e, row) {
-              row.delete();
-            },
-          },
-        ],
-        // printHeader: "<h1 class='pdfPrint' >TABLEAU DE LA PAGE PROJET</h1>",
-        selectableRows: true, //assign data to table
-        layout: "fitColumns",
-        columns: [
-          //Define Table Columns
-          {
-            title: "NOM",
-            field: "nom",
-            minWidth: 125,
-            hozAlign: "left",
-          },
-          { title: "TAILLE", field: "taille", minWidth: 150, hozAlign: "left" },
-          { title: "AGE", field: "age", minWidth: 150, hozAlign: "left" },
-          {
-            title: "STATS",
-            field: "stats",
-            minWidth: 150,
-            hozAlign: "left",
-          },
-          {
-            title: "ACTIONS",
-            minWidth: 200,
-            field: "actions",
-            responsive: 1,
-            hozAlign: "center",
-            vertAlign: "middle",
-            print: false,
-            download: false,
-
-            formatter() {
-              // Créer un conteneur pour le bouton et le menu dropdown
-              const div = document.createElement("div");
-              div.className = "relative inline-block text-left";
-
-              // Créer le bouton pour ouvrir le menu dropdown
-              const button = document.createElement("button");
-              button.className = "px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none";
-              button.innerHTML = "Options";
-
-              // Créer le menu dropdown caché
-              const menu = document.createElement("div");
-              menu.className = "absolute right-0 -mt-6 w-48 bg-white border border-gray-300 rounded shadow-lg hidden z-50";
-              // menu.style.zIndex = "9999"; // Définir un z-index élevé pour le menu dropdown
-              menu.innerHTML = `
-            <ul class="py-1">
-              <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a></li>
-              <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Delete</a></li>
-            </ul>
-          `;
-
-              // Ajouter le bouton et le menu dropdown au conteneur
-              div.appendChild(button);
-              // div.appendChild(menu);
-
-              // // Gérer l'affichage/masquage du menu au clic du bouton
-              // button.addEventListener("click", (e) => {
-              //   e.stopPropagation(); // Empêcher la propagation de l'événement pour éviter la fermeture du menu
-              //   menu.classList.toggle("hidden"); // Afficher/Masquer le menu
-              // });
-
-              // // Fermer le menu lorsque l'utilisateur clique à l'extérieur
-              // document.addEventListener("click", () => {
-              //   menu.classList.add("hidden");
-              // });
-
-              return div;
-            },
-            // formatter() {
-            //   const a = dom(`
-            //   <div class=" w-full flex justify-evenly">
-            //       <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-            //       <svg class="text-blue-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 3.99997H6C4.89543 3.99997 4 4.8954 4 5.99997V18C4 19.1045 4.89543 20 6 20H18C19.1046 20 20 19.1045 20 18V12M18.4142 8.41417L19.5 7.32842C20.281 6.54737 20.281 5.28104 19.5 4.5C18.7189 3.71895 17.4526 3.71895 16.6715 4.50001L15.5858 5.58575M18.4142 8.41417L12.3779 14.4505C12.0987 14.7297 11.7431 14.9201 11.356 14.9975L8.41422 15.5858L9.00257 12.6441C9.08001 12.2569 9.27032 11.9013 9.54951 11.6221L15.5858 5.58575M18.4142 8.41417L15.5858 5.58575" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-            //         Edit</a>
-            //       <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline">
-            //         <svg class="text-red-600 w-6 h-6" fill="#000000" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M5.755,20.283,4,8H20L18.245,20.283A2,2,0,0,1,16.265,22H7.735A2,2,0,0,1,5.755,20.283ZM21,4H16V3a1,1,0,0,0-1-1H9A1,1,0,0,0,8,3V4H3A1,1,0,0,0,3,6H21a1,1,0,0,0,0-2Z"></path></g></svg>
-            //         Delete</a>
-            //   </div>
-            //   `);
-            //   dom(a).on("click", function () {
-            //     // On click actions
-            //   });
-
-            //   return a[0];
-            // },
-          },
-        ],
-      });
-    },
-    // Export
-    onExportCsv() {
-      this.tabulator.download("csv", "data.csv");
-    },
-
-    onExportJson() {
-      this.tabulator.download("json", "data.json");
-    },
-
-    onExportXlsx() {
-      const win = window;
-      win.XLSX = xlsx;
-      this.tabulator.download("xlsx", "data.xlsx", {
-        sheetName: "Products",
-      });
-    },
-
-    onExportHtml() {
-      this.tabulator.download("html", "data.html", {
-        style: true,
-      });
-    },
-
-    // Print
-    onPrint() {
-      this.tabulator.print();
-    },
-  },
-  created() {
-    this.getPermission();
-    if (!this.anoVisible) {
-      this.$router.push("/401-non-autorise");
-    } else {
-      if (this.bailleurVisible) {
-        this.programmeId = this.currentUser.programme.id;
-        this.fetchBailleurs(this.programmeId);
-      }
-      this.fetchAnos();
-    }
-
-    //.then((value) => { console.log(value), console.log('content bailleur ' + this.bailleurs) });
-  },
-
-  mounted() {
-    this.initTabulator();
-  },
-};
-</script>

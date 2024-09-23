@@ -2,13 +2,15 @@ import Vue from "vue";
 
 import Vuex from "vuex";
 
-import auths from "@/store/modules/auths/index";
+// import auths from "@/store/modules/auths/index";
+
+import auths from "./modules/auths/index";
 
 import agencesDeCommunication from "./modules/agencesDeCommunication/index";
 
 import ongs from "./modules/ongs/index";
 
-import bailleurs from "@/store/modules/bailleurs/index";
+import bailleurs from "./modules/bailleurs/index";
 
 import entreprisesExecutante from "./modules/entreprisesExecutante/index";
 
@@ -66,7 +68,7 @@ import eSuivis from "./modules/eSuivis/index";
 
 import sites from "./modules/sites/index";
 
-import revisionPtab from "./modules/revisionPtab/index"
+import revisionPtab from "./modules/revisionPtab/index";
 
 import passations from "./modules/passations/index";
 
@@ -79,227 +81,218 @@ import gouvernements from "./modules/gouvernements/index";
 import indicateurs_mod from "./modules/indicateurs_mod/index";
 
 
-
-import { SET_LOADER, SET_ERRORS_MESSAGE, RESET_ERROR_MESSAGE_MUTATIONS } from "@/store/mutations.type";
+import { SET_LOADER, SET_ERRORS_MESSAGE, RESET_ERROR_MESSAGE_MUTATIONS } from "./mutations.type";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     sideBarOpen: false,
-    counter:0,
-    loading : false,
-    messageErreur : null,
-    errors : [],
-    isActive:false,
-    accountValidate:false,
+    counter: 0,
+    loading: false,
+    messageErreur: null,
+    errors: [],
+    isActive: false,
+    accountValidate: false,
     modSelect: "",
     missionDeControleSelect: "",
-    types : [
+    types: [
       {
-        nom : "pta",
-        type: 'pta'
+        nom: "pta",
+        type: "pta",
       },
 
       {
-        nom : "PPM",
-        type: 'ppm'
-      }
-    ],
-    
-
-    trimestres : [
-      {
-        valeur : 1,
-        trimestre: 'Trimestre 1'
+        nom: "PPM",
+        type: "ppm",
       },
-
-      {
-        valeur : 2,
-        trimestre: 'Trimestre 2'
-      },
-
-      {
-        valeur : 3,
-        trimestre: 'Trimestre 3'
-      },
-
-      {
-        valeur : 4,
-        trimestre: 'Trimestre 4'
-      }
     ],
 
-    statuts : [
+    trimestres: [
       {
-        nom : "Non validé",
-        etat: -2
+        valeur: 1,
+        trimestre: "Trimestre 1",
+      },
+
+      {
+        valeur: 2,
+        trimestre: "Trimestre 2",
+      },
+
+      {
+        valeur: 3,
+        trimestre: "Trimestre 3",
+      },
+
+      {
+        valeur: 4,
+        trimestre: "Trimestre 4",
+      },
+    ],
+
+    statuts: [
+      {
+        nom: "Non validé",
+        etat: -2,
       },
       {
         nom: "Validé",
-        etat: -1
+        etat: -1,
       },
       {
         nom: "En cours",
-        etat: 0
+        etat: 0,
       },
       {
         nom: "En retard",
-        etat: 1
+        etat: 1,
       },
       {
         nom: "Terminé",
-        etat: 2
-      }
-    ],
-    statutsAno : [
-      {
-        nom : "Non validé",
-        etat: -1
-      },
-      {
-        nom: "Validé", 
-        etat: 1
-      },
-     
-     
-     
-    ],
-    modePaiement : [
-      {
-        id : 0, 
-        nom : "Paiement direct"
-      },
-      {
-        id : 1, 
-        nom : "Avance au compte designé"
-      },
-      {
-        id : 2, 
-        nom : "Remboursement"
-      },
-      {
-        id : 3, 
-        nom : "Engagement special"
-      },
-      
-    ],
-    
-    sources : [
-      {
-        id : 0, 
-        nom : "Pret"
-      },
-      {
-        id : 1, 
-        nom : "Budget National"
+        etat: 2,
       },
     ],
-    questionnaire: {}
+    statutsAno: [
+      {
+        nom: "Non validé",
+        etat: -1,
+      },
+      {
+        nom: "Validé",
+        etat: 1,
+      },
+    ],
+    modePaiement: [
+      {
+        id: 0,
+        nom: "Paiement direct",
+      },
+      {
+        id: 1,
+        nom: "Avance au compte designé",
+      },
+      {
+        id: 2,
+        nom: "Remboursement",
+      },
+      {
+        id: 3,
+        nom: "Engagement special",
+      },
+    ],
+
+    sources: [
+      {
+        id: 0,
+        nom: "Pret",
+      },
+      {
+        id: 1,
+        nom: "Budget National",
+      },
+    ],
+    questionnaire: {},
   },
   getters: {
-    getCount: state => {
-      return state.counter
+    getCount: (state) => {
+      return state.counter;
     },
-    sideBarOpen: state => {
-      return state.sideBarOpen
-    },
-
-    HAS_ERROR: state => {
-      return state.messageErreur != null ? true : false
-    },
-  
-    IS_LOADING: state => {
-      return state.loading
-    },
-  
-    GET_MESSAGE_ERREUR: state => {
-      return state.messageErreur
-    },
-    
-    GET_ERREURS: state => {
-      return state.errors
+    sideBarOpen: (state) => {
+      return state.sideBarOpen;
     },
 
-    getModSelect: state => {
-      return state.modSelect
+    HAS_ERROR: (state) => {
+      return state.messageErreur != null ? true : false;
     },
 
-    getMissionDeControleSelect: state => {
-      return state.missionDeControleSelect
+    IS_LOADING: (state) => {
+      return state.loading;
     },
-    getquestionnaire: state => {
-      return state.questionnaire
-    }
 
+    GET_MESSAGE_ERREUR: (state) => {
+      return state.messageErreur;
+    },
+
+    GET_ERREURS: (state) => {
+      return state.errors;
+    },
+
+    getModSelect: (state) => {
+      return state.modSelect;
+    },
+
+    getMissionDeControleSelect: (state) => {
+      return state.missionDeControleSelect;
+    },
+    getquestionnaire: (state) => {
+      return state.questionnaire;
+    },
   },
   mutations: {
     active(state) {
-      state.isActive = true
+      state.isActive = true;
     },
     disabled(state) {
-      state.isActive = false
+      state.isActive = false;
     },
     accountV(state) {
-      state.accountValidate = true
+      state.accountValidate = true;
     },
     accountD(state) {
-      state.accountValidate = false
+      state.accountValidate = false;
     },
-    toggleSidebar (state) {
-      state.sideBarOpen = !state.sideBarOpen
+    toggleSidebar(state) {
+      state.sideBarOpen = !state.sideBarOpen;
     },
-    updateCounter (state,value) {
-    
-      state.counter = value
-    },
-
-    setModSelect(state, value)
-    {
-      state.modSelect = value
+    updateCounter(state, value) {
+      state.counter = value;
     },
 
-    setMissionDeControleSelect(state, value)
-    {
-      state.missionDeControleSelect = value
+    setModSelect(state, value) {
+      state.modSelect = value;
     },
-    setQuestionnaire(state,payload){
-       state.questionnaire = payload
+
+    setMissionDeControleSelect(state, value) {
+      state.missionDeControleSelect = value;
+    },
+    setQuestionnaire(state, payload) {
+      state.questionnaire = payload;
     },
 
     [SET_LOADER](state, value) {
-      if(typeof value === "boolean") // vérifie si le LOADER est vraiement de type boolean
-        state.loading = value
+      if (typeof value === "boolean")
+        // vérifie si le LOADER est vraiement de type boolean
+        state.loading = value;
     },
 
-    [SET_ERRORS_MESSAGE](state, {message, errors}) { //si erreur, cette fonction permet de récuperer les erreurs et de les stockés pour la vue
-      state.messageErreur = message
-      state.errors = errors
+    [SET_ERRORS_MESSAGE](state, { message, errors }) {
+      //si erreur, cette fonction permet de récuperer les erreurs et de les stockés pour la vue
+      state.messageErreur = message;
+      state.errors = errors;
     },
 
-    [RESET_ERROR_MESSAGE_MUTATIONS](state){
-      state.messageErreur = null
-      state.errors = []
-    }
-
+    [RESET_ERROR_MESSAGE_MUTATIONS](state) {
+      state.messageErreur = null;
+      state.errors = [];
+    },
   },
 
   actions: {
     active(context) {
-      context.commit('active')
+      context.commit("active");
     },
     disabled(context) {
-      context.commit('disabled')
+      context.commit("disabled");
     },
     accountV(context) {
-      context.commit('accountV')
+      context.commit("accountV");
     },
     accountD(context) {
-      context.commit('accountD')
+      context.commit("accountD");
     },
     toggleSidebar(context) {
-      context.commit('toggleSidebar')
-    }
+      context.commit("toggleSidebar");
+    },
   },
 
   modules: {
@@ -340,6 +333,6 @@ export default new Vuex.Store({
     reponses,
     structures,
     indicateurs_mod,
-    gouvernements
-  }
+    gouvernements,
+  },
 });
