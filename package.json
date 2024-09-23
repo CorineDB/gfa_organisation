@@ -49,12 +49,14 @@
     "vue-good-table-next": "^0.2.1",
     "vue-pusher": "^1.1.0",
     "vue-router": "4",
+    "vue-tippy": "^6.4.4",
     "vue3-carousel": "^0.2.13",
     "vuex": "^4.1.0",
     "xlsx": "^0.16.9",
     "zoom-vanilla.js": "^2.0.6"
   },
   "devDependencies": {
+    "@iconify/vue": "^4.1.2",
     "@tailwindcss/forms": "^0.5.1",
     "@vitejs/plugin-vue": "^2.0.0",
     "autoprefixer": "10.4.6",
