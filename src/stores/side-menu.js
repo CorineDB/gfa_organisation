@@ -8,11 +8,16 @@ export const useSideMenuStore = defineStore("sideMenu", {
         pageName: "DashboardGfa",
         title: "Dashboard GFA",
       },
-    
+
       {
         icon: "CpuIcon",
         pageName: "Anos",
         title: "Anos",
+      },
+      {
+        icon: "CpuIcon",
+        pageName: "indicateurs",
+        title: "Indicateurs",
       },
       {
         icon: "CpuIcon",

@@ -38,6 +38,7 @@ import Ano from "../views/gfa/Ano.vue";
 import FichePerception from "../views/gfa/FichePerception.vue";
 import FicheSynthese from "../views/gfa/FicheSynthese.vue";
 import DashboardGfa from "../views/gfa/Dashboard.vue";
+import indicateurs from "../views/gfa/indicateurs/index.vue";
 
 const routes = [
   {
@@ -54,6 +55,11 @@ const routes = [
         path: "ano",
         name: "Anos",
         component: Ano,
+      },
+      {
+        path: "/dashboard/indicateurs",
+        component: indicateurs,
+        name: "indicateurs",
       },
       {
         path: "toolsFactuel",

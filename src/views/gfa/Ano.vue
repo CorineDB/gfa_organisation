@@ -244,7 +244,7 @@ export default {
       this.$store.dispatch("disabled");
     },
     getPermission() {
-      this.currentUser.role[0].permissions.forEach((element) => {
+      JSON.parse(localStorage.getItem("bsdInfo")).users.role[0].permissions.forEach((element) => {
         if (element.slug === "voir-un-ano") {
           this.anoVisible = true;
         }
@@ -392,6 +392,47 @@ export default {
           },
         ],
       });
+    },
+    test() {
+      // Réinitialisation des variables pour 36 équipes
+      const nombreEquipes = 36;
+      const nombreMatchsParEquipe = 8;
+
+      // Liste pour suivre combien de matchs chaque équipe a joué
+      let matchsParEquipe = new Array(nombreEquipes).fill(0);
+
+      // Liste pour suivre les matchs déjà joués
+      let matchsJoues = [];
+
+      // Simulation des matchs en respectant les nouvelles règles
+      for (let i = 0; i < nombreEquipes; i++) {
+        // Si l'équipe a déjà joué 8 matchs, on passe à la suivante
+        if (matchsParEquipe[i] >= nombreMatchsParEquipe) {
+          continue;
+        }
+
+        // On cherche des équipes contre qui jouer
+        for (let j = i + 1; j < nombreEquipes; j++) {
+          // Vérifier si l'équipe `j` peut encore jouer (pas plus de 8 matchs)
+          if (matchsParEquipe[j] < nombreMatchsParEquipe) {
+            // Ajouter le match à la liste
+            matchsJoues.push([i, j]);
+
+            // Mettre à jour le nombre de matchs joués par chaque équipe
+            matchsParEquipe[i]++;
+            matchsParEquipe[j]++;
+
+            // Si l'équipe `i` a maintenant 8 matchs, on la retire (virtuellement)
+            if (matchsParEquipe[i] === nombreMatchsParEquipe) {
+              break; // Passer à l'équipe suivante
+            }
+          }
+        }
+      }
+
+      // Résultat : Nombre total de matchs
+      const nombreTotalMatchs = matchsJoues.length;
+      console.log(nombreTotalMatchs);
     },
     // Export
     onExportCsv() {
@@ -649,6 +690,7 @@ export default {
     },
   },
   mounted() {
+    this.test();
     // this.initTabulator();
   },
 
@@ -658,13 +700,13 @@ export default {
     //   this.$router.push("/401-non-autorise");
     // } else {
     //   if (this.bailleurVisible) {
-    //     this.programmeId = this.currentUser.programme.id;
+    //     this.programmeId = JSON.parse(localStorage.getItem("bsdInfo")).users.programme.id;
     //     this.fetchBailleurs(this.programmeId);
     //   }
     //   this.fetchAnos();
     // }
-    //this.programmeId = this.currentUser.programme.id;
-    this.programmeId = "Kl4ankW8vn18AZDLmoaqz3YdgwkG5RE9AEMKBQOP2y9le4pXrj60Wbx71mr7dxLq";
+    //this.programmeId = JSON.parse(localStorage.getItem("bsdInfo")).users.programme.id;
+    this.programmeId = JSON.parse(localStorage.getItem("bsdInfo")).users.programme.id;
     this.fetchBailleurs(this.programmeId);
     this.fetchAnos();
 

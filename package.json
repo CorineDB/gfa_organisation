@@ -49,6 +49,7 @@
     "vue-good-table-next": "^0.2.1",
     "vue-pusher": "^1.1.0",
     "vue-router": "4",
+    "vue-select": "^4.0.0-beta.6",
     "vue-tippy": "^6.4.4",
     "vue3-carousel": "^0.2.13",
     "vuex": "^4.1.0",
