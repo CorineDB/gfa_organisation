@@ -12,7 +12,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
                 pageName: "projets",
                 title: "Projets",
             },
-
+            {
+                icon: "CpuIcon",
+                pageName: "programme",
+                title: "Programme",
+            },
             {
                 icon: "CpuIcon",
                 pageName: "Anos",

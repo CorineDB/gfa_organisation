@@ -1,7 +1,7 @@
 <template>
   <div>
     <DarkModeSwitcher />
-    <Notification refKey="successNotification" :options="{ duration: 3000 }" class="flex">
+    <!-- <Notification refKey="successNotification" :options="{ duration: 3000 }" class="flex">
       <CheckCircleIcon v-if="message.type === 'success'" class="text-success" />
       <div class="ml-4 mr-4">
         <div :class="{ 'text-red-500 capitalize ': message.type != 'success' }" class="font-medium">{{ message.type }}</div>
@@ -9,9 +9,9 @@
           {{ message.message }}
         </div>
       </div>
-    </Notification>
+    </Notification> -->
     <div class="sm:px-10 md:px-0">
-      <div class="block xl:grid grid-cols-2 gap-4">
+      <div class="block xl:grid grid-cols-2 gap-4 bg-white">
         <!-- BEGIN: Login Info -->
         <div class="hidden bg-primary xl:flex flex-col min-h-screen p-5">
           <a href="" class="-intro-x pt-5 bg-white border h-fit w-fit p-2 mx-auto rounded-xl shadow-sm">
@@ -25,24 +25,24 @@
         </div>
         <!-- END: Login Info -->
         <!-- BEGIN: Login Form -->
-        <form @submit.prevent="login" class="h-screen xl:h-auto flex items-center py-5 xl:py-0 m-10 sm:mx-auto xl:my-0">
+        <form @submit.prevent="save" class="h-screen _bg-white xl:h-auto flex items-center py-5 xl:py-0 m-10 sm:mx-auto xl:my-0">
           <div class="my-auto mx-auto bg-white dark:bg-darkmode-600 xl:bg-transparent px-5 sm:px-8 py-8 xl:p-0 rounded-md shadow-md xl:shadow-none w-full sm:w-3/4 lg:w-2/4 xl:w-auto">
             <h2 class="intro-x font-bold text-2xl xl:text-3xl text-center xl:text-left">Se connecter</h2>
             <div class="intro-x mt-2 text-slate-400 xl:hidden text-center">Responsabilité partagée, Qualité améliorée : Unis pour un meilleur service social.</div>
             <div class="intro-x mt-8">
               <div>
-                <input type="text" v-model="state.email" class="intro-x login__input form-control py-3 px-4 block" placeholder="Email" />
-                <div class="text-red-500 text-sm py-2 font-semibold" v-if="v$.email.$error">
-                  <div v-for="error in v$.email.$errors" :key="error.$uid">
-                    <span v-if="error.$validator == 'required'"> Ce champs est obligatoire </span>
-                    <span v-if="error.$validator == 'email'"> Email invalide </span>
-                  </div>
-                </div>
+                <input type="text"  v-model.trim='login' class="intro-x login__input form-control py-3 px-4 block" placeholder="Email" />
+                    <!-- <div class="text-red-500 text-sm py-2 font-semibold" v-if='!$v.login.required && soumettre'>
+                  Ce champ est obligatoire
+                      </div> -->
+                <!-- <div class="text-red-500 text-sm   py-2 font-semibold" v-if='!$v.login.email && soumettre'>
+                  Email invalide
+                </div> -->
               </div>
 
               <div class="">
                 <div class="relative">
-                  <input :type="statePassword" class="intro-x login__input form-control py-3 px-4 block mt-4" v-model.trim="state.password" placeholder="Mots de passe" />
+                  <input :type="statePassword" class="intro-x login__input form-control py-3 px-4 block mt-4" v-model.trim='password' placeholder="Mots de passe" />
 
                   <span @click="invisible" v-if="show" class="text-blue-500 absolute cursor-pointer right-4 z-10 top-2"
                     ><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024" height="1.8em" width="1.6em" xmlns="http://www.w3.org/2000/svg">
@@ -60,30 +60,30 @@
                       <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path></svg
                   ></span>
                 </div>
-                <div class="text-red-500 text-sm py-2 font-semibold" v-if="v$.password.$error">
-                  <div v-for="error in v$.password.$errors" :key="error.$uid">
-                    <span v-if="error.$validator == 'required'"> Ce champs est obligatoire </span>
-                    <span v-if="error.$validator == 'minLength'"> Mot de passe très court (6 caracteres) </span>
-                  </div>
-                </div>
+                <!-- <div class="text-red-500 text-sm   py-2 font-semibold " v-if='!$v.password.required && soumettre'>
+              Ce champ est obligatoire
+            </div>
+            <div class="text-red-500 text-sm   py-2 font-semibold " v-if='!$v.password.minLength && soumettre'>
+              mot de passe très court
+            </div> -->
               </div>
             </div>
             <div class="intro-x flex text-slate-600 dark:text-slate-500 text-xs sm:text-sm mt-4">
               <div class="flex items-center mr-auto">
                 <input id="remember-me" type="checkbox" class="form-check-input border mr-2" />
-                <label class="cursor-pointer select-none" for="remember-me">Se souvenir de moi</label>
+                <label class="cursor-pointer select-none mr-3" for="remember-me">Se souvenir de moi</label>
               </div>
-              <router-link to="/change-password">Mots de passe oublié?</router-link>
+              <router-link to="/change-password"  >Mots de passe oublié?</router-link>
             </div>
             <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left">
               <button class="btn btn-primary py-3 px-4 w-full bg-primary xl:mr-3 align-top">
-                <span class="text-sm font-semibold uppercase" v-if="!store.getLoading"> Se connecter </span>
-                <span v-else class="flex justify-center items-center space-x-2">
+                <span class="text-sm font-semibold uppercase" > Se connecter </span>
+                <!-- <span  class="flex justify-center items-center space-x-2">
                   <span class="px-4 font-semibold"> chargement ... </span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-center animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                </span>
+                </span> -->
               </button>
             </div>
             <div class="intro-x mt-10 xl:mt-24 text-slate-600 dark:text-slate-500 text-center xl:text-left">Célerité holding tout les droits réservés {{ year }}</div>
@@ -95,95 +95,154 @@
   </div>
 </template>
 
-<script setup>
-import { useAuthStore } from "@/stores/modules/authentification";
-import { useVuelidate } from "@vuelidate/core";
+<script>
+//import { required, minLength, numeric, email, sameAs } from 'vuelidate/lib/validators';
+//import gRecaptcha from '@finpo/vue2-recaptcha-invisible';
 import { required, minLength, numeric, email, sameAs } from "@vuelidate/validators";
-import { computed, reactive, ref, onMounted, provide } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import DarkModeSwitcher from "@/components/dark-mode-switcher/Main.vue";
-import dom from "@left4code/tw-starter/dist/js/dom";
+import { mapState, mapActions, mapMutations, mapGetters } from 'vuex'
 
-//props
-const store = useAuthStore();
-const router = useRouter();
-const route = useRoute();
-//emits
+//import Vmodal from '@/components/Vmodal'
+import axios from 'axios'
+import { API_BASE_URL } from "@/services/configs/environment.js";
 
-//datas
-const statePassword = ref("password");
-const show = ref(false);
-const successNotification = ref();
-const state = reactive({
-  email: "",
-  password: "",
-});
-const message = reactive({
-  type: "success",
-  message: "",
-});
 
-//computed
-const year = computed(() => {
-  const date = new Date();
-  return date.getFullYear();
-});
 
-//hook life cycle
+export default {
+  name: 'IndexPage',
+  components: {  },
+  data() {
+    return {
+      base_url: API_BASE_URL,
+      statePassword: "password",
+      show: false,
+      state : {
+        email:"" ,
+        password: "" ,
+      },
+      year : new Date().getFullYear() ,
+      login: "",
+      password: "",
+      isRobot: true,
+      chargement: false,
+      soumettre: false,
+      isValidate: false,
+      showSend: false
 
-//methods
-const login = () => {
-  //alert("ok");
-  //router.push("/dashboard");
-  // console.log(state)
+    }
+  },
+  computed: {
 
-  v$.value.$validate(); // checks all inputs
+    //importation des variables du module auths
+    ...mapState({
+      identifiant: state => state.auths.identifiant,
+      accountValidate: state => state.accountValidate,
+      loading: state => state.loading
+    })
+  },
 
-  if (!v$.value.$error) {
-    store
-      .login(state)
-      .then((payload) => {
-       
-        message.type = "success";
-        message.message = "Vous etes connectées";
-        successNotificationToggle();
-       // alert("ok")
-        router.push("/dashboard/ano");
-      })
-      .catch((err) => {
+  methods: {
+
+    //Charger les fonctions de connexion au serveur 
+    ...mapActions({
+      authentification: "auths/LOGIN"
+    }),
+
+    gotoValidate() {
+      this.showSend = true
+    },
+    resentLink() {
+      this.soumettre = true;
+      if (!this.$v.login.$invalid) {
+        this.$router.push({ name: 'resendLink', params: { identifiant: this.login } })
+        this.showSend = false
+      }
+    },
+    async save() {
+      this.soumettre = true; this.chargement = true
+        if (this.chargement === true) {
+          const identifiant = {}
+          identifiant.email = this.login
+          identifiant.password = this.password
+          const datas = await axios.get(`${this.base_url}/sanctum/csrf-cookie`)
+          if (datas.status == 204) {
+            await this.authentification(identifiant).then((response, status) => {
+              if (response.statut === "success" || response.status === 200) {
+                this.chargement = false
+                if (response.data.utilisateur.type == 'administrateur') {
+                  // this.$toast.success("Connexion réussie")
+                  this.$router.push('/dashboard/programme')
+                } else {
+                  // this.$toast.success("Connexion réussie")
+                  this.$router.push('/dashboard/projets')
+                }
+              }
+            }).catch((error) => {
+              console.log(error)
+              this.chargement = false
+            })
+          }
+          else {
+            this.$toast.error("Connexion impossible reesayer !!!")
+          }
+        }
         
-        message.type = "erreur";
-        message.message = err;
-        successNotificationToggle();
-      });
+    //  if (!this.$v.login.$invalid && !this.$v.password.$invalid) {
+       
+    //  }
+
+
+    },
+
+    validate() {
+      // validate your form , if you don't have validate prop , default validate pass .
+      return true;
+    },
+    callback(token) {
+      // google recaptcha token , then you can pass to backend with your form data .
+      if (token) {
+        //alert(token);
+        this.$toast.success("Confirmer")
+        this.isRobot = false
+      } else {
+        // if you use data-size show reCAPTCHA , maybe you will get empty token.
+        //alert('please check you are not robot');
+        this.$toast.error("Verifier que vous n'est pas un robot  !!!")
+      }
+    },
+    invisible() {
+      this.statePassword = !this.show ? 'text' : 'password'
+      this.show = !this.show;
+      //this.$toast.success('Profile saved',)
+    },
+  },
+  mounted() {
+    this.isValidate = localStorage.getItem("activeCompte")
+
+  },
+
+  validations: {
+    login: {
+      required,
+      email
+    },
+
+    password: {
+      required,
+      minLength: minLength(6)
+    },
+
+  },
+
+  watch: {
+    loading: function (params) {
+      //this.loading = params
+    }
   }
-};
 
-const invisible = () => {
-  statePassword.value = !show.value ? "text" : "password";
-  show.value = !show.value;
-};
-
-provide("bind[successNotification]", (el) => {
-  // Binding
-  successNotification.value = el;
-});
-const successNotificationToggle = () => {
-  // Show notification
-  successNotification.value.showToast();
-};
-
-//validations
-const rules = {
-  password: { required, minLength: minLength(6) },
-  email: { required, email },
-};
-
-const v$ = useVuelidate(rules, state);
-onMounted(() => {
-  dom("body").removeClass("main").removeClass("error-page").addClass("login");
-});
+}
 </script>
+
+
 <style scoped>
 .custom-bg {
   background-color: #0f3460;

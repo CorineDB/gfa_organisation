@@ -103,18 +103,18 @@ export default {
   },
 
   computed: {
-    //  importation des variables du module auths
-    // ...mapState({
-    //   loading: (state) => state.loading,
-    //   errors: (state) => state.errors,
-    // }),
-    // ...mapGetters({
-    //   hasErrors: "GET_ERREURS",
-    //   isLoading: "IS_LOADING",
-    //   ano: "anos/getAno",
-    //   typeAnos: "typeAnos/getTypeAnos",
-    //   currentUser: "auths/GET_AUTHENTICATE_USER",
-    // }),
+    // importation des variables du module auths
+    ...mapState({
+      loading: (state) => state.loading,
+      errors: (state) => state.errors,
+    }),
+    ...mapGetters({
+      hasErrors: "GET_ERREURS",
+      isLoading: "IS_LOADING",
+      ano: "anos/getAno",
+      typeAnos: "typeAnos/getTypeAnos",
+      currentUser: "auths/GET_AUTHENTICATE_USER",
+    }),
   },
 
   methods: {
@@ -228,7 +228,7 @@ export default {
       this.$store.dispatch("disabled");
     },
     getPermission() {
-      JSON.parse(localStorage.getItem('authenticateUser')).users.role[0].permissions.forEach((element) => {
+      JSON.parse(localStorage.getItem('authenticateUser')).role[0].permissions.forEach((element) => {
         if (element.slug === "voir-un-ano") {
           this.anoVisible = true;
         }
@@ -637,20 +637,20 @@ export default {
   },
 
   created() {
-    // this.getPermission();
-    // if (!this.anoVisible) {
-    //   this.$router.push("/401-non-autorise");
-    // } else {
-    //   if (this.bailleurVisible) {
-    //     this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).users.programme.id;
-    //     this.fetchBailleurs(this.programmeId);
-    //   }
-    //   this.fetchAnos();
-    // }
+    this.getPermission();
+    if (!this.anoVisible) {
+      this.$router.push("/401-non-autorise");
+    } else {
+      if (this.bailleurVisible) {
+        this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).programme.id;
+        this.fetchBailleurs(this.programmeId);
+      }
+      this.fetchAnos();
+    }
     //this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).users.programme.id;
-    this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).users.programme.id;
-    this.fetchBailleurs(this.programmeId);
-    this.fetchAnos();
+    // this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).users.programme.id;
+    // this.fetchBailleurs(this.programmeId);
+    // this.fetchAnos();
 
     //.then((value) => { console.log(value), console.log('content bailleur ' + this.bailleurs) });
   },
@@ -735,8 +735,8 @@ export default {
           <input id="tabulator-html-filter-value" v-model="filterValue" type="text" class="form-control sm:w-40 2xl:w-full mt-2 sm:mt-0" placeholder="Search..." />
         </div>
         <div class="mt-2 xl:mt-0">
-          <button id="tabulator-html-filter-go" type="button" class="btn btn-primary w-full sm:w-16" @click="updateFilter">Rechercher</button>
-          <button id="tabulator-html-filter-reset" type="button" class="btn btn-secondary w-full sm:w-16 mt-2 sm:mt-0 sm:ml-1" @click="clearFilter">Réinitialiser</button>
+          <button id="tabulator-html-filter-go" type="button" class="btn btn-primary w-full sm:w-16 mr-5" @click="updateFilter"><SearchIcon class="w-h4 h-4" /></button>
+          <button id="tabulator-html-filter-reset" type="button" class="btn btn-secondary w-full sm:w-16 mt-2 sm:mt-0 sm:ml-1" @click="clearFilter"><RotateCcwIcon class="w-h4 h-4"/></button>
         </div>
       </form>
       <div class="flex mt-5 sm:mt-0">

@@ -237,12 +237,14 @@ const usersProfileImage = ref('')
 onMounted(() => {
   const usersInfo = JSON.parse(localStorage.getItem('authenticateUser'));
 
+  console.log('usersInfo' , usersInfo)
  
   if (usersInfo) {
-    usersProfileImage.value = API_BASE_URL + usersInfo.users.profil
-    currentUsers.nom = usersInfo.users.nom
+    // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil
+    // currentUsers.nom = usersInfo.profil.nom
+    currentUsers.nom = "test"
    // currentUsers.prenom = usersInfo.users.prenom
-    currentUsers.role = usersInfo.users.role.nom
+    currentUsers.role = usersInfo.role[0].nom
   //  + currentUsers.prenom[0]
     let storeInitial = currentUsers.nom[0] + '' 
     storeInitial = storeInitial.toUpperCase()

@@ -2,44 +2,44 @@ export default {
 
     GET_AUTHENTICATE_USER: state => {
 
-        alert("")
-        return state.authenticateUser
 
-            ?
-            state.authenticateUser
+        if (state.authenticateUser) {
+            return state.authenticateUser;
+        }
 
-            : localStorage.getItem('authenticateUser')
+        const storedUser = localStorage.getItem('authenticateUser');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            if (parsedUser !== undefined) {
+                state.authenticateUser = parsedUser;
+                return state.authenticateUser;
+            }
+        }
 
-        ?
-        JSON.parse(localStorage.getItem('authenticateUser')) !== undefined ? state.authenticateUser = JSON.parse(localStorage.getItem('authenticateUser'))
-
-        :
-        null
-
-            : null
+        return null;
     },
 
 
     GET_ACCESS_TOKEN: state => {
+        if (state.access_token) {
+            return state.access_token;
+        }
 
-        return state.access_token
+        const storedToken = localStorage.getItem('access_token');
+        if (storedToken) {
+            const parsedToken = JSON.parse(storedToken);
+            if (parsedToken !== undefined) {
+                state.access_token = parsedToken;
+                return state.access_token;
+            }
+        }
 
-            ?
-            state.access_token
-
-            : localStorage.getItem('access_token')
-
-        ?
-        JSON.parse(localStorage.getItem('access_token')) !== undefined ? state.access_token = JSON.parse(localStorage.getItem('access_token'))
-
-        :
-        null
-
-            : null
+        return null;
     },
 
-    IS_AUTHENTICATED: (getters, state) => {
+    IS_AUTHENTICATED: (getters) => {
         return getters.GET_ACCESS_TOKEN ? true : null;
     },
+
 
 }

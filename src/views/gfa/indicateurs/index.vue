@@ -10,6 +10,8 @@ import extractFormData from "@/utils/extract-data";
 //import { advancedTable } from "../../constant/basic-tablle-data";
 import xlsx from "xlsx";
 import Tabulator from "tabulator-tables";
+import 'tabulator-tables/dist/css/tabulator_modern.css'; // Ou un autre thème
+
 
 export default {
   components: {
@@ -28,6 +30,7 @@ export default {
   },
   data() {
     return {
+      inboxLigne : true ,
       options: ["foo", "bar", "baz"],
       savedInput: [],
       sendRequest: false,
@@ -604,6 +607,7 @@ export default {
 
     fetchIndicateurs() {
       // this.active();
+      // alert("ok")
       IndicateurService.get()
         .then((data) => {
           const datas = data.data.data;
@@ -997,7 +1001,7 @@ export default {
     },
 
     getPermission() {
-      JSON.parse(localStorage.getItem('authenticateUser')).users.role[0].permissions.forEach((element) => {
+      JSON.parse(localStorage.getItem('authenticateUser')).role[0].permissions.forEach((element) => {
         if (element.slug === "voir-un-indicateur") {
           this.indicateurVisible = true;
         }
@@ -1411,9 +1415,10 @@ export default {
 
   created() {
     console.log(JSON.parse(localStorage.getItem('authenticateUser')));
-    this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).users.programme.id;
+    this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).programme.id;
     if (this.programmeId) {
       this.fetchBailleurs(this.programmeId);
+      this.fetchIndicateurs()
     }
     this.getPermission();
     if (!this.indicateurVisible) {
@@ -1422,7 +1427,7 @@ export default {
 
     if (JSON.parse(localStorage.getItem('authenticateUser')).users != undefined) {
       this.currentRole = JSON.parse(localStorage.getItem('authenticateUser')).users.type;
-      this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).users.programme.id;
+      this.programmeId = JSON.parse(localStorage.getItem('authenticateUser')).programme.id;
 
       if (JSON.parse(localStorage.getItem('authenticateUser')).users.type === "bailleur") {
         this.getIndicateurBailleurs();
@@ -1466,7 +1471,7 @@ export default {
 
   <div class="container mx-auto px-4">
     <!-- Combined Filter Section -->
-    <div class="bg-white shadow-md p-6 rounded-lg">
+    <div class="bg-white shadow-md p-6 rounded-lg space-y-3">
       <h2 class="font-bold text-base mb-4">Filtre</h2>
       <div class="grid grid-cols-3 gap-4">
         <input type="text" v-model="filteredIndicateur.nom" placeholder="Indicateur" class="border p-2 rounded" />
@@ -1568,7 +1573,7 @@ export default {
       </div>
     </div>
     <div class="overflow-x-auto scrollbar-hidden">
-      <div id="tabulatorIndicateurs" ref="tableRef" class="mt-5 table-report table-report--tabulator"></div>
+      <div id="tabulatorIndicateurs"  ref="tableRef" class="mt-5 inbox__item"></div>
     </div>
   </div>
   <!-- END: HTML Table Data -->
@@ -1649,4 +1654,6 @@ export default {
   </Modal>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>

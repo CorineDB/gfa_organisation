@@ -40,6 +40,7 @@ import FicheSynthese from "../views/gfa/FicheSynthese.vue";
 import DashboardGfa from "../views/gfa/Dashboard.vue";
 import indicateurs from "../views/gfa/indicateurs/index.vue";
 import projets from "../views/gfa/projets/index.vue";
+import programme from "../views/gfa/programme/index.vue"
 
 const routes = [{
         path: "/dashboard",
@@ -160,6 +161,12 @@ const routes = [{
                 path: "projets",
                 name: "projets",
                 component: projets,
+
+            },
+            {
+                path: "programme",
+                name: "programme",
+                component: programme,
 
             },
             {

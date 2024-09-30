@@ -401,7 +401,7 @@ onMounted(() => {
   console.log(usersInfo);
 
   if (usersInfo) {
-    usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
+   // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
   }
 
   dom("body").removeClass("error-page").removeClass("login").addClass("main");

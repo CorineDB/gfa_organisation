@@ -1,66 +1,106 @@
-import axios from "axios"
+import axios from "axios";
+//import Vue from 'vue';
 import { API_BASE_URL } from "@/services/configs/environment";
-//import store from "@/store";
-//const storeToken = store.getters.getToken
+import { SET_LOADER, SET_ERRORS_MESSAGE } from '../stores/mutations.type';
+import store from "../stores/index";
+//import router from "../router/index";
+
+// Fonction pour gérer le loader
+// const chargement = (bool) => {
+//     Vue.$store.dispatch('SET_LOADER', bool);
+// };
 
 /**
  * Axios basic configuration
- * Some general configuration can be added like timeout, headers, params etc. More details can be found on https://github.com/axios/axios
- * */
+ * Configuration générale : timeout, headers, params, etc.
+ */
+
 const config = {
-    baseURL: API_BASE_URL + "/api/",
-    timeout: 60 * 1000, // Timeout
-    //withCredentials: true, // Check cross-site Access-Control,
+    baseURL: `${API_BASE_URL}/api/`,
+    timeout: 60 * 100000000, // Timeout
     headers: {
         common: {
             'Accept': 'application/json',
             'Content-Type': 'application/json,multipart/form-data',
-
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, X-Token-Auth, Authorization'
         }
     }
 };
 
 /**
- * Creating the instance of Axios
- * It is because, in large scale application we may need to consume APIs from more than single server,
- * So, may need to create multiple http client with different config
- * Only this client will be used rather than axios in the application
- **/
+ * Création d'une instance Axios
+ * Utiliser cette instance au lieu d'axios directement dans l'application
+ */
 const httpClient = axios.create(config);
 
 /**
- * Auth interceptors
- * @description Configuration related to AUTH token can be done in interceptors.
- * Currenlty it is just doing nothing but idea to to show the capability of axios and its interceptors
- * In future, interceptors can be created into separate files and consumed into multiple http clients
- * @param {*} config
+ * Auth interceptor
+ * Ajout du token d'authentification si disponible
  */
-
-
-/** Adding the request interceptors */
-/* 
-  httpClient.interceptors.request.use(authInterceptor);
-  httpClient.interceptors.request.use(loggerInterceptor); 
-*/
-
-/** Adding the request interceptors */
-httpClient.interceptors.request.use(config => {
-    /* if(storeToken != '' && storeToken != undefined) {
-      config.headers.Authorization = `Bearer ${getToken}`
-    } */
-
-    const getToken = JSON.parse(localStorage.getItem('authenticateUser'));
-    if (getToken != undefined || getToken != null) {
-        let token = getToken.token
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
-        }
+const authInterceptor = config => {
+    let token = store.getters['auths/GET_ACCESS_TOKEN'];
+    if (token) {
+        token = token.slice(0, -1); // Optionnel : si besoin de modifier le token
+        config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Réinitialisation des erreurs
+    store.commit(SET_ERRORS_MESSAGE, { message: null, errors: [] });
 
     return config;
-});
+};
 
+/**
+ * Response Interceptor
+ * Gestion des erreurs de réponse et du loader
+ */
+// const responseErrorInterceptor = error => {
+//     store.commit(SET_LOADER, false); // Désactiver le loader en cas d'erreur
 
+//     const statusCode = parseInt(error.response ? .status ? ? 500);
+//     const errorMessage = error.response ? .data ? .message;
+//     const errorDetails = error.response ? .data ? .errors;
+
+//     store.commit(SET_ERRORS_MESSAGE, { message: errorMessage, errors: errorDetails });
+
+//     switch (statusCode) {
+//         case 400:
+//             // Redirection ou traitement spécifique pour le statut 400
+//             break;
+
+//         case 401:
+//             store.commit("auths/RESET_AUTH_DATA");
+//             router.push("/");
+//             break;
+
+//         case 404:
+//             chargement(false);
+//             break;
+
+//         case 422:
+//             // Traitement des erreurs de validation (422)
+//             break;
+
+//         default:
+//             Vue.$toast.error(errorMessage);
+//             chargement(false);
+//             break;
+//     }
+
+//     return Promise.reject(error);
+// };
+
+/** Ajout des interceptors à l'instance Axios */
+httpClient.interceptors.request.use(authInterceptor);
+
+httpClient.interceptors.response.use(
+    response => {
+        store.commit(SET_LOADER, false); // Désactiver le loader après la réponse
+        return response;
+    },
+    // responseErrorInterceptor
+);
 
 export { httpClient };
