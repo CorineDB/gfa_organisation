@@ -8,12 +8,12 @@ export const useSideMenuStore = defineStore("sideMenu", {
                 title: "Dashboard GFA",
             },
             {
-                icon: "CpuIcon",
+                icon: "FolderIcon",
                 pageName: "projets",
                 title: "Projets",
             },
             {
-                icon: "CpuIcon",
+                icon: "ListIcon",
                 pageName: "programme",
                 title: "Programme",
             },
@@ -24,7 +24,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
             },
 
             {
-                icon: "CpuIcon",
+                icon: "BarChart2Icon",
                 pageName: "indicateurs",
                 title: "Indicateurs",
             },
@@ -43,6 +43,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
                 icon: "GlobeIcon",
                 pageName: "Principes",
                 title: "Principes",
+            },
+            {
+                icon: "FolderKanbanIcon",
+                pageName: "typeGouvernance",
+                title: "Type de Gouvernance",
             },
             {
                 icon: "GlobeIcon",

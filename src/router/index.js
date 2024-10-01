@@ -41,6 +41,7 @@ import DashboardGfa from "../views/gfa/Dashboard.vue";
 import indicateurs from "../views/gfa/indicateurs/index.vue";
 import projets from "../views/gfa/projets/index.vue";
 import programme from "../views/gfa/programme/index.vue"
+import typeGouvernance from "../views/gfa/type_gouvernance/index.vue"
 
 const routes = [{
         path: "/dashboard",
@@ -70,6 +71,11 @@ const routes = [{
                 path: "ToolsPerception",
                 name: "ToolsPerception",
                 component: ToolsPerception,
+            },
+            {
+                path: "typeGouvernance",
+                name: "typeGouvernance",
+                component: typeGouvernance,
             },
             {
                 path: "/ficheFactuel",
@@ -161,13 +167,11 @@ const routes = [{
                 path: "projets",
                 name: "projets",
                 component: projets,
-
             },
             {
                 path: "programme",
                 name: "programme",
                 component: programme,
-
             },
             {
                 path: "choix",
