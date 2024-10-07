@@ -3,8 +3,8 @@
   <div class="col-span-12 _lg:col-span-7 _2xl:col-span-8">
       <div class="grid grid-cols-12 gap-5">
         <div
-          v-for="(faker, fakerKey) in $_.take($f(), 9)"
-          :key="fakerKey"
+          v-for="(element, index) in projet"
+          :key="index"
           class="intro-y col-span-12 sm:col-span-6 2xl:col-span-4"
         >
           <div class="box">
@@ -12,20 +12,16 @@
               <div
                 class="h-40 2xl:h-56 image-fit rounded-md overflow-hidden before:block before:absolute before:w-full before:h-full before:top-0 before:left-0 before:z-10 before:bg-gradient-to-t before:from-black before:to-black/10"
               >
-                <img
-                  alt="Midone - HTML Admin Template"
-                  class="rounded-md"
-                  :src="faker.images[0]"
-                />
-                <template v-if="faker.trueFalse[0]">
+                 
+                <!-- <template v-if="faker.trueFalse[0]">
                   <span
                     class="absolute top-0 bg-pending/80 text-white text-xs m-5 px-2 py-1 rounded z-10"
                     >Featured</span
                   >
-                </template>
+                </template> -->
                 <div class="absolute bottom-0 text-white px-5 pb-6 z-10">
                   <a href="" class="block font-medium text-base">{{
-                    faker.products[0].name
+                    element.name
                   }}</a>
                   <span class="text-white/90 text-xs mt-3">{{
                     faker.products[0].category
