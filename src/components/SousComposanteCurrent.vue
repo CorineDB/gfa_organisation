@@ -242,38 +242,16 @@
 </template>
 
 <script>
-import Vtable from '@/components/Vtable'
-import ModalTopRight from '@/components/ModalTopRight'
-import Multiselect from 'vue-multiselect'
-import SearchBar from '@/components/SearchBar'
-import Titre from '@/components/Titre'
-import Vmodal from '@/components/Vmodal'
-import Vform from '@/components/Vform'
-import Dashboard from '@/layouts/Dashboard'
-import Dropdown from '@/components/Dropdown.vue'
-import Empty from '@/components/Empty.vue'
-import CardComposante from '@/components/CardComposante.vue'
+
+
 import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
 import { extractFormData, getStringValueOfStatutCode } from '@/utils/index'
-import DeleteAlert from "@/components/DeleteAlert.vue";
-import Composante from '@/store/modules/composantes/composante'
 import ComposanteService from "@/services/modules/composante.service.js";
 import ProgrammeService from "@/services/modules/programme.service.js";
 export default {
   props: ['valeurProjet', 'valueProfondeur'],
   components: {
-    Dashboard,
-    Vmodal,
-    Titre,
-    Vform,
-    SearchBar,
-    Multiselect,
-    ModalTopRight,
-    Dropdown,
-    CardComposante,
-    DeleteAlert,
-    Vtable,
-    Empty,
+   
   },
   data() {
     return {

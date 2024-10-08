@@ -12,17 +12,39 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
         icon: "FolderIcon",
         pageName: "projets",
         title: "Projets",
+        subMenu: [
+          {
+            icon: "FolderIcon",
+            pageName: "dashboard_projets_composantes_globale",
+            title: "OutComes",
+          },
+          {
+            icon: "FolderIcon",
+            pageName: "dashboard_projets_sous_composantes_globale",
+            title: "OutPut",
+          },
+          {
+            icon: "FolderIcon",
+            pageName: "dashboard_projets_activites_globale",
+            title: "Activités",
+          },
+          {
+            icon: "FolderIcon",
+            pageName: "dashboard_projets_taches_globale",
+            title: "Taches",
+          },
+        ],
       },
-      // {
-      //   icon: "ListIcon",
-      //   pageName: "programme",
-      //   title: "Programme",
-      // },
 
       {
         icon: "CpuIcon",
         pageName: "Ongs",
         title: "Organisations",
+      },
+      {
+        icon: "CpuIcon",
+        pageName: "pta",
+        title: "PTAB",
       },
 
       {
@@ -30,37 +52,40 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
         pageName: "indicateurs",
         title: "Indicateurs",
       },
+      {
+        icon: "FolderIcon",
+        pageName: "projets",
+        title: "Outils de collecte",
+        subMenu: [
+          {
+            icon: "FolderKanbanIcon",
+            pageName: "typeGouvernance",
+            title: "Type de Gouvernance",
+          },
+          {
+            icon: "GlobeIcon",
+            pageName: "Gouvernance",
+            title: "Gouvernance",
+          },
+          {
+            icon: "GlobeIcon",
+            pageName: "Principes",
+            title: "Principes",
+          },
+          {
+            icon: "FolderKanbanIcon",
+            pageName: "Programmation_enquete",
+            title: "Programmation d'enquête",
+          },
+        ],
+      },
 
-      {
-        icon: "GlobeIcon",
-        pageName: "Principes",
-        title: "Principes",
-      },
-      {
-        icon: "FolderKanbanIcon",
-        pageName: "typeGouvernance",
-        title: "Type de Gouvernance",
-      },
-      {
-        icon: "GlobeIcon",
-        pageName: "Gouvernance",
-        title: "Gouvernance",
-      },
-      // {
-      //   icon: "GlobeIcon",
-      //   pageName: "choix",
-      //   title: "Choix",
-      // },
       {
         icon: "SettingsIcon",
         pageName: "ToolsFactuel",
         title: "Outil Factuel",
       },
-      // {
-      //   icon: "SettingsIcon",
-      //   pageName: "Structure",
-      //   title: "Structure",
-      // },
+
       {
         icon: "SettingsIcon",
         pageName: "ToolsPerception",

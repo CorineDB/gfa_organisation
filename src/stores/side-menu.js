@@ -12,12 +12,30 @@ export const useSideMenuStore = defineStore("sideMenu", {
         icon: "FolderIcon",
         pageName: "projets",
         title: "Projets",
+        subMenu: [
+          {
+            icon: "FolderIcon",
+            pageName: "dashboard_projets_composantes_globale",
+            title: "OutComes",
+          },
+          {
+            icon: "FolderIcon",
+            pageName: "dashboard_projets_sous_composantes_globale",
+            title: "OutPut",
+          },
+          {
+            icon: "FolderIcon",
+            pageName: "dashboard_projets_activites_globale",
+            title: "Activités",
+          },
+          {
+            icon: "FolderIcon",
+            pageName: "dashboard_projets_taches_globale",
+            title: "Taches",
+          },
+        ],
       },
-      // {
-      //   icon: "ListIcon",
-      //   pageName: "programme",
-      //   title: "Programme",
-      // },
+
       {
         icon: "CpuIcon",
         pageName: "Ongs",
@@ -34,21 +52,32 @@ export const useSideMenuStore = defineStore("sideMenu", {
         pageName: "indicateurs",
         title: "Indicateurs",
       },
-
       {
-        icon: "GlobeIcon",
-        pageName: "Principes",
-        title: "Principes",
-      },
-      {
-        icon: "FolderKanbanIcon",
-        pageName: "typeGouvernance",
-        title: "Type de Gouvernance",
-      },
-      {
-        icon: "GlobeIcon",
-        pageName: "Gouvernance",
-        title: "Gouvernance",
+        icon: "FolderIcon",
+        pageName: "projets",
+        title: "Outils de collecte",
+        subMenu: [
+          {
+            icon: "FolderKanbanIcon",
+            pageName: "typeGouvernance",
+            title: "Type de Gouvernance",
+          },
+          {
+            icon: "GlobeIcon",
+            pageName: "Gouvernance",
+            title: "Gouvernance",
+          },
+          {
+            icon: "GlobeIcon",
+            pageName: "Principes",
+            title: "Principes",
+          },
+          {
+            icon: "FolderKanbanIcon",
+            pageName: "Programmation_enquete",
+            title: "Programmation d'enquête",
+          },
+        ],
       },
 
       {

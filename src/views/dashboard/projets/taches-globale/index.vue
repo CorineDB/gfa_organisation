@@ -14,10 +14,6 @@ import TachesService from '@/services/modules/tache.service';
 
 export default {
   components: {
-    Dashboard,
-    TacheCurrent,
-    Revisite, Multiselect, SearchBar, Titre, CardTache, Titre
-
   },
   data() {
     return {

@@ -7,7 +7,7 @@
 
 import ProjetService from "@/services/modules/projet.service.js";
 
-import Multiselect from 'vue-multiselect'
+
 import  { getStringValueOfStatutCode }  from '@/utils/index'
 import { mapGetters, mapActions } from "vuex";
 

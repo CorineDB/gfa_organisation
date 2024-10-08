@@ -33,12 +33,15 @@ import FicheSynthese from "../views/dashboard/FicheSynthese.vue";
 import DashboardGfa from "../views/dashboard/Dashboard.vue";
 import indicateurs from "../views/dashboard/indicateurs/index.vue";
 
-import typeGouvernance from "../views/dashboard/type_gouvernance/index.vue"
+import typeGouvernance from "../views/dashboard/type_gouvernance/index.vue";
+import Programmation_enquete from "../views/dashboard/programmation_enquete/index.vue";
 
+//Projet/Outcomes/Activité/Taches
 import dashboard_projets_composantes_globale from "../views/dashboard/projets/composantes-globale/index.vue";
 import projets from "../views/dashboard/projets/index.vue";
-
-
+import dashboard_projets_activites_globale from "../views/dashboard/projets/activites-globale/_id/suivis.vue";
+import dashboard_projets_taches_globale from "../views/dashboard/projets/taches-globale/index.vue";
+import dashboard_projets_sous_composantes_globale from "../views/dashboard/projets/sous-composantes-globale/index.vue";
 
 const routes = [
   {
@@ -56,15 +59,37 @@ const routes = [
         name: "Ongs",
         component: Ong,
       },
-      {
-        path: "projets/composantes-globale",
-        component: dashboard_projets_composantes_globale,
-       
-      },
+
       {
         path: "/dashboard/indicateurs",
         component: indicateurs,
         name: "indicateurs",
+      },
+      {
+        path: "projets/composantes-globale",
+        component: dashboard_projets_composantes_globale,
+        name: "dashboard_projets_composantes_globale",
+      },
+      {
+        path: "/dashboard/projets/sous-composantes-globale",
+        component: dashboard_projets_sous_composantes_globale,
+        name: "dashboard_projets_sous_composantes_globale",
+      },
+      {
+        path: "projets/activites-globale",
+        component: dashboard_projets_activites_globale,
+
+        name: "dashboard_projets_activites_globale",
+      },
+      {
+        path: "projets/taches-globale",
+        component: dashboard_projets_taches_globale,
+        name: "dashboard_projets_taches_globale",
+      },
+      {
+        path: "toolsFactuel",
+        name: "Programmation_enquete",
+        component: Programmation_enquete,
       },
       {
         path: "toolsFactuel",
@@ -204,22 +229,21 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes,
-    scrollBehavior(to, from, savedPosition) {
-        return savedPosition || { left: 0, top: 0 };
-    },
+  history: createWebHistory(),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    return savedPosition || { left: 0, top: 0 };
+  },
 });
 
 router.beforeEach((to, from, next) => {
-    if (!localStorage.getItem('authenticateUser') && to.path !== "/") {
-        next("/");
-    } else {
+  if (!localStorage.getItem("authenticateUser") && to.path !== "/") {
+    next("/");
+  } else {
+    next();
+  }
 
-        next();
-    }
-
-    // next()
+  // next()
 });
 
 export default router;
