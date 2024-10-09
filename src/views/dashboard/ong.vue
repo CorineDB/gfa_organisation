@@ -1,4 +1,7 @@
 <script>
+import { createIcons, icons } from "lucide";
+createIcons({ icons });
+
 import OngService from "@/services/modules/ong.service.js";
 import BailleurService from "@/services/modules/bailleur.service";
 import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
@@ -354,9 +357,16 @@ export default {
             title: "Actions",
             field: "actions",
             formatter: function (cell, formatterParams) {
-              return `<button class='btn-suivre btn btn-primary'>
-                 <i data-lucide="trash"></i>
-                </button>`;
+              return ` 
+              <div class="flex items-center gap-3">
+                <button class='btn-suivre btn btn-primary'>
+                   Modifier
+                </button>
+                 <button class='btn-suivre btn btn-danger'>
+                   Supprimer
+                </button>
+                </div>
+               `;
             },
             cellClick: (e, cell) => {
               // Utilisation d'une fonction fléchée pour garder le contexte de `this`
@@ -365,7 +375,6 @@ export default {
                 //this.suivreIndicateur(rowData.id); // Appel de la méthode
               }
             },
-            
           },
         ],
       });
@@ -513,15 +522,16 @@ export default {
           //   formData.append("fichier" + i, file);
           // }
           let formData = {
-            nom : "test" ,
-            contact : 67217812 ,
-            email : "alaomoutawakil@gmail.com",
-            sigle :"TES",
+            nom: "test",
+            contact: 67217812,
+            email: "alaomoutawakil@gmail.com",
+            sigle: "TES",
             code: "23",
-            programmeId : this.programmeId 
-          }
+            programmeId: this.programmeId,
+          };
 
-          this.saveOng(formData).then((response) => {
+          this.saveOng(formData)
+            .then((response) => {
               if (response.status == 200 || response.status == 201) {
                 this.close();
                 this.resetForm();
@@ -688,101 +698,61 @@ export default {
 </script>
 
 <template>
- <i data-lucide="trash"></i>
-   <Modal
-              :show="showModal"
-              @hidden="showModal = false"
-            >
-              <ModalHeader>
-                <h2 class="font-medium text-base mr-auto">Broadcast Message</h2>
-                <button class="btn btn-outline-secondary hidden sm:flex">
-                  <FileIcon class="w-4 h-4 mr-2" /> Download Docs
-                </button>
-                <Dropdown class="sm:hidden">
-                  <DropdownToggle class="w-5 h-5 block" href="javascript:;">
-                    <MoreHorizontalIcon class="w-5 h-5 text-slate-500" />
-                  </DropdownToggle>
-                  <DropdownMenu class="w-40">
-                    <DropdownContent>
-                      <DropdownItem>
-                        <FileIcon class="w-4 h-4 mr-2" />
-                        Download Docs
-                      </DropdownItem>
-                    </DropdownContent>
-                  </DropdownMenu>
-                </Dropdown>
-              </ModalHeader>
-              <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-                <div class="col-span-12 sm:col-span-6">
-                  <label for="modal-form-1" class="form-label">From</label>
-                  <input
-                    id="modal-form-1"
-                    type="text"
-                    class="form-control"
-                    placeholder="example@gmail.com"
-                  />
-                </div>
-                <div class="col-span-12 sm:col-span-6">
-                  <label for="modal-form-2" class="form-label">To</label>
-                  <input
-                    id="modal-form-2"
-                    type="text"
-                    class="form-control"
-                    placeholder="example@gmail.com"
-                  />
-                </div>
-                <div class="col-span-12 sm:col-span-6">
-                  <label for="modal-form-3" class="form-label">Subject</label>
-                  <input
-                    id="modal-form-3"
-                    type="text"
-                    class="form-control"
-                    placeholder="Important Meeting"
-                  />
-                </div>
-                <div class="col-span-12 sm:col-span-6">
-                  <label for="modal-form-4" class="form-label"
-                    >Has the Words</label
-                  >
-                  <input
-                    id="modal-form-4"
-                    type="text"
-                    class="form-control"
-                    placeholder="Job, Work, Documentation"
-                  />
-                </div>
-                <div class="col-span-12 sm:col-span-6">
-                  <label for="modal-form-5" class="form-label"
-                    >Doesn't Have</label
-                  >
-                  <input
-                    id="modal-form-5"
-                    type="text"
-                    class="form-control"
-                    placeholder="Job, Work, Documentation"
-                  />
-                </div>
-                <div class="col-span-12 sm:col-span-6">
-                  <label for="modal-form-6" class="form-label">Size</label>
-                  <select id="modal-form-6" class="form-select">
-                    <option>10</option>
-                    <option>25</option>
-                    <option>35</option>
-                    <option>50</option>
-                  </select>
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <button
-                  type="button"
-                  @click="showModal = false"
-                  class="btn btn-outline-secondary w-20 mr-1"
-                >
-                  Cancel
-                </button>
-                <button type="button" class="btn btn-primary w-20">Send</button>
-              </ModalFooter>
-            </Modal>
+  <i data-lucide="trash"></i>
+  <Modal :show="showModal" @hidden="showModal = false">
+    <ModalHeader>
+      <h2 class="font-medium text-base mr-auto">Broadcast Message</h2>
+      <button class="btn btn-outline-secondary hidden sm:flex"><FileIcon class="w-4 h-4 mr-2" /> Download Docs</button>
+      <Dropdown class="sm:hidden">
+        <DropdownToggle class="w-5 h-5 block" href="javascript:;">
+          <MoreHorizontalIcon class="w-5 h-5 text-slate-500" />
+        </DropdownToggle>
+        <DropdownMenu class="w-40">
+          <DropdownContent>
+            <DropdownItem>
+              <FileIcon class="w-4 h-4 mr-2" />
+              Download Docs
+            </DropdownItem>
+          </DropdownContent>
+        </DropdownMenu>
+      </Dropdown>
+    </ModalHeader>
+    <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
+      <div class="col-span-12 sm:col-span-6">
+        <label for="modal-form-1" class="form-label">From</label>
+        <input id="modal-form-1" type="text" class="form-control" placeholder="example@gmail.com" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <label for="modal-form-2" class="form-label">To</label>
+        <input id="modal-form-2" type="text" class="form-control" placeholder="example@gmail.com" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <label for="modal-form-3" class="form-label">Subject</label>
+        <input id="modal-form-3" type="text" class="form-control" placeholder="Important Meeting" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <label for="modal-form-4" class="form-label">Has the Words</label>
+        <input id="modal-form-4" type="text" class="form-control" placeholder="Job, Work, Documentation" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <label for="modal-form-5" class="form-label">Doesn't Have</label>
+        <input id="modal-form-5" type="text" class="form-control" placeholder="Job, Work, Documentation" />
+      </div>
+      <div class="col-span-12 sm:col-span-6">
+        <label for="modal-form-6" class="form-label">Size</label>
+        <select id="modal-form-6" class="form-select">
+          <option>10</option>
+          <option>25</option>
+          <option>35</option>
+          <option>50</option>
+        </select>
+      </div>
+    </ModalBody>
+    <ModalFooter>
+      <button type="button" @click="showModal = false" class="btn btn-outline-secondary w-20 mr-1">Cancel</button>
+      <button type="button" class="btn btn-primary w-20">Send</button>
+    </ModalFooter>
+  </Modal>
   <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
     <h2 class="text-lg font-medium mr-auto">Organisation</h2>
     <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
@@ -805,38 +775,7 @@ export default {
   </div>
   <!-- BEGIN: HTML Table Data -->
   <div class="intro-y box p-5 mt-5">
-    <div class="flex flex-row flex-wrap _sm:items-end _xl:items-start">
-      <form id="tabulator-html-filter-form" class="xl:flex sm:mr-auto">
-        <div class="sm:flex items-center sm:mr-4">
-          <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Champs</label>
-          <select id="tabulator-html-filter-field" v-model="filterField" class="form-select w-full _sm:w-32 2xl:w-full mt-2 sm:mt-0 sm:w-auto">
-            <option value="nom">Nom</option>
-            <option value="taille">Taille</option>
-            <option value="age">Age</option>
-            <option value="stats">Stats</option>
-          </select>
-        </div>
-        <div class="sm:flex items-center sm:mr-4 mt-2 xl:mt-0">
-          <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Type</label>
-          <select id="tabulator-html-filter-type" v-model="filterType" class="form-select w-full mt-2 sm:mt-0 sm:w-auto">
-            <option value="like" selected>like</option>
-            <option value="=">=</option>
-            <option value="<">&lt;</option>
-            <option value="<=">&lt;=</option>
-            <option value=">">></option>
-            <option value=">=">>=</option>
-            <option value="!=">!=</option>
-          </select>
-        </div>
-        <div class="sm:flex items-center sm:mr-4 mt-2 xl:mt-0">
-          <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Value</label>
-          <input id="tabulator-html-filter-value" v-model="filterValue" type="text" class="form-control sm:w-40 2xl:w-full mt-2 sm:mt-0" placeholder="Search..." />
-        </div>
-        <div class="mt-2 xl:mt-0">
-          <button id="tabulator-html-filter-go" type="button" class="btn btn-primary w-full sm:w-16 mr-5" @click="updateFilter"><SearchIcon class="w-h4 h-4" /></button>
-          <button id="tabulator-html-filter-reset" type="button" class="btn btn-secondary w-full sm:w-16 mt-2 sm:mt-0 sm:ml-1" @click="clearFilter"><RotateCcwIcon class="w-h4 h-4" /></button>
-        </div>
-      </form>
+    <div class="flex flex-end flex-wrap _sm:items-end _xl:items-start">
       <div class="flex mt-5 sm:mt-0">
         <button id="tabulator-print" class="btn btn-outline-secondary w-1/2 sm:w-auto mr-2" @click="onPrint"><PrinterIcon class="w-4 h-4 mr-2" /> PDF</button>
         <Dropdown class="w-1/2 sm:w-auto">
