@@ -53,6 +53,7 @@
     "vue-select": "^4.0.0-beta.6",
     "vue-tippy": "^6.4.4",
     "vue3-carousel": "^0.2.13",
+    "vue3-toastify": "^0.2.3",
     "vuex": "^4.1.0",
     "xlsx": "^0.16.9",
     "zoom-vanilla.js": "^2.0.6"
