@@ -212,7 +212,6 @@ onMounted(() => {
         <div class="grid grid-cols-1 gap-4">
           <InputForm label="Nom" v-model="payload.nom" />
           <InputForm label="Description" v-model="payload.description" />
-          {{ payload.programmeId }}
           <div class="">
             <label for="regular-form-1" class="form-label">Programmes </label>
             <TomSelect v-model="payload.programmeId" :options="{ placeholder: 'Selectionez un programme' }" class="w-full">
