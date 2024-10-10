@@ -1,10 +1,12 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import VButton from "../../../components/news/VButton.vue";
-import InputForm from "../../../components/news/InputForm.vue";
-import TypeGouvernaceService from "../../../services/modules/typeGouvernance.service";
+import VButton from "@/components/news/VButton.vue";
+import InputForm from "@/components/news/InputForm.vue";
+import TypeGouvernaceService from "@/services/modules/typeGouvernance.service";
 import Tabulator from "tabulator-tables";
-import DeleteButton from "../../../components/news/DeleteButton.vue";
+import DeleteButton from "@/components/news/DeleteButton.vue";
+import { toast } from "vue3-toastify";
+import LoaderSnipper from "@/components/LoaderSnipper.vue";
 
 const payload = reactive({
   nom: "",
@@ -15,12 +17,12 @@ const tabulator = ref();
 const idSelect = ref("");
 const showModalCreate = ref(false);
 const deleteModalPreview = ref(false);
-const isCreate = ref(true);
 const isLoading = ref(false);
+const isLoadingData = ref(true);
+const isCreate = ref(true);
 const programmes = ref([]);
 const datas = ref([]);
 
-const submitData = () => (isCreate.value ? createData() : updateData());
 const createData = async () => {
   isLoading.value = true;
   await TypeGouvernaceService.create(payload)
@@ -28,19 +30,25 @@ const createData = async () => {
       isLoading.value = false;
       getDatas();
       resetForm();
+      toast.success("Type de gouvernace créer.");
     })
     .catch((e) => {
       isLoading.value = false;
-      alert(e);
+      console.error(e);
+      toast.error("Vérifier les informations et ressayer.");
     });
 };
 const getDatas = async () => {
+  isLoadingData.value = true;
   await TypeGouvernaceService.get()
     .then((result) => {
       datas.value = result.data.data;
+      isLoadingData.value = false;
     })
     .catch((e) => {
-      alert(e);
+      console.error(e);
+      isLoadingData.value = false;
+      toast.error("Une erreur est survenue: Liste des type de gouvernance.");
     });
   initTabulator();
 };
@@ -51,24 +59,28 @@ const updateData = async () => {
       isLoading.value = false;
       getDatas();
       resetForm();
+      toast.success("Type de gouvernace modifiée.");
     })
     .catch((e) => {
       isLoading.value = false;
-      alert(e);
+      console.error(e);
+      toast.error("Vérifier les informations et ressayer.");
     });
-  initTabulator();
 };
+const submitData = () => (isCreate.value ? createData() : updateData());
 const deleteData = async () => {
   isLoading.value = true;
   await TypeGouvernaceService.destroy(idSelect.value)
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;
+      toast.success("Type de gouvernance supprimé");
       getDatas();
     })
     .catch((e) => {
       isLoading.value = false;
-      alert(e);
+      console.error(e);
+      toast.error("Une erreur est survenue, ressayer");
     });
 };
 const getProgrammes = () => {
@@ -77,12 +89,14 @@ const getProgrammes = () => {
       programmes.value = result.data.data;
     })
     .catch((e) => {
-      alert(e);
+      console.error(e);
+      toast.error("Une erreur est survenue: Liste des Programmes.");
     });
 };
 const initTabulator = () => {
   tabulator.value = new Tabulator("#tabulator", {
     data: datas.value,
+    placeholder: "Aucune donnée disponible.",
     layout: "fitColumns",
     columns: [
       {
@@ -129,7 +143,7 @@ const handleEdit = (params) => {
   idSelect.value = params.id;
   payload.nom = params.nom;
   payload.description = params.description;
-  payload.programmeId = params.id;
+  payload.programmeId = params.programmeId;
   showModalCreate.value = true;
 };
 const handleDelete = (params) => {
@@ -161,7 +175,6 @@ onMounted(() => {
 
 <template>
   <h2 class="mt-10 text-lg font-medium intro-y">Type de gouvernance</h2>
-  {{ mode }}{{ isCreate }}
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
@@ -197,9 +210,10 @@ onMounted(() => {
         </Dropdown>
       </div>
     </div>
-    <div class="overflow-x-auto scrollbar-hidden" v-if="datas.length > 0">
+    <div class="overflow-x-auto scrollbar-hidden" v-if="!isLoadingData">
       <div id="tabulator" class="mt-5 table-report table-report--tabulator"></div>
     </div>
+    <LoaderSnipper v-if="isLoadingData" />
   </div>
 
   <!-- Modal Register & Update -->
@@ -213,7 +227,7 @@ onMounted(() => {
           <InputForm label="Nom" v-model="payload.nom" />
           <InputForm label="Description" v-model="payload.description" />
           <div class="">
-            <label for="regular-form-1" class="form-label">Programmes </label>
+            <label class="form-label">Programmes </label>
             <TomSelect v-model="payload.programmeId" :options="{ placeholder: 'Selectionez un programme' }" class="w-full">
               <option v-for="(programme, index) in programmes" :key="index" :value="programme.id">{{ programme.nom }}</option>
             </TomSelect>
@@ -223,7 +237,7 @@ onMounted(() => {
       <ModalFooter>
         <div class="flex gap-2">
           <button type="button" @click="resetForm" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
-          <VButton :loading="isLoading" :label="mode" @click="submitData" />
+          <VButton :loading="isLoading" :label="mode" />
         </div>
       </ModalFooter>
     </form>
@@ -236,7 +250,7 @@ onMounted(() => {
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Suppression</div>
-        <div class="mt-2 text-slate-500">Supprimer ce type de gouverneur?</div>
+        <div class="mt-2 text-slate-500">Supprimer ce type de gouvernance?</div>
       </div>
       <div class="flex justify-center w-full gap-3 py-4 text-center">
         <button type="button" @click="cancelSelect" class="mr-1 btn btn-outline-secondary">Annuler</button>
