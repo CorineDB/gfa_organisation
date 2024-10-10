@@ -13,7 +13,7 @@ const payload = reactive({
   libelle: "",
   description: "",
   note: "",
-  programmeId: "",
+  // programmeId: "",
 });
 const tabulator = ref();
 const idSelect = ref("");
@@ -152,7 +152,7 @@ const handleEdit = (params) => {
   payload.libelle = params.libelle;
   payload.description = params.description;
   payload.note = params.note;
-  payload.programmeId = params.programmeId;
+  // payload.programmeId = params.programmeId;
   showModalCreate.value = true;
 };
 const handleDelete = (params) => {
@@ -167,11 +167,11 @@ const resetForm = () => {
   payload.libelle = "";
   payload.description = "";
   payload.note = "";
-  payload.programmeId = "";
+  // payload.programmeId = "";
   showModalCreate.value = false;
 };
 const openCreateModal = () => {
-  payload.programmeId = "";
+  // payload.programmeId = "";
   showModalCreate.value = isCreate.value = true;
 };
 
@@ -236,13 +236,13 @@ onMounted(() => {
         <div class="grid grid-cols-1 gap-4">
           <InputForm label="Libellé" v-model="payload.libelle" />
           <InputForm label="Description" v-model="payload.description" />
-          <InputForm label="Note" v-model="payload.note" type="number" />
-          <div class="">
+          <InputForm label="Note" v-model.number="payload.note" type="number" />
+          <!-- <div class="">
             <label class="form-label">Programmes </label>
             <TomSelect v-model="payload.programmeId" :options="{ placeholder: 'Selectionez un programme' }" class="w-full">
               <option v-for="(programme, index) in programmes" :key="index" :value="programme.id">{{ programme.nom }}</option>
             </TomSelect>
-          </div>
+          </div> -->
         </div>
       </ModalBody>
       <ModalFooter>

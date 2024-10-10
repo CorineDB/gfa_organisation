@@ -11,7 +11,7 @@ import LoaderSnipper from "@/components/LoaderSnipper.vue";
 const payload = reactive({
   nom: "",
   description: "",
-  programmeId: "",
+  // programmeId: "",
 });
 const tabulator = ref();
 const idSelect = ref("");
@@ -143,7 +143,7 @@ const handleEdit = (params) => {
   idSelect.value = params.id;
   payload.nom = params.nom;
   payload.description = params.description;
-  payload.programmeId = params.programmeId;
+  // payload.programmeId = params.programmeId;
   showModalCreate.value = true;
 };
 const handleDelete = (params) => {
@@ -157,11 +157,11 @@ const cancelSelect = () => {
 const resetForm = () => {
   payload.nom = "";
   payload.description = "";
-  payload.programmeId = "";
+  // payload.programmeId = "";
   showModalCreate.value = false;
 };
 const openCreateModal = () => {
-  payload.programmeId = "";
+  // payload.programmeId = "";
   showModalCreate.value = isCreate.value = true;
 };
 
@@ -226,12 +226,12 @@ onMounted(() => {
         <div class="grid grid-cols-1 gap-4">
           <InputForm label="Nom" v-model="payload.nom" />
           <InputForm label="Description" v-model="payload.description" />
-          <div class="">
+          <!-- <div class="">
             <label class="form-label">Programmes </label>
             <TomSelect v-model="payload.programmeId" :options="{ placeholder: 'Selectionez un programme' }" class="w-full">
               <option v-for="(programme, index) in programmes" :key="index" :value="programme.id">{{ programme.nom }}</option>
             </TomSelect>
-          </div>
+          </div> -->
         </div>
       </ModalBody>
       <ModalFooter>
