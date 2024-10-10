@@ -1,1 +1,106 @@
 typeGouvernance
+
+  <!-- <main class="ml-64 p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold">Nom du Projet</h2>
+    <div>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded mx-2">Ajouter une tâche</button>
+      <button class="bg-gray-200 px-4 py-2 rounded mx-2">Modifier projet</button>
+      <button class="bg-gray-200 px-4 py-2 rounded mx-2">Partager</button>
+    </div>
+  </div>
+  
+  <section class="mb-8">
+    <h3 class="text-xl font-semibold mb-4">Résumé du Projet</h3>
+    <p class="text-gray-700">Ce projet a pour objectif de développer une plateforme web intuitive permettant aux utilisateurs de gérer leurs tâches efficacement. Le projet est actuellement en phase de développement avec une équipe de 5 personnes.</p>
+  </section>
+  
+  <section>
+    <h3 class="text-xl font-semibold mb-4">Tâches</h3>
+    <table class="min-w-full bg-white">
+      <thead>
+        <tr class="w-full bg-gray-200 text-left">
+          <th class="py-2 px-4">Tâche</th>
+          <th class="py-2 px-4">Statut</th>
+          <th class="py-2 px-4">Priorité</th>
+          <th class="py-2 px-4">Assigné à</th>
+          <th class="py-2 px-4">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b">
+          <td class="py-2 px-4">Créer la maquette UI</td>
+          <td class="py-2 px-4 text-green-600">En cours</td>
+          <td class="py-2 px-4">Haute</td>
+          <td class="py-2 px-4">Alice</td>
+          <td class="py-2 px-4">
+            <button class="bg-blue-500 text-white px-2 py-1 rounded">Détails</button>
+            <button class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
+          </td>
+        </tr>
+        Autres tâches
+      </tbody>
+    </table>
+  </section>
+</main> -->
+
+<!-- <main class="p-6">
+  Titre et bouton Ajouter
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold">Liste des Projets</h2>
+    <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Ajouter un Projet</button>
+  </div>
+  
+  Barre de recherche
+  <div class="mb-6">
+    <input 
+      type="text" 
+      placeholder="Rechercher un projet..." 
+      class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+  
+  Tableau des projets
+  <table class="min-w-full bg-white border border-gray-300 shadow-lg">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="py-2 px-4 border-b text-left">Nom du Projet</th>
+        <th class="py-2 px-4 border-b text-left">Résumé</th>
+        <th class="py-2 px-4 border-b text-left">Statut</th>
+        <th class="py-2 px-4 border-b text-left">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      Projet 1
+      <tr class="hover:bg-gray-50 transition">
+        <td class="py-2 px-4 border-b">Nom du Projet A</td>
+        <td class="py-2 px-4 border-b">Résumé court du projet A.</td>
+        <td class="py-2 px-4 border-b text-green-600 font-semibold">En cours</td>
+        <td class="py-2 px-4 border-b flex space-x-2">
+          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Modifier</button>
+          <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
+        </td>
+      </tr>
+      Projet 2
+      <tr class="hover:bg-gray-50 transition">
+        <td class="py-2 px-4 border-b">Nom du Projet B</td>
+        <td class="py-2 px-4 border-b">Résumé court du projet B.</td>
+        <td class="py-2 px-4 border-b text-red-600 font-semibold">En retard</td>
+        <td class="py-2 px-4 border-b flex space-x-2">
+          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Modifier</button>
+          <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
+        </td>
+      </tr>
+      Projet 3
+      <tr class="hover:bg-gray-50 transition">
+        <td class="py-2 px-4 border-b">Nom du Projet C</td>
+        <td class="py-2 px-4 border-b">Résumé court du projet C.</td>
+        <td class="py-2 px-4 border-b text-yellow-600 font-semibold">À venir</td>
+        <td class="py-2 px-4 border-b flex space-x-2">
+          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Modifier</button>
+          <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</main> -->

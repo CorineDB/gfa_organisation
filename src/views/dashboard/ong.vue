@@ -12,6 +12,7 @@ import xlsx from "xlsx";
 import Tabulator from "tabulator-tables";
 import InputForm from "@/components/news/InputForm.vue";
 import VButton from "@/components/news/VButton.vue";
+import { toast } from "vue3-toastify";
 
 export default {
   components: {
@@ -117,8 +118,11 @@ export default {
         email: "@gmail.com",
         sigle: "",
         code: "",
-        programmeId: "",
+        //programmeId: "",
       },
+      showDeleteModal: false,
+      isLoading: false,
+      labels: "Ajouter",
     };
   },
 
@@ -142,7 +146,24 @@ export default {
   },
 
   methods: {
-     clearObjectValues(obj) {
+    supprimer(data) {
+      this.showDeleteModal = true;
+      this.ongsId = data.id;
+      console.log(this.showDeleteModal);
+    },
+    modifierOrganisation(data) {
+      this.ongsId = data.id;
+      this.labels = "Modifier";
+      this.showModal = true;
+      this.update = true;
+      this.formData.nom = data.nom;
+      this.formData.contact = data.user.contact;
+      this.formData.email = data.user.email;
+      this.formData.sigle = data.sigle;
+      this.formData.code = data.code;
+      // this.formData.programmeId = data.projet.programmeId;
+    },
+    clearObjectValues(obj) {
       for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
           let value = obj[key];
@@ -185,7 +206,7 @@ export default {
           if (error.response) {
             // Requête effectuée mais le serveur a répondu par une erreur.
             const message = error.response.data.message;
-            this.$toast.error(message);
+            // this.$toast.error(message);
           } else if (error.request) {
             // Demande effectuée mais aucune réponse n'est reçue du serveur.
             //console.log(error.request);
@@ -273,7 +294,7 @@ export default {
           if (error.response) {
             // Requête effectuée mais le serveur a répondu par une erreur.
             const message = error.response.data.message;
-            this.$toast.error(message);
+            // this.$toast.error(message);
           } else if (error.request) {
             // Demande effectuée mais aucune réponse n'est reçue du serveur.
             //console.log(error.request);
@@ -335,29 +356,12 @@ export default {
       this.updateFilter();
     },
     initTabulator() {
-      // console.log(this.ongs);
       this.tabulator = new Tabulator("#tabulator", {
         data: this.ongs,
-        rowClickMenu: [
-          {
-            label: "Modifier",
-            action: function (e, row) {
-              console.log(row);
-              row.delete();
-            },
-          },
-          {
-            label: "Suprimer",
-            action: function (e, row) {
-              row.delete();
-            },
-          },
-        ],
-        // printHeader: "<h1 class='pdfPrint' >TABLEAU DE LA PAGE PROJET</h1>",
+
         selectableRows: true, //assign data to table
         layout: "fitColumns",
         columns: [
-          //Define Table Columns
           {
             title: "Nom",
             field: "nom",
@@ -425,20 +429,23 @@ export default {
             formatter: function (cell, formatterParams) {
               return ` 
               <div class="flex items-center gap-3">
-                <button class='btn-suivre btn btn-primary'>
-                   Modifier
-                </button>
-                 <button class='btn-suivre btn btn-danger'>
-                   Supprimer
-                </button>
+                  <button class='btn-supprimer btn btn-danger'>
+                    Supprimer
+                  </button>
+                   <button class='btn-modifier btn btn-primary'>
+                    Modifier
+                  </button>
                 </div>
                `;
             },
             cellClick: (e, cell) => {
+              console.log(e);
               // Utilisation d'une fonction fléchée pour garder le contexte de `this`
-              if (e.target.classList.contains("btn-suivre")) {
-                const rowData = cell.getRow().getData();
-                //this.suivreIndicateur(rowData.id); // Appel de la méthode
+              const rowData = cell.getRow().getData();
+              if (e.target.classList.contains("btn-modifier")) {
+                this.modifierOrganisation(rowData);
+              } else if (e.target.classList.contains("btn-supprimer")) {
+                this.supprimer(rowData);
               }
             },
           },
@@ -477,7 +484,7 @@ export default {
     // call action
     ...mapActions("ongs", {
       saveOng: "STORE_ONG",
-      updateOng: "UPDATE_Ong",
+      updateOng: "UPDATE_ONG",
       deleteOng: "DESTROY_Ong",
     }),
 
@@ -500,7 +507,6 @@ export default {
     },
 
     sendReponse() {
-
       if (this.chargement == false) {
         this.chargement = true;
         const formData = new FormData();
@@ -535,47 +541,57 @@ export default {
       }
     },
     sendForm() {
-      
-        if (this.update) {
-          this.updateOng({ ong: ong, id: ong?.id })
-            .then((response) => {
-              if (response.status == 200 || response.status == 201) {
-                this.close();
-                this.sendRequest = false;
-              }
-            })
-            .catch((error) => {
-              this.setErrors({ message: error?.response?.data?.message, errors: error?.response?.data?.data?.errors });
-              this.sendRequest = false;
-              this.champs.map((value) => (value.errors = this.erreurs[value.key]));
-            });
-        } else {
-          this.sendRequest = true;
-         
-          this.ajoutLoading = true
-          this.saveOng(this.formData)
-            .then((response) => {
-              if (response.status == 200 || response.status == 201) {
-                this.ajoutLoading = false
-                this.close();
-                this.clearObjectValues(this.formData)
-                // this.resetForm();
-                // localStorage.removeItem("formData");
-                // this.sendRequest = false;
-                this.fetchOngs();
-              }
-            })
-            .catch((error) => {
-              console.log(error)
-               this.ajoutLoading = false
-              // this.getFile();
-              // this.setErrors({ message: error?.response?.data?.message, errors: error?.response?.data?.data?.errors });
-              // this.sendRequest = false;
+      if (this.update) {
+        console.log("ongId", this.ongsId);
+        this.ajoutLoading = true;
+        this.updateOng({ ong: this.formData, id: this.ongsId })
+          .then((response) => {
+            if (response.status == 200 || response.status == 201) {
+              this.ajoutLoading = false;
+              this.showModal = false;
+              toast.success("Modification éffectuée");
+              this.close();
+              this.clearObjectValues(this.formData);
+              this.fetchOngs();
+              //this.sendRequest = false;
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            this.ajoutLoading = false;
+            toast.error(error.response.data.errors.message);
+            // this.setErrors({ message: error?.response?.data?.message, errors: error?.response?.data?.data?.errors });
+            // this.sendRequest = false;
+            // this.champs.map((value) => (value.errors = this.erreurs[value.key]));
+          });
+      } else {
+        this.sendRequest = true;
 
-              // this.champs.map((value) => (value.errors = this.erreurs[value.key]));
-            });
-        }
-      
+        this.ajoutLoading = true;
+        this.saveOng(this.formData)
+          .then((response) => {
+            if (response.status == 200 || response.status == 201) {
+              this.ajoutLoading = false;
+              toast.errors("Ajout éffectué");
+              this.close();
+              this.clearObjectValues(this.formData);
+              // this.resetForm();
+              // localStorage.removeItem("formData");
+              // this.sendRequest = false;
+              this.fetchOngs();
+            }
+          })
+          .catch((error) => {
+            toast.error(error.response.data.errors.message);
+
+            this.ajoutLoading = false;
+            // this.getFile();
+            // this.setErrors({ message: error?.response?.data?.message, errors: error?.response?.data?.data?.errors });
+            // this.sendRequest = false;
+
+            // this.champs.map((value) => (value.errors = this.erreurs[value.key]));
+          });
+      }
     },
 
     addOng() {
@@ -605,23 +621,27 @@ export default {
       });
     },
 
-    supprimer(ong, index) {
-      this.deleteModal = true;
-      this.deleteData.data = ong;
-      this.deleteData.index = index;
-    },
-    deleteOngs(data) {
-      this.ongs.splice(data.index, 1);
-      this.deleteModal = false;
-      OngService.destroy(data.data.id)
+    deleteOngs() {
+      // this.ongs.splice(data.index, 1);
+      // this.deleteModal = false;
+     
+      this.isLoading = true;
+      OngService.destroy(this.ongsId)
         .then((data) => {
-          this.$toast.success("Operation effectué avec success !");
+  
+          this.isLoading = false;
+          this.showDeleteModal  = false
+          toast.success("Suppression  éffectuée avec succès");
+          this.fetchOngs();
         })
         .catch((error) => {
+          console.log(error);
           if (error.response) {
             // Requête effectuée mais le serveur a répondu par une erreur.
             const message = error.response.data.message;
-            this.$toast.error(message);
+            this.isLoading = false;
+            toast.success(message);
+         
           } else if (error.request) {
             // Demande effectuée mais aucune réponse n'est reçue du serveur.
             //console.log(error.request);
@@ -726,6 +746,20 @@ export default {
 </script>
 
 <template>
+  <Modal :show="showDeleteModal" @hidden="showDeleteModal = false">
+    <ModalBody class="p-0">
+      <div class="p-5 text-center">
+        <XCircleIcon class="w-16 h-16 text-danger mx-auto mt-3" />
+        <div class="text-3xl mt-5">Etes vous sûr?</div>
+        <div class="text-slate-500 mt-2">Voulez vous supprimer l'organisation ? <br />Cette action ne peut être annulé</div>
+      </div>
+      <div class="px-5 pb-8 text-center flex gap-2">
+        <button type="button" @click="showDeleteModal = false" class="my-3 btn btn-outline-secondary w-full mr-1">Annuler</button>
+        <VButton :loading="isLoading" label="Supprimer" @click="deleteOngs" />
+      </div>
+    </ModalBody>
+  </Modal>
+
   <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
     <ModalHeader>
       <h2 v-if="!update" class="font-medium text-base mr-auto">Ajouter une organisation</h2>
@@ -738,10 +772,11 @@ export default {
       <InputForm v-model="formData.code" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Code" />
       <InputForm v-model="formData.sigle" class="col-span-12" type="text" required="required" placeHolder="Ex : APF" label="Sigle" />
 
-      <div class="col-span-12">
+      <!-- <div class="col-span-12">
         <label>Programme</label>
         <div class="mt-2">
-          <TomSelect v-model="formData.programmeId"
+          <TomSelect
+            v-model="formData.programmeId"
             :options="{
               placeholder: 'Veuillez choisir le programme auquel est associé l\'organisation',
             }"
@@ -750,13 +785,13 @@ export default {
             <option v-for="(program, index) in programmes" :key="index" :value="program.id">{{ program.nom }}</option>
           </TomSelect>
         </div>
-      </div>
+      </div> -->
     </ModalBody>
     <ModalFooter>
       <div class="flex items-center justify-center">
-        <pre>{{ajoutLoading}}</pre>
+        
         <button type="button" @click="showModal = false" class="btn btn-outline-secondary w-full mr-1">Annuler</button>
-        <VButton class="inline-block" label="Ajouter" :loading="ajoutLoading" @click="sendForm" />
+        <VButton class="inline-block" :label="labels" :loading="ajoutLoading" @click="sendForm" />
         <!-- <button type="button" class="btn btn-primary w-20">Send</button> -->
       </div>
     </ModalFooter>
@@ -765,20 +800,6 @@ export default {
     <h2 class="text-lg font-medium mr-auto">Organisation</h2>
     <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
       <button class="btn btn-primary shadow-md mr-2" @click="showModal = true">Ajouter une organisation</button>
-      <button class="btn btn-primary shadow-md mr-2" @click="sendForm">test</button>
-      <Dropdown class="ml-auto sm:ml-0">
-        <DropdownToggle class="btn px-2 box">
-          <span class="w-5 h-5 flex items-center justify-center">
-            <PlusIcon class="w-4 h-4" />
-          </span>
-        </DropdownToggle>
-        <DropdownMenu class="w-40">
-          <DropdownContent>
-            <DropdownItem> <FilePlusIcon class="w-4 h-4 mr-2" /> New Category </DropdownItem>
-            <DropdownItem> <UserPlusIcon class="w-4 h-4 mr-2" /> New Group </DropdownItem>
-          </DropdownContent>
-        </DropdownMenu>
-      </Dropdown>
     </div>
   </div>
   <!-- BEGIN: HTML Table Data -->

@@ -176,8 +176,11 @@ const logout = () => {
     //toast success
     setTimeout(() => {
       router.push('/')
-    }, 3000)
+    }, 100)
   }).catch((error) => {
+    setTimeout(() => {
+      router.push('/')
+    }, 100)
     if (error.response) {
       const message = error.response.data.message
       message.type = 'erreur'
