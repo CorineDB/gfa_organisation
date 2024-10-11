@@ -95,8 +95,8 @@
       </div>
     </div>
   </div>
-  <!-- mx-4 xl:mx-0 group relative rounded-lg p-4 -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+ 
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 ">
     <div href="#" class="box group _bg-white shadow-2xl zoom-in" v-for="(item, index) in projets" :key="index">
       <div class="relative bg-white m-5">
         <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ item.nom }}</div>
@@ -128,6 +128,7 @@
       </div>
       <div class="text-slate-600 dark:text-slate-500 m-5">
         <div class="flex items-center"><LinkIcon class="w-4 h-4 mr-2" /> Budget: {{ item.budgetNational }}</div>
+        <div v-if="item.owner !== null" class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Organisation: {{ item.owner.user.nom }}</div>
         <div class="flex items-center mt-2">
           <ClockIcon class="w-4 h-4 mr-2" />
           <div>
@@ -148,13 +149,23 @@
         <button class="btn btn-primary text-[11px] lg:text-[14px] uppercase h-[36px] lg:h-[46px] py-3">Détail</button>
       </div> -->
       <div class="flex justify-center lg:justify-end items-center p-5 border-t border-slate-200/60 dark:border-darkmode-400">
-        <a class="flex items-center text-primary mr-auto" href="javascript:;"> <EyeIcon class="w-4 h-4 mr-1" /> Preview </a>
-        <a class="flex items-center mr-3" href="javascript:;"> <CheckSquareIcon class="w-4 h-4 mr-1" /> Edit </a>
-        <a class="flex items-center text-danger" href="javascript:;" @click="deleteConfirmationModal = true"> <Trash2Icon class="w-4 h-4 mr-1" /> Delete </a>
+        <a class="flex items-center text-primary mr-auto" href="javascript:;"> <EyeIcon class="w-4 h-4 mr-1" /> Détail </a>
+        <a class="flex items-center mr-3" href="javascript:;"> <CheckSquareIcon class="w-4 h-4 mr-1" /> Modifier </a>
+        <a class="flex items-center text-danger" href="javascript:;" @click="deleteConfirmationModal = true"> <Trash2Icon class="w-4 h-4 mr-1" /> Supprimer </a>
+      </div>
+      <div class="flex w-full absolute bottom-0">
+        <div class="p-1 bg-green-500 w-1/3"></div>
+        <div class="flex flex-col w-2/3">
+          <div class="p-0.5 bg-yellow-500"></div>
+          <div class="p-0.5 bg-red-500"></div>
+        </div>
       </div>
     </div>
   </div>
+  
 
+
+  <!-- hold -->
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div v-for="(faker, fakerKey) in $_.take($f(), 12)" :key="fakerKey" class="intro-y col-span-12 md:col-span-6 lg:col-span-4 xl:col-span-3">
       <div class="box">
@@ -179,6 +190,7 @@
             </div>
           </div>
         </div>
+       
         <div class="flex justify-center lg:justify-end items-center p-5 border-t border-slate-200/60 dark:border-darkmode-400">
           <a class="flex items-center text-primary mr-auto" href="javascript:;"> <EyeIcon class="w-4 h-4 mr-1" /> Preview </a>
           <a class="flex items-center mr-3" href="javascript:;"> <CheckSquareIcon class="w-4 h-4 mr-1" /> Edit </a>
