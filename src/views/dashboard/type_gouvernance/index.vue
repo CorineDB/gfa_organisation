@@ -126,7 +126,7 @@ const initTabulator = () => {
             handleEdit(cell.getData());
           });
 
-          const deleteButton = createButton("", "btn btn-danger", () => {
+          const deleteButton = createButton("Supprimer", "btn btn-danger", () => {
             handleDelete(cell.getData());
           });
 
