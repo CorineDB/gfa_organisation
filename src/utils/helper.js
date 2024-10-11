@@ -4,6 +4,13 @@ import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 
 const helpers = {
+  reformatDate(dateStr) {
+    // Split the date string by the hyphen
+    let parts = dateStr.split("-");
+    // Rearrange the parts to "DD-MM-YYYY"
+    let reformattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+    return reformattedDate;
+  },
   clearObjectValues(obj) {
     for (let key in obj) {
       if (obj.hasOwnProperty(key)) {

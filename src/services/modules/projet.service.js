@@ -1,46 +1,43 @@
+import ApiService from "@/services/configs/api.service";
 
-import ApiService from '@/services/configs/api.service'
+const ProjetsService = {
+  query(type, params) {
+    return ApiService.query("projets", {
+      params: params,
+    });
+  },
 
-  const ProjetsService = {
-    query(type, params) {
-      return ApiService.query("projets", {
-        params: params
-      });
-    },
+  get() {
+    return ApiService.get("/gfa/projets");
+  },
 
-    get(slug) {
-      return ApiService.get("/projets", slug);
-    },
+  create(params) {
+    return ApiService.post("/gfa/projets", params);
+  },
 
-    create(params) {
-      return ApiService.post("projets", params);
-    },
+  update(slug, params) {
+    return ApiService.put(`/gfa/projets/${slug}/update`, params);
+  },
 
-    update(slug, params) {
-      return ApiService.post(`projets/${slug}/update`,params);
-    },
+  destroy(slug) {
+    return ApiService.delete(`/gfa/projets/${slug}`);
+  },
 
-    destroy(slug) {
-      return ApiService.delete(`projets/${slug}`);
-    },
+  programme(slug) {
+    return ApiService.get(`projets/${slug}/programme`);
+  },
 
-    programme(slug) {
-      return ApiService.get(`projets/${slug}/programme`);
-    },
+  composantes(slug) {
+    return ApiService.get(`projets/${slug}/composantes`);
+  },
 
-    composantes(slug) {
-      return ApiService.get(`projets/${slug}/composantes`);
-    },
+  statistiques(slug) {
+    return ApiService.get(`projets/${slug}/statistiques`);
+  },
 
-    statistiques(slug) {
-      return ApiService.get(`projets/${slug}/statistiques`);
-    },
+  prolonger(slug, params) {
+    return ApiService.post(`projets/${slug}/prolonger`, params);
+  },
+};
 
-    prolonger(slug, params) {
-      return ApiService.post(`projets/${slug}/prolonger`, params);
-    }
-
-  };
-
-  export default ProjetsService;
-  
+export default ProjetsService;

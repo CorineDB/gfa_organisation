@@ -100,6 +100,7 @@
           </div>
         </div>
       </div>
+      
     </div>
 
     <div class="text-xs sm:text-sm w-full items-center text-center bg-[#0E74BC] p-1 border flex bottom-0 flex-col text-white">
