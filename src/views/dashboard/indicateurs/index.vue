@@ -12,10 +12,6 @@ import PrincipeGouvernance from "../../../services/modules/principeGouvernance.s
 import OptionReponse from "../../../services/modules/optionReponse.service";
 import { useRoute, useRouter } from "vue-router";
 
-const route = useRoute();
-
-route.quer;
-
 const payload = reactive({
   nom: "",
   type: "factuel",
