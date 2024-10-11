@@ -35,6 +35,7 @@ import indicateurs from "../views/dashboard/indicateurs/index.vue";
 
 import typeGouvernance from "../views/dashboard/type_gouvernance/index.vue";
 import Programmation_enquete from "../views/dashboard/programmation_enquete/index.vue";
+import EnqueteAppreciations from "../views/dashboard/programmation_enquete/appreciations.vue";
 import OptionReponse from "@/views/dashboard/OptionReponse.vue";
 
 //Projet/Outcomes/Activité/Taches
@@ -89,9 +90,14 @@ const routes = [
         name: "dashboard_projets_taches_globale",
       },
       {
-        path: "toolsFactuel",
+        path: "enquetes",
         name: "Programmation_enquete",
         component: Programmation_enquete,
+      },
+      {
+        path: "apprreciations",
+        name: "EnqueteAppreciations",
+        component: EnqueteAppreciations,
       },
       {
         path: "toolsFactuel",

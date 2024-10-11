@@ -395,45 +395,7 @@ export default {
           }
         });
     },
-    initializeDropzone() {
-      const dropzoneElement = this.$refs.dropzoneElement;
-
-      // Initialisation explicite de Dropzone
-      this.dropzoneInstance = new Dropzone(dropzoneElement, {
-        url: "https://httpbin.org/post",
-        thumbnailWidth: 150,
-        maxFilesize: 1000,
-        addRemoveLinks: true,
-        dictDefaultMessage: "Déposez les fichiers ici pour les télécharger",
-        dictFallbackMessage: "Votre navigateur ne prend pas en charge les téléchargements de fichiers par glisser-déposer.",
-        dictCancelUpload: "Annuler chargement",
-        dictUploadCanceled: "Chargement Annulé.",
-        dictCancelUploadConfirmation: "Êtes-vous sûr de vouloir annuler ce téléchargement ?",
-        dictRemoveFile: "Supprimer le fichier",
-        dictMaxFilesExceeded: "Vous ne pouvez plus charger de fichiers.",
-        headers: { "My-Awesome-Header": "header value" },
-      });
-      const dropzoneRef = null;
-      // Gestion des événements de Dropzone après initialisation
-      this.dropzoneInstance.on("addedfile", (file) => {
-        var myDropzone = this;
-        dropzoneRef = myDropzone;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const binaryData = event.target.result;
-          return binaryData;
-        };
-        reader.readAsBinaryString(file);
-        // this.FormProjet.append("fichier[]", file);
-
-        // this.FormProjet.forEach((value, key) => {
-        //   console.log(`${key}: ${value}`);
-        // });
-      });
-      this.dropzoneMultipleRef = dropzoneRef;
-      console.log(this.dropzoneMultipleRef);
-    },
+   
     getFile(data) {
       this.champs[7].data = data;
       for (const property in data) {
