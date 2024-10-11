@@ -43,6 +43,7 @@ import projets from "../views/dashboard/projets/index.vue";
 import dashboard_projets_activites_globale from "../views/dashboard/projets/activites-globale/_id/suivis.vue";
 import dashboard_projets_taches_globale from "../views/dashboard/projets/taches-globale/index.vue";
 import dashboard_projets_sous_composantes_globale from "../views/dashboard/projets/sous-composantes-globale/index.vue";
+import FormFactuel from "../views/dashboard/FormFactuel.vue";
 
 const routes = [
   {
@@ -196,6 +197,11 @@ const routes = [
         path: "gouvernance/:id/principe/:idp/critere/:idc/indicateur",
         name: "Indicateurs",
         component: Indicateurs,
+      },
+      {
+        path: "form-factuel",
+        name: "FormFactuel",
+        component: FormFactuel,
       },
     ],
   },

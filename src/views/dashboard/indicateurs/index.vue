@@ -10,6 +10,11 @@ import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import CritereGouvernance from "../../../services/modules/critereGouvernance.service";
 import PrincipeGouvernance from "../../../services/modules/principeGouvernance.service";
 import OptionReponse from "../../../services/modules/optionReponse.service";
+import { useRoute, useRouter } from "vue-router";
+
+const route = useRoute();
+
+route.quer;
 
 const payload = reactive({
   nom: "",
