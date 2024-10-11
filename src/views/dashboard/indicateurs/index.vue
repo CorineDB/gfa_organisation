@@ -279,9 +279,6 @@ onMounted(() => {
 
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
-    <pre>
-      {{ payload }}
-    </pre>
     <ModalHeader>
       <h2 class="mr-auto text-base font-medium">{{ mode }} un indicateur de gouvernance</h2>
     </ModalHeader>
