@@ -296,6 +296,7 @@ export default {
           }
         });
     },
+<<<<<<< HEAD
     initializeDropzone() {
       const dropzoneElement = this.$refs.dropzoneElement;
 
@@ -335,6 +336,9 @@ export default {
       // this.dropzoneMultipleRef = dropzoneRef;
       console.log(this.dropzoneMultipleRef);
     },
+=======
+   
+>>>>>>> dd084e4926d163b4b072153a5cf4c142aa6489c4
     getFile(data) {
       this.champs[7].data = data;
       for (const property in data) {

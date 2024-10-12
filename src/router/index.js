@@ -35,6 +35,7 @@ import indicateurs from "../views/dashboard/indicateurs/index.vue";
 
 import typeGouvernance from "../views/dashboard/type_gouvernance/index.vue";
 import Programmation_enquete from "../views/dashboard/programmation_enquete/index.vue";
+import EnqueteAppreciations from "../views/dashboard/programmation_enquete/appreciations.vue";
 import OptionReponse from "@/views/dashboard/OptionReponse.vue";
 
 //Projet/Outcomes/Activité/Taches
@@ -43,7 +44,11 @@ import projets from "../views/dashboard/projets/index.vue";
 import dashboard_projets_activites_globale from "../views/dashboard/projets/activites-globale/_id/suivis.vue";
 import dashboard_projets_taches_globale from "../views/dashboard/projets/taches-globale/index.vue";
 import dashboard_projets_sous_composantes_globale from "../views/dashboard/projets/sous-composantes-globale/index.vue";
+<<<<<<< HEAD
 import projets_id_details from "../views/dashboard/projets/_id/details.vue";
+=======
+import FormFactuel from "../views/dashboard/FormFactuel.vue";
+>>>>>>> dd084e4926d163b4b072153a5cf4c142aa6489c4
 
 const routes = [
   {
@@ -95,9 +100,14 @@ const routes = [
         name: "dashboard_projets_taches_globale",
       },
       {
-        path: "toolsFactuel",
+        path: "enquetes",
         name: "Programmation_enquete",
         component: Programmation_enquete,
+      },
+      {
+        path: "apprreciations",
+        name: "EnqueteAppreciations",
+        component: EnqueteAppreciations,
       },
       {
         path: "toolsFactuel",
@@ -203,6 +213,11 @@ const routes = [
         path: "gouvernance/:id/principe/:idp/critere/:idc/indicateur",
         name: "Indicateurs",
         component: Indicateurs,
+      },
+      {
+        path: "form-factuel",
+        name: "FormFactuel",
+        component: FormFactuel,
       },
     ],
   },

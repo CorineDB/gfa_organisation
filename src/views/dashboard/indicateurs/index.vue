@@ -10,6 +10,7 @@ import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import CritereGouvernance from "../../../services/modules/critereGouvernance.service";
 import PrincipeGouvernance from "../../../services/modules/principeGouvernance.service";
 import OptionReponse from "../../../services/modules/optionReponse.service";
+import { useRoute, useRouter } from "vue-router";
 
 const payload = reactive({
   nom: "",
@@ -279,9 +280,6 @@ onMounted(() => {
 
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
-    <pre>
-      {{ payload }}
-    </pre>
     <ModalHeader>
       <h2 class="mr-auto text-base font-medium">{{ mode }} un indicateur de gouvernance</h2>
     </ModalHeader>
