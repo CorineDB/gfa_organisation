@@ -10,28 +10,28 @@ const ptaService = {
     },
     // getters services
     get(slug) {
-      return ApiService.get("ptas/reviserPtab", slug);
+      return ApiService.get("gfa/ptas/reviserPtab", slug);
     },
     //  create services
     getPta(params) {
-      return ApiService.post("ptas/generer", params);
+      return ApiService.post("gfa/ptas/generer", params);
     },
     getFiltre(params) {
-      return ApiService.post("ptas/filtre", params);
+      return ApiService.post("gfa/ptas/filtre", params);
     },
     reviser(params) {
-      return ApiService.post("ptas/reviserPtab", params);
+      return ApiService.post("gfa/ptas/reviserPtab", params);
     },
     getReviser(params) {
-      return ApiService.post("ptas/getOldPtaReviser", params);
+      return ApiService.post("gfa/ptas/getOldPtaReviser", params);
     },
     // update services
     update(slug, params) {
-      return ApiService.update("ptas/reviserPtab", slug, params);
+      return ApiService.update("gfa/ptas/reviserPtab", slug, params);
     },
     // destroy services
     destroy(slug) {
-      return ApiService.delete(`ptas/reviserPtab/${slug}`);
+      return ApiService.delete(`gfa/ptas/reviserPtab/${slug}`);
     },
 
   };
