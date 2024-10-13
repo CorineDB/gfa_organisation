@@ -1,3 +1,193 @@
+<script>
+import { mapGetters, mapActions } from "vuex";
+
+import { getStringValueOfStatutCode } from "@/utils/index";
+import ProjetService from "@/services/modules/projet.service.js";
+import ComposantesService from "@/services/modules/composante.service";
+import InputForm from "@/components/news/InputForm.vue";
+import VButton from "@/components/news/VButton.vue";
+import { toast } from "vue3-toastify";
+export default {
+  components: {
+    InputForm,
+    VButton,
+  },
+  data() {
+    return {
+      projets: [],
+      projetId: "",
+      composants: [],
+      isLoadingData: false,
+      showModal: false,
+      isUpdate: false,
+      isLoading: false,
+      formData: {
+        nom: "",
+        poids: "",
+        projetId: "",
+        budgetNational: 0,
+      },
+      composantsId: "",
+      labels: "Ajouter",
+      showDeleteModal: false,
+      deleteLoader: false,
+    };
+  },
+  computed: {
+    ...mapGetters("auths", { currentUser: "GET_AUTHENTICATE_USER" }),
+  },
+  watch: {
+    projetId(newValue, oldValue) {
+      if (this.projets.length > 0) {
+        if (newValue == "") {
+          this.composants = this.projets[0].composantes;
+        } else {
+          const projetFiltre = this.projets.filter((item) => item.id == newValue);
+
+          if (projetFiltre.length > 0) {
+            this.composants = projetFiltre[0].composantes;
+          } else {
+            this.composants = [];
+          }
+        }
+      }
+    },
+  },
+
+  methods: {
+    clearObjectValues(obj) {
+      for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          let value = obj[key];
+
+          if (typeof value === "string") {
+            obj[key] = "";
+          } else if (typeof value === "number") {
+            obj[key] = 0;
+          } else if (typeof value === "boolean") {
+            obj[key] = false;
+          } else if (Array.isArray(value)) {
+            obj[key] = [];
+          } else if (typeof value === "object" && value !== null) {
+            obj[key] = {}; // ou appliquer récursion pour vider les objets imbriqués
+            clearObjectValues(obj[key]); // récursion pour les objets imbriqués
+          } else {
+            obj[key] = null; // pour les autres types (null, undefined, etc.)
+          }
+        }
+      }
+    },
+    supprimerComposant(data) {
+      this.showDeleteModal = true;
+      this.composantsId = data.id;
+    },
+    deleteComposants() {
+      this.deleteLoader = true;
+      ComposantesService.destroy(this.composantsId)
+        .then((data) => {
+          this.deleteLoader = false;
+          this.showDeleteModal = false;
+          toast.success("Suppression  éffectuée avec succès");
+          this.getListeProjet();
+        })
+        .catch((error) => {
+          this.deleteLoader = false;
+          toast.error("Erreur lors de la suppression");
+        });
+    },
+    modifierComposante(data) {
+      this.labels = "Modifier";
+      this.showModal = true;
+      this.update = true;
+      this.formData.nom = data.nom;
+      this.formData.poids = data.poids;
+      this.formData.projetId = data.projetId;
+      this.formData.budgetNational = data.budgetNational;
+      this.composantsId = data.id;
+    },
+    addComposants() {
+      this.showModal = true;
+      this.isUpdate = false;
+      this.formData.projetId = this.projetId;
+      this.labels = "Ajouter";
+    },
+    sendForm() {
+      if (this.update) {
+        ComposantesService.update(this.composantsId, this.formData)
+          .then((response) => {
+            if (response.status == 200 || response.status == 201) {
+              this.update = false;
+              this.isLoading = false;
+              this.showModal = false;
+              toast.success("Modification éffectuée");
+              this.formData.projetId = this.projetId;
+
+              this.clearObjectValues(this.formData);
+              this.getListeProjet();
+              //this.sendRequest = false;
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            this.isLoading = false;
+            toast.error(error.message);
+          });
+      } else {
+        this.isLoading = true;
+        this.formData.budgetNational = parseInt(this.formData.budgetNational);
+        ComposantesService.create(this.formData)
+          .then((response) => {
+            if (response.status == 200 || response.status == 201) {
+              this.isLoading = false;
+              toast.success("Ajout éffectué");
+              this.showModal = false;
+              this.clearObjectValues(this.formData);
+
+              this.getListeProjet();
+            }
+          })
+          .catch((error) => {
+            this.isLoading = false;
+            toast.error("Erreur lors de la modification");
+          });
+      }
+    },
+    getListeProjet() {
+      ProjetService.get()
+        .then((data) => {
+          this.projets = data.data.data;
+          this.getProjetById();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getProjetById() {
+      if (this.projetId == "") {
+        this.projetId = this.projets[0].id;
+      }
+
+      ProjetService.getDetailProjet(this.projetId)
+        .then((data) => {
+          this.composants = data.data.data.composantes;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getListeComposants(data) {
+      this.composants = data.composantes;
+    },
+    filter() {},
+  },
+
+  created() {},
+  mounted() {
+    this.getListeProjet();
+  },
+};
+</script>
+
 <template>
   <h2 class="mt-10 text-lg font-medium intro-y">OutComes</h2>
 
@@ -69,8 +259,8 @@
             </DropdownToggle>
             <DropdownMenu class="w-40">
               <DropdownContent>
-                <DropdownItem> <Edit2Icon class="w-4 h-4 mr-2" /> Modifier </DropdownItem>
-                <DropdownItem> <TrashIcon class="w-4 h-4 mr-2" /> Supprimer </DropdownItem>
+                <DropdownItem @click="modifierComposante(item)"> <Edit2Icon class="w-4 h-4 mr-2" /> Modifier </DropdownItem>
+                <DropdownItem @click="supprimerComposant(item)"> <TrashIcon class="w-4 h-4 mr-2" /> Supprimer </DropdownItem>
               </DropdownContent>
             </DropdownMenu>
           </Dropdown>
@@ -96,10 +286,6 @@
             <div class="flex items-center mt-2"><CheckSquareIcon class="w-4 h-4 mr-2" /> Poids : {{ item.poids }}</div>
           </div>
         </div>
-        <!-- <div class="p-5 text-center border-t lg:text-right border-slate-200/60 dark:border-darkmode-400">
-          <button class="px-2 py-1 mr-2 btn btn-primary">Message</button>
-          <button class="px-2 py-1 btn btn-outline-secondary">Profile</button>
-        </div> -->
       </div>
     </div>
   </div>
@@ -132,169 +318,20 @@
       </div>
     </ModalFooter>
   </Modal>
+
+  <Modal :show="showDeleteModal" @hidden="showDeleteModal = false">
+    <ModalBody class="p-0">
+      <div class="p-5 text-center">
+        <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">Etes vous sûr?</div>
+        <div class="mt-2 text-slate-500">Voulez vous supprimer l'organisation ? <br />Cette action ne peut être annulé</div>
+      </div>
+      <div class="flex gap-2 px-5 pb-8 text-center">
+        <button type="button" @click="showDeleteModal = false" class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>
+        <VButton :loading="isLoading" label="Supprimer" @click="deleteComposants" />
+      </div>
+    </ModalBody>
+  </Modal>
 </template>
-
-<script>
-import { mapGetters, mapActions } from "vuex";
-
-import { getStringValueOfStatutCode } from "@/utils/index";
-import ProjetService from "@/services/modules/projet.service.js";
-import ComposantesService from "@/services/modules/composante.service";
-import InputForm from "@/components/news/InputForm.vue";
-import VButton from "@/components/news/VButton.vue";
-import { toast } from "vue3-toastify";
-export default {
-  components: {
-    InputForm,
-    VButton,
-  },
-  data() {
-    return {
-      projets: [],
-      projetId: "",
-      composants: [],
-      isLoadingData: false,
-      showModal: false,
-      isUpdate: false,
-      isLoading: false,
-      formData: {
-        nom: "",
-        poids: "",
-        projetId: "",
-        budgetNational: 0,
-      },
-      composantsId: "",
-      labels: "Ajouter",
-    };
-  },
-  computed: {
-    ...mapGetters("auths", { currentUser: "GET_AUTHENTICATE_USER" }),
-  },
-  watch: {
-    projetId(newValue, oldValue) {
-      if (this.projets.length > 0) {
-        if (newValue == "") {
-          this.composants = this.projets[0].composantes;
-        } else {
-          const projetFiltre = this.projets.filter((item) => item.id == newValue);
-
-          if (projetFiltre.length > 0) {
-            this.composants = projetFiltre[0].composantes;
-          } else {
-            this.composants = [];
-          }
-        }
-      }
-    },
-  },
-
-  methods: {
-    clearObjectValues(obj) {
-      for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          let value = obj[key];
-
-          if (typeof value === "string") {
-            obj[key] = "";
-          } else if (typeof value === "number") {
-            obj[key] = 0;
-          } else if (typeof value === "boolean") {
-            obj[key] = false;
-          } else if (Array.isArray(value)) {
-            obj[key] = [];
-          } else if (typeof value === "object" && value !== null) {
-            obj[key] = {}; // ou appliquer récursion pour vider les objets imbriqués
-            clearObjectValues(obj[key]); // récursion pour les objets imbriqués
-          } else {
-            obj[key] = null; // pour les autres types (null, undefined, etc.)
-          }
-        }
-      }
-    },
-    addComposants() {
-      alert("ok");
-      this.showModal = true;
-      this.isUpdate = false;
-      this.projetId = this.formData.projetId;
-      this.labels = "Ajouter";
-    },
-    sendForm() {
-      if (this.update) {
-        ComposantesService.update(this.composantsId, this.formData)
-          .then((response) => {
-            if (response.status == 200 || response.status == 201) {
-              this.update = false;
-              this.isLoading = false;
-              this.showModal = false;
-              toast.success("Modification éffectuée");
-              this.formData.projetId = this.projetId;
-
-              this.clearObjectValues(this.formData);
-              this.getListeProjet();
-              //this.sendRequest = false;
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-            this.isLoading = false;
-            toast.error(error.message);
-          });
-      } else {
-        this.isLoading = true;
-        this.formData.budgetNational = parseInt(this.formData.budgetNational);
-        ComposantesService.create(this.formData)
-          .then((response) => {
-            if (response.status == 200 || response.status == 201) {
-              this.isLoading = false;
-              toast.success("Ajout éffectué");
-              this.showModal = false;
-              this.clearObjectValues(this.formData);
-
-              this.getListeProjet();
-            }
-          })
-          .catch((error) => {
-            this.isLoading = false;
-            toast.error("Erreur lors de la modification");
-          });
-      }
-    },
-    getListeProjet() {
-      ProjetService.get()
-        .then((data) => {
-          this.projets = data.data.data;
-          this.getProjetById();
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getProjetById() {
-      if (this.projetId == "") {
-        this.projetId = this.projets[0].id;
-      }
-
-      ProjetService.getDetailProjet(this.projetId)
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getListeComposants(data) {
-      alert("ok");
-      console.log(data);
-      this.composants = data.composantes;
-    },
-    filter() {},
-  },
-
-  created() {},
-  mounted() {
-    this.getListeProjet();
-  },
-};
-</script>
 
 <style></style>
