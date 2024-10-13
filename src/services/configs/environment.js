@@ -6,10 +6,7 @@
 
 const API_BASE_URL = "http://192.168.1.3:8000";
 
-<<<<<<< HEAD
 //const API_BASE_URL = "http://192.168.1.14:8000";
-=======
->>>>>>> 6e09837c201e24bc41cd3e58bca433d215a2f4d7
 // const STAGGING_URL = "https://mybsd.shop:8000/"
 //d
 

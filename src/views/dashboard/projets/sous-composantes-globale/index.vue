@@ -94,15 +94,15 @@ export default {
           toast.error("Erreur lors de la suppression");
         });
     },
-    modifierComposante(data) {
+    modifierSousComposante(data) {
       this.labels = "Modifier";
       this.showModal = true;
       this.update = true;
       this.formData.nom = data.nom;
       this.formData.poids = data.poids;
-      this.formData.projetId = data.projetId;
+      this.formData.composanteId = data.composanteId;
       this.formData.budgetNational = data.budgetNational;
-      this.composantsId = data.id;
+      this.sousComposantId = data.id;
     },
     addSousComposants() {
       this.showModal = true;
@@ -112,22 +112,24 @@ export default {
     },
     sendForm() {
       if (this.update) {
-        ComposantesService.update(this.composantsId, this.formData)
+        this.formData.projetId = this.projetId
+         this.isLoading = true;
+        ComposantesService.update(this.sousComposantId, this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
               this.update = false;
               this.isLoading = false;
               this.showModal = false;
               toast.success("Modification éffectuée");
-              this.formData.projetId = this.projetId;
-
+              this.composantsId = this.formData.composanteId
               this.clearObjectValues(this.formData);
+              delete this.formData.projetId;
               this.getListeProjet();
               //this.sendRequest = false;
             }
           })
           .catch((error) => {
-            console.log(error);
+           
             this.isLoading = false;
             toast.error(error.message);
           });
@@ -281,7 +283,7 @@ export default {
             </DropdownToggle>
             <DropdownMenu class="w-40">
               <DropdownContent>
-                <DropdownItem @click="modifierComposante(item)"> <Edit2Icon class="w-4 h-4 mr-2" /> Modifier </DropdownItem>
+                <DropdownItem @click="modifierSousComposante(item)"> <Edit2Icon class="w-4 h-4 mr-2" /> Modifier </DropdownItem>
                 <DropdownItem @click="supprimerComposant(item)"> <TrashIcon class="w-4 h-4 mr-2" /> Supprimer </DropdownItem>
               </DropdownContent>
             </DropdownMenu>
