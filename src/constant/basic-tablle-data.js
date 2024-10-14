@@ -557,7 +557,7 @@ export const basiTableData = [
   },
 ];
 
-import customer1 from "@/assets/images/all-img/customer_1.png";
+import customer1 from "@/assets/users/user-1.png";
 export const advancedTable = [
   {
     id: 1,

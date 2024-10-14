@@ -22,6 +22,9 @@ const ProjetsService = {
   destroy(slug) {
     return ApiService.delete(`/gfa/projets/${slug}`);
   },
+  getDetailProjet(slug) {
+    return ApiService.get(`/gfa/projets/${slug}`);
+  },
 
   programme(slug) {
     return ApiService.get(`projets/${slug}/programme`);

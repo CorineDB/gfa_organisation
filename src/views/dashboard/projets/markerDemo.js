@@ -1,0 +1,1 @@
+export const addressPoints = [{"latitude": 6.27665104598939, "longitude": 2.0613180426463}, {"latitude": 6.963130071089555, "longitude": 2.87057916521712}, {"latitude": 6.272911852412985, "longitude": 2.45848811480407}, {"latitude": 6.866012385536777, "longitude": 2.43066277411563}, {"latitude": 6.28491343141951, "longitude": 2.71354215011813}, ]

@@ -2,52 +2,53 @@
 import ApiService from '@/services/configs/api.service'
 
 const ComposantesService = {
+  query(type, params) {
+    return ApiService.query("/gfa/composantes", {
+      params: params,
+    });
+  },
 
-    query(type, params) {
-      return ApiService.query("composantes", {
-        params: params
-      });
-    },
+  get(slug) {
+    return ApiService.get("/gfa/composantes", slug);
+  },
+  detailComposant(slug) {
+    return ApiService.get(`/gfa/composantes/${slug}` );
+  },
 
-    get(slug) {
-      return ApiService.get("composantes", slug);
-    },
+  create(params) {
+    return ApiService.post("/gfa/composantes", params);
+  },
 
-    create(params) {
-      return ApiService.post("composantes", params);
-    },
+  mySuivis(slug) {
+    return ApiService.get(`/gfa/composantes/${slug}/suivis`);
+  },
+  getSuivi() {
+    const params = {
+      type: "composante",
+    };
+    return ApiService.post(`suivis/filterByModule`, params);
+  },
 
-    mySuivis(slug) {
-      return ApiService.get(`composantes/${slug}/suivis`);
-    },
-    getSuivi() {
-      const params = {
-        type: "composante"
-      }
-      return ApiService.post(`suivis/filterByModule`, params);
-    },
+  update(slug, params) {
+    return ApiService.update("/gfa/composantes", slug, params);
+  },
 
-    update(slug, params) {
-      return ApiService.update("composantes", slug, params);
-    },
+  destroy(slug) {
+    return ApiService.delete(`/gfa/composantes/${slug}`);
+  },
 
-    destroy(slug) {
-      return ApiService.delete(`composantes/${slug}`);
-    },
+  activites(slug) {
+    return ApiService.get(`/gfa/composantes/${slug}/activites`);
+  },
 
-    activites(slug) {
-      return ApiService.get(`composantes/${slug}/activites`);
-    },
+  sousComposantes(slug) {
+    return ApiService.get(`/gfa/composantes/${slug}/sousComposantes`);
+  },
 
-    sousComposantes(slug) {
-      return ApiService.get(`composantes/${slug}/sousComposantes`);
-    },
-
-    projet(slug) {
-      return ApiService.get(`composantes/${slug}/projet`);
-    }
-
-  };
+  projet(slug) {
+    return ApiService.get(`/gfa/composantes/${slug}/projet`);
+  },
+};
 
   export default ComposantesService;
   

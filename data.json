@@ -1,41 +1,44 @@
+
+
+
 typeGouvernance
 
-  <!-- <main class="ml-64 p-6">
-  <div class="flex justify-between items-center mb-6">
+  <!-- <main class="p-6 ml-64">
+  <div class="flex items-center justify-between mb-6">
     <h2 class="text-3xl font-bold">Nom du Projet</h2>
     <div>
-      <button class="bg-blue-600 text-white px-4 py-2 rounded mx-2">Ajouter une tâche</button>
-      <button class="bg-gray-200 px-4 py-2 rounded mx-2">Modifier projet</button>
-      <button class="bg-gray-200 px-4 py-2 rounded mx-2">Partager</button>
+      <button class="px-4 py-2 mx-2 text-white bg-blue-600 rounded">Ajouter une tâche</button>
+      <button class="px-4 py-2 mx-2 bg-gray-200 rounded">Modifier projet</button>
+      <button class="px-4 py-2 mx-2 bg-gray-200 rounded">Partager</button>
     </div>
   </div>
   
   <section class="mb-8">
-    <h3 class="text-xl font-semibold mb-4">Résumé du Projet</h3>
+    <h3 class="mb-4 text-xl font-semibold">Résumé du Projet</h3>
     <p class="text-gray-700">Ce projet a pour objectif de développer une plateforme web intuitive permettant aux utilisateurs de gérer leurs tâches efficacement. Le projet est actuellement en phase de développement avec une équipe de 5 personnes.</p>
   </section>
   
   <section>
-    <h3 class="text-xl font-semibold mb-4">Tâches</h3>
+    <h3 class="mb-4 text-xl font-semibold">Tâches</h3>
     <table class="min-w-full bg-white">
       <thead>
-        <tr class="w-full bg-gray-200 text-left">
-          <th class="py-2 px-4">Tâche</th>
-          <th class="py-2 px-4">Statut</th>
-          <th class="py-2 px-4">Priorité</th>
-          <th class="py-2 px-4">Assigné à</th>
-          <th class="py-2 px-4">Actions</th>
+        <tr class="w-full text-left bg-gray-200">
+          <th class="px-4 py-2">Tâche</th>
+          <th class="px-4 py-2">Statut</th>
+          <th class="px-4 py-2">Priorité</th>
+          <th class="px-4 py-2">Assigné à</th>
+          <th class="px-4 py-2">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr class="border-b">
-          <td class="py-2 px-4">Créer la maquette UI</td>
-          <td class="py-2 px-4 text-green-600">En cours</td>
-          <td class="py-2 px-4">Haute</td>
-          <td class="py-2 px-4">Alice</td>
-          <td class="py-2 px-4">
-            <button class="bg-blue-500 text-white px-2 py-1 rounded">Détails</button>
-            <button class="bg-red-500 text-white px-2 py-1 rounded">Supprimer</button>
+          <td class="px-4 py-2">Créer la maquette UI</td>
+          <td class="px-4 py-2 text-green-600">En cours</td>
+          <td class="px-4 py-2">Haute</td>
+          <td class="px-4 py-2">Alice</td>
+          <td class="px-4 py-2">
+            <button class="px-2 py-1 text-white bg-blue-500 rounded">Détails</button>
+            <button class="px-2 py-1 text-white bg-red-500 rounded">Supprimer</button>
           </td>
         </tr>
         Autres tâches
@@ -46,9 +49,9 @@ typeGouvernance
 
 <!-- <main class="p-6">
   Titre et bouton Ajouter
-  <div class="flex justify-between items-center mb-6">
+  <div class="flex items-center justify-between mb-6">
     <h2 class="text-3xl font-bold">Liste des Projets</h2>
-    <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Ajouter un Projet</button>
+    <button class="px-4 py-2 text-white transition bg-green-600 rounded hover:bg-green-700">Ajouter un Projet</button>
   </div>
   
   Barre de recherche
@@ -64,43 +67,209 @@ typeGouvernance
   <table class="min-w-full bg-white border border-gray-300 shadow-lg">
     <thead class="bg-gray-100">
       <tr>
-        <th class="py-2 px-4 border-b text-left">Nom du Projet</th>
-        <th class="py-2 px-4 border-b text-left">Résumé</th>
-        <th class="py-2 px-4 border-b text-left">Statut</th>
-        <th class="py-2 px-4 border-b text-left">Actions</th>
+        <th class="px-4 py-2 text-left border-b">Nom du Projet</th>
+        <th class="px-4 py-2 text-left border-b">Résumé</th>
+        <th class="px-4 py-2 text-left border-b">Statut</th>
+        <th class="px-4 py-2 text-left border-b">Actions</th>
       </tr>
     </thead>
     <tbody>
       Projet 1
-      <tr class="hover:bg-gray-50 transition">
-        <td class="py-2 px-4 border-b">Nom du Projet A</td>
-        <td class="py-2 px-4 border-b">Résumé court du projet A.</td>
-        <td class="py-2 px-4 border-b text-green-600 font-semibold">En cours</td>
-        <td class="py-2 px-4 border-b flex space-x-2">
-          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Modifier</button>
-          <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
+      <tr class="transition hover:bg-gray-50">
+        <td class="px-4 py-2 border-b">Nom du Projet A</td>
+        <td class="px-4 py-2 border-b">Résumé court du projet A.</td>
+        <td class="px-4 py-2 font-semibold text-green-600 border-b">En cours</td>
+        <td class="flex px-4 py-2 space-x-2 border-b">
+          <button class="px-4 py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700">Modifier</button>
+          <button class="px-4 py-2 text-white transition bg-red-600 rounded hover:bg-red-700">Supprimer</button>
         </td>
       </tr>
       Projet 2
-      <tr class="hover:bg-gray-50 transition">
-        <td class="py-2 px-4 border-b">Nom du Projet B</td>
-        <td class="py-2 px-4 border-b">Résumé court du projet B.</td>
-        <td class="py-2 px-4 border-b text-red-600 font-semibold">En retard</td>
-        <td class="py-2 px-4 border-b flex space-x-2">
-          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Modifier</button>
-          <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
+      <tr class="transition hover:bg-gray-50">
+        <td class="px-4 py-2 border-b">Nom du Projet B</td>
+        <td class="px-4 py-2 border-b">Résumé court du projet B.</td>
+        <td class="px-4 py-2 font-semibold text-red-600 border-b">En retard</td>
+        <td class="flex px-4 py-2 space-x-2 border-b">
+          <button class="px-4 py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700">Modifier</button>
+          <button class="px-4 py-2 text-white transition bg-red-600 rounded hover:bg-red-700">Supprimer</button>
         </td>
       </tr>
       Projet 3
-      <tr class="hover:bg-gray-50 transition">
-        <td class="py-2 px-4 border-b">Nom du Projet C</td>
-        <td class="py-2 px-4 border-b">Résumé court du projet C.</td>
-        <td class="py-2 px-4 border-b text-yellow-600 font-semibold">À venir</td>
-        <td class="py-2 px-4 border-b flex space-x-2">
-          <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Modifier</button>
-          <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Supprimer</button>
+      <tr class="transition hover:bg-gray-50">
+        <td class="px-4 py-2 border-b">Nom du Projet C</td>
+        <td class="px-4 py-2 border-b">Résumé court du projet C.</td>
+        <td class="px-4 py-2 font-semibold text-yellow-600 border-b">À venir</td>
+        <td class="flex px-4 py-2 space-x-2 border-b">
+          <button class="px-4 py-2 text-white transition bg-blue-600 rounded hover:bg-blue-700">Modifier</button>
+          <button class="px-4 py-2 text-white transition bg-red-600 rounded hover:bg-red-700">Supprimer</button>
         </td>
       </tr>
     </tbody>
   </table>
 </main> -->
+
+ <div class="container px-4 mx-auto">
+    <!-- Combined Filter Section -->
+    <div class="p-6 space-y-3 bg-white rounded-lg shadow-md">
+      <h2 class="mb-4 text-base font-bold">Filtre</h2>
+      <div class="grid grid-cols-3 gap-4">
+        <input type="text" v-model="filteredIndicateur.nom" placeholder="Indicateur" class="p-2 border rounded" />
+        <input type="text" v-model="filteredIndicateur.anneeDeBase" placeholder="Année de base" class="p-2 border rounded" />
+
+        <div class="flex w-full">
+          <v-select class="w-full" :reduce="(categories) => categories.id" v-model="filteredIndicateur.categorieId" label="nom" :options="categories">
+            <template #search="{ attributes, events }">
+              <input class="vs__search form-input" :required="!filteredIndicateur.categorieId" v-bind="attributes" v-on="events" />
+            </template>
+          </v-select>
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Catégories</label>
+        </div>
+        <div class="flex w-full">
+          <v-select class="w-full" :reduce="(uniteDeMesures) => uniteDeMesures.id" v-model="filteredIndicateur.uniteeMesureId" label="nom" :options="uniteDeMesures">
+            <template #search="{ attributes, events }">
+              <input class="vs__search form-input" :required="!filteredIndicateur.uniteeMesureId" v-bind="attributes" v-on="events" />
+            </template>
+          </v-select>
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm"> Unité de mesure</label>
+        </div>
+        <div class="flex w-full">
+          <v-select class="w-full" :reduce="(bailleurs) => bailleurs.id" v-model="filteredIndicateur.bailleurId" label="sigle" :options="bailleurs">
+            <template #search="{ attributes, events }">
+              <input class="vs__search form-input" :required="!filteredIndicateur.bailleurId" v-bind="attributes" v-on="events" />
+            </template>
+          </v-select>
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm"> Bailleurs</label>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mt-4">
+        <input type="text" placeholder="Recherche" class="p-2 border rounded" />
+        <button class="px-4 py-2 text-white bg-blue-500 rounded" @click="filter()">Filtrer</button>
+      </div>
+    </div>
+
+    <!-- Results or other components -->
+    <div class="mt-6">
+      <!-- Place the table or grid component here -->
+    </div>
+  </div>
+
+  
+  {
+  "id": "xQRwE5GAr35mGdq0OJg4xzpMl9y6AVPKyDkjYEXwQbavB2nLe71NRZ8KJbjgOrkX",
+  "nom": "Projet de gestion de projet",
+  "codePta": "2.5.1.7978798",
+  "debut": "2020-02-23",
+  "fin": "2030-06-15",
+  "couleur": "Jaune",
+  "nombreEmploie": 0,
+  "budgetNational": 700000000,
+  "objectifGlobaux": null,
+  "pays": "Bénin",
+  "commune": "Cotonou",
+  "departement": "Litoral",
+  "arrondissement": "Sènadé",
+  "tauxEngagement": null,
+  "quartier": "Sènadé",
+  "secteurActivite": "Environnement",
+  "dateAprobation": "2023-12-07",
+  "description": "Projet de gestion de projet",
+  "owner": {
+    "id": "lWy5dAzXpP1dKrXLykzR20mMAZe4Ew7KD39Gvlan5W8BoYgVjbDJO6xNkZ1KRrno",
+    "sigle": "CBT",
+    "code": "7978798",
+    "created_at": "2024-10-02",
+    "user": {
+      "id": "A1x2zw95aXo4bnxPYW7Z0jzBmQVg2l8493D6EeGMA5r9NvRKpkwqLdy1lVNBpjdE",
+      "nom": "Care Benin Togo",
+      "prenom": null,
+      "email": "care@gmail.com",
+      "contact": "69049012",
+      "poste": null,
+      "type": "organisation",
+      "emailVerifiedAt": null,
+      "code": 7978798,
+      "created_at": "2024-10-02",
+      "first_connexion": 0,
+      "statut": 0,
+      "account_verification_request_sent_at": "2024-10-02 10:17:12",
+      "password_update_at": null,
+      "last_password_remember": null,
+      "link_is_valide": 1,
+      "lastRequest": null,
+      "roles": [
+        {
+          "id": "K2r3OpDRRxzyr7A19Dmb5ZeoOwYnlgkKdL63vBXEKQWV280GPpdMNjaqwqmndxGz",
+          "nom": "Organisation",
+          "description": "Organisation",
+          "roleable_type": null,
+          "roleable_id": null,
+          "created_at": "2024-09-30T15:53:28.000000Z"
+        }
+      ]
+    }
+  },
+  "statut": 1,
+  "tep": 0,
+  "tef": 0,
+  "tepByAnnee": 0,
+  "image": null,
+  "fichiers": [],
+  "programme": {
+    "id": "Kd6Zov9ybW9PRxngKpQv81oeXMr6YOJgmV5ZlG47dkq2zjwABDLma3y0DGj3BP7w",
+    "nom": "GFA Redevabilite",
+    "code": "2.5.1",
+    "budgetNational": 5000000,
+    "debut": "2022-10",
+    "fin": "2026-10",
+    "description": "dfsfsdfs",
+    "objectifGlobaux": "satisfaction",
+    "created_at": "2024-09-24T07:27:16.000000Z",
+    "organismeDeTutelle": "Ministère"
+  },
+  "link": null,
+  "composantes": [
+    {
+      "id": "7lyoYAgMzbr1JkKEy7Dqmn2jBlGWOpX2AxAM3oe9RdvPg08V6ZQNYw4LbdmWRkDG",
+      "nom": "Scolarisation des jeunes filles de Bohicon",
+      "poids": 11,
+      "budgetNational": 0,
+      "description": "Scolarisation des jeunes filles de Bohicon",
+      "statut": -1,
+      "tep": 0,
+      "sigle": "CBT",
+      "projetId": "xQRwE5GAr35mGdq0OJg4xzpMl9y6AVPKyDkjYEXwQbavB2nLe71NRZ8KJbjgOrkX",
+      "composanteId": null,
+      "position": 0,
+      "created_at": "2024-10-02 05:35:50"
+    },
+    {
+      "id": "oEqeVjN3wPGze2KpNYo7Qgqkmn8JBExdpxWL39ZR64bAvVMOrd10ylDjd2vO1lYR",
+      "nom": "Scolarisation des jeunes filles",
+      "poids": 11,
+      "budgetNational": 200000,
+      "description": "Scolarisation des jeunes filles",
+      "statut": -1,
+      "tep": 0,
+      "sigle": "CBT",
+      "projetId": "xQRwE5GAr35mGdq0OJg4xzpMl9y6AVPKyDkjYEXwQbavB2nLe71NRZ8KJbjgOrkX",
+      "composanteId": null,
+      "position": 0,
+      "created_at": "2024-10-02 05:36:14"
+    },
+    {
+      "id": "ydG8e1kq3LKeP4Yd8Vj9w1Mnvlkyr05oExAqpBEOJgZN27D6zmboGQRWQ76r4VEL",
+      "nom": "Scolarisation des jeunes filles",
+      "poids": 100,
+      "budgetNational": 200000,
+      "description": "Scolarisation des jeunes filles",
+      "statut": -2,
+      "tep": 0,
+      "sigle": "CBT",
+      "projetId": "xQRwE5GAr35mGdq0OJg4xzpMl9y6AVPKyDkjYEXwQbavB2nLe71NRZ8KJbjgOrkX",
+      "composanteId": null,
+      "position": 0,
+      "created_at": "2024-10-02 05:37:07"
+    }
+  ],
+  "audit": null
+}

@@ -547,6 +547,7 @@ export default {
         this.updateOng({ ong: this.formData, id: this.ongsId })
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
+              this.update =false
               this.ajoutLoading = false;
               this.showModal = false;
               toast.success("Modification éffectuée");
@@ -559,7 +560,7 @@ export default {
           .catch((error) => {
             console.log(error);
             this.ajoutLoading = false;
-            toast.error(error.response.data.errors.message);
+            toast.error(error.message);
             // this.setErrors({ message: error?.response?.data?.message, errors: error?.response?.data?.data?.errors });
             // this.sendRequest = false;
             // this.champs.map((value) => (value.errors = this.erreurs[value.key]));
@@ -572,7 +573,7 @@ export default {
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
               this.ajoutLoading = false;
-              toast.errors("Ajout éffectué");
+              toast.success("Ajout éffectué");
               this.close();
               this.clearObjectValues(this.formData);
               // this.resetForm();
@@ -582,7 +583,7 @@ export default {
             }
           })
           .catch((error) => {
-            toast.error(error.response.data.errors.message);
+            toast.error(error.message);
 
             this.ajoutLoading = false;
             // this.getFile();
@@ -749,12 +750,12 @@ export default {
   <Modal :show="showDeleteModal" @hidden="showDeleteModal = false">
     <ModalBody class="p-0">
       <div class="p-5 text-center">
-        <XCircleIcon class="w-16 h-16 text-danger mx-auto mt-3" />
-        <div class="text-3xl mt-5">Etes vous sûr?</div>
-        <div class="text-slate-500 mt-2">Voulez vous supprimer l'organisation ? <br />Cette action ne peut être annulé</div>
+        <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">Etes vous sûr?</div>
+        <div class="mt-2 text-slate-500">Voulez vous supprimer l'organisation ? <br />Cette action ne peut être annulé</div>
       </div>
-      <div class="px-5 pb-8 text-center flex gap-2">
-        <button type="button" @click="showDeleteModal = false" class="my-3 btn btn-outline-secondary w-full mr-1">Annuler</button>
+      <div class="flex gap-2 px-5 pb-8 text-center">
+        <button type="button" @click="showDeleteModal = false" class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>
         <VButton :loading="isLoading" label="Supprimer" @click="deleteOngs" />
       </div>
     </ModalBody>
@@ -762,8 +763,8 @@ export default {
 
   <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
     <ModalHeader>
-      <h2 v-if="!update" class="font-medium text-base mr-auto">Ajouter une organisation</h2>
-      <h2 v-else class="font-medium text-base mr-auto">Modifier une organisation</h2>
+      <h2 v-if="!update" class="mr-auto text-base font-medium">Ajouter une organisation</h2>
+      <h2 v-else class="mr-auto text-base font-medium">Modifier une organisation</h2>
     </ModalHeader>
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
       <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
@@ -790,25 +791,25 @@ export default {
     <ModalFooter>
       <div class="flex items-center justify-center">
         
-        <button type="button" @click="showModal = false" class="btn btn-outline-secondary w-full mr-1">Annuler</button>
+        <button type="button" @click="showModal = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
         <VButton class="inline-block" :label="labels" :loading="ajoutLoading" @click="sendForm" />
-        <!-- <button type="button" class="btn btn-primary w-20">Send</button> -->
+        <!-- <button type="button" class="w-20 btn btn-primary">Send</button> -->
       </div>
     </ModalFooter>
   </Modal>
-  <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
-    <h2 class="text-lg font-medium mr-auto">Organisation</h2>
-    <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-      <button class="btn btn-primary shadow-md mr-2" @click="showModal = true">Ajouter une organisation</button>
+  <div class="flex flex-col items-center mt-8 intro-y sm:flex-row">
+    <h2 class="mr-auto text-lg font-medium">Organisation</h2>
+    <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
+      <button class="mr-2 shadow-md btn btn-primary" @click="showModal = true ,  labels = 'Ajouter' ">Ajouter une organisation</button>
     </div>
   </div>
   <!-- BEGIN: HTML Table Data -->
-  <div class="intro-y box p-5 mt-5">
-    <div class="flex flex-end flex-wrap _sm:items-end _xl:items-start">
+  <div class="p-5 mt-5 intro-y box">
+    <div class="flex flex-wrap flex-end _sm:items-end _xl:items-start">
       <div class="flex mt-5 sm:mt-0">
-        <button id="tabulator-print" class="btn btn-outline-secondary w-1/2 sm:w-auto mr-2" @click="onPrint"><PrinterIcon class="w-4 h-4 mr-2" /> PDF</button>
+        <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto" @click="onPrint"><PrinterIcon class="w-4 h-4 mr-2" /> PDF</button>
         <Dropdown class="w-1/2 sm:w-auto">
-          <DropdownToggle class="btn btn-outline-secondary w-full sm:w-auto">
+          <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
             <FileTextIcon class="w-4 h-4 mr-2" /> Exporter
             <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
           </DropdownToggle>

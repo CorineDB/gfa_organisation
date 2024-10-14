@@ -6,7 +6,7 @@
       <div class="ml-4 mr-4">
         <div :class="{ 'text-red-500 capitalize ': message.type != 'success' }" class="font-medium">{{ message.type }}
         </div>
-        <div class="text-slate-500 mt-1">
+        <div class="mt-1 text-slate-500">
           {{ message.message }}
         </div>
       </div>
@@ -18,18 +18,18 @@
     <Modal :show="deleteModalPreview" @hidden="deleteModalPreview = false">
       <ModalBody class="p-0">
         <div class="p-5 text-center">
-          <XCircleIcon class="w-16 h-16 text-danger mx-auto mt-3" />
-          <div class="text-3xl mt-5">Vous etes sur supprimer {{ deleteData.nom }} ?</div>
-          <div class="text-slate-500 mt-2">
+          <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
+          <div class="mt-5 text-3xl">Vous etes sur supprimer {{ deleteData.nom }} ?</div>
+          <div class="mt-2 text-slate-500">
             Cette operation est irreverssible ? <br />Cliquer
             sur annuler pour annuler l'operation
           </div>
         </div>
         <div class="px-5 pb-8 text-center">
-          <button type="button" @click="deleteModalPreview = false" class="btn btn-outline-secondary w-24 mr-1">
+          <button type="button" @click="deleteModalPreview = false" class="w-24 mr-1 btn btn-outline-secondary">
             Annuler
           </button>
-          <button type="button" @click="deleteGroupe" class="btn btn-danger w-24">
+          <button type="button" @click="deleteGroupe" class="w-24 btn btn-danger">
             Supprimer
           </button>
         </div>
@@ -48,58 +48,61 @@
     <Modal size="modal-xl" :show="showModal" @hidden="close" id="modxxl">
       <ModalBody class="lg:p-10 ">
 
-        <div class="w-full bg-blue-900 text-white text-center p-4 font-bold rounded">
+        <div class="w-full p-4 font-bold text-center text-white bg-blue-900 rounded">
           FICHE SYNTHESE SCORE FACTUEL GOUVERNANCE
         </div>
 
-        <table class="border-collapse table-fixed w-full text-sm mt-12">
+        <table class="w-full mt-12 text-sm border-collapse table-fixed">
           <tbody>
             <tr class="border-b border-slate-300">
-              <td class="font-medium p-2">Structure :</td>
+              <td class="p-2 font-medium">Structure :</td>
               <td>Lorem ipsum dolor sit amet.</td>
             </tr>
             <tr class="border-b border-slate-300">
-              <td class="font-medium p-2">Nom, Prénom et qualité du point focal Gouvernance :</td>
+              <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
               <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
             </tr>
             <tr class="border-b border-slate-300">
-              <td class="font-medium p-2">Date d’auto-évaluation :</td>
+              <td class="p-2 font-medium">Date d’auto-évaluation :</td>
               <td>Lorem ipsum dolor sit.</td>
             </tr>
           </tbody>
         </table>
 
-        <table class="border-collapse table-auto w-full text-sm mt-12">
-          <thead class="bg-green-200 text-left">
-            <th class="pl-2">Principe</th>
-            <th>Indice Factuel</th>
+        <table class="w-full mt-12 text-sm border-collapse table-auto">
+          <thead class="text-left bg-green-200">
+            <tr>
+               <th class="pl-2">Principe</th>
+               <th>Indice Factuel</th>
+            </tr>
+           
           </thead>
           <tbody>
             <tr class="border-b border-slate-300">
-              <td class="font-medium p-2">Redevabilité</td>
+              <td class="p-2 font-medium">Redevabilité</td>
               <td>0.56</td>
             </tr>
             <tr class="border-b border-slate-300">
-              <td class="font-medium p-2">Transparence</td>
+              <td class="p-2 font-medium">Transparence</td>
               <td>0.56</td>
             </tr>
             <tr class="border-b border-slate-300">
-              <td class="font-medium p-2">Participation</td>
+              <td class="p-2 font-medium">Participation</td>
               <td>0.56</td>
             </tr>
             <tr class="border-b border-slate-300">
-              <td class="font-medium p-2">Egalité et non-discrimination / inclusion</td>
+              <td class="p-2 font-medium">Egalité et non-discrimination / inclusion</td>
               <td>0.56</td>
             </tr>
             <tr class="border-b border-slate-300">
-              <td class="font-medium p-2">Efficacité et efficience</td>
+              <td class="p-2 font-medium">Efficacité et efficience</td>
               <td>0.56</td>
             </tr>
           </tbody>
         </table>
 
-        <table class="w-full table-auto border-collapse mt-12" border="0" cellpadding="0" cellspacing="0">
-          <thead class="bg-blue-900 text-left">
+        <table class="w-full mt-12 border-collapse table-auto" border="0" cellpadding="0" cellspacing="0">
+          <thead class="text-left bg-blue-900">
             <tr>
               <th scope="col" class="p-2 text-white">Principes</th>
               <th scope="col" class="p-2 text-white">Critères</th>
@@ -109,12 +112,12 @@
               <th scope="col" class="p-2 text-white whitespace-nowrap">Sources de vérification</th>
             </tr>
             <tr class="bg-white border-t-8 border-white">
-              <th class="p-2 my-2 bg-yellow-300 text-center" colspan="5">INDICE FACTUEL DE GOUVERNANCE</th>
-              <th class="p-2 bg-yellow-300 text-center">0.59</th>
+              <th class="p-2 my-2 text-center bg-yellow-300" colspan="5">INDICE FACTUEL DE GOUVERNANCE</th>
+              <th class="p-2 text-center bg-yellow-300">0.59</th>
             </tr>
             <tr class="bg-white border-t-8 border-white">
               <th class="p-2 my-2 bg-yellow-300" colspan="5">Gouvernance politique</th>
-              <th class="p-2 bg-yellow-300 text-center">0.59</th>
+              <th class="p-2 text-center bg-yellow-300">0.59</th>
             </tr>
           </thead>
 
@@ -123,10 +126,10 @@
               <td class="p-2 font-bold bg-yellow-500" rowspan="5">Redevabilité</td>
               <td class="p-2 bg-yellow-500" rowspan="4">Légitimité/légalité</td>
               <td class="p-2 bg-green-600">Rôles et responsabilité clairement définis</td>
-              <td class="p-2 bg-green-600 text-center">1</td>
+              <td class="p-2 text-center bg-green-600">1</td>
               <td class="p-2 bg-green-600">10</td>
             </tr>
-            <tr class="bg-red-600 text-white">
+            <tr class="text-white bg-red-600">
               <td class="p-2 ">Organes statutaires fonctionnels</td>
               <td class="p-2 text-center">2</td>
               <td class="p-2">15</td>
@@ -141,7 +144,7 @@
               <td class="p-2 text-center">3</td>
               <td class="p-2">6</td>
             </tr>
-            <tr class=" bg-yellow-500 font-bold">
+            <tr class="font-bold bg-yellow-500 ">
               <td colspan="2" class="px-2"></td>
               <td class="px-2 text-xs whitespace-nowrap">Score Factuel</td>
               <td class="px-2">0.43</td>
@@ -171,7 +174,7 @@
             </tr>
             <tr class="subTotatlRow">
               <td colspan="2" class="px-2 sub-total-text"> ->\ </td>
-              <td class="px-2 font-bold text-xs whitespace-nowrap">Score Factuel</td>
+              <td class="px-2 text-xs font-bold whitespace-nowrap">Score Factuel</td>
               <td class="px-2">0.43</td>
             </tr>
 
@@ -182,13 +185,13 @@
     </Modal>
     <!-- END: Modal Content -->
     <!-- BEGIN: Modal Toggle -->
-    <div class=" flex justify-end ">
-      <!-- <button @click="addGroupe" class="btn btn-primary flex space-x-2 items-center">
+    <div class="flex justify-end ">
+      <!-- <button @click="addGroupe" class="flex items-center space-x-2 btn btn-primary">
         <PlusSquareIcon />
-        <span class="uppercase font-semibold"> ajouter</span>
+        <span class="font-semibold uppercase"> ajouter</span>
       </button> -->
-      <div class="search hidden sm:block">
-        <input type="text" class="search__input form-control border-transparent" v-model="search"
+      <div class="hidden search sm:block">
+        <input type="text" class="border-transparent search__input form-control" v-model="search"
           placeholder="Recherche..." />
         <SearchIcon class="search__icon dark:text-slate-500" />
       </div>
@@ -196,7 +199,7 @@
     </div>
     <!-- END: Modal Toggle -->
 
-    <div class="overflow-x-auto mt-5">
+    <div class="mt-5 overflow-x-auto">
       <table class="table mt-5">
         <thead class="table-light">
           <tr>
@@ -216,7 +219,7 @@
             <td>{{ data.created_at }}</td>
             <!-- <td> {{ data.created_at }} </td>
             <td> {{ data.updated_at }}</td> -->
-            <td v-if="$h.getPermission('write.indicateur')" class="flex space-x-2 items-center">
+            <td v-if="$h.getPermission('write.indicateur')" class="flex items-center space-x-2">
 
 
               <Dropdown class="inline-block" placement="top-end">
@@ -225,52 +228,52 @@
                 </DropdownToggle>
                 <DropdownMenu class="w-40">
                   <DropdownContent>
-                    <!-- <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2" content="cliquez pour modifier">
+                    <!-- <Tippy tag="a" href="javascript:;" class="inline-block my-2 tooltip" content="cliquez pour modifier">
                       <span @click="modifier(index, data)"
-                        class="text-black cursor-pointer flex justify-start items-center">
+                        class="flex items-center justify-start text-black cursor-pointer">
                         <EditIcon class="mr-2" />Modifier
                       </span>
                     </Tippy> -->
-                    <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2" content="cliquez pour modifier">
+                    <Tippy tag="a" href="javascript:;" class="inline-block my-2 tooltip" content="cliquez pour modifier">
                       <span @click="modifier(index, data)"
-                        class="text-black cursor-pointer flex justify-start items-center">
+                        class="flex items-center justify-start text-black cursor-pointer">
                         <EditIcon class="mr-2" />Fiche synthèse
                       </span>
                     </Tippy>
-                    <!-- <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2" content="cliquez pour supprimer">
+                    <!-- <Tippy tag="a" href="javascript:;" class="inline-block my-2 tooltip" content="cliquez pour supprimer">
                       <span @click="supprimer(index, data)"
-                        class="text-black cursor-pointer flex justify-start items-center">
+                        class="flex items-center justify-start text-black cursor-pointer">
                         <Trash2Icon class="mr-2" />Supprimer
                       </span>
                     </Tippy> -->
-                    <!-- <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2"
+                    <!-- <Tippy tag="a" href="javascript:;" class="inline-block my-2 tooltip"
                       content="cliquez pour ajouter ou voir les indicateurs">
                       <span @click="voirIndicateur(index, data.id)"
-                        class="text-black cursor-pointer flex justify-start items-center"><svg
+                        class="flex items-center justify-start text-black cursor-pointer"><svg
                           xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                          class="feather feather-plus-circle mr-2">
+                          class="mr-2 feather feather-plus-circle">
                           <circle cx="12" cy="12" r="10"></circle>
                           <line x1="12" y1="8" x2="12" y2="16"></line>
                           <line x1="8" y1="12" x2="16" y2="12"></line>
                         </svg>Ajouter Indicateur</span>
                     </Tippy> -->
-                    <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2"
+                    <Tippy tag="a" href="javascript:;" class="inline-block my-2 tooltip"
                       content="cliquez pour voir les stats de ce indicateur">
-                      <span class="text-black cursor-pointer flex justify-start items-center">
+                      <span class="flex items-center justify-start text-black cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                          class="feather feather-trending-up mr-2">
+                          class="mr-2 feather feather-trending-up">
                           <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                           <polyline points="17 6 23 6 23 12"></polyline>
                         </svg>Voir Stats</span>
                     </Tippy>
-                    <Tippy tag="a" href="javascript:;" class="tooltip inline-block my-2"
+                    <Tippy tag="a" href="javascript:;" class="inline-block my-2 tooltip"
                       content="cliquez pour exporter les stats de ce indicateur">
-                      <span class="text-black cursor-pointer flex justify-start items-center">
+                      <span class="flex items-center justify-start text-black cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                          class="feather feather-upload mr-2">
+                          class="mr-2 feather feather-upload">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                           <polyline points="17 8 12 3 7 8"></polyline>
                           <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -305,11 +308,11 @@
       </table>
       <div class="flex justify-center mt-4" v-if="totalPages() > 1">
         <button
-          class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-l-md px-4 py-2 m-1 focus:outline-none"
+          class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 hover:bg-gray-300 rounded-l-md focus:outline-none"
           :disabled="currentPage === 1" @click="currentPage--">Previous</button>
         <template v-if="totalPages() <= 7">
           <button
-            class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+            class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
             :class="{ 'bg-gray-400': pageNumber === currentPage }" v-for="pageNumber in totalPages()" :key="pageNumber"
             @click="goToPage(pageNumber)">
             {{ pageNumber }}
@@ -318,34 +321,34 @@
         <template v-else>
           <template v-if="currentPage <= 4">
             <button
-              class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+              class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === currentPage }" v-for="pageNumber in 5" :key="pageNumber"
               @click="goToPage(pageNumber)">
               {{ pageNumber }}
             </button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
+            <span class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md">...</span>
             <button
-              class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+              class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === totalPages() }" @click="goToPage(totalPages())">
               {{ totalPages() }}
             </button>
           </template>
           <template v-else-if="currentPage >= totalPages() - 3">
             <button
-              class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+              class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === 1 }" @click="goToPage(1)">
               1
             </button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
+            <span class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md">...</span>
             <button
-              class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+              class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === currentPage }" v-for="pageNumber in 5" :key="pageNumber"
               @click="goToPage(pageNumber)">
               {{ pageNumber }}
             </button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
+            <span class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md">...</span>
             <button
-              class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+              class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === currentPage }"
               v-for="pageNumber in [totalPages() - 3, totalPages() - 2, totalPages() - 1, totalPages()]" :key="pageNumber"
               @click="goToPage(pageNumber)">
@@ -354,28 +357,28 @@
           </template>
           <template v-else>
             <button
-              class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+              class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === 1 }" @click="goToPage(1)">
               1
             </button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
+            <span class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md">...</span>
             <button
-              class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+              class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === currentPage }"
               v-for="pageNumber in [currentPage - 1, currentPage, currentPage + 1]" :key="pageNumber"
               @click="goToPage(pageNumber)">
               {{ pageNumber }}
             </button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
+            <span class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md">...</span>
             <button
-              class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
+              class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 rounded-md hover:bg-gray-300 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === totalPages() }" @click="goToPage(totalPages())">
               {{ totalPages() }}
             </button>
           </template>
         </template>
         <button
-          class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-r-md px-4 py-2 m-1 focus:outline-none"
+          class="px-4 py-2 m-1 text-gray-700 bg-gray-200 border border-gray-300 hover:bg-gray-300 rounded-r-md focus:outline-none"
           :disabled="currentPage === totalPages()" @click="currentPage++">Next</button>
       </div>
     </div>

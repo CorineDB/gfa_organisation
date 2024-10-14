@@ -1,19 +1,19 @@
 <template>
-  <div class="py-5 md:py-0 -mx-3 px-3 sm:-mx-8 sm:px-8">
+  <div class="px-3 py-5 -mx-3 md:py-0 sm:-mx-8 sm:px-8">
     <!-- <DarkModeSwitcher /> -->
     <!-- <MainColorSwitcher /> -->
     <MobileMenu />
     <div class="flex mt-[4.7rem] md:mt-0 relative overflow-hidden">
       <!-- BEGIN: Side Menu -->
-      <nav class="side-nav fixed navColor h-screen overflow-scroll scrollbar-hidden">
-        <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="intro-x flex flex-wrap items-center justify-center mt-3">
+      <nav class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
+        <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-wrap items-center justify-center mt-3 intro-x">
           <img alt="Tinker Tailwind HTML Admin Template" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" />
         </router-link>
-        <div class="side-nav__devider my-6"></div>
+        <div class="my-6 side-nav__devider"></div>
         <ul>
           <!-- BEGIN: First Child -->
           <template v-for="(menu, menuKey) in formattedMenu">
-            <li v-if="menu == 'devider'" :key="menu + menuKey" class="side-nav__devider my-6"></li>
+            <li v-if="menu == 'devider'" :key="menu + menuKey" class="my-6 side-nav__devider"></li>
             <li v-else :key="menu + menuKey + 0">
               <SideMenuTooltip
                 tag="a"
@@ -84,7 +84,7 @@
       </nav>
       <!-- END: Side Menu -->
       <!-- BEGIN: Content -->
-      <div class="content xl:pl-64 md:pl-32 pl-0">
+      <div class="pl-0 content xl:pl-64 md:pl-32">
         <TopBar />
         <router-view />
       </div>
@@ -398,7 +398,7 @@ const usersProfileImage = ref("");
 
 onMounted(() => {
   const usersInfo = JSON.parse(localStorage.getItem('authenticateUser'));
-  console.log(usersInfo);
+  //console.log(usersInfo);
 
   if (usersInfo) {
    // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
