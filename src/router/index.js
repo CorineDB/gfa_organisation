@@ -211,11 +211,6 @@ const routes = [
         name: "Indicateurs",
         component: indicateurs,
       },
-      {
-        path: "form-factuel",
-        name: "FormFactuel",
-        component: FormFactuel,
-      },
     ],
   },
 
