@@ -168,6 +168,7 @@ const initTabulator = () => {
   });
 };
 const handleEdit = (params) => {
+  console.log("Edit:", params);
   isCreate.value = false;
   idSelect.value = params.id;
   payload.nom = params.nom;
@@ -175,8 +176,7 @@ const handleEdit = (params) => {
   payload.type = params.type;
   payload.can_have_multiple_reponse = params.can_have_multiple_reponse;
   payload.options_de_reponse = params.options_de_reponse.map((item) => item.id);
-  console.log(payload.options_de_reponse);
-
+  // console.log(payload.options_de_reponse);
   payload.principeable_id = params.principeable.id;
   showModalCreate.value = true;
 };
@@ -205,12 +205,14 @@ const openCreateModal = () => {
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 const principeable = computed(() => (payload.type === "factuel" ? criteres.value : principes.value));
 
-watch(
-  () => payload.can_have_multiple_reponse,
-  () => {
-    payload.options_de_reponse = [];
-  }
-);
+// watch(
+//   () => payload.can_have_multiple_reponse,
+//   (newValue) => {
+//     console.log(newValue);
+
+//     payload.can_have_multiple_reponse = Boolean(newValue);
+//   }
+// );
 watch(
   () => payload.type,
   () => {
@@ -280,6 +282,7 @@ onMounted(() => {
 
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
+    {{ typeof payload.can_have_multiple_reponse }} {{ payload.can_have_multiple_reponse }}
     <ModalHeader>
       <h2 class="mr-auto text-base font-medium">{{ mode }} un indicateur de gouvernance</h2>
     </ModalHeader>
@@ -289,7 +292,7 @@ onMounted(() => {
           <InputForm label="Nom" v-model="payload.nom" />
           <InputForm label="Description" v-model="payload.description" />
           <div class="form-check">
-            <input v-model="payload.can_have_multiple_reponse" id="is-multiple" class="form-check-input" type="checkbox" value="" />
+            <input v-model="payload.can_have_multiple_reponse" id="is-multiple" class="form-check-input" type="checkbox" checked />
             <label class="form-check-label" for="is-multiple">Réponses Multiple</label>
           </div>
 

@@ -140,7 +140,6 @@ const initTabulator = () => {
 };
 const handleEdit = (params) => {
   console.log(params);
-
   isCreate.value = false;
   idSelect.value = params.id;
   payload.nom = params.nom;
