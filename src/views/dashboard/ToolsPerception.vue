@@ -73,7 +73,6 @@ const getcurrentUserAndFetchOrganization = async () => {
     });
 };
 const submitData = async () => {
-  console.log("formDat:", formData);
   isLoading.value = true;
   filterFormData();
   const response = {
@@ -85,7 +84,6 @@ const submitData = async () => {
   };
 
   payload.response_data.push(response);
-  console.log("response_data:", payload.response_data);
   await FormulaireFactuel.create(idEnquete, payload)
     .then((result) => {
       isLoading.value = false;
