@@ -1,7 +1,7 @@
 import axios from "axios";
 //import Vue from 'vue';
 import { API_BASE_URL } from "@/services/configs/environment";
-import { SET_LOADER, SET_ERRORS_MESSAGE } from '../stores/mutations.type';
+import { SET_LOADER, SET_ERRORS_MESSAGE } from "../stores/mutations.type";
 import store from "../stores/index";
 //import router from "../router/index";
 
@@ -24,17 +24,17 @@ function determineContentType(payLoad) {
 }
 
 const config = {
-    baseURL: `${API_BASE_URL}/api/`,
-    timeout: 60 * 100000000, // Timeout
-    headers: {
-        common: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json,multipart/form-data',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, X-Token-Auth, Authorization'
-        }
-    }
+  baseURL: `${API_BASE_URL}/api/`,
+  timeout: 60 * 100000000, // Timeout
+  headers: {
+    common: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, X-Token-Auth, Authorization",
+    },
+  },
 };
 
 /**
@@ -47,17 +47,17 @@ const httpClient = axios.create(config);
  * Auth interceptor
  * Ajout du token d'authentification si disponible
  */
-const authInterceptor = config => {
-    let token = store.getters['auths/GET_ACCESS_TOKEN'];
-    if (token) {
-        token = token.slice(0, -1); // Optionnel : si besoin de modifier le token
-        config.headers.Authorization = `Bearer ${token}`;
-    }
+const authInterceptor = (config) => {
+  let token = store.getters["auths/GET_ACCESS_TOKEN"];
+  if (token) {
+    token = token.slice(0, -1); // Optionnel : si besoin de modifier le token
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-    // Réinitialisation des erreurs
-    store.commit(SET_ERRORS_MESSAGE, { message: null, errors: [] });
+  // Réinitialisation des erreurs
+  store.commit(SET_ERRORS_MESSAGE, { message: null, errors: [] });
 
-    return config;
+  return config;
 };
 
 /**
@@ -104,11 +104,11 @@ const authInterceptor = config => {
 httpClient.interceptors.request.use(authInterceptor);
 
 httpClient.interceptors.response.use(
-    response => {
-        store.commit(SET_LOADER, false); // Désactiver le loader après la réponse
-        return response;
-    },
-    // responseErrorInterceptor
+  (response) => {
+    store.commit(SET_LOADER, false); // Désactiver le loader après la réponse
+    return response;
+  }
+  // responseErrorInterceptor
 );
 
-export { httpClient , determineContentType };
+export { httpClient, determineContentType };

@@ -48,12 +48,12 @@ export const useSideMenuStore = defineStore("sideMenu", {
           {
             icon: "FolderKanbanIcon",
             pageName: "cadreDeRendement",
-            title: "Cadre de rendemente",
+            title: "Cadre de rendement",
           },
           {
-            icon: "FolderKanbanIcon",
-            pageName: "categorie",
-            title: "Categorie",
+            icon: "GlobeIcon",
+            pageName: "resultats",
+            title: "Résultats Escomptés",
           },
           {
             icon: "GlobeIcon",
@@ -61,9 +61,9 @@ export const useSideMenuStore = defineStore("sideMenu", {
             title: "Indicateurs",
           },
           {
-            icon: "GlobeIcon",
-            pageName: "resultats",
-            title: "Résultats Escomptés",
+            icon: "FolderKanbanIcon",
+            pageName: "categorie",
+            title: "Categorie",
           },
         ],
       },
