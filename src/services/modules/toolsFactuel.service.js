@@ -7,12 +7,12 @@ const FormulaireFactuel = {
     });
   },
 
-  getDataFormFactuel(idProgramme) {
-    return ApiService.get(`gfa/programmes/${idProgramme}/formulaire-factuel`);
+  getDataFormFactuel() {
+    return ApiService.get(`gfa/formulaire-factuel`);
   },
 
-  getDataFormPerception(idProgramme) {
-    return ApiService.get(`gfa/programmes/${idProgramme}/formulaire-de-perception`);
+  getDataFormPerception() {
+    return ApiService.get(`gfa/formulaire-de-perception`);
   },
 
   getAllProgrammes() {

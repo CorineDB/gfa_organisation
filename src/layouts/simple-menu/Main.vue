@@ -1,29 +1,20 @@
 <template>
-  <div
-    class="py-5 md:py-0 -mx-3 px-3 sm:-mx-8 sm:px-8 bg-black/[0.15] dark:bg-transparent"
-  >
+  <div class="py-5 md:py-0 -mx-3 px-3 sm:-mx-8 sm:px-8 bg-black/[0.15] dark:bg-transparent">
     <!-- <DarkModeSwitcher /> -->
     <!-- <MainColorSwitcher /> -->
     <MobileMenu />
     <div class="flex mt-[4.7rem] md:mt-0 overflow-hidden">
       <!-- BEGIN: Simple Menu -->
       <nav class="side-nav side-nav--simple">
-        <a href="" class="intro-x flex items-center pl-5 pt-4">
-          <img
-            alt="Tinker Tailwind HTML Admin Template"
-            class="w-6"
-            src="@/assets/images/logo.svg"
-          />
+        <a href="" class="flex items-center pt-4 pl-5 intro-x">
+          <img alt="Tinker Tailwind HTML Admin Template" class="w-6" src="@/assets/images/logo.svg" />
+          <span class="ml-3 text-lg text-white"> Tinker </span>
         </a>
-        <div class="side-nav__devider my-6"></div>
+        <div class="my-6 side-nav__devider"></div>
         <ul>
           <!-- BEGIN: First Child -->
           <template v-for="(menu, menuKey) in formattedMenu">
-            <li
-              v-if="menu == 'devider'"
-              :key="menu + menuKey"
-              class="side-nav__devider my-6"
-            ></li>
+            <li v-if="menu == 'devider'" :key="menu + menuKey" class="my-6 side-nav__devider"></li>
             <li v-else :key="menu + menuKey">
               <Tippy
                 tag="a"
@@ -31,11 +22,7 @@
                 :options="{
                   placement: 'left',
                 }"
-                :href="
-                  menu.subMenu
-                    ? 'javascript:;'
-                    : router.resolve({ name: menu.pageName }).path
-                "
+                :href="menu.subMenu ? 'javascript:;' : router.resolve({ name: menu.pageName }).path"
                 class="side-menu"
                 :class="{
                   'side-menu--active': menu.active,
@@ -48,31 +35,20 @@
                 </div>
                 <div class="side-menu__title">
                   {{ menu.title }}
-                  <ChevronDownIcon
-                    v-if="$h.isset(menu.subMenu)"
-                    class="side-menu__sub-icon"
-                    :class="{ 'transform rotate-180': menu.activeDropdown }"
-                  />
+                  <ChevronDownIcon v-if="$h.isset(menu.subMenu)" class="side-menu__sub-icon" :class="{ 'transform rotate-180': menu.activeDropdown }" />
                 </div>
               </Tippy>
               <!-- BEGIN: Second Child -->
               <transition @enter="enter" @leave="leave">
                 <ul v-if="$h.isset(menu.subMenu) && menu.activeDropdown">
-                  <li
-                    v-for="(subMenu, subMenuKey) in menu.subMenu"
-                    :key="subMenuKey"
-                  >
+                  <li v-for="(subMenu, subMenuKey) in menu.subMenu" :key="subMenuKey">
                     <Tippy
                       tag="a"
                       :content="subMenu.title"
                       :options="{
                         placement: 'left',
                       }"
-                      :href="
-                        subMenu.subMenu
-                          ? 'javascript:;'
-                          : router.resolve({ name: subMenu.pageName }).path
-                      "
+                      :href="subMenu.subMenu ? 'javascript:;' : router.resolve({ name: subMenu.pageName }).path"
                       class="side-menu"
                       :class="{ 'side-menu--active': subMenu.active }"
                       @click="linkTo(subMenu, router, $event)"
@@ -93,29 +69,15 @@
                     </Tippy>
                     <!-- BEGIN: Third Child -->
                     <transition @enter="enter" @leave="leave">
-                      <ul
-                        v-if="
-                          $h.isset(subMenu.subMenu) && subMenu.activeDropdown
-                        "
-                      >
-                        <li
-                          v-for="(
-                            lastSubMenu, lastSubMenuKey
-                          ) in subMenu.subMenu"
-                          :key="lastSubMenuKey"
-                        >
+                      <ul v-if="$h.isset(subMenu.subMenu) && subMenu.activeDropdown">
+                        <li v-for="(lastSubMenu, lastSubMenuKey) in subMenu.subMenu" :key="lastSubMenuKey">
                           <Tippy
                             tag="a"
                             :content="lastSubMenu.title"
                             :options="{
                               placement: 'left',
                             }"
-                            :href="
-                              lastSubMenu.subMenu
-                                ? 'javascript:;'
-                                : router.resolve({ name: lastSubMenu.pageName })
-                                    .path
-                            "
+                            :href="lastSubMenu.subMenu ? 'javascript:;' : router.resolve({ name: lastSubMenu.pageName }).path"
                             class="side-menu"
                             :class="{ 'side-menu--active': lastSubMenu.active }"
                             @click="linkTo(lastSubMenu, router, $event)"

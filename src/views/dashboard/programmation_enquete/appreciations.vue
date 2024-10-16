@@ -11,12 +11,10 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-
-
 const payload = reactive({
   contenu: "",
   type: "faiblesse",
-  organisationId: ""
+  organisationId: "",
 });
 
 const tabulator = ref();
@@ -61,7 +59,7 @@ const getDatas = async () => {
 };
 
 const getOrganisations = async () => {
- await OngService.get()
+  await OngService.get()
     .then((result) => {
       organisations.value = result.data.data;
     })
@@ -111,9 +109,7 @@ const initTabulator = () => {
       {
         title: "Organisation",
         field: "nom",
-        formatter: (cell) => {
-
-        }
+        formatter: (cell) => {},
       },
       {
         title: "Description",
@@ -160,16 +156,16 @@ const initTabulator = () => {
 };
 
 const getStatusText = (param) => {
-    switch (param) {
-        case 2:
-            return "Terminé";
-        case 1:
-            return "En cours";
-        case 0:
-            return "Non demarré";
-        default:
-            return "A déterminer";
-    }
+  switch (param) {
+    case 2:
+      return "Terminé";
+    case 1:
+      return "En cours";
+    case 0:
+      return "Non demarré";
+    default:
+      return "A déterminer";
+  }
 };
 
 const handleEdit = (params) => {
@@ -201,9 +197,9 @@ const openCreateModal = () => {
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
-onMounted( async () => {
-    await getOrganisations();
-    await getDatas();
+onMounted(async () => {
+  await getOrganisations();
+  await getDatas();
 });
 </script>
 
@@ -256,10 +252,9 @@ onMounted( async () => {
       <h2 class="mr-auto text-base font-medium">{{ mode }} une enquête</h2>
     </ModalHeader>
     <form @submit.prevent="submitData">
-
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
-          <textarea name="contenu"  v-model="payload.contenu" cols="30" rows="10"></textarea>
+          <textarea name="contenu" v-model="payload.contenu" cols="30" rows="10"></textarea>
           <div>
             <label>Type</label>
             <div class="flex flex-col mt-2 sm:flex-row">
@@ -276,7 +271,7 @@ onMounted( async () => {
           <div class="">
             <label class="form-label">Organisation </label>
             <TomSelect v-model="payload.organisationId" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
-              <option v-for="(organisation, index) in organisations" :key="index" :value="organisation.id">{{ organisation.nom  }}</option>
+              <option v-for="(organisation, index) in organisations" :key="index" :value="organisation.id">{{ organisation.nom }}</option>
             </TomSelect>
           </div>
         </div>

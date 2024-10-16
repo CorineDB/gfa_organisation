@@ -168,7 +168,7 @@ const initTabulator = () => {
   });
 };
 const handleEdit = (params) => {
-  console.log("Edit:", params);
+  // console.log("Edit:", params);
   isCreate.value = false;
   idSelect.value = params.id;
   payload.nom = params.nom;
@@ -280,21 +280,20 @@ onMounted(() => {
       <LoaderSnipper v-if="isLoadingData" />
     </div>
 
-    <!-- Modal Register & Update -->
-    <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
-      {{ typeof payload.can_have_multiple_reponse }} {{ payload.can_have_multiple_reponse }}
-      <ModalHeader>
-        <h2 class="mr-auto text-base font-medium">{{ mode }} un indicateur de gouvernance</h2>
-      </ModalHeader>
-      <form @submit.prevent="submitData">
-        <ModalBody>
-          <div class="grid grid-cols-1 gap-4">
-            <InputForm label="Nom" v-model="payload.nom" />
-            <InputForm label="Description" v-model="payload.description" />
-            <div class="form-check">
-              <input v-model="payload.can_have_multiple_reponse" id="is-multiple" class="form-check-input" type="checkbox" checked />
-              <label class="form-check-label" for="is-multiple">Réponses Multiple</label>
-            </div>
+  <!-- Modal Register & Update -->
+  <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
+    <ModalHeader>
+      <h2 class="mr-auto text-base font-medium">{{ mode }} un indicateur de gouvernance</h2>
+    </ModalHeader>
+    <form @submit.prevent="submitData">
+      <ModalBody>
+        <div class="grid grid-cols-1 gap-4">
+          <InputForm label="Nom" v-model="payload.nom" />
+          <InputForm label="Description" v-model="payload.description" />
+          <div class="form-check">
+            <input v-model="payload.can_have_multiple_reponse" id="is-multiple" class="form-check-input" type="checkbox" checked />
+            <label class="form-check-label" for="is-multiple">Réponses Multiple</label>
+          </div>
 
             <div>
               <label class="form-label">Options de réponse </label>

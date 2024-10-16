@@ -83,13 +83,13 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
       {
         icon: "SettingsIcon",
         pageName: "ToolsFactuel",
-        title: "Outil Factuel",
+        title: "Formulaire Factuel",
       },
 
       {
         icon: "SettingsIcon",
         pageName: "ToolsPerception",
-        title: "Outil de Perception",
+        title: "Formulaire de Perception",
       },
       {
         icon: "FileIcon",

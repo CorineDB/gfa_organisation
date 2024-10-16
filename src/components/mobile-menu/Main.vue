@@ -8,34 +8,25 @@
   >
     <div class="mobile-menu-bar">
       <a href="" class="flex mr-auto">
-        <img
+        <!-- <img
           alt="Tinker Tailwind HTML Admin Template"
           class="w-16"
           :src="usersProfileImage"
-        />
+        /> -->
+        <span class="ml-3 text-lg text-white"> Programme de redevabilité </span>
       </a>
       <a href="javascript:;" class="mobile-menu-toggler">
-        <BarChart2Icon
-          class="w-8 h-8 text-white transform -rotate-90"
-          @click="toggleMobileMenu"
-        />
+        <BarChart2Icon class="w-8 h-8 text-white transform -rotate-90" @click="toggleMobileMenu" />
       </a>
     </div>
     <div class="scrollable">
       <a href="javascript:;" class="mobile-menu-toggler">
-        <XCircleIcon
-          class="w-8 h-8 text-white transform -rotate-90"
-          @click="toggleMobileMenu"
-        />
+        <XCircleIcon class="w-8 h-8 text-white transform -rotate-90" @click="toggleMobileMenu" />
       </a>
-      <ul class="scrollable__content py-2">
+      <ul class="py-2 scrollable__content">
         <!-- BEGIN: First Child -->
         <template v-for="(menu, menuKey) in formattedMenu">
-          <li
-            v-if="menu == 'devider'"
-            :key="menu + menuKey"
-            class="menu__devider my-6"
-          ></li>
+          <li v-if="menu == 'devider'" :key="menu + menuKey" class="my-6 menu__devider"></li>
           <li v-else :key="menu + menuKey">
             <a
               href="javascript:;"
@@ -51,11 +42,7 @@
               </div>
               <div class="menu__title">
                 {{ menu.title }}
-                <div
-                  v-if="menu.subMenu"
-                  class="menu__sub-icon"
-                  :class="{ 'transform rotate-180': menu.activeDropdown }"
-                >
+                <div v-if="menu.subMenu" class="menu__sub-icon" :class="{ 'transform rotate-180': menu.activeDropdown }">
                   <ChevronDownIcon />
                 </div>
               </div>
@@ -63,16 +50,8 @@
             <!-- BEGIN: Second Child -->
             <transition @enter="enter" @leave="leave">
               <ul v-if="menu.subMenu && menu.activeDropdown">
-                <li
-                  v-for="(subMenu, subMenuKey) in menu.subMenu"
-                  :key="subMenuKey"
-                >
-                  <a
-                    href="javascript:;"
-                    class="menu"
-                    :class="{ 'menu--active': subMenu.active }"
-                    @click="linkTo(subMenu, router)"
-                  >
+                <li v-for="(subMenu, subMenuKey) in menu.subMenu" :key="subMenuKey">
+                  <a href="javascript:;" class="menu" :class="{ 'menu--active': subMenu.active }" @click="linkTo(subMenu, router)">
                     <div class="menu__icon">
                       <ActivityIcon />
                     </div>
@@ -92,16 +71,8 @@
                   <!-- BEGIN: Third Child -->
                   <transition @enter="enter" @leave="leave">
                     <ul v-if="subMenu.subMenu && subMenu.activeDropdown">
-                      <li
-                        v-for="(lastSubMenu, lastSubMenuKey) in subMenu.subMenu"
-                        :key="lastSubMenuKey"
-                      >
-                        <a
-                          href="javascript:;"
-                          class="menu"
-                          :class="{ 'menu--active': lastSubMenu.active }"
-                          @click="linkTo(lastSubMenu, router)"
-                        >
+                      <li v-for="(lastSubMenu, lastSubMenuKey) in subMenu.subMenu" :key="lastSubMenuKey">
+                        <a href="javascript:;" class="menu" :class="{ 'menu--active': lastSubMenu.active }" @click="linkTo(lastSubMenu, router)">
                           <div class="menu__icon">
                             <ZapIcon />
                           </div>
@@ -131,18 +102,11 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { helper as $h } from "@/utils/helper";
 import { useSideMenuStore } from "@/stores/side-menu";
-import {
-  activeMobileMenu,
-  toggleMobileMenu,
-  linkTo,
-  enter,
-  leave,
-} from "./index";
+import { activeMobileMenu, toggleMobileMenu, linkTo, enter, leave } from "./index";
 import { nestedMenu } from "@/layouts/side-menu";
 import dom from "@left4code/tw-starter/dist/js/dom";
 import SimpleBar from "simplebar";
 import { API_BASE_URL } from "@/services/configs/environment";
-
 
 const route = useRoute();
 const router = useRouter();
@@ -156,9 +120,9 @@ watch(
     formattedMenu.value = $h.toRaw(mobileMenu.value);
   }
 );
-const usersProfileImage = ref('')
+const usersProfileImage = ref("");
 onMounted(() => {
-  const usersInfo = JSON.parse(localStorage.getItem('authenticateUser'));
+  const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
 
   // if (usersInfo) {
   //   usersProfileImage.value = API_BASE_URL + usersInfo.users.profil}

@@ -25,11 +25,11 @@ const isOrganisation = ref(false);
 const isLoading = ref(false);
 const isLoadingDataFactuel = ref(true);
 const currentPage = ref(0);
+const nomProgram = ref("");
 const idEnquete = "EaPR3GQnP1z2YvMVZXEL0QorKA7BmkNLzWlnw9egqGOjbxJd3Ra68p4Dql46Yrj7";
-const idProgramme = "Kd6Zov9ybW9PRxngKpQv81oeXMr6YOJgmV5ZlG47dkq2zjwABDLma3y0DGj3BP7w";
 
 const getDataFormFactuel = async () => {
-  await FormulaireFactuel.getDataFormPerception(idProgramme)
+  await FormulaireFactuel.getDataFormPerception()
     .then((result) => {
       formDataPerception.value = result.data.data;
       isLoadingDataFactuel.value = false;
@@ -65,6 +65,7 @@ const getcurrentUserAndFetchOrganization = async () => {
         getOrganizations();
         isOrganisation.value = true;
       }
+      nomProgram.value = result.data.data.programme.nom;
     })
     .catch((e) => {
       console.error(e);
@@ -74,6 +75,7 @@ const getcurrentUserAndFetchOrganization = async () => {
 const submitData = async () => {
   console.log("formDat:", formData);
   isLoading.value = true;
+  filterFormData();
   const response = {
     perception: Object.keys(formData).map((indicateurId) => ({
       indicateurDeGouvernanceId: indicateurId,
@@ -113,6 +115,13 @@ const changePage = (pageNumber) => {
 const saveFormData = () => {
   localStorage.setItem("formData", JSON.stringify(formData));
 };
+const filterFormData = () => {
+  Object.keys(formData).forEach((key) => {
+    if (!formData[key].selectedOption) {
+      delete formData[key]; // Supprime l'objet si 'selectedOption' est vide
+    }
+  });
+};
 
 // watch(
 //   formData,
@@ -129,7 +138,7 @@ onMounted(async () => {
 </script>
 <template>
   <h2 class="mt-10 text-lg font-medium intro-y">Outils de perception</h2>
-  <div class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">programme 1</div>
+  <div v-if="nomProgram" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ nomProgram }}</div>
   <div v-if="organisations.length > 0 && isOrganisation" class="flex justify-end my-5">
     <div class="">
       <label class="form-label">Organisations</label>
@@ -176,13 +185,13 @@ onMounted(async () => {
           </AccordionGroup>
         </div>
       </div>
+      <div class="flex justify-center w-full">
+        <VButton label="Soumettre" class="px-8 py-3 w-max" :loading="isLoading" @click="submitData" />
+      </div>
     </div>
     <LoaderSnipper v-else />
     <div class="flex justify-center gap-3 my-8">
       <button v-for="(item, index) in formDataPerception" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
-    </div>
-    <div class="flex justify-center w-full">
-      <VButton label="Soumettre" class="px-8 py-3 w-max" :loading="isLoading" @click="submitData" />
     </div>
   </div>
 </template>

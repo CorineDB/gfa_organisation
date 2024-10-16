@@ -7,7 +7,8 @@
       <!-- BEGIN: Side Menu -->
       <nav class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
         <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-wrap items-center justify-center mt-3 intro-x">
-          <img alt="Tinker Tailwind HTML Admin Template" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" />
+          <h1 class="font-semibold text-white">Programme de redevabilité</h1>
+          <!-- <img alt="Programme de redevabilité" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" /> -->
         </router-link>
         <div class="my-6 side-nav__devider"></div>
         <ul>
@@ -397,11 +398,11 @@ const updatedMenu = () => {
 const usersProfileImage = ref("");
 
 onMounted(() => {
-  const usersInfo = JSON.parse(localStorage.getItem('authenticateUser'));
+  const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
   //console.log(usersInfo);
 
   if (usersInfo) {
-   // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
+    // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
   }
 
   dom("body").removeClass("error-page").removeClass("login").addClass("main");
