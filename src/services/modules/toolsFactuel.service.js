@@ -7,12 +7,11 @@ const FormulaireFactuel = {
     });
   },
 
-  getDataFormFactuel() {
-    return ApiService.get(`gfa/formulaire-factuel`);
+  getDataFormFactuel(enqueteDeCollecteId = null, organisationId = "") {
+    return ApiService.get(`gfa/enquetes-de-collecte/${enqueteDeCollecteId}/formulaire-factuel/${organisationId}`);
   },
-
-  getDataFormPerception() {
-    return ApiService.get(`gfa/formulaire-de-perception`);
+  getDataFormPerception(enqueteDeCollecteId = null, organisationId = null) {
+    return ApiService.get(`gfa/enquetes-de-collecte/${enqueteDeCollecteId}/formulaire-de-perception/${organisationId}`);
   },
 
   getAllProgrammes() {

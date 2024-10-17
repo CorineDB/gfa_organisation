@@ -48,6 +48,7 @@ import dashboard_projets_taches_globale from "../views/dashboard/projets/taches-
 import dashboard_projets_sous_composantes_globale from "../views/dashboard/projets/sous-composantes-globale/index.vue";
 import projets_id_details from "../views/dashboard/projets/_id/details.vue";
 import EnqueteIndividuel from "../views/dashboard/enqueteIndividuel.vue";
+import FicheResultat from "../views/dashboard/FicheResultat.vue";
 
 const routes = [
   {
@@ -212,6 +213,11 @@ const routes = [
         path: "enquete-individuel",
         name: "EnqueteIndividuel",
         component: EnqueteIndividuel,
+      },
+      {
+        path: "resultat-collecte",
+        name: "resultat_collecte",
+        component: FicheResultat,
       },
       {
         path: "gouvernance/:id/principe/:idp/critere/:idc/indicateur",

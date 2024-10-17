@@ -8,7 +8,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const organizationId = ref("R5P1oK0OP6DmWGvB21RNoeb9Xpgdwr7PNQ4zy0LAM8KnVZEJa5xlOjYkeWBv8aJy");
-const enqueteDeCollecteId = ref("EaPR3GQnP1z2YvMVZXEL0QorKA7BmkNLzWlnw9egqGOjbxJd3Ra68p4Dql46Yrj7");
+const enqueteDeCollecteId = ref("RmLpz4vVan0mOqYvjBE8bVZ3DX7or9yB45RxA6Jp4MGkwlPedKL1z2gQe32BXnE1");
 const selectStructureId = ref("");
 const datasCollection = ref({});
 const datasFactuel = ref([]);
@@ -48,16 +48,6 @@ const changeStructure = () => {
   getDataCollection();
 };
 
-const findColor = () => {
-  switch (key) {
-    case value:
-      break;
-
-    default:
-      break;
-  }
-};
-
 onMounted(() => {
   getDataCollection();
   getStructure();
@@ -68,7 +58,7 @@ onMounted(() => {
   <!-- BEGIN: Boxed Tab -->
   <PreviewComponent class="mt-5 intro-y _box">
     <Preview>
-      <TabGroup :selectedIndex="1">
+      <TabGroup>
         <TabList class="space-x-4 font-bold uppercase nav-boxed-tabs">
           <Tab class="w-full py-2 bg-white" tag="button">Outil Factuel</Tab>
           <Tab class="w-full py-2 bg-white" tag="button">Outil de Perception</Tab>
@@ -96,11 +86,11 @@ onMounted(() => {
                 </tr>
                 <tr class="border-b border-slate-300">
                   <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
-                  <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
+                  <td>{{ datasCollection.nom }}</td>
                 </tr>
                 <tr class="border-b border-slate-300">
                   <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td>Lorem ipsum dolor sit.</td>
+                  <td>10/09/2024</td>
                 </tr>
               </tbody>
             </table>
@@ -125,11 +115,11 @@ onMounted(() => {
                 </tr>
                 <tr class="bg-red-400">
                   <td rowspan="13" class="p-2 text-start">Redevabilité</td>
-                  <td rowspan="4" class="p-2 text-center">Legitimité</td>
-                  <td class="p-2 text-center">yy</td>
-                  <td class="p-2 text-center">yy</td>
-                  <td class="p-2 text-center">yy</td>
-                  <td class="p-2 text-center">yy</td>
+                  <td rowspan="5" class="p-2 text-center">Legitimité</td>
+                  <td class="p-2 text-center">Rôles et responsabilité clairement définis</td>
+                  <td class="p-2 text-center">Organes statutaires fonctionnels</td>
+                  <td class="p-2 text-center">Rôles et responsabilité clairement définis</td>
+                  <td class="p-2 text-center">Rôles et responsabilité clairement définis</td>
                 </tr>
                 <tr>
                   <td class="p-2 text-center">Roles et responsabilité reizuz zeuizhiu</td>
@@ -150,7 +140,7 @@ onMounted(() => {
                   <td class="p-2 text-center">Dernier 1</td>
                 </tr>
                 <tr>
-                  <td colspan="3" class="p-2 text-right">Roles et responsabilité reizuz zeuizhiu</td>
+                  <td colspan="2" class="p-2 text-right">Roles et responsabilité reizuz zeuizhiu</td>
                   <td class="p-2 text-center">Oui</td>
                   <td class="p-2 text-center"></td>
                 </tr>
@@ -180,12 +170,12 @@ onMounted(() => {
                   </td>
                 </tr>
                 <tr class="border-b border-slate-300">
-                  <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
-                  <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
+                  <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
+                  <td>{{ datasCollection.nom }}</td>
                 </tr>
                 <tr class="border-b border-slate-300">
-                  <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td>Lorem ipsum dolor sit.</td>
+                  <td class="p-2 font-medium">Date d’auto-évaluation :</td>
+                  <td>10/09/2024</td>
                 </tr>
               </tbody>
             </table>
@@ -214,7 +204,7 @@ onMounted(() => {
                   <td class="p-2 text-center border border-slate-600">{{ indicateur.moyPQO }}</td>
                 </tr>
                 <tr class="text-black" v-if="principe.indicateurs_de_gouvernance.length > 0">
-                  <td class="p-2 text-center border border-slate-600">Indice de perception du principe</td>
+                  <td class="p-2 text-right border border-slate-600">Indice de perception du principe</td>
                   <td class="p-2 text-center border border-slate-600">{{ principe.indice_de_perception }}</td>
                 </tr>
               </tbody>
