@@ -37,6 +37,7 @@ import indicateurs from "../views/dashboard/indicateurs/index.vue";
 import typeGouvernance from "../views/dashboard/type_gouvernance/index.vue";
 import Programmation_enquete from "../views/dashboard/programmation_enquete/index.vue";
 import EnqueteAppreciations from "../views/dashboard/programmation_enquete/appreciations.vue";
+import SoumissionsEnqueteDeCollete from "../views/dashboard/programmation_enquete/soumissions.vue";
 import OptionReponse from "@/views/dashboard/OptionReponse.vue";
 
 //Projet/Outcomes/Activité/Taches
@@ -103,9 +104,9 @@ const routes = [
         component: Programmation_enquete,
       },
       {
-        path: "apprreciations",
-        name: "EnqueteAppreciations",
-        component: EnqueteAppreciations,
+        path: "enquetes/:id/soumissions",
+        name: "SoumissionsEnqueteDeCollecte",
+        component: SoumissionsEnqueteDeCollete,
       },
       {
         path: "toolsFactuel",

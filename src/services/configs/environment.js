@@ -1,5 +1,4 @@
- const API_BASE_URL = "http://mybsd.shop"
-
+ const API_BASE_URL = "http://192.168.1.10:8000";
 
 
 const DEPLOYMENT_URL = "https://mybsd.shop/";
