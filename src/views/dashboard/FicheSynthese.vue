@@ -48,6 +48,12 @@ const changeStructure = () => {
   getDataCollection();
 };
 
+const getTotalIndicateurs = (principe) => {
+  return principe.criteres_de_gouvernance.reduce((total, critere) => {
+    return total + critere.indicateurs_de_gouvernance.length;
+  }, 0);
+};
+
 onMounted(() => {
   getDataCollection();
   getStructure();
@@ -97,7 +103,7 @@ onMounted(() => {
             <!-- Figure 3 : Grille de notation des indicateurs de la gouvernance politique -->
             <table class="w-full my-12 border-collapse table-auto" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-blue-900">
-                <tr class="">
+                <tr>
                   <th class="p-2 text-center text-white">Principes</th>
                   <th class="p-2 text-center text-white">Critères</th>
                   <th class="p-2 text-center text-white">Indicateur</th>
@@ -108,43 +114,104 @@ onMounted(() => {
               </thead>
 
               <tbody class="text-black bg-white">
+                <!-- Indice factuel de gouvernance -->
                 <tr class="my-4 bg-blue-600 border-white border-y-8">
-                  <td colspan="4" class="p-2 text-center">Indice factuel de gouvernace</td>
-                  <td class="p-2 text-center">2</td>
+                  <td colspan="4" class="p-2 font-bold text-center">Indice factuel de gouvernance</td>
+                  <td class="p-2 font-bold text-center">2</td>
                   <td></td>
                 </tr>
+
+                <!-- Deuxième section : Redevabilité - Transparence -->
+                <tr class="bg-yellow-400">
+                  <td rowspan="5" class="p-2 font-bold text-start">Redevabilité</td>
+                  <td rowspan="5" class="p-2 text-center">Transparence</td>
+                  <td class="p-2 text-center">Indépendance des organes de gouvernance</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">9</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-green-400">
+                  <td class="p-2 text-center">Accès à l'information</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">0,92</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
                 <tr class="bg-red-400">
-                  <td rowspan="13" class="p-2 text-start">Redevabilité</td>
-                  <td rowspan="5" class="p-2 text-center">Legitimité</td>
-                  <td class="p-2 text-center">Rôles et responsabilité clairement définis</td>
-                  <td class="p-2 text-center">Organes statutaires fonctionnels</td>
-                  <td class="p-2 text-center">Rôles et responsabilité clairement définis</td>
-                  <td class="p-2 text-center">Rôles et responsabilité clairement définis</td>
-                </tr>
-                <tr>
-                  <td class="p-2 text-center">Roles et responsabilité reizuz zeuizhiu</td>
+                  <td class="p-2 text-center">Partage des informations avec les parties prenantes</td>
                   <td class="p-2 text-center">Oui</td>
-                  <td class="p-2 text-center">10</td>
-                  <td class="p-2 text-center">source</td>
+                  <td class="p-2 text-center">0,1</td>
+                  <td class="p-2 text-center">Source</td>
                 </tr>
-                <tr>
-                  <td class="p-2 text-center">Roles et responsabilité 2</td>
-                  <td class="p-2 text-center">Oui</td>
-                  <td class="p-2 text-center">10</td>
-                  <td class="p-2 text-center">source</td>
+
+                <tr class="bg-yellow-400">
+                  <td class="p-2 text-center">Publication des rapports financiers</td>
+                  <td class="p-2 text-center">Non</td>
+                  <td class="p-2 text-center">2</td>
+                  <td class="p-2 text-center">Source</td>
                 </tr>
-                <tr>
-                  <td class="p-2 text-center">Roles et responsabilité reizuz zeuizhiu</td>
+
+                <tr class="bg-yellow-400">
+                  <td class="p-2 text-center">Transparence des mécanismes de prise de décision</td>
                   <td class="p-2 text-center">Oui</td>
-                  <td class="p-2 text-center">10</td>
-                  <td class="p-2 text-center">Dernier 1</td>
+                  <td class="p-2 text-center">1</td>
+                  <td class="p-2 text-center">Source</td>
                 </tr>
-                <tr>
-                  <td colspan="2" class="p-2 text-right">Roles et responsabilité reizuz zeuizhiu</td>
-                  <td class="p-2 text-center">Oui</td>
+
+                <!-- Ligne de score factuel pour la deuxième section -->
+                <tr class="font-bold bg-yellow-400">
+                  <td colspan="4" class="p-2 text-center">Score factuel</td>
+                  <td class="p-2 text-center">033</td>
+                  <!-- Remplacer par la note calculée -->
                   <td class="p-2 text-center"></td>
                 </tr>
-                <!-- Rows 2 -->
+                <tr class="bg-green-400">
+                  <td rowspan="5" class="p-2 font-bold text-start">Redevabilité</td>
+                  <td rowspan="5" class="p-2 text-center">Transparence</td>
+                  <td class="p-2 text-center">Indépendance des organes de gouvernance</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">9</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-red-400">
+                  <td class="p-2 text-center">Accès à l'information</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">0,92</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-yellow-400">
+                  <td class="p-2 text-center">Partage des informations avec les parties prenantes</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">0,1</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-yellow-400">
+                  <td class="p-2 text-center">Publication des rapports financiers</td>
+                  <td class="p-2 text-center">Non</td>
+                  <td class="p-2 text-center">2</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-green-400">
+                  <td class="p-2 text-center">Transparence des mécanismes de prise de décision</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">1</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <!-- Ligne de score factuel pour la deuxième section -->
+                <tr class="font-bold bg-green-400">
+                  <td colspan="4" class="p-2 text-center">Score factuel</td>
+                  <td class="p-2 text-center">033</td>
+                  <!-- Remplacer par la note calculée -->
+                  <td class="p-2 text-center"></td>
+                </tr>
+
+                <!-- Ajouter plus de sections si nécessaire -->
               </tbody>
             </table>
           </TabPanel>

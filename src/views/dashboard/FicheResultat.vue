@@ -1,13 +1,14 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 import SyntheseService from "@/services/modules/synthese.service";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { colorsOptionFactuel, getColorForValue, optionResponses } from "../../utils/findColorIndicator";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import FormulaireFactuel from "@/services/modules/toolsFactuel.service";
 
-const router = useRouter();
+const route = useRoute();
+
 const organizationId = ref("R5P1oK0OP6DmWGvB21RNoeb9Xpgdwr7PNQ4zy0LAM8KnVZEJa5xlOjYkeWBv8aJy");
 const enqueteDeCollecteId = ref("RmLpz4vVan0mOqYvjBE8bVZ3DX7or9yB45RxA6Jp4MGkwlPedKL1z2gQe32BXnE1");
 const selectStructureId = ref("");
@@ -65,6 +66,10 @@ onMounted(() => {
   getDataCollection();
   getDataCollectionPerception();
   getStructure();
+});
+
+onBeforeMount(() => {
+  console.log(route.query.enqueteId, route.query.organisationId);
 });
 </script>
 <template>
@@ -224,7 +229,11 @@ onMounted(() => {
               <tbody>
                 <!-- Principes de Gouvernance -->
                 <!-- <tr>
-                  <td v-for="(option, index) in optionResponses" :key="index" class="p-2 text-center">{{ option }}</td>
+                  <td></td>
+                  <td></td>
+                  <td class="p-2 space-x-2 text-center">
+                    <span class="font-semibold" v-for="(option, index) in optionResponses" :key="index">{{ option }}</span>
+                  </td>
                 </tr> -->
                 <template v-for="(principe, indexPrincipe) in datasPerception" :key="indexPrincipe">
                   <tr class="font-semibold text-black border-slate-100 border-y-4">
@@ -253,8 +262,8 @@ onMounted(() => {
                     <td class="p-2 border-y-2 border-slate-100">{{ indicateur.nom }}</td>
                     <td class="p-2 border-y-2 border-slate-100">
                       <div class="flex space-x-3">
-                        <!-- Flex pour l'alignement horizontal des réponses -->
                         <div v-for="(optionReponse, index) in indicateur.options_de_reponse" :key="index" class="flex flex-col items-center space-y-1">
+                          <p>{{ optionReponse.libelle }}</p>
                           <input type="checkbox" :checked="indicateur.reponses_collecter && indicateur.reponses_collecter[0] && optionReponse.note == indicateur.reponses_collecter[0].note" disabled />
                         </div>
                       </div>
