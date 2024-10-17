@@ -112,7 +112,25 @@ onBeforeMount(() => {
                 </tr>
               </tbody>
             </table>
-
+            <div class="flex justify-end my-6 sm:flex-row sm:items-end xl:items-start">
+              <div class="flex mt-5 sm:mt-0">
+                <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto"><PrinterIcon class="w-4 h-4 mr-2" /> Imprimer</button>
+                <Dropdown class="w-1/2 sm:w-auto">
+                  <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
+                    <FileTextIcon class="w-4 h-4 mr-2" /> Exporter
+                    <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter CSV </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter JSON </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter XLSX </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter HTML </DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+            </div>
             <table v-if="!isLoadingData" class="w-full my-12 border border-collapse table-auto border-slate-100" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-blue-900 border-l border-slate-100">
                 <!-- <tr>
@@ -217,6 +235,25 @@ onBeforeMount(() => {
                 </tr>
               </tbody>
             </table>
+            <div class="flex justify-end my-6 sm:flex-row sm:items-end xl:items-start">
+              <div class="flex mt-5 sm:mt-0">
+                <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto"><PrinterIcon class="w-4 h-4 mr-2" /> Imprimer</button>
+                <Dropdown class="w-1/2 sm:w-auto">
+                  <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
+                    <FileTextIcon class="w-4 h-4 mr-2" /> Exporter
+                    <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter CSV </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter JSON </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter XLSX </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter HTML </DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+            </div>
             <table v-if="!isLoadingData" class="w-full my-12 border border-collapse table-auto border-slate-100" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-blue-900 border-l border-slate-100">
                 <!-- <tr>

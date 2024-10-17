@@ -100,8 +100,27 @@ onMounted(() => {
                 </tr>
               </tbody>
             </table>
+            <div class="flex justify-end my-6 sm:flex-row sm:items-end xl:items-start">
+              <div class="flex mt-5 sm:mt-0">
+                <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto"><PrinterIcon class="w-4 h-4 mr-2" /> Imprimer</button>
+                <Dropdown class="w-1/2 sm:w-auto">
+                  <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
+                    <FileTextIcon class="w-4 h-4 mr-2" /> Exporter
+                    <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter CSV </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter JSON </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter XLSX </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter HTML </DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+            </div>
             <!-- Figure 3 : Grille de notation des indicateurs de la gouvernance politique -->
-            <table class="w-full my-12 border-collapse table-auto" cellpadding="0" cellspacing="0">
+            <table class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-blue-900">
                 <tr>
                   <th class="p-2 text-center text-white">Principes</th>
@@ -246,7 +265,25 @@ onMounted(() => {
                 </tr>
               </tbody>
             </table>
-
+            <div class="flex justify-end my-6 sm:flex-row sm:items-end xl:items-start">
+              <div class="flex mt-5 sm:mt-0">
+                <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto"><PrinterIcon class="w-4 h-4 mr-2" /> Imprimer</button>
+                <Dropdown class="w-1/2 sm:w-auto">
+                  <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
+                    <FileTextIcon class="w-4 h-4 mr-2" /> Exporter
+                    <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter CSV </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter JSON </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter XLSX </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter HTML </DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+            </div>
             <table v-if="!isLoadingData" class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-gray-400">
                 <tr class="border-b-8 border-white" :style="{ 'background-color': getColorForValue(datasPerception.indice_de_perception) }">
@@ -324,3 +361,9 @@ onMounted(() => {
   </PreviewComponent>
   <!-- END: Boxed Tab -->
 </template>
+
+<style scoped>
+table td {
+  border: 1px solid #000;
+}
+</style>
