@@ -42,20 +42,20 @@ export const useSideMenuStore = defineStore("sideMenu", {
       },
       {
         icon: "FolderIcon",
-        // pageName: "projets",
-        title: "Indicateurs et Suivis",
-        subMenu: [
-          {
-            icon: "FolderIcon",
-            pageName: "Indicateurs",
-            title: "Indicateurs",
-          },
-          {
-            icon: "CpuIcon",
-            pageName: "SuiviIndicateurs",
-            title: "Suivi Indicateurs",
-          },
-        ],
+        pageName: "Indicateurs",
+        title: "Cadre Mesure Rendement",
+        // subMenu: [
+        //   {
+        //     icon: "FolderIcon",
+        //     pageName: "Indicateurs",
+        //     title: "Indicateurs",
+        //   },
+        //   {
+        //     icon: "CpuIcon",
+        //     pageName: "SuiviIndicateurs",
+        //     title: "Suivi Indicateurs",
+        //   },
+        // ],
       },
 
       {
@@ -151,6 +151,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "BarChart2Icon",
             pageName: "CategoriesIndicateurs",
             title: "Catégories d'indicateurs",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "Sites",
+            title: "Sites",
           },
         ],
       },

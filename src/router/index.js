@@ -42,6 +42,7 @@ import OptionReponse from "@/views/dashboard/OptionReponse.vue";
 import UniteDeMesure from "@/views/dashboard/uniteDeMesure.vue";
 import KeyValue from "@/views/dashboard/keyValue.vue";
 import CategorieIndicateurs from "@/views/dashboard/categoriesIndicateurs.vue";
+import Sites from "@/views/dashboard/sites.vue";
 
 //Projet/Outcomes/Activité/Taches
 import dashboard_projets_composantes_globale from "../views/dashboard/projets/composantes-globale/index.vue";
@@ -215,6 +216,11 @@ const routes = [
         path: "categories_indicateurs",
         name: "CategoriesIndicateurs",
         component: CategorieIndicateurs,
+      },
+      {
+        path: "sites_indicateurs",
+        name: "Sites",
+        component: Sites,
       },
       {
         path: "gouvernance/:id/principe",

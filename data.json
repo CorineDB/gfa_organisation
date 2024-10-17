@@ -1,1 +1,36 @@
-SuiviIndicateurs  
+{
+  "id": "4lwvqLbKNyRW63YK4kD1rxeq79nmzQPRqgMOoJAGZ5vb2lpLg8wV0EajBJBoz9en",
+  "nom": "Indicateur",
+  "description": "Indicateur",
+  "kobo": null,
+  "koboVersion": null,
+  "categorie": {
+    "id": "4XgqbVpe9PZlVAa8Qq1WjMG6pwXzk4mLdmEnBdrNy2beKYgRvoLD305OaKOW9PDk",
+    "nom": "Impact"
+  },
+  "agreger": 0,
+  "value_keys": [
+    {
+      "id": "Aowb8qPdxANWYRvZeJm27yqnlgobK3L4rO01pMD48wVzd56rEGaXkQ9Pv04We1k6",
+      "libelle": "total",
+      "key": "moy",
+      "description": "Indicateur mod",
+      "type": "int",
+      "uniteeMesureId": "MrkPnW9OPO6qmRGD2gzZl80Mje9L7V5Px5wAaXNBdpQEYWx4kyrbv3n1R4q2j8z0"
+    }
+  ],
+  "unitee_mesure": {
+    "id": "MrkPnW9OPO6qmRGD2gzZl80Mje9L7V5Px5wAaXNBdpQEYWx4kyrbv3n1R4q2j8z0",
+    "nom": "int"
+  },
+  "anneeDeBase": 2018,
+  "valeurDeBase": {
+    "moy": 15
+  },
+  "valeursCible": [],
+  "valeurCibleTotal": [],
+  "valeurRealiserTotal": [],
+  "taux_realisation": [],
+  "sites": [],
+  "created_at": "2024-10-09 09:24:29"
+}

@@ -55,30 +55,32 @@
           <thead class="sticky top-0 text-xs text-gray-700 uppercase _z-20 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr class="">
               <th scope="col" rowspan="3" class="px-6 py-3 border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">OutComes / OutPut / activiés / Taches</th>
-              <th scope="col" colspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Montant projet XOF</th>
-              <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Montant budgetisé XOF</th>
+              <th scope="col" colspan="5" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Montant projet XOF</th>
+              <!-- <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Montant budgetisé XOF</th> -->
               <th scope="col" rowspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Poids</th>
               <th v-if="statutActuel" scope="col" rowspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">poids actuel</th>
 
-              <th scope="col" rowspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">STRUCTURE ASSOCIER</th>
+              <!-- <th scope="col" rowspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">STRUCTURE ASSOCIER</th> -->
               <th scope="col" rowspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">STRUCTURE RESPONSABLE</th>
               <th scope="col" colspan="12" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">PLANING</th>
-              <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 1</th>
+              <th scope="col" colspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 1</th>
 
-              <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 2</th>
+              <th scope="col" colspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 2</th>
 
-              <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 3</th>
+              <th scope="col" colspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 3</th>
 
-              <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 4</th>
+              <th scope="col" colspan="2" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 4</th>
             </tr>
 
             <tr class="">
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Budget</th>
-              <!-- <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP</th> -->
+              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Dépenses</th>
+              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Solde</th>
+              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Taux d'exécution financière</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th>
-              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">BN</th>
+              <!-- <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">BN</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP</th>
-              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th>
+              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th> -->
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">JAV</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">FEV</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">MARS</th>
@@ -92,16 +94,16 @@
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">NOVEMBRE</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">DECEMBRE</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Budget</th>
-              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP XOF</th>
+              <!-- <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP XOF</th> -->
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Budget</th>
-              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP XOF</th>
+              <!-- <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP XOF</th> -->
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Budget</th>
-              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP XOF</th>
+              <!-- <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP XOF</th> -->
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Budget</th>
-              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP XOF</th>
+              <!-- <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP XOF</th> -->
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th>
             </tr>
           </thead>
@@ -126,6 +128,11 @@
                  <span v-else class="font-bold" >0 FCFA </span>
               </td>
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
+                <td v-if="pta.pret != '' || pta.bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                <span class="font-bold text-yellow-500"> {{ (pta.pret + pta.bn) | formatNumber }} </span>
+                <!--  <span v-else class="font-bold" >0 FCFA </span> -->
+              </td>
+              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <td v-if="pta.pret != '' || pta.bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold text-yellow-500"> {{ (pta.pret + pta.bn) | formatNumber }} </span>
@@ -162,10 +169,10 @@
                 <!--  <span v-else class="font-bold" >0 FCFA</span> -->
               </td>
 
-              <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+              <!-- <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span v-if="pta.structureAssocie != undefined" class="font-bold"> {{ pta.structureAssocie }} </span>
-                <!--  <span v-else class="font-bold" >0 FCFA</span> -->
-              </td>
+                 <span v-else class="font-bold" >0 FCFA</span>
+              </td> -->
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span v-if="pta.structureResponsable != undefined" class="font-bold"> {{ pta.structureResponsable }} </span>
                 <!--  <span v-else class="font-bold" >0 FCFA</span> -->
@@ -231,11 +238,11 @@
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <!--  planing semestre -->
-              <td v-if="pta.t1Pret != undefined && pta.t1Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+              <!-- <td v-if="pta.t1Pret != undefined && pta.t1Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold"> {{ pta.t1Pret | formatNumber }} </span>
-                <!--  <span v-else class="font-bold" >0 FCFA </span> -->
+                 <span v-else class="font-bold" >0 FCFA </span>
               </td>
-              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
+              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
 
               <td v-if="pta.t1Pret != '' || pta.t1Bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold"> {{ (pta.t1Pret + pta.t1Bn) | formatNumber }} </span>
@@ -267,11 +274,11 @@
               </td>
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
-              <td v-if="pta.t3Pret != undefined && pta.t3Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+              <!-- <td v-if="pta.t3Pret != undefined && pta.t3Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold"> {{ pta.t3Pret | formatNumber }} </span>
-                <!--  <span v-else class="font-bold" >0 FCFA </span> -->
+                 <span v-else class="font-bold" >0 FCFA </span>
               </td>
-              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
+              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
 
               <td v-if="pta.t3Pret != '' || pta.t3Bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold"> {{ (pta.t3Pret + pta.t3Bn) | formatNumber }} </span>
@@ -286,11 +293,11 @@
 
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
-              <td v-if="pta.t4Pret != undefined && pta.t4Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+              <!-- <td v-if="pta.t4Pret != undefined && pta.t4Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold"> {{ pta.t4Pret | formatNumber }} </span>
-                <!--  <span v-else class="font-bold" >0 FCFA </span> -->
+                 <span v-else class="font-bold" >0 FCFA </span>
               </td>
-              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
+              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
 
               <td v-if="pta.t4Pret != '' || pta.t4Bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span v-if="pta.t4Pret != undefined && pta.t4Bn != undefined" class="font-bold"> {{ (pta.t4Pret + pta.t4Bn) | formatNumber }} </span>
