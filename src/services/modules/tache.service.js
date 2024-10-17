@@ -48,7 +48,7 @@ const TachesService = {
       return ApiService.delete(`taches/${slug}`);
     },
 
-    composante(slug) {
+    activite(slug) {
       return ApiService.get(`taches/${slug}/activite`);
     }
 

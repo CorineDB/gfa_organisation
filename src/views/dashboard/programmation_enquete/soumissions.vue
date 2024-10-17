@@ -7,16 +7,14 @@ import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
-import { useRouter } from "vue-router";
+import { useRouter,useRoute } from "vue-router";
 
 const router = useRouter();
 
+const route = useRoute();
+
 const payload = reactive({
-  nom: "",
-  objectif: "",
-  description: "",
-  debut: "",
-  fin: "",
+  nom: ""
 });
 
 const tabulator = ref();
@@ -35,7 +33,7 @@ const createData = async () => {
       isLoading.value = false;
       getDatas();
       resetForm();
-      toast.success("Enquête créer.");
+      toast.success("Soumission créer.");
     })
     .catch((e) => {
       isLoading.value = false;
@@ -43,11 +41,75 @@ const createData = async () => {
       toast.error("Vérifier les informations et ressayer.");
     });
 };
+const initTabulator = () => {
+  tabulator.value = new Tabulator("#tabulator", {
+    data: datas.value.reponses,
+    placeholder: "Aucune donnée disponible.",
+    layout: "fitColumns",
+    columns: [
+      {
+        title: "Nom",
+        field: "nom",
+      },
+      {
+        title: "Statut",
+        field: "levelOfSubmission",
+        formatter: (cell) => {
+          return getStatusText(cell.getData().levelOfSubmission);
+        },
+      },
+      {
+        title: "Submitted by",
+        field: "submitted_at",
+      },
+      {
+        title: "Actions",
+        field: "actions",
+        formatter: (cell) => {
+            const container = document.createElement("div");
+            container.className = "flex items-center justify-center gap-3";
+
+            const createButton = (label, className, onClick) => {
+              const button = document.createElement("button");
+              button.className = className;
+              button.innerText = label;
+              button.addEventListener("click", onClick);
+              return button;
+            };
+
+            if(cell.getData().levelOfSubmission < 100){
+              const modifyButton = createButton("Continuer", "btn btn-primary", () => {
+                handleEdit(cell.getData());
+              });
+
+              container.append(modifyButton);
+            }
+            else{
+              const resultatButton = createButton("Consulter Resultats", "btn btn-primary", () => {
+                viewResultats(datas.value.id, cell.getData().id);
+              });
+
+              container.append(resultatButton);
+              const syntheseButton = createButton("Voir synthese", "btn btn-primary", () => {
+                viewSyntheses(datas.value.id, cell.getData().id);
+              });
+
+              container.append(syntheseButton);
+            }
+
+            return container;
+        },
+      },
+    ],
+  });
+};
+
 const getDatas = async () => {
   isLoadingData.value = true;
-  await EnqueteDeColleteService.get()
+  await EnqueteDeColleteService.soumissions(route.params.id)
     .then((result) => {
       datas.value = result.data.data;
+      console.log(datas.value);
       isLoadingData.value = false;
     })
     .catch((e) => {
@@ -65,7 +127,7 @@ const updateData = async () => {
       isLoading.value = false;
       getDatas();
       resetForm();
-      toast.success("Enquête modifiée.");
+      toast.success("Soumission modifiée.");
     })
     .catch((e) => {
       isLoading.value = false;
@@ -73,6 +135,7 @@ const updateData = async () => {
       toast.error("Vérifier les informations et ressayer.");
     });
 };
+
 const submitData = () => (isCreate.value ? createData() : updateData());
 const deleteData = async () => {
   isLoading.value = true;
@@ -80,7 +143,7 @@ const deleteData = async () => {
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;
-      toast.success("Enquête de gouvernance supprimé");
+      toast.success("Soumission de gouvernance supprimé");
       getDatas();
     })
     .catch((e) => {
@@ -89,94 +152,26 @@ const deleteData = async () => {
       toast.error("Une erreur est survenue, ressayer");
     });
 };
-const initTabulator = () => {
-  tabulator.value = new Tabulator("#tabulator", {
-    data: datas.value,
-    placeholder: "Aucune donnée disponible.",
-    layout: "fitColumns",
-    columns: [
-      {
-        title: "Nom",
-        field: "nom",
-      },
-      {
-        title: "Description",
-        field: "description",
-      },
-      {
-        title: "Objectif",
-        field: "objectif",
-      },
-      {
-        title: "Date Debut",
-        field: "debut",
-      },
-      {
-        title: "Date Fin",
-        field: "fin",
-      },
-      {
-        title: "Statut",
-        field: "Statut",
-        formatter: (cell) => {
-          return getStatusText(cell.getData().statut);
-        },
-      },
-      {
-        title: "Actions",
-        field: "actions",
-        formatter: (cell) => {
-          const container = document.createElement("div");
-          container.className = "flex items-center justify-center gap-3";
 
-          const createButton = (label, className, onClick) => {
-            const button = document.createElement("button");
-            button.className = className;
-            button.innerText = label;
-            button.addEventListener("click", onClick);
-            return button;
-          };
-
-          const voirApprecationsButton = createButton("Voir", "btn btn-primary", () => {
-            gotoSoumissions( cell.getData());
-          });
-
-          const modifyButton = createButton("Modifier", "btn btn-primary", () => {
-            handleEdit(cell.getData());
-          });
-
-          container.append(voirApprecationsButton, modifyButton);
-
-          return container;
-        },
-      },
-    ],
-  });
-};
 
 const getStatusText = (param) => {
-  switch (param) {
-    case 2:
-      return "Terminé";
-    case 1:
-      return "En cours";
-    case 0:
-      return "Non demarré";
-    default:
-      return "A déterminer";
+  if(param===100){
+    return "Soumis";
+  }
+  else if(param>0){
+    return "En cours";
+  }
+  else if(param===0){
+    return "Non demarré";
   }
 };
-
-function gotoSoumissions(enquete) {
-  router.push({ name: "SoumissionsEnqueteDeCollecte", params: { id: enquete.id } });
-}
 
 function gotoAppreciations(enquete) {
   router.push({ name: "EnqueteAppreciations", query: { enqueteId: enquete.id } });
 }
 
 const handleEdit = (params) => {
-  console.log(params);
+  /*console.log(params);
 
   isCreate.value = false;
   idSelect.value = params.id;
@@ -185,8 +180,18 @@ const handleEdit = (params) => {
   payload.objectif = params.objectif;
   payload.debut = params.debut;
   payload.fin = params.fin;
-  showModalCreate.value = true;
+  showModalCreate.value = true;*/
+  router.push({ name: "ToolsFactuel", query: { enqueteId: route.params.id }  });
 };
+
+const viewResultats = (organisationId) => {
+  router.push({ name: "resultat_collecte", query: { enqueteId: route.params.id, organisationId: organisationId }  });
+};
+
+const viewSyntheses = (organisationId) => {
+  router.push({ name: "FicheSynthese", query: { enqueteId: route.params.id, organisationId: organisationId }  });
+};
+
 const handleDelete = (params) => {
   idSelect.value = params.id;
   deleteModalPreview.value = true;
@@ -203,8 +208,16 @@ const resetForm = () => {
   payload.fin = "";
   showModalCreate.value = false;
 };
-const openCreateModal = () => {
-  showModalCreate.value = isCreate.value = true;
+const openFactuelModal = () => {
+
+  router.push({ name: "ToolsFactuel"  });
+  //showModalCreate.value = isCreate.value = true;
+};
+
+const openPerceptionModal = () => {
+
+  router.push({ name: "ToolsPerception"  });
+  //showModalCreate.value = isCreate.value = true;
 };
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
@@ -215,7 +228,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Enquête</h2>
+  <h2 class="mt-10 text-lg font-medium intro-y">Soumissions</h2>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
@@ -225,7 +238,9 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal"><PlusIcon class="w-4 h-4 mr-3" />Ajouter une Enquête de Gouvernace</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal"><PlusIcon class="w-4 h-4 mr-3" />Remplir formulaire Factuel</button>
+
+        <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal"><PlusIcon class="w-4 h-4 mr-3" />Remplir formulaire de perception</button>
       </div>
     </div>
   </div>
@@ -260,16 +275,13 @@ onMounted(() => {
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
     <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">{{ mode }} une enquête</h2>
+      <h2 class="mr-auto text-base font-medium">{{ mode }} une soummission</h2>
     </ModalHeader>
     <form @submit.prevent="submitData">
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
           <InputForm label="Nom" v-model="payload.nom" />
           <InputForm label="Objectif" v-model="payload.objectif" />
-          <InputForm label="Description" v-model="payload.description" :required="false" />
-          <InputForm label="Début de l'enquete " v-model="payload.debut" type="date" />
-          <InputForm label="Début de l'enquete " v-model="payload.fin" type="date" />
         </div>
       </ModalBody>
       <ModalFooter>
@@ -288,7 +300,7 @@ onMounted(() => {
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Suppression</div>
-        <div class="mt-2 text-slate-500">Supprimer une enquête?</div>
+        <div class="mt-2 text-slate-500">Supprimer une soummission?</div>
       </div>
       <div class="flex justify-center w-full gap-3 py-4 text-center">
         <button type="button" @click="cancelSelect" class="mr-1 btn btn-outline-secondary">Annuler</button>

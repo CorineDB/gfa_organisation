@@ -38,6 +38,7 @@ import SuiviIndicateurs from "../views/dashboard/indicateurs/suivi.vue";
 import typeGouvernance from "../views/dashboard/type_gouvernance/index.vue";
 import Programmation_enquete from "../views/dashboard/programmation_enquete/index.vue";
 import EnqueteAppreciations from "../views/dashboard/programmation_enquete/appreciations.vue";
+import SoumissionsEnqueteDeCollete from "../views/dashboard/programmation_enquete/soumissions.vue";
 import OptionReponse from "@/views/dashboard/OptionReponse.vue";
 import UniteDeMesure from "@/views/dashboard/uniteDeMesure.vue";
 import KeyValue from "@/views/dashboard/keyValue.vue";
@@ -52,6 +53,7 @@ import dashboard_projets_taches_globale from "../views/dashboard/projets/taches-
 import dashboard_projets_sous_composantes_globale from "../views/dashboard/projets/sous-composantes-globale/index.vue";
 import projets_id_details from "../views/dashboard/projets/_id/details.vue";
 import EnqueteIndividuel from "../views/dashboard/enqueteIndividuel.vue";
+import FicheResultat from "../views/dashboard/FicheResultat.vue";
 
 const routes = [
   {
@@ -108,9 +110,9 @@ const routes = [
         component: Programmation_enquete,
       },
       {
-        path: "apprreciations",
-        name: "EnqueteAppreciations",
-        component: EnqueteAppreciations,
+        path: "enquetes/:id/soumissions",
+        name: "SoumissionsEnqueteDeCollecte",
+        component: SoumissionsEnqueteDeCollete,
       },
       {
         path: "toolsFactuel",
@@ -242,6 +244,11 @@ const routes = [
       //   name: "Indicateurs",
       //   component: indicateurs,
       // },
+      {
+        path: "resultat-collecte",
+        name: "resultat_collecte",
+        component: FicheResultat,
+      },
       {
         path: "indicateurs",
         name: "Indicateurs",

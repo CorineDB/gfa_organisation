@@ -1,22 +1,22 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
 import VButton from "@/components/news/VButton.vue";
-import InputForm from "@/components/news/InputForm.vue";
 import Tabulator from "tabulator-tables";
 import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
-import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
-import { useRouter } from "vue-router";
+import AppreciationResultatEnqueteService from "@/services/modules/appreciationResultatEnquete.service";
+import OngService from "@/services/modules/ong.service";
+import { useRoute } from "vue-router";
 
-const router = useRouter();
+const route = useRoute();
+
+
 
 const payload = reactive({
-  nom: "",
-  objectif: "",
-  description: "",
-  debut: "",
-  fin: "",
+  contenu: "",
+  type: "faiblesse",
+  organisationId: ""
 });
 
 const tabulator = ref();
@@ -27,15 +27,16 @@ const isLoading = ref(false);
 const isLoadingData = ref(true);
 const isCreate = ref(true);
 const datas = ref([]);
+const organisations = ref([]);
 
 const createData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.create(payload)
+  await AppreciationResultatEnqueteService.create(payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
       resetForm();
-      toast.success("Enquête créer.");
+      toast.success("Appreciation créer.");
     })
     .catch((e) => {
       isLoading.value = false;
@@ -45,27 +46,39 @@ const createData = async () => {
 };
 const getDatas = async () => {
   isLoadingData.value = true;
-  await EnqueteDeColleteService.get()
+  await AppreciationResultatEnqueteService.chargerAppreciationsDeResulatEnquete(route.query.enquete, organisations.value[0].id)
     .then((result) => {
       datas.value = result.data.data;
+      console.log(datas.value);
       isLoadingData.value = false;
     })
     .catch((e) => {
       console.error(e);
       isLoadingData.value = false;
-      toast.error("Une erreur est survenue: Liste des enquêtes.");
+      toast.error("Une erreur est survenue: Liste des appreciations.");
     });
   initTabulator();
 };
 
+const getOrganisations = async () => {
+ await OngService.get()
+    .then((result) => {
+      organisations.value = result.data.data;
+    })
+    .catch((e) => {
+      console.error(e);
+      toast.error("Une erreur est survenue: Liste des organisayion.");
+    });
+};
+
 const updateData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.update(idSelect.value, payload)
+  await AppreciationResultatEnqueteService.update(idSelect.value, payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
       resetForm();
-      toast.success("Enquête modifiée.");
+      toast.success("Appreciation modifiée.");
     })
     .catch((e) => {
       isLoading.value = false;
@@ -76,11 +89,11 @@ const updateData = async () => {
 const submitData = () => (isCreate.value ? createData() : updateData());
 const deleteData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.destroy(idSelect.value)
+  await AppreciationResultatEnqueteService.destroy(idSelect.value)
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;
-      toast.success("Enquête de gouvernance supprimé");
+      toast.success("Appreciation supprimé");
       getDatas();
     })
     .catch((e) => {
@@ -96,31 +109,23 @@ const initTabulator = () => {
     layout: "fitColumns",
     columns: [
       {
-        title: "Nom",
+        title: "Organisation",
         field: "nom",
+        formatter: (cell) => {
+
+        }
       },
       {
         title: "Description",
         field: "description",
       },
       {
-        title: "Objectif",
-        field: "objectif",
+        title: "Contenu",
+        field: "contenu",
       },
       {
-        title: "Date Debut",
-        field: "debut",
-      },
-      {
-        title: "Date Fin",
-        field: "fin",
-      },
-      {
-        title: "Statut",
-        field: "Statut",
-        formatter: (cell) => {
-          return getStatusText(cell.getData().statut);
-        },
+        title: "Contenu",
+        field: "contenu",
       },
       {
         title: "Actions",
@@ -137,15 +142,15 @@ const initTabulator = () => {
             return button;
           };
 
-          const voirApprecationsButton = createButton("Voir", "btn btn-primary", () => {
-            gotoSoumissions( cell.getData());
-          });
-
           const modifyButton = createButton("Modifier", "btn btn-primary", () => {
             handleEdit(cell.getData());
           });
 
-          container.append(voirApprecationsButton, modifyButton);
+          const deleteButton = createButton("Supprimer", "btn btn-danger", () => {
+            handleDelete(cell.getData());
+          });
+
+          container.append(modifyButton, deleteButton);
 
           return container;
         },
@@ -155,38 +160,27 @@ const initTabulator = () => {
 };
 
 const getStatusText = (param) => {
-  switch (param) {
-    case 2:
-      return "Terminé";
-    case 1:
-      return "En cours";
-    case 0:
-      return "Non demarré";
-    default:
-      return "A déterminer";
-  }
+    switch (param) {
+        case 2:
+            return "Terminé";
+        case 1:
+            return "En cours";
+        case 0:
+            return "Non demarré";
+        default:
+            return "A déterminer";
+    }
 };
-
-function gotoSoumissions(enquete) {
-  router.push({ name: "SoumissionsEnqueteDeCollecte", params: { id: enquete.id } });
-}
-
-function gotoAppreciations(enquete) {
-  router.push({ name: "EnqueteAppreciations", query: { enqueteId: enquete.id } });
-}
 
 const handleEdit = (params) => {
-  console.log(params);
-
   isCreate.value = false;
   idSelect.value = params.id;
-  payload.nom = params.nom;
-  payload.description = params.description;
-  payload.objectif = params.objectif;
-  payload.debut = params.debut;
-  payload.fin = params.fin;
+  payload.contenu = params.contenu;
+  payload.type = params.type;
+  payload.organisationId = params.organisationId;
   showModalCreate.value = true;
 };
+
 const handleDelete = (params) => {
   idSelect.value = params.id;
   deleteModalPreview.value = true;
@@ -196,11 +190,9 @@ const cancelSelect = () => {
   idSelect.value = "";
 };
 const resetForm = () => {
-  payload.nom = "";
-  payload.description = "";
-  payload.objectif = "";
-  payload.debut = "";
-  payload.fin = "";
+  payload.contenu = "";
+  payload.type = "faiblesse";
+  payload.organisationId = "";
   showModalCreate.value = false;
 };
 const openCreateModal = () => {
@@ -209,13 +201,14 @@ const openCreateModal = () => {
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
-onMounted(() => {
-  getDatas();
+onMounted( async () => {
+    await getOrganisations();
+    await getDatas();
 });
 </script>
 
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Enquête</h2>
+  <h2 class="mt-10 text-lg font-medium intro-y">Appreciations</h2>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
@@ -225,7 +218,7 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal"><PlusIcon class="w-4 h-4 mr-3" />Ajouter une Enquête de Gouvernace</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal"><PlusIcon class="w-4 h-4 mr-3" />Laisser un avis</button>
       </div>
     </div>
   </div>
@@ -263,13 +256,29 @@ onMounted(() => {
       <h2 class="mr-auto text-base font-medium">{{ mode }} une enquête</h2>
     </ModalHeader>
     <form @submit.prevent="submitData">
+
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
-          <InputForm label="Nom" v-model="payload.nom" />
-          <InputForm label="Objectif" v-model="payload.objectif" />
-          <InputForm label="Description" v-model="payload.description" :required="false" />
-          <InputForm label="Début de l'enquete " v-model="payload.debut" type="date" />
-          <InputForm label="Début de l'enquete " v-model="payload.fin" type="date" />
+          <textarea name="contenu"  v-model="payload.contenu" cols="30" rows="10"></textarea>
+          <div>
+            <label>Type</label>
+            <div class="flex flex-col mt-2 sm:flex-row">
+              <div class="mr-2 form-check">
+                <input v-model="payload.type" id="faiblesse" class="form-check-input" type="radio" name="type" value="faiblesse" />
+                <label class="form-check-label" for="faiblesse">Faiblesse</label>
+              </div>
+              <div class="mt-2 mr-2 form-check sm:mt-0">
+                <input v-model="payload.type" id="recommandation" class="form-check-input" type="radio" name="type" value="recommandation" />
+                <label class="form-check-label" for="recommandation">Recommandation</label>
+              </div>
+            </div>
+          </div>
+          <div class="">
+            <label class="form-label">Organisation </label>
+            <TomSelect v-model="payload.organisationId" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
+              <option v-for="(organisation, index) in organisations" :key="index" :value="organisation.id">{{ organisation.nom  }}</option>
+            </TomSelect>
+          </div>
         </div>
       </ModalBody>
       <ModalFooter>
@@ -288,7 +297,7 @@ onMounted(() => {
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Suppression</div>
-        <div class="mt-2 text-slate-500">Supprimer une enquête?</div>
+        <div class="mt-2 text-slate-500">Supprimer une appreciation?</div>
       </div>
       <div class="flex justify-center w-full gap-3 py-4 text-center">
         <button type="button" @click="cancelSelect" class="mr-1 btn btn-outline-secondary">Annuler</button>

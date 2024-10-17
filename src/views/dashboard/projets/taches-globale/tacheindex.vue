@@ -1,237 +1,5 @@
-<script>
-import { mapGetters, mapActions } from "vuex";
-
-import { getStringValueOfStatutCode } from "@/utils/index";
-import ProjetService from "@/services/modules/projet.service.js";
-import ComposantesService from "@/services/modules/composante.service";
-import ActiviteService from "@/services/modules/activite.service";
-import InputForm from "@/components/news/InputForm.vue";
-import VButton from "@/components/news/VButton.vue";
-import { toast } from "vue3-toastify";
-export default {
-  components: {
-    InputForm,
-    VButton,
-  },
-  data() {
-    return {
-      projets: [],
-      projetId: "",
-      composants: [],
-      sousComposants: [],
-      activites: [],
-      haveSousComposantes: false,
-      isLoadingData: false,
-      showModal: false,
-      isUpdate: false,
-      isLoading: false,
-      formData: {
-        nom: "",
-        poids: "",
-        debut: "",
-        fin: "",
-        type: "",
-        composanteId: "",
-        budgetNational: 0,
-      },
-      composantsId: "",
-      sousComposantId: "",
-      activiteId: "",
-      labels: "Ajouter",
-      showDeleteModal: false,
-      deleteLoader: false,
-    };
-  },
-  computed: {
-    ...mapGetters("auths", { currentUser: "GET_AUTHENTICATE_USER" }),
-  },
-  watch: {
-    projetId(newValue, oldValue) {
-      if (this.projets.length > 0) {
-        console.log(newValue);
-
-        this.getProjetById(newValue);
-      }
-    },
-    composantsId(newValue, oldValue) {
-      if (this.composants.length > 0) {
-        this.getComposantById(newValue);
-      }
-    },
-    sousComposantId(newValue, oldValue) {
-      if (this.sousComposants.length > 0) {
-        this.getComposantById(newValue);
-      }
-    },
-  },
-
-  methods: {
-    text() {},
-    clearObjectValues(obj) {
-      for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          let value = obj[key];
-
-          if (typeof value === "string") {
-            obj[key] = "";
-          } else if (typeof value === "number") {
-            obj[key] = 0;
-          } else if (typeof value === "boolean") {
-            obj[key] = false;
-          } else if (Array.isArray(value)) {
-            obj[key] = [];
-          } else if (typeof value === "object" && value !== null) {
-            obj[key] = {}; // ou appliquer récursion pour vider les objets imbriqués
-            clearObjectValues(obj[key]); // récursion pour les objets imbriqués
-          } else {
-            obj[key] = null; // pour les autres types (null, undefined, etc.)
-          }
-        }
-      }
-    },
-    supprimerComposant(data) {
-      this.showDeleteModal = true;
-      this.sousComposantId = data.id;
-    },
-    deleteComposants() {
-      this.deleteLoader = true;
-      ComposantesService.destroy(this.sousComposantId)
-        .then((data) => {
-          this.deleteLoader = false;
-          this.showDeleteModal = false;
-          toast.success("Suppression  éffectuée avec succès");
-          this.getListeProjet();
-        })
-        .catch((error) => {
-          this.deleteLoader = false;
-          toast.error("Erreur lors de la suppression");
-        });
-    },
-    modifierActivite(data) {
-      this.labels = "Modifier";
-      this.showModal = true;
-      this.update = true;
-      this.formData.nom = data.nom;
-      this.formData.poids = data.poids;
-      this.formData.debut = data.debut;
-      this.formData.fin = data.fin;
-      this.formData.type = data.type;
-      this.formData.composanteId = data.composanteId;
-      this.formData.budgetNational = data.budgetNational;
-      this.activiteId = data.id;
-    },
-    addSousComposants() {
-      this.showModal = true;
-      this.isUpdate = false;
-      if (this.haveSousComposantes) {
-        this.formData.composanteId = this.sousComposantId;
-      } else {
-        this.formData.composanteId = this.composantsId;
-      }
-
-      this.labels = "Ajouter";
-    },
-    sendForm() {
-      if (this.update) {
-        this.formData.budgetNational = parseInt(this.formData.budgetNational);
-        // this.formData.projetId = this.projetId
-        this.isLoading = true;
-        ActiviteService.update(this.activiteId, this.formData)
-          .then((response) => {
-            if (response.status == 200 || response.status == 201) {
-              this.update = false;
-              this.isLoading = false;
-              this.showModal = false;
-              toast.success("Modification éffectuée");
-              this.composantsId = this.formData.composanteId;
-              this.clearObjectValues(this.formData);
-              // delete this.formData.projetId;
-              this.getListeProjet();
-              //this.sendRequest = false;
-            }
-          })
-          .catch((error) => {
-            // delete this.formData.projetId;
-            this.isLoading = false;
-            toast.error(error.message);
-          });
-      } else {
-        this.isLoading = true;
-        this.formData.budgetNational = parseInt(this.formData.budgetNational);
-        ActiviteService.create(this.formData)
-          .then((response) => {
-            if (response.status == 200 || response.status == 201) {
-              this.isLoading = false;
-              toast.success("Ajout éffectué");
-              this.showModal = false;
-              this.clearObjectValues(this.formData);
-
-              this.getListeProjet();
-            }
-          })
-          .catch((error) => {
-            this.isLoading = false;
-            toast.error("Erreur lors de la modification");
-          });
-      }
-    },
-    getListeProjet() {
-      this.isLoadingData = true;
-      ProjetService.get()
-        .then((data) => {
-          this.isLoadingData = false;
-          this.projets = data.data.data;
-          if (this.projetId == "") {
-            this.projetId = this.projets[0].id;
-          }
-
-          this.getProjetById(this.projetId);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getProjetById(data) {
-      ProjetService.getDetailProjet(data)
-        .then((datas) => {
-          this.composants = datas.data.data.composantes;
-          if (this.composantsId == "") {
-            this.composantsId = this.composants[0].id;
-          }
-          this.getComposantById(this.composantsId);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getComposantById(data) {
-      ComposantesService.detailComposant(data)
-        .then((data) => {        
-         
-          this.activites = data.data.data.activites;
-
-          if (data.data.data.souscomposantes.length > 0) {
-            this.sousComposants = data.data.data.souscomposantes;
-            this.haveSousComposantes = true;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-
-    filter() {},
-  },
-
-  created() {},
-  mounted() {
-    this.getListeProjet();
-  },
-};
-</script>
-
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Activités</h2>
+  <h2 class="mt-10 text-lg font-medium intro-y">Taches</h2>
 
   <!-- Filtre -->
   <div class="container px-4 mx-auto">
@@ -279,6 +47,15 @@ export default {
             <option v-for="(element, index) in sousComposants" :key="index" :value="element.id">{{ element.nom }}</option>
           </TomSelect>
         </div>
+
+        <div class="flex w-full">
+          <v-select class="w-full" :reduce="(activite) => activite.id" v-model="activitesId" label="nom" :options="activites">
+            <template #search="{ attributes, events }">
+              <input class="vs__search form-input" :required="!activitesId" v-bind="attributes" v-on="events" />
+            </template>
+          </v-select>
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activites</label>
+        </div>
       </div>
 
       <!-- <button class="absolute px-4 py-2 text-white transform -translate-x-1/2 bg-blue-500 rounded -bottom-3 left-1/2" @click="filter()">Filtrer</button> -->
@@ -300,7 +77,7 @@ export default {
         </div>
       </div>
       <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="addSousComposants()"><PlusIcon class="w-4 h-4 mr-3" />Ajouter une Activité</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="addSousComposants()"><PlusIcon class="w-4 h-4 mr-3" />Ajouter une tache</button>
       </div>
     </div>
   </div>
@@ -369,14 +146,14 @@ export default {
 
   <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
     <ModalHeader>
-      <h2 v-if="!update" class="mr-auto text-base font-medium">Ajouter une Activité</h2>
-      <h2 v-else class="mr-auto text-base font-medium">Modifier un Activité</h2>
+      <h2 v-if="!update" class="mr-auto text-base font-medium">Ajouter une tache</h2>
+      <h2 v-else class="mr-auto text-base font-medium">Modifier une tache</h2>
     </ModalHeader>
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
       <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
-      <InputForm v-model="formData.poids" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
-      <InputForm v-model="formData.debut" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de début" label="Début du projet" />
-      <InputForm v-model="formData.fin" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de fin" label="Fin du projet " />
+      <InputForm v-model="formData.poids" class="col-span-12" type="number" required="required" placeHolder="Poids de la " label="Poids" />
+      <InputForm v-model="formData.debut" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de début" label="Début de la tache" />
+      <InputForm v-model="formData.fin" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de fin" label="Fin de la tache " />
       <div class="col-span-12">
         <label for="modal-form-6" class="form-label">Type d'activité</label>
         <div class="mt-2">
@@ -393,7 +170,21 @@ export default {
           </TomSelect>
         </div>
       </div>
-        <div class="flex col-span-12" v-if="haveSousComposantes">
+        <div class="flex w-full">
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activites</label>
+          <TomSelect
+            v-model="formData.activiteId"
+            :options="{
+              placeholder: 'Choisir une activte',
+              create: false,
+              onOptionAdd: text(),
+            }"
+            class="w-full"
+          >
+            <option v-for="(element, index) in activites" :key="index" :value="element.id">{{ element.nom }}</option>
+          </TomSelect>
+        </div>
+        <div class="flex w-full" v-if="haveSousComposantes">
           <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OUtPut</label>
           <TomSelect
             v-model="formData.composanteId"
@@ -408,6 +199,15 @@ export default {
           </TomSelect>
         </div>
       <div class="flex col-span-12">
+        <v-select class="w-full" :reduce="(composant) => composant.id" v-model="formData.composanteId" label="nom" :options="composants">
+          <template #search="{ attributes, events }">
+            <input class="vs__search form-input" :required="!formData.composanteId" v-bind="attributes" v-on="events" />
+          </template>
+        </v-select>
+        <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
+      </div>
+
+       <div class="flex col-span-12">
         <v-select class="w-full" :reduce="(composant) => composant.id" v-model="formData.composanteId" label="nom" :options="composants">
           <template #search="{ attributes, events }">
             <input class="vs__search form-input" :required="!formData.composanteId" v-bind="attributes" v-on="events" />
@@ -431,7 +231,7 @@ export default {
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Etes vous sûr?</div>
-        <div class="mt-2 text-slate-500">Voulez vous supprimer l'activité ? <br />Cette action ne peut être annulé</div>
+        <div class="mt-2 text-slate-500">Voulez vous supprimer l'organisation ? <br />Cette action ne peut être annulé</div>
       </div>
       <div class="flex gap-2 px-5 pb-8 text-center">
         <button type="button" @click="showDeleteModal = false" class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>
@@ -441,4 +241,246 @@ export default {
   </Modal>
 </template>
 
-<style></style>
+<script>
+
+import ComposanteService from "@/services/modules/composante.service.js";
+
+import ProjetService from "@/services/modules/projet.service.js";
+import ActiviteService from "@/services/modules/activite.service.js";
+import { getStringValueOfStatutCode } from '@/utils/index'
+import { mapGetters, mapActions } from "vuex";
+import TachesService from '@/services/modules/tache.service';
+
+export default {
+  components: {
+  },
+  data() {
+    return {
+      currentPage: true,
+      version: 'current',
+      tacheVisible: false,
+      tacheReVisible: false,
+      scopes: [],
+      activites: [],
+      composantes: [],
+      sous_composantes: [],
+      taches: [],
+      value: '',
+      valueSC: '',
+      valueAc: '',
+      activiteId: ''
+    }
+  },
+  computed: {
+    ...mapGetters('auths', { currentUser: 'GET_AUTHENTICATE_USER' })
+  },
+
+
+  computed: {
+
+    ...mapGetters({
+      currentUser: 'auths/GET_AUTHENTICATE_USER',
+    })
+  },
+
+  methods: {
+    active() {
+      this.$store.dispatch('active')
+    },
+    disabled() {
+      this.$store.dispatch('disabled')
+    },
+    getPermission() {
+      this.currentUser.role[0].permissions.forEach(element => {
+        if (element.slug === 'voir-une-tache') {
+          this.tacheVisible = true
+        }
+        if (element.slug === 'voir-revision-ptab') {
+          this.tacheReVisible = true
+        }
+      });
+    },
+
+    ...mapActions("revisionPtab", {
+      fetchProgrammeScopes: "FETCH_PROGRAMME_SCOPES"
+    }),
+
+    choiceVersion(version) {
+      if (this.scopes.length > 0) {
+        if ("" === version) {
+          this.currentPage = true;
+        } else {
+          this.currentPage = false;
+        }
+      } else {
+        this.currentPage = true;
+      }
+    },
+    demoEcoute(value) {
+      this.getSComposante(value.id)
+    },
+    demoEcouteSC(value) {
+      this.getActivite(value.id)
+    },
+    demoEcouteAC(value) {
+      this.activiteId = value.id
+      this.getTache(value.id)
+    },
+    ...mapActions("revisionPtab", {
+      fetchProgrammeScopes: "FETCH_PROGRAMME_SCOPES"
+    }),
+    validation(data) {
+      const id = data.id
+      const datas = {
+        statut: -1,
+        activiteId: this.activiteId
+      }
+      TachesService.update(id, datas).then(() => {
+        this.$toast.success('validation effectué')
+
+      }).catch((error) => {
+        if (error.response) {
+          // Requête effectuée mais le serveur a répondu par une erreur.
+          const message = error.response.data.message
+          this.$toast.error(message)
+        } else if (error.request) {
+          // Demande effectuée mais aucune réponse n'est reçue du serveur.
+          //console.log(error.request);
+        } else {
+          // Une erreur s'est produite lors de la configuration de la demande
+        }
+      })
+    },
+    getNom(nom, prenom) {
+
+      let name = ''
+
+      if (nom !== undefined && nom !== null) name += nom
+
+      if (prenom !== undefined && prenom !== null) name += prenom
+
+      return name;
+    },
+
+    customLabel({ codePta, nom }) {
+      return `${codePta} – ${nom}`
+    },
+    customLabelSC({ codePta, nom }) {
+      return `${codePta} – ${nom}`
+    },
+
+    getStatus(status) {
+      return getStringValueOfStatutCode(status);
+    },
+    getComposante(id) {
+      ProjetService.composantes(id).then((data) => {
+        const datas = data.data.data
+        this.composantes = datas
+        this.getSComposante(datas[0].id)
+      }).catch((error) => {
+        if (error.response) {
+              // Requête effectuée mais le serveur a répondu par une erreur.
+              const message = error.response.data.message
+              this.$toast.error(message)
+              } else if (error.request) {
+                // Demande effectuée mais aucune réponse n'est reçue du serveur.
+                //console.log(error.request);
+              } else {
+              // Une erreur s'est produite lors de la configuration de la demande
+              //console.log('dernier message', error.message);
+          }
+      })
+    },
+    getSComposante(id) {
+      ComposanteService.sousComposantes(id).then((data) => {
+        const datas = data.data.data
+        this.sous_composantes = datas
+        this.getActivite(datas[0].id)
+
+      }).catch((error) => {
+        if (error.response) {
+              // Requête effectuée mais le serveur a répondu par une erreur.
+              const message = error.response.data.message
+              this.$toast.error(message)
+              } else if (error.request) {
+                // Demande effectuée mais aucune réponse n'est reçue du serveur.
+                //console.log(error.request);
+              } else {
+              // Une erreur s'est produite lors de la configuration de la demande
+              //console.log('dernier message', error.message);
+          }
+      })
+    },
+    getActivite(id) {
+      this.active()
+      ComposanteService.activites(id).then((data) => {
+        const datas = data.data.data
+        this.activites = datas
+        this.activiteId = datas[0].id
+        this.getTache(datas[0].id)
+        this.disabled()
+      }).catch((error) => {
+        if (error.response) {
+              // Requête effectuée mais le serveur a répondu par une erreur.
+              const message = error.response.data.message
+              this.$toast.error(message)
+              } else if (error.request) {
+                // Demande effectuée mais aucune réponse n'est reçue du serveur.
+                //console.log(error.request);
+              } else {
+              // Une erreur s'est produite lors de la configuration de la demande
+              //console.log('dernier message', error.message);
+          }
+        this.disabled()
+      })
+    },
+    getTache(id) {
+      ActiviteService.taches(id).then((data) => {
+        const datas = data.data.data
+        this.taches = datas
+
+      }).catch((error) => {
+        if (error.response) {
+              // Requête effectuée mais le serveur a répondu par une erreur.
+              const message = error.response.data.message
+              this.$toast.error(message)
+              } else if (error.request) {
+                // Demande effectuée mais aucune réponse n'est reçue du serveur.
+                //console.log(error.request);
+              } else {
+              // Une erreur s'est produite lors de la configuration de la demande
+              //console.log('dernier message', error.message);
+          }
+      })
+    },
+
+  },
+
+  created() {
+    if (this.currentUser.programme.id) {
+      this.currentRole = this.currentUser.type
+      const bailleurInfo = JSON.parse(localStorage.getItem("bailleurInfo"));
+      if (bailleurInfo) {
+        const idProjet = bailleurInfo.id
+        this.getComposante(idProjet)
+      }
+      else {
+        this.fetchProgrammeScopes(this.currentUser.programme.id).then((response) => {
+          this.scopes = response.data.data
+        });
+      }
+
+    }
+  },
+  mounted() {
+    this.getPermission()
+    if (!this.tacheVisible) {
+      this.$router.push('/401-non-autorise')
+    }
+  }
+};
+</script>
+
+<style>
+
+</style>

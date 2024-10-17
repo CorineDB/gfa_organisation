@@ -8,7 +8,7 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const organizationId = ref("R5P1oK0OP6DmWGvB21RNoeb9Xpgdwr7PNQ4zy0LAM8KnVZEJa5xlOjYkeWBv8aJy");
-const enqueteDeCollecteId = ref("EaPR3GQnP1z2YvMVZXEL0QorKA7BmkNLzWlnw9egqGOjbxJd3Ra68p4Dql46Yrj7");
+const enqueteDeCollecteId = ref("RmLpz4vVan0mOqYvjBE8bVZ3DX7or9yB45RxA6Jp4MGkwlPedKL1z2gQe32BXnE1");
 const selectStructureId = ref("");
 const datasCollection = ref({});
 const datasFactuel = ref([]);
@@ -48,14 +48,10 @@ const changeStructure = () => {
   getDataCollection();
 };
 
-const findColor = () => {
-  switch (key) {
-    case value:
-      break;
-
-    default:
-      break;
-  }
+const getTotalIndicateurs = (principe) => {
+  return principe.criteres_de_gouvernance.reduce((total, critere) => {
+    return total + critere.indicateurs_de_gouvernance.length;
+  }, 0);
 };
 
 onMounted(() => {
@@ -68,7 +64,7 @@ onMounted(() => {
   <!-- BEGIN: Boxed Tab -->
   <PreviewComponent class="mt-5 intro-y _box">
     <Preview>
-      <TabGroup :selectedIndex="1">
+      <TabGroup>
         <TabList class="space-x-4 font-bold uppercase nav-boxed-tabs">
           <Tab class="w-full py-2 bg-white" tag="button">Outil Factuel</Tab>
           <Tab class="w-full py-2 bg-white" tag="button">Outil de Perception</Tab>
@@ -96,18 +92,37 @@ onMounted(() => {
                 </tr>
                 <tr class="border-b border-slate-300">
                   <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
-                  <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
+                  <td>{{ datasCollection.nom }}</td>
                 </tr>
                 <tr class="border-b border-slate-300">
                   <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td>Lorem ipsum dolor sit.</td>
+                  <td>10/09/2024</td>
                 </tr>
               </tbody>
             </table>
+            <div class="flex justify-end my-6 sm:flex-row sm:items-end xl:items-start">
+              <div class="flex mt-5 sm:mt-0">
+                <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto"><PrinterIcon class="w-4 h-4 mr-2" /> Imprimer</button>
+                <Dropdown class="w-1/2 sm:w-auto">
+                  <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
+                    <FileTextIcon class="w-4 h-4 mr-2" /> Exporter
+                    <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter CSV </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter JSON </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter XLSX </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter HTML </DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+            </div>
             <!-- Figure 3 : Grille de notation des indicateurs de la gouvernance politique -->
-            <table class="w-full my-12 border-collapse table-auto" cellpadding="0" cellspacing="0">
+            <table class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-blue-900">
-                <tr class="">
+                <tr>
                   <th class="p-2 text-center text-white">Principes</th>
                   <th class="p-2 text-center text-white">Critères</th>
                   <th class="p-2 text-center text-white">Indicateur</th>
@@ -118,43 +133,104 @@ onMounted(() => {
               </thead>
 
               <tbody class="text-black bg-white">
+                <!-- Indice factuel de gouvernance -->
                 <tr class="my-4 bg-blue-600 border-white border-y-8">
-                  <td colspan="4" class="p-2 text-center">Indice factuel de gouvernace</td>
-                  <td class="p-2 text-center">2</td>
+                  <td colspan="4" class="p-2 font-bold text-center">Indice factuel de gouvernance</td>
+                  <td class="p-2 font-bold text-center">2</td>
                   <td></td>
                 </tr>
+
+                <!-- Deuxième section : Redevabilité - Transparence -->
+                <tr class="bg-yellow-400">
+                  <td rowspan="5" class="p-2 font-bold text-start">Redevabilité</td>
+                  <td rowspan="5" class="p-2 text-center">Transparence</td>
+                  <td class="p-2 text-center">Indépendance des organes de gouvernance</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">9</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-green-400">
+                  <td class="p-2 text-center">Accès à l'information</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">0,92</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
                 <tr class="bg-red-400">
-                  <td rowspan="13" class="p-2 text-start">Redevabilité</td>
-                  <td rowspan="4" class="p-2 text-center">Legitimité</td>
-                  <td class="p-2 text-center">yy</td>
-                  <td class="p-2 text-center">yy</td>
-                  <td class="p-2 text-center">yy</td>
-                  <td class="p-2 text-center">yy</td>
-                </tr>
-                <tr>
-                  <td class="p-2 text-center">Roles et responsabilité reizuz zeuizhiu</td>
+                  <td class="p-2 text-center">Partage des informations avec les parties prenantes</td>
                   <td class="p-2 text-center">Oui</td>
-                  <td class="p-2 text-center">10</td>
-                  <td class="p-2 text-center">source</td>
+                  <td class="p-2 text-center">0,1</td>
+                  <td class="p-2 text-center">Source</td>
                 </tr>
-                <tr>
-                  <td class="p-2 text-center">Roles et responsabilité 2</td>
-                  <td class="p-2 text-center">Oui</td>
-                  <td class="p-2 text-center">10</td>
-                  <td class="p-2 text-center">source</td>
+
+                <tr class="bg-yellow-400">
+                  <td class="p-2 text-center">Publication des rapports financiers</td>
+                  <td class="p-2 text-center">Non</td>
+                  <td class="p-2 text-center">2</td>
+                  <td class="p-2 text-center">Source</td>
                 </tr>
-                <tr>
-                  <td class="p-2 text-center">Roles et responsabilité reizuz zeuizhiu</td>
+
+                <tr class="bg-yellow-400">
+                  <td class="p-2 text-center">Transparence des mécanismes de prise de décision</td>
                   <td class="p-2 text-center">Oui</td>
-                  <td class="p-2 text-center">10</td>
-                  <td class="p-2 text-center">Dernier 1</td>
+                  <td class="p-2 text-center">1</td>
+                  <td class="p-2 text-center">Source</td>
                 </tr>
-                <tr>
-                  <td colspan="3" class="p-2 text-right">Roles et responsabilité reizuz zeuizhiu</td>
-                  <td class="p-2 text-center">Oui</td>
+
+                <!-- Ligne de score factuel pour la deuxième section -->
+                <tr class="font-bold bg-yellow-400">
+                  <td colspan="4" class="p-2 text-center">Score factuel</td>
+                  <td class="p-2 text-center">033</td>
+                  <!-- Remplacer par la note calculée -->
                   <td class="p-2 text-center"></td>
                 </tr>
-                <!-- Rows 2 -->
+                <tr class="bg-green-400">
+                  <td rowspan="5" class="p-2 font-bold text-start">Redevabilité</td>
+                  <td rowspan="5" class="p-2 text-center">Transparence</td>
+                  <td class="p-2 text-center">Indépendance des organes de gouvernance</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">9</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-red-400">
+                  <td class="p-2 text-center">Accès à l'information</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">0,92</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-yellow-400">
+                  <td class="p-2 text-center">Partage des informations avec les parties prenantes</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">0,1</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-yellow-400">
+                  <td class="p-2 text-center">Publication des rapports financiers</td>
+                  <td class="p-2 text-center">Non</td>
+                  <td class="p-2 text-center">2</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <tr class="bg-green-400">
+                  <td class="p-2 text-center">Transparence des mécanismes de prise de décision</td>
+                  <td class="p-2 text-center">Oui</td>
+                  <td class="p-2 text-center">1</td>
+                  <td class="p-2 text-center">Source</td>
+                </tr>
+
+                <!-- Ligne de score factuel pour la deuxième section -->
+                <tr class="font-bold bg-green-400">
+                  <td colspan="4" class="p-2 text-center">Score factuel</td>
+                  <td class="p-2 text-center">033</td>
+                  <!-- Remplacer par la note calculée -->
+                  <td class="p-2 text-center"></td>
+                </tr>
+
+                <!-- Ajouter plus de sections si nécessaire -->
               </tbody>
             </table>
           </TabPanel>
@@ -180,16 +256,34 @@ onMounted(() => {
                   </td>
                 </tr>
                 <tr class="border-b border-slate-300">
-                  <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
-                  <td>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</td>
+                  <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
+                  <td>{{ datasCollection.nom }}</td>
                 </tr>
                 <tr class="border-b border-slate-300">
-                  <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td>Lorem ipsum dolor sit.</td>
+                  <td class="p-2 font-medium">Date d’auto-évaluation :</td>
+                  <td>10/09/2024</td>
                 </tr>
               </tbody>
             </table>
-
+            <div class="flex justify-end my-6 sm:flex-row sm:items-end xl:items-start">
+              <div class="flex mt-5 sm:mt-0">
+                <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto"><PrinterIcon class="w-4 h-4 mr-2" /> Imprimer</button>
+                <Dropdown class="w-1/2 sm:w-auto">
+                  <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
+                    <FileTextIcon class="w-4 h-4 mr-2" /> Exporter
+                    <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
+                  </DropdownToggle>
+                  <DropdownMenu class="w-40">
+                    <DropdownContent>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter CSV </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter JSON </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter XLSX </DropdownItem>
+                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter HTML </DropdownItem>
+                    </DropdownContent>
+                  </DropdownMenu>
+                </Dropdown>
+              </div>
+            </div>
             <table v-if="!isLoadingData" class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-gray-400">
                 <tr class="border-b-8 border-white" :style="{ 'background-color': getColorForValue(datasPerception.indice_de_perception) }">
@@ -214,7 +308,7 @@ onMounted(() => {
                   <td class="p-2 text-center border border-slate-600">{{ indicateur.moyPQO }}</td>
                 </tr>
                 <tr class="text-black" v-if="principe.indicateurs_de_gouvernance.length > 0">
-                  <td class="p-2 text-center border border-slate-600">Indice de perception du principe</td>
+                  <td class="p-2 text-right border border-slate-600">Indice de perception du principe</td>
                   <td class="p-2 text-center border border-slate-600">{{ principe.indice_de_perception }}</td>
                 </tr>
               </tbody>
@@ -267,3 +361,9 @@ onMounted(() => {
   </PreviewComponent>
   <!-- END: Boxed Tab -->
 </template>
+
+<style scoped>
+table td {
+  border: 1px solid #000;
+}
+</style>

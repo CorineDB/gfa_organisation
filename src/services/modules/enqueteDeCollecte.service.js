@@ -22,6 +22,11 @@ const EnqueteDeCollecteService = {
   destroy(slug) {
     return ApiService.delete(`gfa/enquetes-de-collecte/${slug}`);
   },
+
+  soumissions(slug) {
+    return ApiService.get(`gfa/enquetes-de-collecte/${slug}/reponses-collecter`);
+    return ApiService.get("gfa/enquetes-de-collecte", slug);
+  },
 };
 
 export default EnqueteDeCollecteService;
