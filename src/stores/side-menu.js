@@ -84,39 +84,6 @@ export const useSideMenuStore = defineStore("sideMenu", {
         title: "Indicateurs de gouvernance",
       },
       {
-        icon: "FolderIcon",
-        pageName: "projets",
-        title: "Outils de collecte",
-        subMenu: [
-          {
-            icon: "FolderKanbanIcon",
-            pageName: "typeGouvernance",
-            title: "Type de Gouvernance",
-          },
-          {
-            icon: "GlobeIcon",
-            pageName: "PrincipeGouvernance",
-            title: "Principes de Gouvernance",
-          },
-          {
-            icon: "GlobeIcon",
-            pageName: "critereGouvernance",
-            title: "Criteres de Gouvernance",
-          },
-          {
-            icon: "SettingsIcon",
-            pageName: "ToolsFactuel",
-            title: "Formulaire Factuel",
-          },
-
-          {
-            icon: "SettingsIcon",
-            pageName: "ToolsPerception",
-            title: "Formulaire de Perception",
-          },
-        ],
-      },
-      {
         icon: "BarChart2Icon",
         pageName: "Programmation_enquete",
         title: " Enquête & résulats",
