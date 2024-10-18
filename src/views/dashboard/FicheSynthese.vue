@@ -6,6 +6,7 @@ import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { getColorForValue } from "../../utils/findColorIndicator";
 import { useRouter } from "vue-router";
 import ChartSynthese from "../../components/news/ChartSynthese.vue";
+import ChartCircular from "../../components/news/ChartCircular.vue";
 
 const router = useRouter();
 const organizationId = ref("R5P1oK0OP6DmWGvB21RNoeb9Xpgdwr7PNQ4zy0LAM8KnVZEJa5xlOjYkeWBv8aJy");
@@ -29,7 +30,7 @@ const getDataCollection = async () => {
     .catch((e) => {
       isLoadingData.value = false;
       console.error(e);
-      toast.error("Une erreur est survenue: Resultats des synthese .");
+      // toast.error("Une erreur est survenue: Resultats des synthese .");
     });
 };
 
@@ -119,7 +120,7 @@ onMounted(() => {
                 </tr>
               </tbody>
             </table>
-            <table v-if="!isLoadingData" class="mt-12 text-sm border-collapse table-fixed w-max">
+            <!-- <table v-if="!isLoadingData" class="mt-12 text-sm border-collapse table-fixed w-max">
               <thead class="text-left bg-gray-300 border border-slate-300">
                 <tr>
                   <th class="p-2">Principe</th>
@@ -134,7 +135,7 @@ onMounted(() => {
                   </tr>
                 </template>
               </tbody>
-            </table>
+            </table> -->
             <!-- Figure 3 : Grille de notation des indicateurs de la gouvernance politique -->
             <table class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-blue-900">
@@ -251,6 +252,7 @@ onMounted(() => {
             </table>
             <div class="report-chart">
               <ChartSynthese :height="275" class="mt-6 -mb-6" />
+              <ChartCircular :height="275" class="mt-6 -mb-6" />
             </div>
           </TabPanel>
           <!-- tab 2 -->
@@ -303,7 +305,7 @@ onMounted(() => {
                 </tr>
               </tbody>
             </table>
-            <table v-if="!isLoadingData" class="mt-12 text-sm border-collapse table-fixed w-max">
+            <!-- <table v-if="!isLoadingData" class="mt-12 text-sm border-collapse table-fixed w-max">
               <thead class="text-left bg-gray-300 border border-slate-300">
                 <th class="p-2">Principe</th>
                 <th class="p-2">Indice de perception</th>
@@ -314,7 +316,7 @@ onMounted(() => {
                   <td class="text-center">{{ prinxipe.indice_de_perception }}</td>
                 </tr>
               </tbody>
-            </table>
+            </table> -->
 
             <table v-if="!isLoadingData" class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-gray-400">
