@@ -1,30 +1,27 @@
-
-import ApiService from '@/services/configs/api.service'
+import ApiService from "@/services/configs/api.service";
 
 const UniteeDeMesureService = {
+  query(type, params) {
+    return ApiService.query("/gfa/unitees-de-mesure", {
+      params: params,
+    });
+  },
 
-    query(type, params) {
-      return ApiService.query("unitees-de-mesure", {
-        params: params
-      });
-    },
+  get(slug) {
+    return ApiService.get("/gfa/unitees-de-mesure", slug);
+  },
 
-    get(slug) {
-      return ApiService.get("unitees-de-mesure", slug);
-    },
+  create(params) {
+    return ApiService.post("/gfa/unitees-de-mesure", params);
+  },
 
-    create(params) {
-      return ApiService.post("unitees-de-mesure", params);
-    },
+  update(slug, params) {
+    return ApiService.update("/gfa/unitees-de-mesure", slug, params);
+  },
 
-    update(slug, params) {
-      return ApiService.update("unitees-de-mesure", slug, params);
-    },
+  destroy(slug) {
+    return ApiService.delete(`/gfa/unitees-de-mesure/${slug}`);
+  },
+};
 
-    destroy(slug) {
-      return ApiService.delete(`unitees-de-mesure/${slug}`);
-    }
-  };
-
-  export default UniteeDeMesureService;
-  
+export default UniteeDeMesureService;

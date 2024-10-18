@@ -33,12 +33,17 @@ import FichePerception from "../views/dashboard/FichePerception.vue";
 import FicheSynthese from "../views/dashboard/FicheSynthese.vue";
 import DashboardGfa from "../views/dashboard/Dashboard.vue";
 import indicateurs from "../views/dashboard/indicateurs/index.vue";
+import SuiviIndicateurs from "../views/dashboard/indicateurs/suivi.vue";
 
 import typeGouvernance from "../views/dashboard/type_gouvernance/index.vue";
 import Programmation_enquete from "../views/dashboard/programmation_enquete/index.vue";
 import EnqueteAppreciations from "../views/dashboard/programmation_enquete/appreciations.vue";
 import SoumissionsEnqueteDeCollete from "../views/dashboard/programmation_enquete/soumissions.vue";
 import OptionReponse from "@/views/dashboard/OptionReponse.vue";
+import UniteDeMesure from "@/views/dashboard/uniteDeMesure.vue";
+import KeyValue from "@/views/dashboard/keyValue.vue";
+import CategorieIndicateurs from "@/views/dashboard/categoriesIndicateurs.vue";
+import Sites from "@/views/dashboard/sites.vue";
 
 //Projet/Outcomes/Activité/Taches
 import dashboard_projets_composantes_globale from "../views/dashboard/projets/composantes-globale/index.vue";
@@ -206,6 +211,26 @@ const routes = [
         component: OptionReponse,
       },
       {
+        path: "unite_de_mesure",
+        name: "UniteDeMesure",
+        component: UniteDeMesure,
+      },
+      {
+        path: "cle_valeurs",
+        name: "KeyValue",
+        component: KeyValue,
+      },
+      {
+        path: "categories_indicateurs",
+        name: "CategoriesIndicateurs",
+        component: CategorieIndicateurs,
+      },
+      {
+        path: "sites_indicateurs",
+        name: "Sites",
+        component: Sites,
+      },
+      {
         path: "gouvernance/:id/principe",
         name: "Principe",
         component: Principe,
@@ -220,15 +245,25 @@ const routes = [
         name: "EnqueteIndividuel",
         component: EnqueteIndividuel,
       },
+      // {
+      //   path: "gouvernance/:id/principe/:idp/critere/:idc/indicateur",
+      //   name: "Indicateurs",
+      //   component: indicateurs,
+      // },
       {
         path: "resultat-collecte",
         name: "resultat_collecte",
         component: FicheResultat,
       },
       {
-        path: "gouvernance/:id/principe/:idp/critere/:idc/indicateur",
+        path: "indicateurs",
         name: "Indicateurs",
         component: indicateurs,
+      },
+      {
+        path: "suiviIndicateurs",
+        name: "SuiviIndicateurs",
+        component: SuiviIndicateurs,
       },
     ],
   },

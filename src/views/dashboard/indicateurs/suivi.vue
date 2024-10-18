@@ -236,39 +236,16 @@
 </template>
 
 <script>
-import ModalTopRight from '@/components/ModalTopRight'
-import SearchBar from '@/components/SearchBar'
-import Titre from '@/components/Titre'
-import Vtable from '@/components/Vtable'
-import Vform from '@/components/Vform'
-import Vmodal from '@/components/Vmodal'
-import Vbutton from '@/components/Vbutton'
-import Dashboard from '@/layouts/Dashboard'
-import VueHtml2pdf from 'vue-html2pdf'
+
 import { mapGetters, mapMutations, mapActions } from "vuex";
-import extractFormData from "@/utils/extract-data";
+
 import IndicateurSuiviService from "@/services/modules/indicateur.suivi.service";
 import SuiviService from "@/services/modules/indicateur.suivi.service.js";
-import JsonExcel from "vue-json-excel";
-import ModalChat from '@/components/ModalChat'
-import Commentaire from '@/components/Commentaire.vue'
-import DeleteAlert from "@/components/DeleteAlert.vue";
+
 
 export default {
   components: {
-    Vtable,
-    Vbutton,
-    Dashboard,
-    Vmodal,
-    Vform,
-    Titre,
-    SearchBar,
-    ModalTopRight,
-    JsonExcel,
-    ModalChat,
-    VueHtml2pdf,
-    Commentaire,
-    DeleteAlert
+   
   },
   data() {
     return ({

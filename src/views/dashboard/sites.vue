@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref } from "vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
-import IndicateursService from "@/services/modules/indicateur.service";
+import SiteService from "@/services/modules/site.service";
 import TypeGouvernance from "@/services/modules/typeGouvernance.service";
 import Tabulator from "tabulator-tables";
 import DeleteButton from "@/components/news/DeleteButton.vue";
@@ -11,19 +11,8 @@ import LoaderSnipper from "@/components/LoaderSnipper.vue";
 
 const payload = reactive({
   nom: "",
-  description: "",
-  indice: Number,
-  sources_de_donnee: "",
-  methode_de_la_collecte: "",
-  frequence_de_la_collecte: "",
-  responsable: "",
-  anneeDeBase: "",
-  type_de_variable: "", // selecte
-  agreger: false,
-  valeurDeBase: 145,
-  categorieId: "",
-  uniteeMesureId: "",
-  sites: [],
+  longitude: "",
+  latitude: "",
 });
 const tabulator = ref();
 const idSelect = ref("");
@@ -35,26 +24,14 @@ const isCreate = ref(true);
 const programmes = ref([]);
 const datas = ref([]);
 
-const years = computed(() => {
-    const currentYear = new Date().getFullYear();
-  const startYear = 1900;
-
-  for (let i = currentYear; i >= startYear; i--) {
-    const option = document.createElement('option');
-    option.value = i;
-    option.text = i;
-    yearSelect.add(option);
-  }
-}) 
-
 const createData = async () => {
   isLoading.value = true;
-  await IndicateursService.create(payload)
+  await SiteService.create(payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
       resetForm();
-      toast.success("Indicateurs créer.");
+      toast.success("Sites créer.");
     })
     .catch((e) => {
       isLoading.value = false;
@@ -64,7 +41,7 @@ const createData = async () => {
 };
 const getDatas = async () => {
   isLoadingData.value = true;
-  await IndicateursService.get()
+  await SiteService.get()
     .then((result) => {
       datas.value = result.data.data;
       isLoadingData.value = false;
@@ -78,12 +55,12 @@ const getDatas = async () => {
 };
 const updateData = async () => {
   isLoading.value = true;
-  await IndicateursService.update(idSelect.value, payload)
+  await SiteService.update(idSelect.value, payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
       resetForm();
-      toast.success("Indicateurs modifiée.");
+      toast.success("Sites modifiée.");
     })
     .catch((e) => {
       isLoading.value = false;
@@ -94,11 +71,11 @@ const updateData = async () => {
 const submitData = () => (isCreate.value ? createData() : updateData());
 const deleteData = async () => {
   isLoading.value = true;
-  await IndicateursService.destroy(idSelect.value)
+  await SiteService.destroy(idSelect.value)
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;
-      toast.success("Indicateurs supprimée");
+      toast.success("Sites supprimée");
       getDatas();
     })
     .catch((e) => {
@@ -128,34 +105,14 @@ const initTabulator = () => {
         field: "nom",
       },
       {
-        title: "Description",
-        field: "description",
+        title: "Longitude",
+        field: "longitude",
       },
       {
-        title: "Année de base",
-        field: "anneeDeBase",
-      },
-      {
-        title: "Unité de mesure",
-        field: "unitee_mesure",
+        title: "Latitude",
+        field: "latitude",
         hozAlign: "center",
         width: 200,
-        formatter(cell) {
-          return `${cell.getData().unitee_mesure.nom}`;
-        },
-      },
-      {
-        title: "Catégories",
-        field: "categorie",
-        hozAlign: "center",
-        width: 200,
-        formatter(cell) {
-          return `${cell.getData().categorie.nom}`;
-        },
-      },
-      {
-        title: "Date de création",
-        field: "created_at",
       },
       {
         title: "Actions",
@@ -191,10 +148,9 @@ const initTabulator = () => {
 const handleEdit = (params) => {
   isCreate.value = false;
   idSelect.value = params.id;
-  payload.libelle = params.libelle;
-  payload.description = params.description;
-  payload.note = params.note;
-  // payload.programmeId = params.programmeId;
+  payload.nom = params.nom;
+  payload.longitude = params.longitude;
+  payload.latitude = params.latitude
   showModalCreate.value = true;
 };
 const handleDelete = (params) => {
@@ -226,7 +182,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Indicateurs</h2>
+  <h2 class="mt-10 text-lg font-medium intro-y">Sites</h2>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
@@ -236,7 +192,7 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal"><PlusIcon class="w-4 h-4 mr-3" />Ajouter un indicateur</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal"><PlusIcon class="w-4 h-4 mr-3" />Ajouter un Site</button>
       </div>
     </div>
   </div>
@@ -271,18 +227,14 @@ onMounted(() => {
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
     <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">{{ mode }} un indicateur</h2>
+      <h2 class="mr-auto text-base font-medium">{{ mode }} une Sites</h2>
     </ModalHeader>
     <form @submit.prevent="submitData">
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
           <InputForm label="Nom" v-model="payload.nom" />
-          <InputForm label="Description" v-model="payload.description" />
-          <InputForm label="Source de donnée" v-model="payload.sources_de_donnee" />
-          <InputForm label="Méthode de collecte" v-model.number="payload.methode_de_la_collecte" />
-          <InputForm label="Fréquence de la collecte" v-model.number="payload.frequence_de_la_collecte" />
-          <InputForm label="Responsable" v-model.number="payload.responsable" />
-          <InputForm label="Anée de base" v-model.number="payload.anneeDeBase" />
+          <InputForm label="Longitude" v-model="payload.longitude" />
+          <InputForm label="Latitude" v-model.number="payload.latitude" />
           <!-- <div class="">
             <label class="form-label">Programmes </label>
             <TomSelect v-model="payload.programmeId" :options="{ placeholder: 'Selectionez un programme' }" class="w-full">
@@ -307,7 +259,7 @@ onMounted(() => {
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Suppression</div>
-        <div class="mt-2 text-slate-500">Supprimer cette option de réponse?</div>
+        <div class="mt-2 text-slate-500">Supprimer cette Sites?</div>
       </div>
       <div class="flex justify-center w-full gap-3 py-4 text-center">
         <button type="button" @click="cancelSelect" class="mr-1 btn btn-outline-secondary">Annuler</button>

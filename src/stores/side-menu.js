@@ -42,30 +42,20 @@ export const useSideMenuStore = defineStore("sideMenu", {
       },
       {
         icon: "FolderIcon",
-        pageName: "projets",
-        title: "Cadre de rendement",
-        subMenu: [
-          {
-            icon: "FolderKanbanIcon",
-            pageName: "cadreDeRendement",
-            title: "Cadre de rendement",
-          },
-          {
-            icon: "GlobeIcon",
-            pageName: "resultats",
-            title: "Résultats Escomptés",
-          },
-          {
-            icon: "GlobeIcon",
-            pageName: "Indicateur",
-            title: "Indicateurs",
-          },
-          {
-            icon: "FolderKanbanIcon",
-            pageName: "categorie",
-            title: "Categorie",
-          },
-        ],
+        pageName: "Indicateurs",
+        title: "Cadre Mesure Rendement",
+        // subMenu: [
+        //   {
+        //     icon: "FolderIcon",
+        //     pageName: "Indicateurs",
+        //     title: "Indicateurs",
+        //   },
+        //   {
+        //     icon: "CpuIcon",
+        //     pageName: "SuiviIndicateurs",
+        //     title: "Suivi Indicateurs",
+        //   },
+        // ],
       },
 
       {
@@ -146,6 +136,26 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "BarChart2Icon",
             pageName: "optionReponse",
             title: "Option de réponse",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "UniteDeMesure",
+            title: "Unité de Mesure",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "KeyValue",
+            title: "Clé Valeur Indicateur",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "CategoriesIndicateurs",
+            title: "Catégories d'indicateurs",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "Sites",
+            title: "Sites",
           },
         ],
       },

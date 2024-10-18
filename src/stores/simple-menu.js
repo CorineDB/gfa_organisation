@@ -15,6 +15,11 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
         subMenu: [
           {
             icon: "FolderIcon",
+            pageName: "projets",
+            title: "Projets",
+          },
+          {
+            icon: "FolderIcon",
             pageName: "dashboard_projets_composantes_globale",
             title: "OutComes",
           },
@@ -46,10 +51,9 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
       //   pageName: "pta",
       //   title: "PTAB",
       // },
-
       {
         icon: "BarChart2Icon",
-        pageName: "indicateurs",
+        pageName: "indicateursDeGouvernance",
         title: "Indicateurs de gouvernance",
       },
       {
@@ -64,43 +68,74 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
           },
           {
             icon: "GlobeIcon",
-            pageName: "Gouvernance",
-            title: "Gouvernance",
+            pageName: "PrincipeGouvernance",
+            title: "Principes de Gouvernance",
           },
           {
             icon: "GlobeIcon",
-            pageName: "Principes",
-            title: "Principes",
+            pageName: "critereGouvernance",
+            title: "Criteres de Gouvernance",
           },
           {
-            icon: "FolderKanbanIcon",
-            pageName: "Programmation_enquete",
-            title: "Programmation d'enquête",
+            icon: "SettingsIcon",
+            pageName: "ToolsFactuel",
+            title: "Formulaire Factuel",
+          },
+
+          {
+            icon: "SettingsIcon",
+            pageName: "ToolsPerception",
+            title: "Formulaire de Perception",
           },
         ],
       },
-
       {
-        icon: "SettingsIcon",
-        pageName: "ToolsFactuel",
-        title: "Formulaire Factuel",
+        icon: "BarChart2Icon",
+        pageName: "Programmation_enquete",
+        title: " Enquête & résulats",
       },
-
+      // {
+      //   icon: "FileIcon",
+      //   pageName: "FicheSynthese",
+      //   title: "Fiche de Synthèse",
+      // },
       {
-        icon: "SettingsIcon",
-        pageName: "ToolsPerception",
-        title: "Formulaire de Perception",
-      },
-      {
-        icon: "FileIcon",
-        pageName: "FicheSynthese",
-        title: "Fiche de Synthèse",
+        icon: "BarChart2Icon",
+        pageName: "EnqueteIndividuel",
+        title: "Enquête individuelle",
       },
 
       {
         icon: "UsersIcon",
         pageName: "Utilisateur",
         title: "Utilisateurs",
+      },
+      {
+        icon: "SettingsIcon",
+        pageName: "setting",
+        title: "Paramètres",
+        subMenu: [
+          {
+            icon: "BarChart2Icon",
+            pageName: "optionReponse",
+            title: "Option de réponse",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "UniteDeMesure",
+            title: "Unité de Mesure",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "KeyValue",
+            title: "Clé Valeur Indicateur",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "CategoriesIndicateurs",
+            title: "Catégories d'indicateurs",
+          },
+        ],
       },
     ],
   }),
