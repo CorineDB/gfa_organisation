@@ -1,4 +1,5 @@
 import ApiService from "@/services/configs/api.service";
+import { numeric } from "@vuelidate/validators";
 
 const FormulaireFactuel = {
   query(type, params) {
@@ -7,7 +8,7 @@ const FormulaireFactuel = {
     });
   },
 
-  getDataFormFactuel(enqueteDeCollecteId = null, organisationId = "") {
+  getDataFormFactuel(enqueteDeCollecteId = null, organisationId = null) {
     return ApiService.get(`gfa/enquetes-de-collecte/${enqueteDeCollecteId}/formulaire-factuel/${organisationId}`);
   },
   getDataFormPerception(enqueteDeCollecteId = null, organisationId = null) {

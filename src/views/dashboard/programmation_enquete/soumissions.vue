@@ -77,7 +77,7 @@ const initTabulator = () => {
             return button;
           };
 
-          if (cell.getData().levelOfSubmission < 100) {
+          if (cell.getData().levelOfSubmission < 50) {
             const modifyButton = createButton("Continuer", "btn btn-primary", () => {
               handleEdit(cell.getData());
             });

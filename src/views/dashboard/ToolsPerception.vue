@@ -26,7 +26,7 @@ const isLoading = ref(false);
 const isLoadingDataFactuel = ref(true);
 const currentPage = ref(0);
 const nomProgram = ref("");
-const idEnquete = "LRDEO2bqER7dDVPrLzvGAjgkKZwp1x5JLyXmloq2480QOnJbYe96MBa3n0d9mQ1o";
+const idEnquete = "LrDVRGx0Gmqz79w1j3M2AlBbr6apLE5aKyK8XvDeOJYVZPo4dQgkRnx0mjpzOB7k";
 
 const getDataFormFactuel = async () => {
   await FormulaireFactuel.getDataFormPerception()
@@ -102,7 +102,7 @@ const initializeFormData = () => {
     critere.indicateurs_de_gouvernance.map((indicateur) => {
       formData[indicateur.id] = {
         selectedOption: null,
-        commentaire: " ",
+        commentaire: "Commentaire",
       };
     })
   );
@@ -193,7 +193,7 @@ onMounted(async () => {
         <VButton label="Soumettre" class="px-8 py-3 w-max" :loading="isLoading" @click="submitData" />
       </div>
       <div class="flex justify-center gap-3 my-8">
-        <button v-for="(item, index) in formDataPerception" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
+        <button v-for="(item, index) in filterFormDataPerception" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
       </div>
     </div>
     <LoaderSnipper v-else />

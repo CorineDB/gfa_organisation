@@ -1,38 +1,38 @@
 <template>
   <div class="flex items-center mt-4">
-    <h2 class="text-lg font-medium mr-5 whitespace-nowrap">Filtre :</h2>
-    <div class="w-full flex items-center gap-2">
-      <Dropdown class="md:ml-auto md:mt-0 w-full">
-        <DropdownToggle class="btn btn-outline-secondary font-normal w-full text-left">
+    <h2 class="mr-5 text-lg font-medium whitespace-nowrap">Filtre :</h2>
+    <div class="flex items-center w-full gap-2">
+      <Dropdown class="w-full md:ml-auto md:mt-0">
+        <DropdownToggle class="w-full font-normal text-left btn btn-outline-secondary">
           {{ selectedIndicateur.name }}
           <ChevronDownIcon class="w-4 h-4 ml-2" />
         </DropdownToggle>
         <DropdownMenu class="w-40">
-          <DropdownContent class="overflow-y-auto h-32">
+          <DropdownContent class="h-32 overflow-y-auto">
             <DropdownItem v-for="(indicateurOfCampagne, index) in indicateurOfCampagnes" :key="index" @click="choixIndicateur(indicateurOfCampagne)"> {{ indicateurOfCampagne.nom }}</DropdownItem>
           </DropdownContent>
         </DropdownMenu>
       </Dropdown>
 
-      <Dropdown class="md:ml-auto md:mt-0 w-full">
-        <DropdownToggle class="btn btn-outline-secondary font-normal w-full text-left">
+      <Dropdown class="w-full md:ml-auto md:mt-0">
+        <DropdownToggle class="w-full font-normal text-left btn btn-outline-secondary">
           {{ selectedIndicateur.name }}
           <ChevronDownIcon class="w-4 h-4 ml-2" />
         </DropdownToggle>
         <DropdownMenu class="w-40">
-          <DropdownContent class="overflow-y-auto h-32">
+          <DropdownContent class="h-32 overflow-y-auto">
             <DropdownItem v-for="(indicateurOfCampagne, index) in indicateurOfCampagnes" :key="index" @click="choixIndicateur(indicateurOfCampagne)"> {{ indicateurOfCampagne.nom }}</DropdownItem>
           </DropdownContent>
         </DropdownMenu>
       </Dropdown>
 
-      <Dropdown class="md:ml-auto md:mt-0 w-full">
-        <DropdownToggle class="btn btn-outline-secondary font-normal w-full text-left">
+      <Dropdown class="w-full md:ml-auto md:mt-0">
+        <DropdownToggle class="w-full font-normal text-left btn btn-outline-secondary">
           {{ selectedIndicateur.name }}
           <ChevronDownIcon class="w-4 h-4 ml-2" />
         </DropdownToggle>
         <DropdownMenu class="w-40">
-          <DropdownContent class="overflow-y-auto h-32">
+          <DropdownContent class="h-32 overflow-y-auto">
             <DropdownItem v-for="(indicateurOfCampagne, index) in indicateurOfCampagnes" :key="index" @click="choixIndicateur(indicateurOfCampagne)"> {{ indicateurOfCampagne.nom }}</DropdownItem>
           </DropdownContent>
         </DropdownMenu>
@@ -45,35 +45,35 @@
       <div class="grid grid-cols-12 gap-6">
         <!-- BEGIN: General Report -->
         <div class="col-span-12 mt-8">
-          <div class="intro-y flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Principe de Perception</h2>
-            <a href="" class="ml-auto flex items-center text-primary"> <RefreshCcwIcon class="w-4 h-4 mr-3" /> Actualiser </a>
+          <div class="flex items-center h-10 intro-y">
+            <h2 class="mr-5 text-lg font-medium truncate">Principe de Perception</h2>
+            <a href="" class="flex items-center ml-auto text-primary"> <RefreshCcwIcon class="w-4 h-4 mr-3" /> Actualiser </a>
           </div>
-          <div class="grid grid-cols-12 lg:grid-cols-10 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+          <div class="grid grid-cols-12 gap-6 mt-5 lg:grid-cols-10">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
-                    <div class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="_report-box__indicator bg-green-600 cursor-pointer rounded-full text-white animate-pulse" content="100%">
+                    <div class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="text-white bg-green-600 rounded-full cursor-pointer _report-box__indicator animate-pulse" content="100%">
                         <CircleIcon class="w-6 h-6" />
                       </Tippy>
                     </div>
                   </div>
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable && statistique.mediocre && statistique.excellent">{{ statistique.passable[0] + statistique.mediocre[0] + statistique.excellent[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.passable && statistique.mediocre && statistique.excellent">{{ statistique.passable[0] + statistique.mediocre[0] + statistique.excellent[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
+                    <div class="mt-1 text-base text-slate-500">TOTAL FICHE</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
-                    <div v-if="statistique.excellent" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-red-600 cursor-pointer" content="">
+                    <div v-if="statistique.excellent" class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="bg-red-600 cursor-pointer report-box__indicator" content="">
                         {{ statistique.excellent[1] }}
                         <!-- <ChevronDownIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
@@ -81,20 +81,20 @@
                     <div class="w-full bg-red-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.excellent">{{ statistique.excellent[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.excellent">{{ statistique.excellent[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">Non Observé</div>
+                    <div class="mt-1 text-base text-slate-500">Non Observé</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
-                    <div v-if="statistique.passable" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-red-800 cursor-pointer" content="">
+                    <div v-if="statistique.passable" class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="bg-red-800 cursor-pointer report-box__indicator" content="">
                         {{ statistique.passable[1] }}
                         <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
@@ -103,20 +103,20 @@
                     <div class="w-full bg-red-800 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable">{{ statistique.passable[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.passable">{{ statistique.passable[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
+                    <div class="mt-1 text-base text-slate-500">Partiellement Observé</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
-                    <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-yellow-500 cursor-pointer" content="">
+                    <div v-if="statistique.mediocre" class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="bg-yellow-500 cursor-pointer report-box__indicator" content="">
                         {{ statistique.mediocre[1] }}
                         <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
@@ -126,20 +126,20 @@
                   </div>
 
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre">{{ statistique.mediocre[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.mediocre">{{ statistique.mediocre[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
+                    <div class="mt-1 text-base text-slate-500">Moyennement Observé</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
-                    <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-green-600 cursor-pointer" content="">
+                    <div v-if="statistique.mediocre" class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="bg-green-600 cursor-pointer report-box__indicator" content="">
                         {{ statistique.mediocre[1] }}
                         <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
@@ -148,9 +148,9 @@
                   </div>
 
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre">{{ statistique.mediocre[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.mediocre">{{ statistique.mediocre[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">Observé</div>
+                    <div class="mt-1 text-base text-slate-500">Observé</div>
                   </div>
                 </div>
               </div>
@@ -161,35 +161,35 @@
 
         <!-- BEGIN: General Report -->
         <div class="col-span-12 mt-8">
-          <div class="intro-y flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Principe Factuel</h2>
-            <a href="" class="ml-auto flex items-center text-primary"> <RefreshCcwIcon class="w-4 h-4 mr-3" /> Actualiser </a>
+          <div class="flex items-center h-10 intro-y">
+            <h2 class="mr-5 text-lg font-medium truncate">Principe Factuel</h2>
+            <a href="" class="flex items-center ml-auto text-primary"> <RefreshCcwIcon class="w-4 h-4 mr-3" /> Actualiser </a>
           </div>
-          <div class="grid grid-cols-12 lg:grid-cols-10 gap-6 mt-5">
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+          <div class="grid grid-cols-12 gap-6 mt-5 lg:grid-cols-10">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
-                    <div class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="_report-box__indicator bg-green-600 cursor-pointer rounded-full text-white animate-pulse" content="100%">
+                    <div class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="text-white bg-green-600 rounded-full cursor-pointer _report-box__indicator animate-pulse" content="100%">
                         <CircleIcon class="w-6 h-6" />
                       </Tippy>
                     </div>
                   </div>
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable && statistique.mediocre && statistique.excellent">{{ statistique.passable[0] + statistique.mediocre[0] + statistique.excellent[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.passable && statistique.mediocre && statistique.excellent">{{ statistique.passable[0] + statistique.mediocre[0] + statistique.excellent[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">TOTAL FICHE</div>
+                    <div class="mt-1 text-base text-slate-500">TOTAL FICHE</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
-                    <div v-if="statistique.excellent" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-red-600 cursor-pointer" content="">
+                    <div v-if="statistique.excellent" class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="bg-red-600 cursor-pointer report-box__indicator" content="">
                         {{ statistique.excellent[1] }}
                         <!-- <ChevronDownIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
@@ -197,20 +197,20 @@
                     <div class="w-full bg-red-600 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.excellent">{{ statistique.excellent[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.excellent">{{ statistique.excellent[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">Non Observé</div>
+                    <div class="mt-1 text-base text-slate-500">Non Observé</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
-                    <div v-if="statistique.passable" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-red-800 cursor-pointer" content="">
+                    <div v-if="statistique.passable" class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="bg-red-800 cursor-pointer report-box__indicator" content="">
                         {{ statistique.passable[1] }}
                         <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
@@ -219,19 +219,19 @@
                     <div class="w-full bg-red-800 absolute top-0 left-0 p-4 rounded-t-[6px]"></div>
                   </div>
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.passable">{{ statistique.passable[0] }}</div>
-                    <div class="text-base text-slate-500 mt-1">Partiellement Observé</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.passable">{{ statistique.passable[0] }}</div>
+                    <div class="mt-1 text-base text-slate-500">Partiellement Observé</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
                     <!-- <UserIcon class="report-box__icon text-success" /> -->
-                    <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-yellow-500 cursor-pointer" content="">
+                    <div v-if="statistique.mediocre" class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="bg-yellow-500 cursor-pointer report-box__indicator" content="">
                         {{ statistique.mediocre[1] }}
                         <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
@@ -241,19 +241,19 @@
                   </div>
 
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre">{{ statistique.mediocre[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.mediocre">{{ statistique.mediocre[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">Moyennement Observé</div>
+                    <div class="mt-1 text-base text-slate-500">Moyennement Observé</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-span-12 sm:col-span-4 lg:col-span-2 intro-y relative">
+            <div class="relative col-span-12 sm:col-span-4 lg:col-span-2 intro-y">
               <div class="report-box zoom-in">
-                <div class="box p-5 min-card-height">
+                <div class="p-5 box min-card-height">
                   <div class="flex">
-                    <div v-if="statistique.mediocre" class="ml-auto z-10 font-medium">
-                      <Tippy tag="div" class="report-box__indicator bg-green-600 cursor-pointer" content="">
+                    <div v-if="statistique.mediocre" class="z-10 ml-auto font-medium">
+                      <Tippy tag="div" class="bg-green-600 cursor-pointer report-box__indicator" content="">
                         {{ statistique.mediocre[1] }}
                         <!-- <ChevronUpIcon class="w-4 h-4 ml-0.5" /> -->
                       </Tippy>
@@ -262,9 +262,9 @@
                   </div>
 
                   <div class="min-h-[62px] flex flex-col items-start justify-end">
-                    <div class="text-3xl font-medium leading-8 mt-6" v-if="statistique.mediocre">{{ statistique.mediocre[0] }}</div>
+                    <div class="mt-6 text-3xl font-medium leading-8" v-if="statistique.mediocre">{{ statistique.mediocre[0] }}</div>
 
-                    <div class="text-base text-slate-500 mt-1">Observé</div>
+                    <div class="mt-1 text-base text-slate-500">Observé</div>
                   </div>
                 </div>
               </div>
@@ -277,30 +277,30 @@
 
         <!-- choix export excel -->
         <Modal :show="voirOptionExcel" @hidden="voirOptionExcel = false">
-          <a @click="voirOptionExcel = false" class="absolute right-0 top-0 mt-3 mr-3" href="javascript:;">
+          <a @click="voirOptionExcel = false" class="absolute top-0 right-0 mt-3 mr-3" href="javascript:;">
             <XIcon class="w-8 h-8 text-slate-400" />
           </a>
           <ModalBody class="p-10 text-center">
             <p class="my-2 text-lg">Choisir la donnée à exporter</p>
             <div class="flex justify-center space-x-1">
-              <button @click="exportToExcel('Campagne')" class="btn btn-primary mr-1">Campagne</button>
+              <button @click="exportToExcel('Campagne')" class="mr-1 btn btn-primary">Campagne</button>
               <!-- END: Hide Modal Toggle -->
               <!-- BEGIN: Toggle Modal Toggle -->
-              <button @click="exportToExcel('Indicateur')" class="btn btn-primary mr-1">Indicateur</button>
+              <button @click="exportToExcel('Indicateur')" class="mr-1 btn btn-primary">Indicateur</button>
               <!-- END: Toggle Modal Toggle -->
-              <button @click="exportToExcel('Site')" class="btn btn-primary mr-1">Site</button>
+              <button @click="exportToExcel('Site')" class="mr-1 btn btn-primary">Site</button>
             </div>
             <!-- BEGIN: Hide Modal Toggle -->
           </ModalBody>
         </Modal>
 
-        <div class="col-span-12 lg:col-span-6 mt-8">
-          <div class="intro-y block sm:flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Outil de Perception</h2>
-            <div class="flex justify-center items-center">
+        <div class="col-span-12 mt-8 lg:col-span-6">
+          <div class="items-center block h-10 intro-y sm:flex">
+            <h2 class="mr-5 text-lg font-medium truncate">Outil de Perception</h2>
+            <div class="flex items-center justify-center">
               <input class="mr-2" @click="isDisabled = !isDisabled" type="checkbox" name="multidate" id="multidate" />
-              <div class="sm:ml-auto mt-3 sm:mt-0 relative text-slate-500">
-                <CalendarIcon class="w-4 h-4 z-10 absolute my-auto inset-y-0 ml-3 left-0" />
+              <div class="relative mt-3 sm:ml-auto sm:mt-0 text-slate-500">
+                <CalendarIcon class="absolute inset-y-0 left-0 z-10 w-4 h-4 my-auto ml-3" />
                 <Litepicker
                   :disabled="isDisabled"
                   v-model="salesReportFilter"
@@ -318,25 +318,25 @@
                       years: true,
                     },
                   }"
-                  class="form-control sm:w-56 box pl-10"
+                  class="pl-10 form-control sm:w-56 box"
                 />
               </div>
             </div>
           </div>
-          <div class="intro-y box p-5 mt-12 sm:mt-5">
+          <div class="p-5 mt-12 intro-y box sm:mt-5">
             <div class="flex justify-between space-x-1">
               <!-- <div class="flex flex-col space-y-1 ">
                 <div class="flex">
                   <span class="w-20">Code QR /C</span>
                   <span
-                    class="text-xs px-1 rounded-full bg-green-500 text-white mr-1 flex items-center justify-center w-4 h-4 cursor-pointer">
+                    class="flex items-center justify-center w-4 h-4 px-1 mr-1 text-xs text-white bg-green-500 rounded-full cursor-pointer">
                     {{ Qr }}</span>
 
                 </div>
                 <div class="flex">
                   <span class="w-20">Kit BSD /C</span>
                   <span
-                    class="text-xs px-1 rounded-full flex items-center justify-center w-4 h-4 cursor-pointer bg-orange-300 text-white mr-1">
+                    class="flex items-center justify-center w-4 h-4 px-1 mr-1 text-xs text-white bg-orange-300 rounded-full cursor-pointer">
                     {{ kits }}</span>
 
                 </div>
@@ -344,7 +344,7 @@
                   <span class="w-20">Tablette /C</span>
 
                   <span
-                    class="text-xs px-1 rounded-full bg-danger text-white mr-1 flex items-center justify-center w-4 h-4 cursor-pointer">
+                    class="flex items-center justify-center w-4 h-4 px-1 mr-1 text-xs text-white rounded-full cursor-pointer bg-danger">
                     {{ Tablette }}</span>
 
                 </div>
@@ -352,7 +352,7 @@
               <!-- bouton exporter -->
               <div>
                 <Dropdown :show="closeExport">
-                  <DropdownToggle class="btn btn-primary flex justify-evenly items-center space-x-1">
+                  <DropdownToggle class="flex items-center space-x-1 btn btn-primary justify-evenly">
                     <svg class="mr-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1); transform: ; msfilter: ">
                       <path d="M11 16h2V7h3l-4-5-4 5h3z"></path>
                       <path d="M5 22h14c1.103 0 2-.897 2-2v-9c0-1.103-.897-2-2-2h-4v2h4v9H5v-9h4V9H5c-1.103 0-2 .897-2 2v9c0 1.103.897 2 2 2z"></path>
@@ -388,26 +388,26 @@
             </div>
 
             <div class="flex flex-col">
-              <div class="flex items-center flex-wrap gap-2 mt-2">
+              <div class="flex flex-wrap items-center gap-2 mt-2">
                 <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="btn btn-outline-secondary font-normal">
+                  <DropdownToggle class="font-normal btn btn-outline-secondary">
                     {{ selectedIndicateur.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32">
+                    <DropdownContent class="h-32 overflow-y-auto">
                       <DropdownItem v-for="(indicateurOfCampagne, index) in indicateurOfCampagnes" :key="index" @click="choixIndicateur(indicateurOfCampagne)"> {{ indicateurOfCampagne.nom }}</DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
 
                 <!-- <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="btn btn-outline-secondary font-normal">
+                  <DropdownToggle class="font-normal btn btn-outline-secondary">
                     {{ selectedType.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32">
+                    <DropdownContent class="h-32 overflow-y-auto">
                       <DropdownItem v-for="(type, index ) in types" :key="index" @click="choixtype(type)">{{
                         type.nom }}</DropdownItem>
                     </DropdownContent>
@@ -415,36 +415,36 @@
                 </Dropdown> -->
 
                 <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
+                  <DropdownToggle class="font-normal btn btn-outline-secondary" v-if="campagnes">
                     {{ selectedSite.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32">
+                    <DropdownContent class="h-32 overflow-y-auto">
                       <DropdownItem v-for="(siteOfCampagne, index) in siteOfCampagnes" :key="index" @click="choixSite(siteOfCampagne)">{{ siteOfCampagne.nom }}</DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
 
                 <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="truncate btn btn-outline-secondary font-normal">
+                  <DropdownToggle class="font-normal truncate btn btn-outline-secondary">
                     {{ selectedCampagne.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32">
+                    <DropdownContent class="h-32 overflow-y-auto">
                       <DropdownItem class="truncate" v-for="(campagne, index) in campagnes" :key="index" @click="choixCampagne(campagne)"> {{ campagne.nom }}</DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
 
                 <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
+                  <DropdownToggle class="font-normal btn btn-outline-secondary" v-if="campagnes">
                     {{ selectedYear }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32">
+                    <DropdownContent class="h-32 overflow-y-auto">
                       <DropdownItem v-for="(year, index) in years" :key="index" @click="choixAnnee(year)">{{ year }}</DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
@@ -452,7 +452,7 @@
 
                 <!-- <div class="flex">
                   <div
-                    class="z-30 rounded-l w-12 flex items-center justify-center bg-gray-100 border text-gray-600 dark:bg-dark-1 dark:border-dark-4 -mr-1 p-1">
+                    class="z-30 flex items-center justify-center w-12 p-1 -mr-1 text-gray-600 bg-gray-100 border rounded-l dark:bg-dark-1 dark:border-dark-4">
                     Année
                   </div>
                   <TomSelect v-model="selectedYear" :options="{
@@ -463,7 +463,7 @@
 
                 </div> -->
               </div>
-              <p v-if="messageForUser" class="border text-right text-red-500 inline p-1 w-auto">Veuillez choisir une campagne</p>
+              <p v-if="messageForUser" class="inline w-auto p-1 text-right text-red-500 border">Veuillez choisir une campagne</p>
             </div>
             <div class="report-chart">
               <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" />
@@ -472,13 +472,13 @@
         </div>
 
         <!-- graph 2 -->
-        <div class="col-span-12 lg:col-span-6 mt-8">
-          <div class="intro-y block sm:flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Outil Factuel</h2>
-            <div class="flex justify-center items-center">
+        <div class="col-span-12 mt-8 lg:col-span-6">
+          <div class="items-center block h-10 intro-y sm:flex">
+            <h2 class="mr-5 text-lg font-medium truncate">Outil Factuel</h2>
+            <div class="flex items-center justify-center">
               <input class="mr-2" @click="isDisabled = !isDisabled" type="checkbox" name="multidate" id="multidate" />
-              <div class="sm:ml-auto mt-3 sm:mt-0 relative text-slate-500">
-                <CalendarIcon class="w-4 h-4 z-10 absolute my-auto inset-y-0 ml-3 left-0" />
+              <div class="relative mt-3 sm:ml-auto sm:mt-0 text-slate-500">
+                <CalendarIcon class="absolute inset-y-0 left-0 z-10 w-4 h-4 my-auto ml-3" />
                 <Litepicker
                   :disabled="isDisabled"
                   v-model="salesReportFilter"
@@ -496,25 +496,25 @@
                       years: true,
                     },
                   }"
-                  class="form-control sm:w-56 box pl-10"
+                  class="pl-10 form-control sm:w-56 box"
                 />
               </div>
             </div>
           </div>
-          <div class="intro-y box p-5 mt-12 sm:mt-5">
+          <div class="p-5 mt-12 intro-y box sm:mt-5">
             <div class="flex justify-between space-x-1">
               <!-- <div class="flex flex-col space-y-1 ">
                 <div class="flex">
                   <span class="w-20">Code QR /C</span>
                   <span
-                    class="text-xs px-1 rounded-full bg-green-500 text-white mr-1 flex items-center justify-center w-4 h-4 cursor-pointer">
+                    class="flex items-center justify-center w-4 h-4 px-1 mr-1 text-xs text-white bg-green-500 rounded-full cursor-pointer">
                     {{ Qr }}</span>
 
                 </div>
                 <div class="flex">
                   <span class="w-20">Kit BSD /C</span>
                   <span
-                    class="text-xs px-1 rounded-full flex items-center justify-center w-4 h-4 cursor-pointer bg-orange-300 text-white mr-1">
+                    class="flex items-center justify-center w-4 h-4 px-1 mr-1 text-xs text-white bg-orange-300 rounded-full cursor-pointer">
                     {{ kits }}</span>
 
                 </div>
@@ -522,7 +522,7 @@
                   <span class="w-20">Tablette /C</span>
 
                   <span
-                    class="text-xs px-1 rounded-full bg-danger text-white mr-1 flex items-center justify-center w-4 h-4 cursor-pointer">
+                    class="flex items-center justify-center w-4 h-4 px-1 mr-1 text-xs text-white rounded-full cursor-pointer bg-danger">
                     {{ Tablette }}</span>
 
                 </div>
@@ -530,7 +530,7 @@
               <!-- bouton exporter -->
               <div>
                 <Dropdown :show="closeExport">
-                  <DropdownToggle class="btn btn-primary flex justify-evenly items-center space-x-1">
+                  <DropdownToggle class="flex items-center space-x-1 btn btn-primary justify-evenly">
                     <svg class="mr-1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(255, 255, 255, 1); transform: ; msfilter: ">
                       <path d="M11 16h2V7h3l-4-5-4 5h3z"></path>
                       <path d="M5 22h14c1.103 0 2-.897 2-2v-9c0-1.103-.897-2-2-2h-4v2h4v9H5v-9h4V9H5c-1.103 0-2 .897-2 2v9c0 1.103.897 2 2 2z"></path>
@@ -566,26 +566,26 @@
             </div>
 
             <div class="flex flex-col">
-              <div class="flex items-center flex-wrap gap-2 mt-2">
+              <div class="flex flex-wrap items-center gap-2 mt-2">
                 <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="btn btn-outline-secondary font-normal">
+                  <DropdownToggle class="font-normal btn btn-outline-secondary">
                     {{ selectedIndicateur.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32">
+                    <DropdownContent class="h-32 overflow-y-auto">
                       <DropdownItem v-for="(indicateurOfCampagne, index) in indicateurOfCampagnes" :key="index" @click="choixIndicateur(indicateurOfCampagne)"> {{ indicateurOfCampagne.nom }}</DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
 
                 <!-- <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="btn btn-outline-secondary font-normal">
+                  <DropdownToggle class="font-normal btn btn-outline-secondary">
                     {{ selectedType.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32">
+                    <DropdownContent class="h-32 overflow-y-auto">
                       <DropdownItem v-for="(type, index ) in types" :key="index" @click="choixtype(type)">{{
                         type.nom }}</DropdownItem>
                     </DropdownContent>
@@ -593,37 +593,37 @@
                 </Dropdown> -->
 
                 <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
+                  <DropdownToggle class="font-normal btn btn-outline-secondary" v-if="campagnes">
                     {{ selectedSite.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-auto pb-1">
+                    <DropdownContent class="h-auto pb-1 overflow-y-auto">
                       <DropdownItem v-for="(siteOfCampagne, index) in siteOfCampagnes" :key="index" @click="choixSite(siteOfCampagne)">{{ siteOfCampagne.nom }}</DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
 
                 <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="truncate btn btn-outline-secondary font-normal">
+                  <DropdownToggle class="font-normal truncate btn btn-outline-secondary">
                     {{ selectedCampagne.name }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32">
+                    <DropdownContent class="h-32 overflow-y-auto">
                       <DropdownItem class="truncate" v-for="(campagne, index) in campagnes" :key="index" @click="choixCampagne(campagne)"> {{ campagne.nom }}</DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
 
                 <Dropdown class="md:ml-auto md:mt-0">
-                  <DropdownToggle class="btn btn-outline-secondary font-normal" v-if="campagnes">
+                  <DropdownToggle class="font-normal btn btn-outline-secondary" v-if="campagnes">
                     {{ selectedYear }}
                     <ChevronDownIcon class="w-4 h-4 ml-2" />
                   </DropdownToggle>
 
                   <DropdownMenu class="w-40">
-                    <DropdownContent class="overflow-y-auto h-32 pb-1">
+                    <DropdownContent class="h-32 pb-1 overflow-y-auto">
                       <DropdownItem v-for="(year, index) in years" :key="index" @click="choixAnnee(year)">{{ year }}</DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
@@ -631,7 +631,7 @@
 
                 <!-- <div class="flex">
                   <div
-                    class="z-30 rounded-l w-12 flex items-center justify-center bg-gray-100 border text-gray-600 dark:bg-dark-1 dark:border-dark-4 -mr-1 p-1">
+                    class="z-30 flex items-center justify-center w-12 p-1 -mr-1 text-gray-600 bg-gray-100 border rounded-l dark:bg-dark-1 dark:border-dark-4">
                     Année
                   </div>
                   <TomSelect v-model="selectedYear" :options="{
@@ -642,7 +642,7 @@
 
                 </div> -->
               </div>
-              <p v-if="messageForUser" class="border text-right text-red-500 inline p-1 w-auto">Veuillez choisir une campagne</p>
+              <p v-if="messageForUser" class="inline w-auto p-1 text-right text-red-500 border">Veuillez choisir une campagne</p>
             </div>
             <div class="report-chart">
               <!-- <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" /> -->
@@ -652,61 +652,61 @@
         </div>
 
         <!-- BEGIN: Weekly Top Seller -->
-        <!-- <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
-          <div class="intro-y flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Résolution</h2>
-            <a href="http://localhost:3000/dashboard/resolution" class="ml-auto text-primary truncate">Voir plus</a>
+        <!-- <div class="col-span-12 mt-8 sm:col-span-6 lg:col-span-3">
+          <div class="flex items-center h-10 intro-y">
+            <h2 class="mr-5 text-lg font-medium truncate">Résolution</h2>
+            <a href="http://localhost:3000/dashboard/resolution" class="ml-auto truncate text-primary">Voir plus</a>
 
           </div>
-          <div class="intro-y box p-5 mt-5">
+          <div class="p-5 mt-5 intro-y box">
             <div class="mt-3">
               <ReportPieChart :chartData="chartData" :height="213" />
             </div>
-            <div class="w-52 sm:w-auto mx-auto mt-8">
+            <div class="mx-auto mt-8 w-52 sm:w-auto">
               <div class="flex items-center">
-                <div class="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                <div class="w-2 h-2 mr-3 rounded-full bg-primary"></div>
                 <span class="truncate">Terminé</span>
-                <span class="font-medium ml-auto"> {{ resolutionTerminer }}%</span>
+                <span class="ml-auto font-medium"> {{ resolutionTerminer }}%</span>
               </div>
               <div class="flex items-center mt-4">
-                <div class="w-2 h-2 bg-yellow-500 rounded-full mr-3"></div>
+                <div class="w-2 h-2 mr-3 bg-yellow-500 rounded-full"></div>
                 <span class="truncate">En cour</span>
-                <span class="font-medium ml-auto">{{ resolutionEncour }}%</span>
+                <span class="ml-auto font-medium">{{ resolutionEncour }}%</span>
               </div>
               <div class="flex items-center mt-4">
-                <div class="w-2 h-2 bg-red-500 rounded-full mr-3"></div>
+                <div class="w-2 h-2 mr-3 bg-red-500 rounded-full"></div>
                 <span class="truncate">En retard </span>
-                <span class="font-medium ml-auto">{{ resolutionEnretard }}%</span>
+                <span class="ml-auto font-medium">{{ resolutionEnretard }}%</span>
               </div>
             </div>
           </div>
         </div> -->
         <!-- END: Weekly Top Seller -->
         <!-- BEGIN: Sales Report -->
-        <!-- <div class="col-span-12 sm:col-span-6 lg:col-span-3 mt-8">
-          <div class="intro-y flex items-center h-10">
-            <h2 class="text-lg font-medium truncate mr-5">Statistique journalier</h2>
-            <a href="" class="ml-auto text-primary truncate">Voir plus</a>
+        <!-- <div class="col-span-12 mt-8 sm:col-span-6 lg:col-span-3">
+          <div class="flex items-center h-10 intro-y">
+            <h2 class="mr-5 text-lg font-medium truncate">Statistique journalier</h2>
+            <a href="" class="ml-auto truncate text-primary">Voir plus</a>
           </div>
-          <div class="intro-y box p-5 mt-5">
+          <div class="p-5 mt-5 intro-y box">
             <div class="mt-3">
               <ReportDonutChart :chartData="dayStatC" :height="213" />
             </div>
-            <div class="w-52 sm:w-auto mx-auto mt-8">
+            <div class="mx-auto mt-8 w-52 sm:w-auto">
               <div class="flex items-center">
-                <div class="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                <div class="w-2 h-2 mr-3 rounded-full bg-primary"></div>
                 <span class="truncate">bon</span>
-                <span class="font-medium ml-auto">{{ jexcellent }}%</span>
+                <span class="ml-auto font-medium">{{ jexcellent }}%</span>
               </div>
               <div class="flex items-center mt-4">
-                <div class="w-2 h-2 bg-pending rounded-full mr-3"></div>
+                <div class="w-2 h-2 mr-3 rounded-full bg-pending"></div>
                 <span class="truncate">Passable</span>
-                <span class="font-medium ml-auto">{{ jpassable }}%</span>
+                <span class="ml-auto font-medium">{{ jpassable }}%</span>
               </div>
               <div class="flex items-center mt-4">
-                <div class="w-2 h-2 bg-danger rounded-full mr-3"></div>
+                <div class="w-2 h-2 mr-3 rounded-full bg-danger"></div>
                 <span class="truncate">mediocre</span>
-                <span class="font-medium ml-auto">{{ jmediocre }}%</span>
+                <span class="ml-auto font-medium">{{ jmediocre }}%</span>
               </div>
             </div>
           </div>
@@ -714,11 +714,11 @@
         <!-- END: Sales Report -->
 
         <!-- BEGIN: General Report -->
-        <div class="col-span-12 grid grid-cols-12 gap-6 mt-8">
+        <div class="grid grid-cols-12 col-span-12 gap-6 mt-8">
           <div class="col-span-12 sm:col-span-6 2xl:col-span-3 intro-y">
-            <div class="box p-5 zoom-in">
+            <div class="p-5 box zoom-in">
               <div class="flex items-center">
-                <div class="w-1/2 text-center flex-none">
+                <div class="flex-none w-1/2 text-center">
                   <div class="text-lg font-medium">STATS/J/ Tous campagnes</div>
                   <div class="text-slate-500">KIT BSD</div>
                 </div>
@@ -758,9 +758,9 @@
 
                     </div>
                   </div> -->
-                  <div class="flex-none ml-auto relative">
+                  <div class="relative flex-none ml-auto">
                     <ReportDonutChart :chartData="dayStatAllKit" :width="90" :height="90" />
-                    <div v-if="statistique.toutCampagneJExcellentKit" class="font-medium absolute w-full h-full text-green-700 flex items-center justify-center top-0 left-0">{{ statistique.toutCampagneJExcellentKit[1] }} %</div>
+                    <div v-if="statistique.toutCampagneJExcellentKit" class="absolute top-0 left-0 flex items-center justify-center w-full h-full font-medium text-green-700">{{ statistique.toutCampagneJExcellentKit[1] }} %</div>
                     <span v-if="statistique.toutCampagneJExcellentQr" class="p-0.5 tracking-[0.1em] flex items-center justify-center rounded-full shadow-2xl bg-blue-700 text-white mr-1">
                       <span v-if="statistique.toutCampagneJExcellentKit" class="p-0.5 tracking-[0.1em] flex items-center justify-center rounded-full shadow-2xl bg-green-500 text-white mr-1">
                         {{ statistique.toutCampagneJExcellentKit[0] }}
@@ -776,9 +776,9 @@
             </div>
           </div>
           <div class="col-span-12 sm:col-span-6 2xl:col-span-3 intro-y">
-            <div class="box p-5 zoom-in">
+            <div class="p-5 box zoom-in">
               <div class="flex items-center">
-                <div class="w-1/2 text-center flex-none">
+                <div class="flex-none w-1/2 text-center">
                   <div class="text-lg font-medium">STATS/J/ Tous campagnes</div>
                   <div class="text-slate-500">QR code</div>
                 </div>
@@ -819,9 +819,9 @@
 
                     </div>
                   </div> -->
-                  <div class="flex-none ml-auto relative">
+                  <div class="relative flex-none ml-auto">
                     <ReportDonutChart :chartData="dayStatAllQr" :width="90" :height="90" />
-                    <div v-if="statistique.toutCampagneJExcellentQr" class="font-medium absolute w-full h-full text-green-700 flex items-center justify-center top-0 left-0">{{ statistique.toutCampagneJExcellentQr[1] }}%</div>
+                    <div v-if="statistique.toutCampagneJExcellentQr" class="absolute top-0 left-0 flex items-center justify-center w-full h-full font-medium text-green-700">{{ statistique.toutCampagneJExcellentQr[1] }}%</div>
                     <span v-if="statistique.toutCampagneJExcellentQr" class="p-0.5 tracking-[0.1em] flex items-center justify-center rounded-full bg-blue-700 text-white mr-1">
                       <span v-if="statistique.toutCampagneJExcellentQr" class="p-0.5 tracking-[0.1em] flex items-center justify-center rounded-full bg-green-500 text-white mr-1">
                         {{ statistique.toutCampagneJExcellentQr[0] }}
@@ -837,9 +837,9 @@
             </div>
           </div>
           <div class="col-span-12 sm:col-span-6 2xl:col-span-3 intro-y">
-            <div class="box p-5 zoom-in">
+            <div class="p-5 box zoom-in">
               <div class="flex items-center">
-                <div class="w-1/2 text-center flex-none">
+                <div class="flex-none w-1/2 text-center">
                   <div class="text-lg font-medium">STATS/J/ Tous campagnes</div>
                   <div class="text-slate-500">TABLETTE</div>
                 </div>
@@ -888,9 +888,9 @@
 
                     </div>
                   </div> -->
-                  <div class="flex-none ml-auto relative">
+                  <div class="relative flex-none ml-auto">
                     <ReportDonutChart :chartData="dayStatAllTab" :width="90" :height="90" />
-                    <div v-if="statistique.toutCampagneJExcellentTablette" class="font-medium absolute w-full h-full text-green-700 flex items-center justify-center top-0 left-0">{{ statistique.toutCampagneJExcellentTablette[1] }}%</div>
+                    <div v-if="statistique.toutCampagneJExcellentTablette" class="absolute top-0 left-0 flex items-center justify-center w-full h-full font-medium text-green-700">{{ statistique.toutCampagneJExcellentTablette[1] }}%</div>
                     <span v-if="statistique.toutCampagneJExcellentTablette" class="p-0.5 tracking-[0.1em] flex items-center justify-center rounded-full bg-blue-700 text-white mr-1">
                       <span v-if="statistique.toutCampagneJExcellentTablette" class="p-0.5 tracking-[0.1em] flex items-center justify-center rounded-full bg-green-500 text-white mr-1">
                         {{ statistique.toutCampagneJExcellentTablette[0] }}
@@ -906,10 +906,10 @@
             </div>
           </div>
           <div class="col-span-12 sm:col-span-6 2xl:col-span-3 intro-y">
-            <div class="box p-5 zoom-in">
+            <div class="p-5 box zoom-in">
               <div class="flex">
-                <div class="text-lg font-medium truncate mr-3">Trafics de notation</div>
-                <div class="bg-yellow-100 shadow-2xl py-1 px-2 flex items-center rounded-full text-xs dark:bg-darkmode-400 text-slate-500 cursor-pointer ml-auto truncate">180</div>
+                <div class="mr-3 text-lg font-medium truncate">Trafics de notation</div>
+                <div class="flex items-center px-2 py-1 ml-auto text-xs truncate bg-yellow-100 rounded-full shadow-2xl cursor-pointer dark:bg-darkmode-400 text-slate-500">180</div>
               </div>
               <div class="mt-1">
                 <SimpleLineChart1 :height="58" class="-ml-1" />
@@ -1309,12 +1309,12 @@ const nextImportantNotes = () => {
 
 const subscribe = function () {
   var token = "";
-  const getToken = JSON.parse(localStorage.getItem('authenticateUser'));
+  const getToken = JSON.parse(localStorage.getItem("authenticateUser"));
   if (getToken != undefined || getToken != null) {
     token = getToken.token;
   }
 
-  const usersInfo = JSON.parse(localStorage.getItem('authenticateUser'));
+  const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
   var pusher = new Pusher(PUSHER_APP_KEY, {
     authEndpoint: PUSHER_BASE_URL + "/api/broadcasting/auth",
     cluster: PUSHER_APP_CLUSTER,

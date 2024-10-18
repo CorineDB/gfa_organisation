@@ -138,7 +138,7 @@ const initTabulator = () => {
           };
 
           const voirApprecationsButton = createButton("Voir", "btn btn-primary", () => {
-            gotoSoumissions( cell.getData());
+            gotoSoumissions(cell.getData());
           });
 
           const modifyButton = createButton("Modifier", "btn btn-primary", () => {

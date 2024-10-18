@@ -5,18 +5,54 @@ import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { getColorForValue } from "../../utils/findColorIndicator";
 import { useRouter } from "vue-router";
+import ReportBarChart1 from "@/components/report-bar-chart-1/Main.vue";
 import ReportPieChart from "@/components/report-pie-chart/Main.vue";
 
 const router = useRouter();
 const organizationId = ref("R5P1oK0OP6DmWGvB21RNoeb9Xpgdwr7PNQ4zy0LAM8KnVZEJa5xlOjYkeWBv8aJy");
-const enqueteDeCollecteId = ref("RmLpz4vVan0mOqYvjBE8bVZ3DX7or9yB45RxA6Jp4MGkwlPedKL1z2gQe32BXnE1");
+const enqueteDeCollecteId = ref("LrDVRGx0Gmqz79w1j3M2AlBbr6apLE5aKyK8XvDeOJYVZPo4dQgkRnx0mjpzOB7k");
 const selectStructureId = ref("");
 const datasCollection = ref({});
 const datasFactuel = ref([]);
 const datasPerception = ref([]);
 const structures = ref([]);
 const isLoadingData = ref(false);
+const graphDataFac = ref({
+  labels: ["Redevabilité", "Passable", "Assez-Bon", "Bon", "Excellent"],
+  datasets: [
+    {
+      markers: {
+        size: 0,
+      },
 
+      label: "Redevabilité",
+      data: [0, 200, 250, 200, 700],
+      borderWidth: 3,
+      borderColor: "#F39200",
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+    {
+      label: "Passable",
+      data: [0, 300, 400, 560, 320, 600],
+      borderWidth: 3,
+      borderColor: "#BE1622",
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+    {
+      label: "Assez-Bon",
+      data: [0, 100, 100, 100, 100],
+      borderWidth: 3,
+      borderColor: "#3AAA35",
+      backgroundColor: "transparent",
+      pointBorderColor: "transparent",
+      tension: 0.4,
+    },
+  ],
+});
 const getDataCollection = async () => {
   isLoadingData.value = true;
   await SyntheseService.get(enqueteDeCollecteId.value, organizationId.value)
@@ -249,8 +285,9 @@ onMounted(() => {
                 <!-- Ajouter plus de sections si nécessaire -->
               </tbody>
             </table>
-            <div class="mt-3">
-              <ReportPieChart :chartData="chartData" :height="213" />
+            <div class="report-chart">
+              <!-- <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" /> -->
+              <!-- <ReportBarChart1 id="rapportAnnuel" :graphData="graphDataFac" :height="290" class="mt-6 -mb-6" /> -->
             </div>
           </TabPanel>
           <!-- tab 2 -->
