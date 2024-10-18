@@ -46,17 +46,17 @@ export const useSideMenuStore = defineStore("sideMenu", {
         title: "Cadre Mesure Rendement",
       },
       {
-        icon: "FolderIcon",
+        icon: "ServerIcon",
         pageName: "audit",
         title: "Audit",
       },
       {
-        icon: "FolderIcon",
+        icon: "ArchiveIcon",
         pageName: "rapport",
         title: "Rapport",
       },
       {
-        icon: "FolderIcon",
+        icon: "ZapIcon",
         pageName: "finances_suivi",
         title: "Suivi Financier",
       },
