@@ -28,12 +28,14 @@ import FicheFactuel from "../views/dashboard/FicheFactuel.vue";
 import pta from "../views/dashboard/organisation/pta.vue";
 
 import Ong from "../views/dashboard/organisation/ong.vue";
+import audit from "../views/dashboard/audit/index.vue";
 
 import FichePerception from "../views/dashboard/FichePerception.vue";
 import FicheSynthese from "../views/dashboard/FicheSynthese.vue";
 import DashboardGfa from "../views/dashboard/Dashboard.vue";
 import indicateurs from "../views/dashboard/indicateurs/index.vue";
 import SuiviIndicateurs from "../views/dashboard/indicateurs/suivi.vue";
+import rapport from "../views/dashboard/rapport/index.vue";
 
 import typeGouvernance from "../views/dashboard/type_gouvernance/index.vue";
 import Programmation_enquete from "../views/dashboard/programmation_enquete/index.vue";
@@ -44,6 +46,9 @@ import UniteDeMesure from "@/views/dashboard/uniteDeMesure.vue";
 import KeyValue from "@/views/dashboard/keyValue.vue";
 import CategorieIndicateurs from "@/views/dashboard/categoriesIndicateurs.vue";
 import Sites from "@/views/dashboard/sites.vue";
+import TypeResultat from "@/views/dashboard/typeResultat.vue";
+import finances_suivi from "../views/dashboard/finances/suivi.vue";
+
 
 //Projet/Outcomes/Activité/Taches
 import dashboard_projets_composantes_globale from "../views/dashboard/projets/composantes-globale/index.vue";
@@ -119,6 +124,23 @@ const routes = [
         name: "ToolsFactuel",
         component: ToolsFactuel,
       },
+      {
+        path: "audit",
+        name: "audit",
+        component: audit,
+      },
+      {
+        path: "rapport",
+        name: "rapport",
+        component: rapport,
+      },
+      {
+        path: "/dashboard/finances/suivi",
+        component: finances_suivi,
+        
+        name: "finances_suivi",
+      },
+
       {
         path: "ToolsPerception",
         name: "ToolsPerception",
@@ -218,6 +240,11 @@ const routes = [
         path: "categories_indicateurs",
         name: "CategoriesIndicateurs",
         component: CategorieIndicateurs,
+      },
+      {
+        path: "typeResultat",
+        name: "TypeResultat",
+        component: TypeResultat,
       },
       {
         path: "sites_indicateurs",

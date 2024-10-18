@@ -126,13 +126,18 @@
               <!-- <td v-if="pta.pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold text-green-500"> {{ pta.pret | formatNumber }} </span>
                  <span v-else class="font-bold" >0 FCFA </span>
+              </td> -->
+              <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
+              <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                <span class="font-bold text-yellow-500"> 222</span>
               </td>
-              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
-                <td v-if="pta.pret != '' || pta.bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span class="font-bold text-yellow-500"> {{ (pta.pret + pta.bn) | formatNumber }} </span>
-                <!--  <span v-else class="font-bold" >0 FCFA </span> -->
+              <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                <span class="font-bold text-yellow-500"> 222</span>
               </td>
-              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
+
+              <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                <span class="font-bold text-yellow-500"> 222</span>
+              </td>
 
               <td v-if="pta.pret != '' || pta.bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold text-yellow-500"> {{ (pta.pret + pta.bn) | formatNumber }} </span>
@@ -142,22 +147,7 @@
 
               <!-- total budgetaire-->
 
-              <td v-if="pta.tBn != undefined && pta.tBn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span class="font-bold"> {{ pta.tBn | formatNumber }} </span>
-                <!--  <span v-else class="font-bold" >0 FCFA</span> -->
-              </td>
-              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
-
-              <td v-if="pta.tPret != undefined && pta.tPret != ''" class="p-2 text-green-500 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span class="font-bold"> {{ pta.tPret | formatNumber }} </span>
-                <!--  <span v-else class="font-bold" >0 FCFA </span> -->
-              </td>
-              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
-
-              <td v-if="pta.total != undefined && pta.total != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span class="font-bold"> {{ pta.total | formatNumber }} </span>
-                <!--  <span v-else class="font-bold" >0 FCFA </span> -->
-              </td>
+            
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">

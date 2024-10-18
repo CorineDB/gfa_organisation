@@ -44,18 +44,21 @@ export const useSideMenuStore = defineStore("sideMenu", {
         icon: "FolderIcon",
         pageName: "Indicateurs",
         title: "Cadre Mesure Rendement",
-        // subMenu: [
-        //   {
-        //     icon: "FolderIcon",
-        //     pageName: "Indicateurs",
-        //     title: "Indicateurs",
-        //   },
-        //   {
-        //     icon: "CpuIcon",
-        //     pageName: "SuiviIndicateurs",
-        //     title: "Suivi Indicateurs",
-        //   },
-        // ],
+      },
+      {
+        icon: "FolderIcon",
+        pageName: "audit",
+        title: "Audit",
+      },
+      {
+        icon: "FolderIcon",
+        pageName: "rapport",
+        title: "Rapport",
+      },
+      {
+        icon: "FolderIcon",
+        pageName: "finances_suivi",
+        title: "Suivi Financier",
       },
 
       {
@@ -63,11 +66,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
         pageName: "Ongs",
         title: "Organisations",
       },
-      // {
-      //   icon: "CpuIcon",
-      //   pageName: "pta",
-      //   title: "PTAB",
-      // },
+
       {
         icon: "BarChart2Icon",
         pageName: "indicateursDeGouvernance",
@@ -111,11 +110,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
         pageName: "Programmation_enquete",
         title: " Enquête & résulats",
       },
-      // {
-      //   icon: "FileIcon",
-      //   pageName: "FicheSynthese",
-      //   title: "Fiche de Synthèse",
-      // },
+
       {
         icon: "BarChart2Icon",
         pageName: "EnqueteIndividuel",
@@ -156,6 +151,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "BarChart2Icon",
             pageName: "Sites",
             title: "Sites",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "TypeResultat",
+            title: "Résultats Cadre de rendement",
           },
         ],
       },
