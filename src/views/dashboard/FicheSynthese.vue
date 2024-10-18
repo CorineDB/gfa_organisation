@@ -5,8 +5,7 @@ import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { getColorForValue } from "../../utils/findColorIndicator";
 import { useRouter } from "vue-router";
-import ReportBarChart1 from "@/components/report-bar-chart-1/Main.vue";
-import ReportPieChart from "@/components/report-pie-chart/Main.vue";
+import ChartSynthese from "../../components/news/ChartSynthese.vue";
 
 const router = useRouter();
 const organizationId = ref("R5P1oK0OP6DmWGvB21RNoeb9Xpgdwr7PNQ4zy0LAM8KnVZEJa5xlOjYkeWBv8aJy");
@@ -17,42 +16,7 @@ const datasFactuel = ref([]);
 const datasPerception = ref([]);
 const structures = ref([]);
 const isLoadingData = ref(false);
-const graphDataFac = ref({
-  labels: ["Redevabilité", "Passable", "Assez-Bon", "Bon", "Excellent"],
-  datasets: [
-    {
-      markers: {
-        size: 0,
-      },
 
-      label: "Redevabilité",
-      data: [0, 200, 250, 200, 700],
-      borderWidth: 3,
-      borderColor: "#F39200",
-      backgroundColor: "transparent",
-      pointBorderColor: "transparent",
-      tension: 0.4,
-    },
-    {
-      label: "Passable",
-      data: [0, 300, 400, 560, 320, 600],
-      borderWidth: 3,
-      borderColor: "#BE1622",
-      backgroundColor: "transparent",
-      pointBorderColor: "transparent",
-      tension: 0.4,
-    },
-    {
-      label: "Assez-Bon",
-      data: [0, 100, 100, 100, 100],
-      borderWidth: 3,
-      borderColor: "#3AAA35",
-      backgroundColor: "transparent",
-      pointBorderColor: "transparent",
-      tension: 0.4,
-    },
-  ],
-});
 const getDataCollection = async () => {
   isLoadingData.value = true;
   await SyntheseService.get(enqueteDeCollecteId.value, organizationId.value)
@@ -286,8 +250,7 @@ onMounted(() => {
               </tbody>
             </table>
             <div class="report-chart">
-              <!-- <ReportLineChart id="rapportAnnuel" :graphData="graphData" :height="275" class="mt-6 -mb-6" /> -->
-              <!-- <ReportBarChart1 id="rapportAnnuel" :graphData="graphDataFac" :height="290" class="mt-6 -mb-6" /> -->
+              <ChartSynthese :height="275" class="mt-6 -mb-6" />
             </div>
           </TabPanel>
           <!-- tab 2 -->
@@ -383,6 +346,8 @@ onMounted(() => {
               </tbody>
             </table>
             <LoaderSnipper v-else />
+            <ChartSynthese v-if="!isLoadingData" :height="275" class="mt-6 -mb-6" />
+
             <!-- <h2 class="py-4 mr-5 text-lg font-medium">Indice de Gouvernace</h2>
 
             <table class="w-full mb-12 border-collapse table-auto" cellpadding="0" cellspacing="0">
