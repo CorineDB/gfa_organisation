@@ -2,6 +2,7 @@
 :root {
     /* --color-primary: theme("colors.rgb.emerald.900"); */
     --color-primary: 15 52 96;
+    --color-sidebar: 8 10 34;
     --color-secondary: theme("colors.rgb.slate.200");
     --color-success: theme("colors.rgb.emerald.600");
     --color-info: theme("colors.rgb.cyan.500");
@@ -49,6 +50,7 @@
     --color-danger: theme("colors.rgb.red.600");
     --color-light: theme("colors.rgb.slate.100");
     --color-dark: theme("colors.rgb.slate.800");
+
     &.dark {
         --color-primary: theme("colors.rgb.blue.700");
     }
@@ -56,7 +58,7 @@
 
 /* Theme 2 colors */
 .theme-2 {
-    
+
     /* --color-primary: theme("colors.rgb.blue.900"); */
     --color-primary: 0 9 110;
     --color-secondary: theme("colors.rgb.slate.200");
@@ -67,6 +69,7 @@
     --color-danger: theme("colors.rgb.red.700");
     --color-light: theme("colors.rgb.slate.100");
     --color-dark: theme("colors.rgb.slate.800");
+
     &.dark {
         --color-primary: theme("colors.rgb.blue.800");
     }
@@ -83,6 +86,7 @@
     --color-danger: theme("colors.rgb.red.700");
     --color-light: theme("colors.rgb.slate.100");
     --color-dark: theme("colors.rgb.slate.800");
+
     &.dark {
         --color-primary: theme("colors.rgb.cyan.800");
     }
@@ -99,6 +103,7 @@
     --color-danger: theme("colors.rgb.red.700");
     --color-light: theme("colors.rgb.slate.100");
     --color-dark: theme("colors.rgb.slate.800");
+
     &.dark {
         --color-primary: theme("colors.rgb.indigo.700");
     }

@@ -76,7 +76,7 @@ const initTabulator = () => {
             button.addEventListener("click", onClick);
             return button;
           };
-
+          // C'est < 100 j'ai pris 50 pour l'exemple, il faudra modifier
           if (cell.getData().levelOfSubmission < 50) {
             const modifyButton = createButton("Continuer", "btn btn-primary", () => {
               handleEdit(cell.getData());
@@ -94,7 +94,7 @@ const initTabulator = () => {
             });
 
             container.append(syntheseButton);
-            const marqueurButton = createButton(" Marqueur", "btn btn-primary", () => {
+            const marqueurButton = createButton("Marqueur", "btn btn-primary", () => {
               viewMarqueur(datas.value.id, cell.getData().id);
             });
 

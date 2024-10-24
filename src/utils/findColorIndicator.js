@@ -5,6 +5,13 @@ export const colors = [
   { limit: 1, color: "rgb(22 163 74 )" },
 ];
 
+export const colorsExcel = [
+  { limit: 0.25, color: "EF4444" },
+  { limit: 0.5, color: "BA3030" },
+  { limit: 0.75, color: "EAB308" },
+  { limit: 1, color: "16A34A" },
+];
+
 export const optionResponses = [" Ne peux répondre", "Pas du tout", "Faiblement", "Moyennement"];
 
 export const colorsOptionFactuel = [
@@ -20,4 +27,13 @@ export function getColorForValue(value) {
   }
 
   return "";
+}
+export function getColorForExcel(value) {
+  for (const interval of colorsExcel) {
+    if (value <= interval.limit) {
+      return interval.color;
+    }
+  }
+
+  return "FFFFFFFF";
 }

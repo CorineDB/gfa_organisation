@@ -1,8 +1,5 @@
 const colors = require("tailwindcss/colors");
-const {
-  toRGB,
-  withOpacityValue,
-} = require("@left4code/tw-starter/dist/js/tailwind-config-helper");
+const { toRGB, withOpacityValue } = require("@left4code/tw-starter/dist/js/tailwind-config-helper");
 
 module.exports = {
   mode: "jit",
@@ -10,6 +7,7 @@ module.exports = {
     "./src/**/*.{php,html,js,jsx,ts,tsx,vue}",
     "./resources/**/*.{php,html,js,jsx,ts,tsx,vue}",
     "./node_modules/@left4code/tw-starter/**/*.js",
+    "./node_modules/flowbite/**/*.js",
     // ".//*.html",
   ],
   darkMode: "class",
@@ -51,6 +49,7 @@ module.exports = {
           slate: colors.slate,
         }),
         primary: withOpacityValue("--color-primary"),
+        sidebar: withOpacityValue("--color-sidebar"),
         secondary: withOpacityValue("--color-secondary"),
         success: withOpacityValue("--color-success"),
         info: withOpacityValue("--color-info"),
@@ -102,7 +101,7 @@ module.exports = {
       },
     },
   },
-  plugins: [require("@tailwindcss/forms"), require('@tailwindcss/line-clamp')],
+  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/line-clamp"), require("flowbite/plugin")],
   variants: {
     extend: {
       boxShadow: ["dark"],

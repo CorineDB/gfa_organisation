@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button @click="generateExcel">Télécharger Excel</button>
+    <button class="btn btn-outline-secondary" @click="generateExcel"><FileTextIcon class="w-4 h-4 mr-2" />Exporter Excel</button>
   </div>
 </template>
 
@@ -10,213 +10,11 @@ import { saveAs } from "file-saver";
 import { getColorForExcel } from "../../utils/findColorIndicator";
 
 export default {
+  props: {
+    datas: { type: Array, required: true },
+  },
   data() {
-    return {
-      datas: [
-        {
-          id: "KJX3Od8nrE8lA0MQGK5jRvLwD43Yq6BbMy12gz7NkZXOVJnameobpWd9Rm6L419Y",
-          nom: "Gouvernance 2",
-          indice_factuel: 0.3333333333333333,
-          principes_de_gouvernance: [
-            {
-              id: "V0zMBvj6BY0m6lDbQ1dvLo54pZX9wPKo1x8ANnzE7eVGkMyOJqa2RjrgQDp5R4wq",
-              nom: "Principes 1",
-              score_factuel: 0.6666666666666666,
-              criteres_de_gouvernance: [
-                {
-                  id: "6w3x9VMdYlbqvG1nxmMN4zrD7PkZeW5d9QoVjKaEyd623JAp0w9gBL8XaXgoBKY2",
-                  nom: "Critere 1",
-                  indicateurs_de_gouvernance: [
-                    {
-                      id: "xOkENaVZDkMb97L30gE2BQ8jwYd6OnP9d8lqNGXpxza4AyZmoeR51VKrvpBj27DG",
-                      nom: "Rôles et responsabilité clairement",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.3,
-                    },
-                    {
-                      id: "rhuinkkn27jn7L30gE2BQ8jwYd6OnP9d8lqNGXpxza4AyZmoeR51VKrvpBj27DG",
-                      nom: "Responsabilté",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.3,
-                    },
-                  ],
-                },
-                {
-                  id: "9aLDd6r2DW7jeJ63b8dGoVY1xZ4rBPRpGQl29kymqawK0EnvgNXzpALMAJMYb3Ne",
-                  nom: "Critere 2",
-                  indicateurs_de_gouvernance: [
-                    {
-                      id: "B3jz7YXwgM3Xo2YVpdBxewyrN70vz1PyZdWRLbZ46O5nq8A9EaGQjkDKmp8ebvd1",
-                      nom: "La réputation des services bénéficiaires sont conformes aux normes de qualité",
-                      type: "factuel",
-                      can_have_multiple_reponse: true,
-                      note: 1,
-                    },
-                    {
-                      id: "Z5jNqA9V0q74jgVAx2bwZOXeK5EyvGJb6QJdMY9pNLa36nmQRkz81rBoD0aMwmYe",
-                      nom: "Données de détermination de l'état de conformité",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.44,
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              id: "V0zMBvj6BY0m6lDbQ1dvLo54pZX9wPKo1x8ANnzE7eVGkMyOJqa2RjrgQDp5R4wq",
-              nom: "Principes 2",
-              score_factuel: 0.33,
-              criteres_de_gouvernance: [
-                {
-                  id: "6w3x9VMdYlbqvG1nxmMN4zrD7PkZeW5d9QoVjKaEyd623JAp0w9gBL8XaXgoBKY2",
-                  nom: "Critere 3",
-                  indicateurs_de_gouvernance: [
-                    {
-                      id: "xOkENaVZDkMb97L30gE2BQ8jwYd6OnP9d8lqNGXpxza4AyZmoeR51VKrvpBj27DG",
-                      nom: "Rôles et responsabilité clairement",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.6,
-                    },
-                    {
-                      id: "rhuinkkn27jn7L30gE2BQ8jwYd6OnP9d8lqNGXpxza4AyZmoeR51VKrvpBj27DG",
-                      nom: "Responsabilté",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.3,
-                    },
-                  ],
-                },
-                {
-                  id: "9aLDd6r2DW7jeJ63b8dGoVY1xZ4rBPRpGQl29kymqawK0EnvgNXzpALMAJMYb3Ne",
-                  nom: "Critere 4",
-                  indicateurs_de_gouvernance: [
-                    {
-                      id: "B3jz7YXwgM3Xo2YVpdBxewyrN70vz1PyZdWRLbZ46O5nq8A9EaGQjkDKmp8ebvd1",
-                      nom: "Les services  bénéficiaires sont conformes aux normes de qualité",
-                      type: "factuel",
-                      can_have_multiple_reponse: true,
-                      note: 0.7,
-                    },
-                    {
-                      id: "Z5jNqA9V0q74jgVAx2bwZOXeK5EyvGJb6QJdMY9pNLa36nmQRkz81rBoD0aMwmYe",
-                      nom: "Données de détermination de l'état de conformité",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.88,
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          id: "KJX3OdskljHUIHUI778QGK5jRvLwD43Yq6BbMy12gz7NkZXOVJnameobpWd9Rm6L419Y",
-          nom: "Gouvernance 3",
-          indice_factuel: 0.88,
-          principes_de_gouvernance: [
-            {
-              id: "V0zMBvj6BY0m6lDbQ1dvLo54pZX9wPKo1x8ANnzE7eVGkMyOJqa2RjrgQDp5R4wq",
-              nom: "Principes 1",
-              score_factuel: 0.6666666666666666,
-              criteres_de_gouvernance: [
-                {
-                  id: "6w3x9VMdYlbqvG1nxmMN4zrD7PkZeW5d9QoVjKaEyd623JAp0w9gBL8XaXgoBKY2",
-                  nom: "Critere 1",
-                  indicateurs_de_gouvernance: [
-                    {
-                      id: "xOkENaVZDkMb97L30gE2BQ8jwYd6OnP9d8lqNGXpxza4AyZmoeR51VKrvpBj27DG",
-                      nom: "Rôles et responsabilité clairement",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.3,
-                    },
-                    {
-                      id: "rhuinkkn27jn7L30gE2BQ8jwYd6OnP9d8lqNGXpxza4AyZmoeR51VKrvpBj27DG",
-                      nom: "Responsabilté",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.3,
-                    },
-                  ],
-                },
-                {
-                  id: "9aLDd6r2DW7jeJ63b8dGoVY1xZ4rBPRpGQl29kymqawK0EnvgNXzpALMAJMYb3Ne",
-                  nom: "Critere 2",
-                  indicateurs_de_gouvernance: [
-                    {
-                      id: "B3jz7YXwgM3Xo2YVpdBxewyrN70vz1PyZdWRLbZ46O5nq8A9EaGQjkDKmp8ebvd1",
-                      nom: "La réputation des services bénéficiaires sont conformes aux normes de qualité",
-                      type: "factuel",
-                      can_have_multiple_reponse: true,
-                      note: 1,
-                    },
-                    {
-                      id: "Z5jNqA9V0q74jgVAx2bwZOXeK5EyvGJb6QJdMY9pNLa36nmQRkz81rBoD0aMwmYe",
-                      nom: "Données de détermination de l'état de conformité",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.44,
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              id: "V0zMBvj6BY0m6lDbQ1dvLo54pZX9wPKo1x8ANnzE7eVGkMyOJqa2RjrgQDp5R4wq",
-              nom: "Principes 2",
-              score_factuel: 0.33,
-              criteres_de_gouvernance: [
-                {
-                  id: "6w3x9VMdYlbqvG1nxmMN4zrD7PkZeW5d9QoVjKaEyd623JAp0w9gBL8XaXgoBKY2",
-                  nom: "Critere 3",
-                  indicateurs_de_gouvernance: [
-                    {
-                      id: "xOkENaVZDkMb97L30gE2BQ8jwYd6OnP9d8lqNGXpxza4AyZmoeR51VKrvpBj27DG",
-                      nom: "Rôles et responsabilité clairement",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.6,
-                    },
-                    {
-                      id: "rhuinkkn27jn7L30gE2BQ8jwYd6OnP9d8lqNGXpxza4AyZmoeR51VKrvpBj27DG",
-                      nom: "Responsabilté",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.3,
-                    },
-                  ],
-                },
-                {
-                  id: "9aLDd6r2DW7jeJ63b8dGoVY1xZ4rBPRpGQl29kymqawK0EnvgNXzpALMAJMYb3Ne",
-                  nom: "Critere 4",
-                  indicateurs_de_gouvernance: [
-                    {
-                      id: "B3jz7YXwgM3Xo2YVpdBxewyrN70vz1PyZdWRLbZ46O5nq8A9EaGQjkDKmp8ebvd1",
-                      nom: "Les services  bénéficiaires sont conformes aux normes de qualité",
-                      type: "factuel",
-                      can_have_multiple_reponse: true,
-                      note: 0.7,
-                    },
-                    {
-                      id: "Z5jNqA9V0q74jgVAx2bwZOXeK5EyvGJb6QJdMY9pNLa36nmQRkz81rBoD0aMwmYe",
-                      nom: "Données de détermination de l'état de conformité",
-                      type: "factuel",
-                      can_have_multiple_reponse: false,
-                      note: 0.88,
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    };
+    return {};
   },
   methods: {
     applyBorders(cell, addBottomBorder = false) {
@@ -349,7 +147,7 @@ export default {
       });
 
       const buffer = await workbook.xlsx.writeBuffer();
-      const date = new Date();
+      const date = new Date().getTime();
       saveAs(new Blob([buffer]), `SYNTHESSE_FACTUEL_${date}.xlsx`);
     },
   },

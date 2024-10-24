@@ -43,8 +43,8 @@ onMounted(() => {
 
 <style scoped>
 canvas {
-  width: 600px; /* Largeur plus grande pour le cercle */
-  height: 600px; /* Hauteur plus grande pour le cercle */
+  width: 600px;
+  height: 600px;
   margin: auto;
 }
 </style>

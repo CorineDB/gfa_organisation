@@ -27,7 +27,6 @@ import ToolsPerception from "../views/dashboard/ToolsPerception.vue";
 import FicheFactuel from "../views/dashboard/FicheFactuel.vue";
 import pta from "../views/dashboard/organisation/pta.vue";
 
-
 import Ong from "../views/dashboard/organisation/ong.vue";
 import audit from "../views/dashboard/audit/index.vue";
 
@@ -51,8 +50,6 @@ import TypeResultat from "@/views/dashboard/typeResultat.vue";
 import finances_suivi from "../views/dashboard/finances/suivi.vue";
 import indicateurs_suivi_details from "../views/dashboard/indicateurs/_id/suivi.vue";
 
-
-
 //Projet/Outcomes/Activité/Taches
 import dashboard_projets_composantes_globale from "../views/dashboard/projets/composantes-globale/index.vue";
 import projets from "../views/dashboard/projets/index.vue";
@@ -63,6 +60,7 @@ import projets_id_details from "../views/dashboard/projets/_id/details.vue";
 import EnqueteIndividuel from "../views/dashboard/enqueteIndividuel.vue";
 import FicheResultat from "../views/dashboard/FicheResultat.vue";
 import Marqueur from "../views/dashboard/marqueur.vue";
+import CreateForm from "../views/dashboard/CreateForm.vue";
 
 const routes = [
   {
@@ -136,7 +134,7 @@ const routes = [
       {
         path: "indicateurs/:id/suivi",
         component: indicateurs_suivi_details,
-        
+
         name: "indicateurs_suivi_details",
       },
       {
@@ -155,6 +153,11 @@ const routes = [
         path: "ToolsPerception",
         name: "ToolsPerception",
         component: ToolsPerception,
+      },
+      {
+        path: "create-form",
+        name: "createform",
+        component: CreateForm,
       },
       {
         path: "pta/:ongId",
