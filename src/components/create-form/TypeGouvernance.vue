@@ -131,17 +131,17 @@ onMounted(getDatas);
     </div>
 
     <!-- Data List -->
-    <ul v-if="!isLoadingData" class="overflow-y-auto max-h-[300px]">
+    <ul v-if="!isLoadingData" class="overflow-y-auto max-h-[40vh]">
       <li v-for="data in datas" :key="data.id" class="flex items-center justify-between gap-2 px-1 py-1.5 text-base hover:bg-blue-100 list-data">
         <div class="p-2 form-check">
           <input :id="data.id" class="form-check-input" @change="choiceOption(data)" type="radio" name="type" :value="data.id" v-model="idChecked" />
           <label class="form-check-label" :for="data.id">{{ data.nom }}</label>
         </div>
-        <div v-if="data.id !== idChecked" class="flex items-center gap-1 transition-all opacity-0 spacex-2 container-buttons">
-          <button class="p-2 text-primary" @click="handleEdit(data)">
-            <EditIcon class="size-5" />
+        <div v-if="data.id !== idChecked" class="flex items-center gap-1 space-x-1 transition-all opacity-0 container-buttons">
+          <button class="p-1.5 text-white btn btn-primary" @click="handleEdit(data)">
+            <Edit3Icon class="size-5" />
           </button>
-          <button class="p-2 text-red-500" @click="handleDelete(data)">
+          <button class="p-1.5 text-white btn btn-danger" @click="handleDelete(data)">
             <TrashIcon class="size-5" />
           </button>
         </div>

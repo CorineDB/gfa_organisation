@@ -1,14 +1,16 @@
 <script setup>
+import { onBeforeUnmount, reactive, ref, computed } from "vue";
+import { toast } from "vue3-toastify";
 import OptionsResponse from "@/components/create-form/OptionsResponse.vue";
 import TypeGouvernance from "@/components/create-form/TypeGouvernance.vue";
 import PrincipeGouvernance from "@/components/create-form/PrincipeGouvernance.vue";
 import CritereGouvernance from "@/components/create-form/CritereGouvernance.vue";
 import IndicateurGouvernance from "@/components/create-form/IndicateurGouvernance.vue";
 import QuestionsOperationnel from "@/components/create-form/QuestionsOperationnel.vue";
-import { reactive } from "vue";
-import { ref } from "vue";
-import FactuelStructure from "../../components/create-form/FactuelStructure.vue";
-import { computed } from "vue";
+import FactuelStructure from "@/components/create-form/FactuelStructure.vue";
+import ListAccordionIndicateur from "@/components/create-form/ListAccordionIndicateur.vue";
+import VButton from "@/components/news/VButton.vue";
+import InputForm from "@/components/news/InputForm.vue";
 
 const tabs = [
   {
@@ -16,7 +18,7 @@ const tabs = [
     key: 0,
   },
   {
-    label: "FORMULAIRE DE PERCEPTION",
+    label: "LISTE FORMULAIRE FACTUEL",
     key: 1,
   },
 ];
@@ -24,8 +26,13 @@ const tabs = [
 const currentTab = ref(0);
 const indexAccordion = ref(1);
 const resetCurrentForm = ref(false);
-const formFactuelData = ref([]);
-const formData = ref([]);
+const modalForm = ref(false);
+const isLoadingForm = ref(false);
+const previewFormFactuelData = ref([]);
+const globalFormFactuelData = ref([]);
+const previewTypesGouvernance = ref({});
+const globalTypesGouvernance = ref({});
+const uniqueKeys = new Map();
 
 const isAvailable = reactive({
   option: true,
@@ -36,24 +43,126 @@ const isAvailable = reactive({
   question: true,
 });
 
-const currentFactuelFormData = reactive({
+const payload = reactive({
+  libelle: "",
+  annee_exercice: new Date().getFullYear(),
+  type: "factuel",
+  factuel: { options_de_reponse: [], globalTypesGouvernance },
+});
+
+const currentPreviewFactuelFormData = reactive({
+  type: { id: "", nom: "" },
+  principe: { id: "", nom: "" },
+  critere: { id: "", nom: "" },
+  indicateur: { id: "", nom: "" },
+});
+
+const currentGlobalFactuelFormData = reactive({
   type: "",
   principe: "",
   critere: "",
   indicateur: "",
 });
 
-const dataFactuel = reactive({
-  type: "",
-  principe: "",
-  critere: "",
-  indicateur: "",
-});
+// Fonction pour générer une clé unique pour chaque soumission
+const generateKey = (submission) => {
+  return `${submission.type}-${submission.principe}-${submission.critere}-${submission.indicateur}`;
+};
 
-const resetCurrentFactuelFormData = () => {
-  Object.keys(currentFactuelFormData).forEach((key) => {
-    currentFactuelFormData[key] = "";
+const organiseGlobalFormFactuelData = (submissions) => {
+  const organisedData = { types_de_gouvernance: [] };
+
+  submissions.forEach((submission) => {
+    // Trouver ou créer le type de gouvernance
+    let type = organisedData.types_de_gouvernance.find((t) => t.id === submission.type);
+    if (!type) {
+      type = { id: submission.type, principes_de_gouvernance: [] };
+      organisedData.types_de_gouvernance.push(type);
+    }
+
+    // Trouver ou créer le principe de gouvernance
+    let principe = type.principes_de_gouvernance.find((p) => p.id === submission.principe);
+    if (!principe) {
+      principe = { id: submission.principe, criteres_de_gouvernance: [] };
+      type.principes_de_gouvernance.push(principe);
+    }
+
+    // Trouver ou créer le critère de gouvernance
+    let critere = principe.criteres_de_gouvernance.find((c) => c.id === submission.critere);
+    if (!critere) {
+      critere = { id: submission.critere, indicateurs_de_gouvernance: [] };
+      principe.criteres_de_gouvernance.push(critere);
+    }
+
+    // Ajouter l'indicateur de gouvernance s'il n'est pas déjà présent
+    if (!critere.indicateurs_de_gouvernance.includes(submission.indicateur)) {
+      critere.indicateurs_de_gouvernance.push(submission.indicateur);
+    }
   });
+
+  return organisedData;
+};
+const organisePreviewFormFactuelData = (submissions) => {
+  const organisedData = { types_de_gouvernance: [] };
+
+  submissions.forEach((submission) => {
+    // Trouver ou créer le type de gouvernance
+    let type = organisedData.types_de_gouvernance.find((t) => t.id === submission.type.id);
+    if (!type) {
+      type = { id: submission.type.id, nom: submission.type.nom, principes_de_gouvernance: [] };
+      organisedData.types_de_gouvernance.push(type);
+    }
+
+    // Assurer que principes_de_gouvernance est un tableau
+    type.principes_de_gouvernance = type.principes_de_gouvernance || [];
+
+    // Trouver ou créer le principe de gouvernance
+    let principe = type.principes_de_gouvernance.find((p) => p.id === submission.principe.id);
+    if (!principe) {
+      principe = { id: submission.principe.id, nom: submission.principe.nom, criteres_de_gouvernance: [] };
+      type.principes_de_gouvernance.push(principe);
+    }
+
+    // Assurer que criteres_de_gouvernance est un tableau
+    principe.criteres_de_gouvernance = principe.criteres_de_gouvernance || [];
+
+    // Trouver ou créer le critère de gouvernance
+    let critere = principe.criteres_de_gouvernance.find((c) => c.id === submission.critere.id);
+    if (!critere) {
+      critere = { id: submission.critere.id, nom: submission.critere.nom, indicateurs_de_gouvernance: [] };
+      principe.criteres_de_gouvernance.push(critere);
+    }
+
+    // Assurer que indicateurs_de_gouvernance est un tableau
+    critere.indicateurs_de_gouvernance = critere.indicateurs_de_gouvernance || [];
+
+    // Trouver ou créer l'indicateur de gouvernance
+    let indicateur = critere.indicateurs_de_gouvernance.find((i) => i.id === submission.indicateur.id);
+    if (!indicateur) {
+      indicateur = { id: submission.indicateur.id, nom: submission.indicateur.nom };
+      critere.indicateurs_de_gouvernance.push(indicateur);
+    }
+  });
+
+  return organisedData;
+};
+
+const resetCurrentPreviewFactuelFormData = () => {
+  for (const key in currentPreviewFactuelFormData) {
+    currentPreviewFactuelFormData[key] = { id: "", nom: "" };
+  }
+};
+const resetCurrentGlobalFactuelFormData = () => {
+  Object.keys(currentGlobalFactuelFormData).forEach((key) => {
+    currentGlobalFactuelFormData[key] = "";
+  });
+};
+
+const updateAllTypesGouvernance = () => {
+  globalTypesGouvernance.value = organiseGlobalFormFactuelData(globalFormFactuelData.value);
+  previewTypesGouvernance.value = organisePreviewFormFactuelData(previewFormFactuelData.value);
+  console.log("GLOBAL", globalTypesGouvernance.value);
+  console.log("PREVIEW", previewTypesGouvernance.value);
 };
 
 const changeIndexAccordion = (index) => {
@@ -62,49 +171,102 @@ const changeIndexAccordion = (index) => {
 
 const getType = (type) => {
   changeIndexAccordion(1);
-  dataFactuel.type = type.id;
-  currentFactuelFormData.type = type.nom;
+  currentGlobalFactuelFormData.type = type.id;
+  currentPreviewFactuelFormData.type = { id: type.id, nom: type.nom };
 };
-
 const getPrincipe = (principe) => {
   changeIndexAccordion(5);
-  dataFactuel.principe = principe.id;
-  currentFactuelFormData.principe = principe.nom;
+  currentGlobalFactuelFormData.principe = principe.id;
+  currentPreviewFactuelFormData.principe = { id: principe.id, nom: principe.nom };
 };
-
 const getCritere = (critere) => {
   changeIndexAccordion(4);
-  dataFactuel.critere = critere.id;
-  currentFactuelFormData.critere = critere.nom;
+  currentGlobalFactuelFormData.critere = critere.id;
+  currentPreviewFactuelFormData.critere = { id: critere.id, nom: critere.nom };
 };
-
 const getIndicateur = (indicateur) => {
   changeIndexAccordion(3);
-  dataFactuel.indicateur = indicateur.id;
-  currentFactuelFormData.indicateur = indicateur.nom;
+  currentGlobalFactuelFormData.indicateur = indicateur.id;
+  currentPreviewFactuelFormData.indicateur = { id: indicateur.id, nom: indicateur.nom };
 };
-
 const getQuestion = (question) => {
-  dataFactuel.question = question.id;
-  currentFactuelFormData.question = question.nom;
+  currentGlobalFactuelFormData.question = question.id;
+  currentPreviewFactuelFormData.question = { id: question.id, nom: question.nom };
 };
 
-const addIndicateur = () => {
-  formFactuelData.value.unshift({ ...currentFactuelFormData });
-  resetCurrentFactuelFormData();
-  resetCurrentForm.value = !resetCurrentForm.value;
+const addNewIndicator = () => {
+  const key = generateKey(currentGlobalFactuelFormData);
+
+  // Ajouter la soumission si la clé est absente
+  if (!uniqueKeys.has(key)) {
+    globalFormFactuelData.value.unshift({ ...currentGlobalFactuelFormData });
+    previewFormFactuelData.value.unshift(JSON.parse(JSON.stringify(currentPreviewFactuelFormData)));
+    uniqueKeys.set(key, true);
+    console.log("global:", globalFormFactuelData.value);
+    console.log("preview:", previewFormFactuelData.value);
+    updateAllTypesGouvernance();
+    resetCurrentPreviewFactuelFormData();
+    resetCurrentGlobalFactuelFormData();
+    resetCurrentForm.value = !resetCurrentForm.value;
+    toast.success("Indicateur ajouté.");
+  }
+};
+const removeIndicator = (indicateur) => {
+  const key = generateKey(indicateur);
+  console.log("delete");
+
+  // Trouver l'index de la soumission à supprimer
+  const index = globalFormFactuelData.value.findIndex((s) => s.type === indicateur.type.id && s.principe === indicateur.principe.id && s.critere === indicateur.critere.id && s.indicateur === indicateur.indicateur.id);
+
+  // Supprimer la soumission et sa clé si elle est trouvée
+  if (index !== -1) {
+    globalFormFactuelData.value.splice(index, 1);
+    previewFormFactuelData.value.splice(index, 1);
+    addNewIndicator.uniqueKeys.delete(key);
+    updateAllTypesGouvernance();
+    console.log("Nouvelle Global:", globalFormFactuelData.value);
+    console.log("Nouvelle preview:", previewFormFactuelData.value);
+  }
+};
+const clearUniqueKeys = () => {
+  uniqueKeys.clear(); // Supprime toutes les clés de uniqueKeys
+};
+
+const resetForm = () => {
+  payload.libelle = "";
+  modalForm.value = false;
+};
+const createForm = async () => {
+  isLoading.value = true;
+  try {
+    // await  Formulaire.create(payload);
+    toast.success(`Formulaire créé avec succès.`);
+    resetForm();
+  } catch (e) {
+    toast.error(getAllErrorMessages(e));
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const isCurrentFormValid = computed(() => {
-  return Object.values(currentFactuelFormData).every((value) => value.trim() !== "");
+  return Object.values(currentPreviewFactuelFormData).every((value) => value.id.trim() !== "");
+});
+
+const showForm = computed(() => {
+  return globalFormFactuelData.value.length > 0;
+});
+
+onBeforeUnmount(() => {
+  clearUniqueKeys();
 });
 </script>
 
 <template>
   <div class="flex w-full gap-2">
-    <section class="w-1/3 max-h-screen min-h-screen pr-1 overflow-auto border-r-2 pt-7">
-      <AccordionGroup :selectedIndex="indexAccordion" class="space-y-8">
-        <AccordionItem class="!p-0">
+    <section class="w-[30%] max-h-screen pr-1 overflow-auto border-r-2 pt-5">
+      <AccordionGroup :selectedIndex="indexAccordion" class="space-y-1">
+        <AccordionItem class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
             <p>Options de réponses</p>
             <ChevronDownIcon />
@@ -114,7 +276,7 @@ const isCurrentFormValid = computed(() => {
           </AccordionPanel>
         </AccordionItem>
 
-        <AccordionItem v-show="currentTab === 0" class="!p-0">
+        <AccordionItem v-show="currentTab === 0" class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
             <p>Indicateurs de gouvernance</p>
             <ChevronDownIcon />
@@ -124,7 +286,7 @@ const isCurrentFormValid = computed(() => {
           </AccordionPanel>
         </AccordionItem>
 
-        <AccordionItem v-show="currentTab === 1" class="!p-0">
+        <AccordionItem v-show="currentTab === 1" class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
             <p>Questions opérationnelles</p>
             <ChevronDownIcon />
@@ -134,7 +296,7 @@ const isCurrentFormValid = computed(() => {
           </AccordionPanel>
         </AccordionItem>
 
-        <AccordionItem class="!p-0">
+        <AccordionItem class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
             <p>Critères de gouvernance</p>
             <ChevronDownIcon />
@@ -144,7 +306,7 @@ const isCurrentFormValid = computed(() => {
           </AccordionPanel>
         </AccordionItem>
 
-        <AccordionItem class="!p-0">
+        <AccordionItem class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
             <p>Principe de gouvernance</p>
             <ChevronDownIcon />
@@ -154,7 +316,7 @@ const isCurrentFormValid = computed(() => {
           </AccordionPanel>
         </AccordionItem>
 
-        <AccordionItem class="!p-0">
+        <AccordionItem class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
             <p>Type de gouvernance</p>
             <ChevronDownIcon />
@@ -166,29 +328,68 @@ const isCurrentFormValid = computed(() => {
       </AccordionGroup>
     </section>
 
-    <section class="w-2/3 pt-5">
+    <section class="w-[70%] pt-5">
       <TabGroup :selectedIndex="currentTab">
         <TabList class="nav-boxed-tabs">
           <Tab @click="currentTab = tab.key" v-for="(tab, indexTab) in tabs" :key="indexTab" class="w-full py-2" tag="button">{{ tab.label }}</Tab>
         </TabList>
         <TabPanels class="mt-5">
           <TabPanel class="leading-relaxed">
-            <FactuelStructure :type="currentFactuelFormData.type" :principe="currentFactuelFormData.principe" :critere="currentFactuelFormData.critere" :indicateur="currentFactuelFormData.indicateur" />
-            <!-- <button :disabled="!isCurrentFormValid" @click="addIndicateur" class="my-4 text-sm btn btn-primary">Ajouter l'indicateur</button>
-            {{ formFactuelData }}
-            <br />
-            --------------------------------------------------------------------------------------------
-            {{ currentFactuelFormData }} -->
+            <div class="flex flex-col gap-8">
+              <div class="space-y-2">
+                <p class="text-lg font-medium">Création de l'indicateur</p>
+                <FactuelStructure :type="currentPreviewFactuelFormData.type.nom" :principe="currentPreviewFactuelFormData.principe.nom" :critere="currentPreviewFactuelFormData.critere.nom" :indicateur="currentPreviewFactuelFormData.indicateur.nom" />
+                <button :disabled="!isCurrentFormValid" @click="addNewIndicator" class="my-4 text-sm btn btn-primary"><PlusIcon class="mr-1 size-4" />Ajouter l'indicateur</button>
+              </div>
+              <div class="space-y-2">
+                <p class="text-lg font-medium">Liste des indicateurs</p>
+                <div class="max-h-[40vh] h-[40vh] py-2 border-t overflow-y-auto">
+                  <ListAccordionIndicateur :indicateurs-array="previewFormFactuelData" />
+                </div>
+                <div class="flex justify-start pt-4 pb-2">
+                  <button :disabled="!showForm" @click="modalForm = true" class="px-5 text-base btn btn-primary"><CheckIcon class="mr-1 size-5" />Valider les indicateurs</button>
+                </div>
+              </div>
+            </div>
           </TabPanel>
           <TabPanel class="leading-relaxed"> It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like). </TabPanel>
         </TabPanels>
       </TabGroup>
     </section>
   </div>
+  <!-- BEGIN: Modal Content -->
+  <Modal backdrop="static" size="modal-xl" :show="modalForm" @hidden="modalForm = false">
+    <ModalHeader>
+      <h2 class="mr-auto text-base font-medium">Enregistrer le formulaire</h2>
+    </ModalHeader>
+    <form @submit.prevent="createForm">
+      <ModalBody class="space-y-5">
+        <div class="flex gap-4">
+          <InputForm label="Libellé" class="w-full" v-model="payload.libelle" />
+          <div class="w-full">
+            <label for="annee" class="form-label">Année</label>
+            <input id="annee" type="number" required v-model.number="payload.annee_exercice" class="form-control" placeholder="Année" />
+          </div>
+        </div>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate cumque beatae laudantium ex mollitia hic ut minima quo explicabo voluptas. Rem dolorem quaerat eos officia veniam magnam, sint voluptates animi.</p>
+      </ModalBody>
+      <ModalFooter>
+        <div class="flex gap-2">
+          <button type="button" @click="resetForm" class="w-full px-2 py-2 my-3 btn btn-outline-secondary">Annuler</button>
+          <VButton :loading="isLoadingForm" label="Enregistrer" />
+        </div>
+      </ModalFooter>
+    </form>
+  </Modal>
+  <!-- END: Modal Content -->
 </template>
 
 <style>
 .accordion .accordion-item .accordion-header .accordion-button:not(.collapsed) {
   background: rgb(var(--color-primary)) !important;
+}
+
+.accordion .accordion-item:first-child {
+  margin-top: 0 !important;
 }
 </style>
