@@ -1,6 +1,5 @@
 <script setup>
-import { defineProps } from "vue";
-import IconLoading from "../icons/IconLoading.vue"; 
+import IconLoading from "../icons/IconLoading.vue";
 
 const props = defineProps({
   loading: Boolean,
