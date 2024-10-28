@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, reactive, ref, computed } from "vue";
+import { onBeforeUnmount, reactive, ref, computed, onMounted } from "vue";
 import { toast } from "vue3-toastify";
 import OptionsResponse from "@/components/create-form/OptionsResponse.vue";
 import TypeGouvernance from "@/components/create-form/TypeGouvernance.vue";
@@ -31,10 +31,12 @@ const indexAccordion = ref(0);
 const resetCurrentForm = ref(false);
 const modalForm = ref(false);
 const isLoadingForm = ref(false);
+const isLoading = ref(false);
 const previewFormFactuelData = ref([]);
 const globalFormFactuelData = ref([]);
 const previewTypesGouvernance = ref({});
 const globalTypesGouvernance = ref({});
+const listForms = ref([]);
 const globalOptionResponses = ref({ options_de_reponse: [] });
 const typesGouvernance = ref({ types_de_gouvernance: [] });
 const uniqueKeys = new Map();
@@ -71,7 +73,7 @@ const currentGlobalFactuelFormData = reactive({
 
 // Fonction pour générer une clé unique pour chaque soumission
 const generateKey = (submission) => {
-  return `${submission.type}-${submission.principe}-${submission.critere}-${submission.indicateur}`;
+  return `${submission.indicateur}`;
 };
 
 const organiseGlobalFormFactuelData = (submissions) => {
@@ -153,14 +155,16 @@ const organisePreviewFormFactuelData = (submissions) => {
 };
 
 const resetCurrentPreviewFactuelFormData = () => {
-  for (const key in currentPreviewFactuelFormData) {
-    currentPreviewFactuelFormData[key] = { id: "", nom: "" };
-  }
+  // for (const key in currentPreviewFactuelFormData) {
+  //   currentPreviewFactuelFormData[key] = { id: "", nom: "" };
+  // }
+  currentPreviewFactuelFormData.indicateur = { id: "", nom: "" };
 };
 const resetCurrentGlobalFactuelFormData = () => {
-  Object.keys(currentGlobalFactuelFormData).forEach((key) => {
-    currentGlobalFactuelFormData[key] = "";
-  });
+  // Object.keys(currentGlobalFactuelFormData).forEach((key) => {
+  //   currentGlobalFactuelFormData[key] = "";
+  // });
+  currentGlobalFactuelFormData.indicateur = "";
 };
 
 const updateAllTypesGouvernance = () => {
@@ -210,9 +214,9 @@ const addNewIndicator = () => {
     // console.log("global:", globalFormFactuelData.value);
     // console.log("preview:", previewFormFactuelData.value);
     updateAllTypesGouvernance();
-    // resetCurrentPreviewFactuelFormData();
-    // resetCurrentGlobalFactuelFormData();
-    // resetCurrentForm.value = !resetCurrentForm.value;
+    resetCurrentPreviewFactuelFormData();
+    resetCurrentGlobalFactuelFormData();
+    resetCurrentForm.value = !resetCurrentForm.value;
     toast.success("Indicateur ajouté.");
   }
 };
@@ -244,8 +248,6 @@ const resetForm = () => {
 const createForm = async () => {
   isLoadingForm.value = true;
   try {
-    console.log("PAYLOAD", payload);
-
     await FormulaireFactuel.create(payload);
     toast.success(`Formulaire créé avec succès.`);
     resetForm();
@@ -254,6 +256,19 @@ const createForm = async () => {
     console.log(e);
   } finally {
     isLoadingForm.value = false;
+  }
+};
+
+const getListForm = async () => {
+  isLoading.value = true;
+  try {
+    const { data } = await FormulaireFactuel.get();
+    listForms.value = data.data;
+  } catch (e) {
+    toast.error("Erreur récupération liste des formulaires.");
+    console.log(e);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -267,6 +282,10 @@ const showForm = computed(() => {
 
 onBeforeUnmount(() => {
   clearUniqueKeys();
+});
+
+onMounted(() => {
+  getListForm();
 });
 </script>
 
@@ -310,7 +329,7 @@ onBeforeUnmount(() => {
             <ChevronDownIcon />
           </Accordion>
           <AccordionPanel class="p-2">
-            <CritereGouvernance :to-reset="resetCurrentForm" :is-available="isAvailable.critere" @selected="getCritere" />
+            <CritereGouvernance :to-reset="false" :is-available="isAvailable.critere" @selected="getCritere" />
           </AccordionPanel>
         </AccordionItem>
 
@@ -320,7 +339,7 @@ onBeforeUnmount(() => {
             <ChevronDownIcon />
           </Accordion>
           <AccordionPanel class="p-2">
-            <PrincipeGouvernance :to-reset="resetCurrentForm" :is-available="isAvailable.principe" @selected="getPrincipe" />
+            <PrincipeGouvernance :to-reset="false" :is-available="isAvailable.principe" @selected="getPrincipe" />
           </AccordionPanel>
         </AccordionItem>
 
@@ -330,7 +349,7 @@ onBeforeUnmount(() => {
             <ChevronDownIcon />
           </Accordion>
           <AccordionPanel class="p-2">
-            <TypeGouvernance :to-reset="resetCurrentForm" :is-available="isAvailable.type" @selected="getType" />
+            <TypeGouvernance :to-reset="false" :is-available="isAvailable.type" @selected="getType" />
           </AccordionPanel>
         </AccordionItem>
       </AccordionGroup>
