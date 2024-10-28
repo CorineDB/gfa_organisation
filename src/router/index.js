@@ -60,7 +60,8 @@ import projets_id_details from "../views/dashboard/projets/_id/details.vue";
 import EnqueteIndividuel from "../views/dashboard/enqueteIndividuel.vue";
 import FicheResultat from "../views/dashboard/FicheResultat.vue";
 import Marqueur from "../views/dashboard/marqueur.vue";
-import CreateForm from "../views/dashboard/CreateForm.vue";
+import CreateFormFactuel from "../views/dashboard/CreateFormFactuel.vue";
+import CreateFormPerception from "../views/dashboard/CreateFormPerception.vue";
 
 const routes = [
   {
@@ -155,9 +156,14 @@ const routes = [
         component: ToolsPerception,
       },
       {
-        path: "create-form",
-        name: "createform",
-        component: CreateForm,
+        path: "create-factuel",
+        name: "create_form_factuel",
+        component: CreateFormFactuel,
+      },
+      {
+        path: "create-perception",
+        name: "create_form_perception",
+        component: CreateFormPerception,
       },
       {
         path: "pta/:ongId",

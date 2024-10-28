@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
 import OptionReponse from "@/services/modules/optionReponse.service";
@@ -19,6 +19,8 @@ const isLoading = ref(false);
 const isLoadingData = ref(true);
 const isCreate = ref(true);
 const isEditOrDelete = ref(false);
+const globalOptionResponses = defineModel("globalOptionResponses");
+const previewOptionResponses = ref({ options_de_reponse: [] });
 const datas = ref([]);
 
 // Fetch data
@@ -102,6 +104,26 @@ const closeDeleteModal = () => (deleteModalPreview.value = false);
 
 const modeText = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
+function updateTemporyOption(id, point) {
+  const index = globalOptionResponses.value.options_de_reponse.findIndex((option) => option.id === id);
+  if (index !== -1) {
+    globalOptionResponses.value.options_de_reponse[index].point = point;
+  } else {
+    globalOptionResponses.value.options_de_reponse.push({ id, point });
+  }
+}
+
+function removeTemporyOption(id) {
+  globalOptionResponses.value.options_de_reponse = globalOptionResponses.value.options_de_reponse.filter((option) => option.id !== id);
+}
+
+watch(idChecked, (newChecked, oldChecked) => {
+  oldChecked.forEach((id) => {
+    if (!newChecked.includes(id)) {
+      removeTemporyOption(id);
+    }
+  });
+});
 // Fetch data on component mount
 onMounted(getDatas);
 </script>
@@ -119,20 +141,14 @@ onMounted(getDatas);
 
     <!-- Data List -->
     <ul v-if="!isLoadingData" class="overflow-y-auto listes max-h-[40vh]">
-      <li v-for="data in datas" :key="data.id" class="flex items-center justify-between gap-2 px-1 py-1.5 text-base hover:bg-blue-100 list-data">
+      <li v-for="(data, index) in datas" :key="data.id" class="flex items-center justify-between gap-2 px-1 py-1.5 text-base hover:bg-blue-100 list-data">
         <div class="flex items-center gap-1">
           <div class="p-2 form-check">
             <input :id="data.id" class="form-check-input" type="checkbox" :value="data.id" v-model="idChecked" />
             <label class="form-check-label" :for="data.id">{{ data.libelle }}</label>
           </div>
           <div v-if="idChecked.includes(data.id)" class="flex items-center gap-1 transition-all">
-            <input type="number" name="point" :id="data.id" class="w-[75px] form-control" />
-            <button class="p-2 btn btn-primary">
-              <PlusIcon class="size-4" />
-            </button>
-            <button class="p-2 btn btn-primary">
-              <Edit3Icon class="size-4" />
-            </button>
+            <input type="number" name="point" :id="`${data.id}${index}`" :value="globalOptionResponses.options_de_reponse.find((option) => option.id === data.id)?.point || ''" @input="updateTemporyOption(data.id, $event.target.value)" class="w-[75px] form-control" />
           </div>
         </div>
         <div v-if="!idChecked.includes(data.id) && isEditOrDelete" class="flex items-center gap-1 space-x-1 transition-all opacity-0 container-buttons">

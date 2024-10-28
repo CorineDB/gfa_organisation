@@ -25,6 +25,7 @@ const deleteModalPreview = ref(false);
 const isLoading = ref(false);
 const isLoadingData = ref(true);
 const isCreate = ref(true);
+const isEditOrDelete = ref(false);
 const datas = ref([]);
 
 function choiceOption(data) {
@@ -126,7 +127,11 @@ onMounted(getDatas);
 <template>
   <div :class="[isAvailable ? '' : 'opacity-50 pointer-events-none']">
     <!-- Button to open modal -->
-    <div class="flex justify-end mb-4">
+    <div class="flex items-center justify-between mb-4">
+      <div class="form-check form-switch">
+        <input id="indicateur" class="form-check-input" type="checkbox" v-model="isEditOrDelete" />
+        <label class="form-check-label" for="indicateur">Modifier/Supprimer</label>
+      </div>
       <button class="text-sm btn btn-primary" @click="openCreateModal"><PlusIcon class="mr-1 size-4" />Ajouter</button>
     </div>
 
@@ -137,7 +142,7 @@ onMounted(getDatas);
           <input :id="data.id" @change="choiceOption(data)" class="form-check-input" type="radio" name="indicateur" :value="data.id" v-model="idChecked" />
           <label class="form-check-label" :for="data.id">{{ data.nom }}</label>
         </div>
-        <div v-if="data.id !== idChecked" class="flex items-center gap-1 space-x-1 transition-all opacity-0 container-buttons">
+        <div v-if="data.id !== idChecked && isEditOrDelete" class="flex items-center gap-1 space-x-1 transition-all opacity-0 container-buttons">
           <button class="p-1.5 text-white btn btn-primary" @click="handleEdit(data)">
             <Edit3Icon class="size-5" />
           </button>

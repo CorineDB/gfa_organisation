@@ -11,6 +11,9 @@ import FactuelStructure from "@/components/create-form/FactuelStructure.vue";
 import ListAccordionIndicateur from "@/components/create-form/ListAccordionIndicateur.vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
+import FormulaireFactuel from "@/services/modules/formFactuel.service";
+import PreviewFactuelForm from "@/components/create-form/PreviewFactuelForm.vue";
+import { getAllErrorMessages } from "@/utils/gestion-error";
 
 const tabs = [
   {
@@ -24,7 +27,7 @@ const tabs = [
 ];
 
 const currentTab = ref(0);
-const indexAccordion = ref(1);
+const indexAccordion = ref(0);
 const resetCurrentForm = ref(false);
 const modalForm = ref(false);
 const isLoadingForm = ref(false);
@@ -32,6 +35,8 @@ const previewFormFactuelData = ref([]);
 const globalFormFactuelData = ref([]);
 const previewTypesGouvernance = ref({});
 const globalTypesGouvernance = ref({});
+const globalOptionResponses = ref({ options_de_reponse: [] });
+const typesGouvernance = ref({ types_de_gouvernance: [] });
 const uniqueKeys = new Map();
 
 const isAvailable = reactive({
@@ -47,7 +52,7 @@ const payload = reactive({
   libelle: "",
   annee_exercice: new Date().getFullYear(),
   type: "factuel",
-  factuel: { options_de_reponse: [], globalTypesGouvernance },
+  factuel: { options_de_reponse: globalOptionResponses.value.options_de_reponse, types_de_gouvernance: typesGouvernance.value.types_de_gouvernance },
 });
 
 const currentPreviewFactuelFormData = reactive({
@@ -70,14 +75,14 @@ const generateKey = (submission) => {
 };
 
 const organiseGlobalFormFactuelData = (submissions) => {
-  const organisedData = { types_de_gouvernance: [] };
+  // const organisedData = { types_de_gouvernance: [] };
 
   submissions.forEach((submission) => {
     // Trouver ou créer le type de gouvernance
-    let type = organisedData.types_de_gouvernance.find((t) => t.id === submission.type);
+    let type = typesGouvernance.value.types_de_gouvernance.find((t) => t.id === submission.type);
     if (!type) {
       type = { id: submission.type, principes_de_gouvernance: [] };
-      organisedData.types_de_gouvernance.push(type);
+      typesGouvernance.value.types_de_gouvernance.push(type);
     }
 
     // Trouver ou créer le principe de gouvernance
@@ -100,7 +105,7 @@ const organiseGlobalFormFactuelData = (submissions) => {
     }
   });
 
-  return organisedData;
+  return typesGouvernance.value;
 };
 const organisePreviewFormFactuelData = (submissions) => {
   const organisedData = { types_de_gouvernance: [] };
@@ -161,8 +166,8 @@ const resetCurrentGlobalFactuelFormData = () => {
 const updateAllTypesGouvernance = () => {
   globalTypesGouvernance.value = organiseGlobalFormFactuelData(globalFormFactuelData.value);
   previewTypesGouvernance.value = organisePreviewFormFactuelData(previewFormFactuelData.value);
-  console.log("GLOBAL", globalTypesGouvernance.value);
-  console.log("PREVIEW", previewTypesGouvernance.value);
+  // console.log("GLOBAL", globalTypesGouvernance.value);
+  // console.log("PREVIEW", previewTypesGouvernance.value);
 };
 
 const changeIndexAccordion = (index) => {
@@ -175,17 +180,17 @@ const getType = (type) => {
   currentPreviewFactuelFormData.type = { id: type.id, nom: type.nom };
 };
 const getPrincipe = (principe) => {
-  changeIndexAccordion(5);
+  changeIndexAccordion(4);
   currentGlobalFactuelFormData.principe = principe.id;
   currentPreviewFactuelFormData.principe = { id: principe.id, nom: principe.nom };
 };
 const getCritere = (critere) => {
-  changeIndexAccordion(4);
+  changeIndexAccordion(3);
   currentGlobalFactuelFormData.critere = critere.id;
   currentPreviewFactuelFormData.critere = { id: critere.id, nom: critere.nom };
 };
 const getIndicateur = (indicateur) => {
-  changeIndexAccordion(3);
+  changeIndexAccordion(2);
   currentGlobalFactuelFormData.indicateur = indicateur.id;
   currentPreviewFactuelFormData.indicateur = { id: indicateur.id, nom: indicateur.nom };
 };
@@ -202,12 +207,12 @@ const addNewIndicator = () => {
     globalFormFactuelData.value.unshift({ ...currentGlobalFactuelFormData });
     previewFormFactuelData.value.unshift(JSON.parse(JSON.stringify(currentPreviewFactuelFormData)));
     uniqueKeys.set(key, true);
-    console.log("global:", globalFormFactuelData.value);
-    console.log("preview:", previewFormFactuelData.value);
+    // console.log("global:", globalFormFactuelData.value);
+    // console.log("preview:", previewFormFactuelData.value);
     updateAllTypesGouvernance();
-    resetCurrentPreviewFactuelFormData();
-    resetCurrentGlobalFactuelFormData();
-    resetCurrentForm.value = !resetCurrentForm.value;
+    // resetCurrentPreviewFactuelFormData();
+    // resetCurrentGlobalFactuelFormData();
+    // resetCurrentForm.value = !resetCurrentForm.value;
     toast.success("Indicateur ajouté.");
   }
 };
@@ -224,8 +229,8 @@ const removeIndicator = (indicateur) => {
     previewFormFactuelData.value.splice(index, 1);
     addNewIndicator.uniqueKeys.delete(key);
     updateAllTypesGouvernance();
-    console.log("Nouvelle Global:", globalFormFactuelData.value);
-    console.log("Nouvelle preview:", previewFormFactuelData.value);
+    // console.log("Nouvelle Global:", globalFormFactuelData.value);
+    // console.log("Nouvelle preview:", previewFormFactuelData.value);
   }
 };
 const clearUniqueKeys = () => {
@@ -237,15 +242,18 @@ const resetForm = () => {
   modalForm.value = false;
 };
 const createForm = async () => {
-  isLoading.value = true;
+  isLoadingForm.value = true;
   try {
-    // await  Formulaire.create(payload);
+    console.log("PAYLOAD", payload);
+
+    await FormulaireFactuel.create(payload);
     toast.success(`Formulaire créé avec succès.`);
     resetForm();
   } catch (e) {
     toast.error(getAllErrorMessages(e));
+    console.log(e);
   } finally {
-    isLoading.value = false;
+    isLoadingForm.value = false;
   }
 };
 
@@ -254,7 +262,7 @@ const isCurrentFormValid = computed(() => {
 });
 
 const showForm = computed(() => {
-  return globalFormFactuelData.value.length > 0;
+  return globalFormFactuelData.value.length > 0 && globalOptionResponses.value.options_de_reponse.length >= 2;
 });
 
 onBeforeUnmount(() => {
@@ -264,7 +272,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex w-full gap-2">
-    <section class="w-[30%] max-h-screen pr-1 overflow-auto border-r-2 pt-5">
+    <section class="w-[30%] h-screen pr-1 overflow-y-auto border-r-2 pt-5">
       <AccordionGroup :selectedIndex="indexAccordion" class="space-y-1">
         <AccordionItem class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
@@ -272,11 +280,11 @@ onBeforeUnmount(() => {
             <ChevronDownIcon />
           </Accordion>
           <AccordionPanel class="p-2">
-            <OptionsResponse />
+            <OptionsResponse v-model:globalOptionResponses="globalOptionResponses" />
           </AccordionPanel>
         </AccordionItem>
 
-        <AccordionItem v-show="currentTab === 0" class="">
+        <AccordionItem>
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
             <p>Indicateurs de gouvernance</p>
             <ChevronDownIcon />
@@ -286,7 +294,7 @@ onBeforeUnmount(() => {
           </AccordionPanel>
         </AccordionItem>
 
-        <AccordionItem v-show="currentTab === 1" class="">
+        <!-- <AccordionItem v-show="currentTab === 1" class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
             <p>Questions opérationnelles</p>
             <ChevronDownIcon />
@@ -294,7 +302,7 @@ onBeforeUnmount(() => {
           <AccordionPanel class="p-2">
             <QuestionsOperationnel :to-reset="resetCurrentForm" :is-available="isAvailable.question" @selected="getIndicateur" />
           </AccordionPanel>
-        </AccordionItem>
+        </AccordionItem> -->
 
         <AccordionItem class="">
           <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
@@ -337,9 +345,9 @@ onBeforeUnmount(() => {
           <TabPanel class="leading-relaxed">
             <div class="flex flex-col gap-8">
               <div class="space-y-2">
-                <p class="text-lg font-medium">Création de l'indicateur</p>
+                <p class="text-lg font-medium">Ajouter des indicateurs</p>
                 <FactuelStructure :type="currentPreviewFactuelFormData.type.nom" :principe="currentPreviewFactuelFormData.principe.nom" :critere="currentPreviewFactuelFormData.critere.nom" :indicateur="currentPreviewFactuelFormData.indicateur.nom" />
-                <button :disabled="!isCurrentFormValid" @click="addNewIndicator" class="my-4 text-sm btn btn-primary"><PlusIcon class="mr-1 size-4" />Ajouter l'indicateur</button>
+                <button :disabled="!isCurrentFormValid" @click="addNewIndicator" class="my-4 text-sm btn btn-primary"><PlusIcon class="mr-1 size-4" />Ajouter</button>
               </div>
               <div class="space-y-2">
                 <p class="text-lg font-medium">Liste des indicateurs</p>
@@ -371,7 +379,10 @@ onBeforeUnmount(() => {
             <input id="annee" type="number" required v-model.number="payload.annee_exercice" class="form-control" placeholder="Année" />
           </div>
         </div>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate cumque beatae laudantium ex mollitia hic ut minima quo explicabo voluptas. Rem dolorem quaerat eos officia veniam magnam, sint voluptates animi.</p>
+        <div class="max-h-[50vh] h-[50vh] overflow-y-auto">
+          <p class="mb-3">Formulaire factuel</p>
+          <PreviewFactuelForm :types-gouvernance="previewTypesGouvernance.types_de_gouvernance" />
+        </div>
       </ModalBody>
       <ModalFooter>
         <div class="flex gap-2">

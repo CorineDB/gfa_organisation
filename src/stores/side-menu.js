@@ -108,20 +108,30 @@ export const useSideMenuStore = defineStore("sideMenu", {
         pageName: "projets",
         title: "Outils de collecte",
         subMenu: [
+          // {
+          //   icon: "FolderKanbanIcon",
+          //   pageName: "typeGouvernance",
+          //   title: "Type de Gouvernance",
+          // },
+          // {
+          //   icon: "GlobeIcon",
+          //   pageName: "PrincipeGouvernance",
+          //   title: "Principes de Gouvernance",
+          // },
+          // {
+          //   icon: "GlobeIcon",
+          //   pageName: "critereGouvernance",
+          //   title: "Criteres de Gouvernance",
+          // },
           {
-            icon: "FolderKanbanIcon",
-            pageName: "typeGouvernance",
-            title: "Type de Gouvernance",
+            icon: "SettingsIcon",
+            pageName: "create_form_factuel",
+            title: "Création Formulaire Factuel",
           },
           {
-            icon: "GlobeIcon",
-            pageName: "PrincipeGouvernance",
-            title: "Principes de Gouvernance",
-          },
-          {
-            icon: "GlobeIcon",
-            pageName: "critereGouvernance",
-            title: "Criteres de Gouvernance",
+            icon: "SettingsIcon",
+            pageName: "create_form_perception",
+            title: "Création Formulaire de Perception",
           },
           {
             icon: "SettingsIcon",
