@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import { reactive } from "vue";
-import FormulaireFactuel from "@/services/modules/toolsFactuel.service";
+import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { toast } from "vue3-toastify";
 import VButton from "@/components/news/VButton.vue";
@@ -26,10 +26,10 @@ const isLoading = ref(false);
 const isLoadingDataFactuel = ref(true);
 const currentPage = ref(0);
 const nomProgram = ref("");
-const idEnquete = "LrDVRGx0Gmqz79w1j3M2AlBbr6apLE5aKyK8XvDeOJYVZPo4dQgkRnx0mjpzOB7k";
+const idEvaluation = "JVpw9BrNk0wMNlBjQrXVAe2Y6pZzgE79nD8G4vL3On51JPbWaKyR9mdonZgy56RG";
 
 const getDataFormFactuel = async () => {
-  await FormulaireFactuel.getDataFormFactuel()
+  await EvaluationService.getOneEvaluation(idEvaluation)
     .then((result) => {
       formDataFactuel.value = result.data.data;
       isLoadingDataFactuel.value = false;
@@ -84,7 +84,7 @@ const submitData = async () => {
   };
   payload.response_data = response;
   console.log("response:", response);
-  await FormulaireFactuel.create(idEnquete, payload)
+  await EvaluationService.create(idEvaluation, payload)
     .then((result) => {
       isLoading.value = false;
       // payload.response_data = [];
@@ -136,7 +136,7 @@ const filterFormData = () => {
 // );
 
 onMounted(async () => {
-  await getcurrentUserAndFetchOrganization();
+  // await getcurrentUserAndFetchOrganization();
   await getDataFormFactuel();
 });
 </script>

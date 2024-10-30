@@ -93,7 +93,7 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
       {
         icon: "BarChart2Icon",
         pageName: "Programmation_enquete",
-        title: " Enquête & résulats",
+        title: "Évaluations & Résulats",
       },
 
       {

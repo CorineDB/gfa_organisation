@@ -135,7 +135,7 @@ const optionPreviewForm = computed(() => {
   if (previewForm.value.options_de_reponse)
     return previewForm.value.options_de_reponse.map((option) => ({
       id: option.id,
-      point: option.pivot.point,
+      point: option.point,
       libelle: option.libelle,
     }));
 });
