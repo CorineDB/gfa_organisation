@@ -1,4 +1,5 @@
 import ApiService from "@/services/configs/api.service";
+import { param } from "jquery";
 
 const EvaluationService = {
   query(type, params) {
@@ -7,8 +8,17 @@ const EvaluationService = {
     });
   },
 
-  getOneEvaluation(id) {
-    return ApiService.get(`gfa/evaluations-de-gouvernance/${id}/soumissions`);
+  getFormEvaluation(idEvaluation) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/formulaires-de-gouvernance`);
+  },
+  findEvaluation(id) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${id}`);
+  },
+  getSource() {
+    return ApiService.get(`gfa/sources-de-verification`);
+  },
+  submitSumission(id, params) {
+    return ApiService.post(`gfa/evaluations-de-gouvernance/${id}/soumissions`, params);
   },
 
   create(params) {

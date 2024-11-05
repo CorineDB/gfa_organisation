@@ -62,6 +62,7 @@ import FicheResultat from "../views/dashboard/FicheResultat.vue";
 import Marqueur from "../views/dashboard/marqueur.vue";
 import CreateFormFactuel from "../views/dashboard/CreateFormFactuel.vue";
 import CreateFormPerception from "../views/dashboard/CreateFormPerception.vue";
+import EvaluationFactuel from "@/views/dashboard/EvaluationFactuel.vue";
 
 const routes = [
   {
@@ -125,7 +126,7 @@ const routes = [
       {
         path: "toolsFactuel",
         name: "ToolsFactuel",
-        component: ToolsFactuel,
+        component: EvaluationFactuel,
       },
       {
         path: "audit",

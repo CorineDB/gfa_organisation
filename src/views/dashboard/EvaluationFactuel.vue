@@ -75,10 +75,13 @@ const getcurrentUserAndFetchOrganization = async () => {
 };
 
 const submitData = async () => {
+  // Convertir `responses` en tableau et l'affecter à `payload.factuel.response_data`
   payload.factuel.response_data = Object.values(responses);
+
   const formData = new FormData();
 
-  // Function to append data, including handling arrays, objects, and files
+  // Fonction pour ajouter les données dans FormData de manière récursive
+  // En excluant les fichiers de `preuves` qui seront ajoutés manuellement
   const appendFormData = (data, root = "") => {
     if (Array.isArray(data)) {
       data.forEach((item, index) => {
@@ -86,17 +89,20 @@ const submitData = async () => {
       });
     } else if (data instanceof Object && !(data instanceof File)) {
       Object.keys(data).forEach((key) => {
-        appendFormData(data[key], root ? `${root}[${key}]` : key);
+        // Ignore le champ `preuves` pour éviter la duplication
+        if (key !== "preuves") {
+          appendFormData(data[key], root ? `${root}[${key}]` : key);
+        }
       });
     } else {
       formData.append(root, data);
     }
   };
 
-  // Append non-file data from payload to FormData
+  // Ajouter toutes les données dans `payload` à `FormData`, en excluant les fichiers `preuves`
   appendFormData(payload);
 
-  // Manually add files to FormData from `responses`
+  // Manuellement ajouter les fichiers `preuves` à `FormData`
   payload.factuel.response_data.forEach((response, questionIndex) => {
     if (response.preuves) {
       response.preuves.forEach((file, fileIndex) => {
@@ -165,20 +171,7 @@ const initializeFormData = () => {
 };
 const handleFileUpload = (event, questionIndex) => {
   const files = Array.from(event.target.files);
-  responses[questionIndex].preuves = files.map((file) => {
-    const formData = new FormData();
-    formData.append("file", file); // Ajoute le fichier à FormData
-    formData.forEach((value, key) => {
-      console.log(`${key}:`, value);
-    });
-
-    // Vous pouvez aussi ajouter d'autres informations si nécessaire
-    // formData.append('questionIndex', questionIndex);
-
-    return {
-      formData, // Enregistre le FormData pour chaque fichier
-    };
-  });
+  responses[questionIndex].preuves = files; // Store files directly as an array of File objects
 };
 
 const changePage = (pageNumber) => {

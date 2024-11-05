@@ -79,8 +79,6 @@ const generateKey = (id) => {
 };
 
 const organiseGlobalFormFactuelData = (submissions) => {
-  // const organisedData = { types_de_gouvernance: [] };
-
   submissions.forEach((submission) => {
     // Trouver ou créer le type de gouvernance
     let type = typesGouvernance.value.types_de_gouvernance.find((t) => t.id === submission.type);
