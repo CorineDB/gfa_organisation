@@ -180,7 +180,7 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <div v-if="!isLoadingDataFactuel">
+  <div v-if="!isLoadingDataFactuel" class="mx-auto mt-5 max-w-screen-2xl">
     <div v-if="formDataPerception.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataPerception.intitule }}</div>
     <div v-if="formDataPerception.organisations" class="flex items-center justify-end mt-5">
       <div class="min-w-[250px] flex items-center gap-3">

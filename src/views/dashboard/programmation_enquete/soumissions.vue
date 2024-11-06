@@ -7,6 +7,7 @@ import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
+import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
 import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
@@ -21,6 +22,7 @@ const tabulator = ref();
 const idSelect = ref("");
 const showModalCreate = ref(false);
 const deleteModalPreview = ref(false);
+const idEvaluation = route.params.id;
 const isLoading = ref(false);
 const isLoadingData = ref(true);
 const isCreate = ref(true);
@@ -41,79 +43,12 @@ const createData = async () => {
       toast.error("Vérifier les informations et ressayer.");
     });
 };
-const initTabulator = () => {
-  tabulator.value = new Tabulator("#tabulator", {
-    data: datas.value.reponses,
-    placeholder: "Aucune donnée disponible.",
-    layout: "fitColumns",
-    columns: [
-      {
-        title: "Nom",
-        field: "nom",
-      },
-      {
-        title: "Statut",
-        field: "levelOfSubmission",
-        formatter: (cell) => {
-          return getStatusText(cell.getData().levelOfSubmission);
-        },
-      },
-      {
-        title: "Submitted by",
-        field: "submitted_at",
-      },
-      {
-        title: "Actions",
-        field: "actions",
-        formatter: (cell) => {
-          const container = document.createElement("div");
-          container.className = "flex items-center justify-center gap-3";
-
-          const createButton = (label, className, onClick) => {
-            const button = document.createElement("button");
-            button.className = className;
-            button.innerText = label;
-            button.addEventListener("click", onClick);
-            return button;
-          };
-          // C'est < 100 j'ai pris 50 pour l'exemple, il faudra modifier
-          if (cell.getData().levelOfSubmission < 50) {
-            const modifyButton = createButton("Continuer", "btn btn-primary", () => {
-              handleEdit(cell.getData());
-            });
-
-            container.append(modifyButton);
-          } else {
-            const resultatButton = createButton("Résultats", "btn btn-primary", () => {
-              viewResultats(datas.value.id, cell.getData().id);
-            });
-
-            container.append(resultatButton);
-            const syntheseButton = createButton(" Synthese", "btn btn-primary", () => {
-              viewSyntheses(datas.value.id, cell.getData().id);
-            });
-
-            container.append(syntheseButton);
-            const marqueurButton = createButton("Marqueur", "btn btn-primary", () => {
-              viewMarqueur(datas.value.id, cell.getData().id);
-            });
-
-            container.append(marqueurButton);
-          }
-
-          return container;
-        },
-      },
-    ],
-  });
-};
 
 const getDatas = async () => {
   isLoadingData.value = true;
-  await EnqueteDeColleteService.soumissions(route.params.id)
+  await EvaluationService.getSoumissionsEvaluation(idEvaluation)
     .then((result) => {
       datas.value = result.data.data;
-      console.log(datas.value);
       isLoadingData.value = false;
     })
     .catch((e) => {
@@ -121,7 +56,6 @@ const getDatas = async () => {
       isLoadingData.value = false;
       toast.error("Une erreur est survenue: Liste des enquêtes.");
     });
-  initTabulator();
 };
 
 const updateData = async () => {
@@ -143,11 +77,11 @@ const updateData = async () => {
 const submitData = () => (isCreate.value ? createData() : updateData());
 const deleteData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.destroy(idSelect.value)
+  await EvaluationService.deleteOneSoumission(idEvaluation, idSelect.value)
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;
-      toast.success("Soumission de gouvernance supprimé");
+      toast.success("Soumission supprimé");
       getDatas();
     })
     .catch((e) => {
@@ -189,15 +123,15 @@ const viewResultats = (organisationId) => {
   router.push({ name: "resultat_collecte", query: { enqueteId: route.params.id, organisationId: organisationId } });
 };
 
-const viewSyntheses = (organisationId) => {
+const viewSynthese = (organisationId) => {
   router.push({ name: "FicheSynthese", query: { enqueteId: route.params.id, organisationId: organisationId } });
 };
 const viewMarqueur = (organisationId) => {
   router.push({ name: "marqueur", query: { enqueteId: route.params.id, organisationId } });
 };
 
-const handleDelete = (params) => {
-  idSelect.value = params.id;
+const handleDelete = (id) => {
+  idSelect.value = id;
   deleteModalPreview.value = true;
 };
 const cancelSelect = () => {
@@ -213,24 +147,34 @@ const resetForm = () => {
   showModalCreate.value = false;
 };
 const openFactuelModal = () => {
-  router.push({ name: "ToolsFactuel" });
-  //showModalCreate.value = isCreate.value = true;
+  router.push({ name: "ToolsFactuel", query: { e: idEvaluation } });
+};
+const goToPageSynthese = (Idsoumission) => {
+  router.push({ name: "FicheSynthese", query: { e: idEvaluation, s: Idsoumission } });
 };
 
 const openPerceptionModal = () => {
-  router.push({ name: "ToolsPerception" });
-  //showModalCreate.value = isCreate.value = true;
+  router.push({ name: "ToolsPerception", query: { e: idEvaluation } });
 };
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
+// Fonction pour trouver les soumissions de type "factuel"
+function getFactuelSubmissions(soumissions) {
+  return soumissions.filter((sub) => sub.type === "factuel");
+}
+
+// Fonction pour trouver les soumissions de type "perception"
+function getPerceptionSubmissions(soumissions) {
+  return soumissions.filter((sub) => sub.type === "perception");
+}
 onMounted(() => {
   getDatas();
 });
 </script>
 
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Soumissions</h2>
+  <h2 class="mt-10 text-lg font-medium intro-y">Soumissions par organisations</h2>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
@@ -240,36 +184,69 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal"><PlusIcon class="w-4 h-4 mr-3" />Remplir formulaire Factuel</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal">Remplir formulaire Factuel</button>
 
-        <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal"><PlusIcon class="w-4 h-4 mr-3" />Remplir formulaire de perception</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de perception</button>
       </div>
     </div>
   </div>
 
-  <div class="p-5 mt-5 intro-y box">
-    <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-      <div></div>
-      <div class="flex mt-5 sm:mt-0">
-        <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto"><PrinterIcon class="w-4 h-4 mr-2" /> Print</button>
-        <Dropdown class="w-1/2 sm:w-auto">
-          <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
-            <FileTextIcon class="w-4 h-4 mr-2" /> Export
-            <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
-          </DropdownToggle>
-          <DropdownMenu class="w-40">
-            <DropdownContent>
-              <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export CSV </DropdownItem>
-              <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export JSON </DropdownItem>
-              <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export XLSX </DropdownItem>
-              <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export HTML </DropdownItem>
-            </DropdownContent>
-          </DropdownMenu>
-        </Dropdown>
-      </div>
-    </div>
-    <div class="overflow-x-auto scrollbar-hidden" v-if="!isLoadingData">
-      <div id="tabulator" class="mt-5 table-report table-report--tabulator"></div>
+  <div class="p-5 mt-5 intro-y">
+    <div class="" v-if="!isLoadingData">
+      <section class="w-full">
+        <AccordionGroup :selectedIndex="null" class="space-y-1">
+          <AccordionItem v-for="(ong, index) in datas" :key="index">
+            <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
+              <p>{{ ong.nom }}</p>
+              <ChevronDownIcon />
+            </Accordion>
+            <AccordionPanel class="p-2 space-y-2">
+              <AccordionGroup :selectedIndex="null" class="space-y-1">
+                <AccordionItem v-if="getFactuelSubmissions(ong.soumissions).length > 0">
+                  <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
+                    <p>Factuel</p>
+                    <ChevronDownIcon />
+                  </Accordion>
+                  <AccordionPanel class="p-2 space-y-2">
+                    <!-- {{ ong.soumissions }} -->
+                    <div v-for="(soumission, index) in getFactuelSubmissions(ong.soumissions)" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border-l-2 border-yellow-200 rounded shadow">
+                      <p>
+                        Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
+                      </p>
+                      <div class="flex items-center gap-4">
+                        <div class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</div>
+                        <button class="p-2 text-danger" @click="handleDelete(soumission.id)">
+                          <TrashIcon class="size-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </AccordionPanel>
+                </AccordionItem>
+                <AccordionItem v-if="getPerceptionSubmissions(ong.soumissions).length > 0">
+                  <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
+                    <p>Perception</p>
+                    <ChevronDownIcon />
+                  </Accordion>
+                  <AccordionPanel class="p-2 space-y-2">
+                    <!-- {{ ong.soumissions }} -->
+                    <div v-for="(soumission, index) in getPerceptionSubmissions(ong.soumissions)" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border-l-2 border-yellow-200 rounded shadow">
+                      <p>
+                        Soumission n° {{ index + 1 }} ({{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
+                      </p>
+                      <div class="flex items-center gap-4">
+                        <div class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</div>
+                        <button class="p-2 text-danger" @click="handleDelete(soumission.id)">
+                          <TrashIcon class="size-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </AccordionPanel>
+                </AccordionItem>
+              </AccordionGroup>
+            </AccordionPanel>
+          </AccordionItem>
+        </AccordionGroup>
+      </section>
     </div>
     <LoaderSnipper v-if="isLoadingData" />
   </div>

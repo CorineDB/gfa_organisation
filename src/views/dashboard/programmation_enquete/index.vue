@@ -129,78 +129,13 @@ const deleteData = async () => {
       toast.error("Une erreur est survenue, ressayer");
     });
 };
-// const initTabulator = () => {
-//   tabulator.value = new Tabulator("#tabulator", {
-//     data: datas.value,
-//     placeholder: "Aucune donnée disponible.",
-//     layout: "fitColumns",
-//     columns: [
-//       {
-//         title: "Nom",
-//         field: "nom",
-//       },
-//       {
-//         title: "Description",
-//         field: "description",
-//       },
-//       {
-//         title: "Objectif",
-//         field: "objectif",
-//       },
-//       {
-//         title: "Date Debut",
-//         field: "debut",
-//       },
-//       {
-//         title: "Date Fin",
-//         field: "fin",
-//       },
-//       {
-//         title: "Statut",
-//         field: "Statut",
-//         formatter: (cell) => {
-//           return getStatusText(cell.getData().statut);
-//         },
-//       },
-//       {
-//         title: "Actions",
-//         field: "actions",
-//         formatter: (cell) => {
-//           const container = document.createElement("div");
-//           container.className = "flex items-center justify-center gap-3";
-
-//           const createButton = (label, className, onClick) => {
-//             const button = document.createElement("button");
-//             button.className = className;
-//             button.innerText = label;
-//             button.addEventListener("click", onClick);
-//             return button;
-//           };
-
-//           const voirApprecationsButton = createButton("Voir", "btn btn-primary", () => {
-//             gotoSoumissions(cell.getData());
-//           });
-
-//           const modifyButton = createButton("Modifier", "btn btn-primary", () => {
-//             handleEdit(cell.getData());
-//           });
-
-//           container.append(voirApprecationsButton, modifyButton);
-
-//           return container;
-//         },
-//       },
-//     ],
-//   });
-// };
-
 const getStatusText = (param) => {
   switch (param) {
-    case 2:
-      return { label: "Terminé", class: "bg-success" };
     case 1:
-      return { label: "En cours", class: "bg-warning" };
+      return { label: "Terminé", class: "bg-success" };
     case 0:
+      return { label: "En cours", class: "bg-warning" };
+    case -1:
       return { label: "Non demarré", class: "bg-primary" };
     default:
       return { label: "A déterminer", class: "bg-primary" };
@@ -208,7 +143,7 @@ const getStatusText = (param) => {
 };
 
 function gotoSoumissions(enquete) {
-  router.push({ name: "SoumissionsEnqueteDeCollecte", params: { id: enquete.id } });
+  // router.push({ name: "SoumissionsEnqueteDeCollecte", params: { id: enquete.id } });
 }
 
 function gotoAppreciations(enquete) {
@@ -314,14 +249,14 @@ onMounted(() => {
           </div>
 
           <!-- Description section with distinct styling -->
-          <div class="mt-5 text-center lg:text-left">
+          <div @click="gotoSoumissions(item)" class="mt-5 text-center cursor-pointer lg:text-left">
             <!-- <div class="" v-if="item.description">
               <p class="mb-3 text-base font-semibold text-primary">Description</p>
               <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description }}</p>
             </div> -->
 
             <!-- Other details with iconized section headers -->
-            <div @click="gotoSoumissions(item)" class="mt-5 space-y-3 text-gray-600">
+            <div class="mt-5 space-y-3 text-gray-600">
               <div class="flex items-center text-sm font-medium text-gray-700">
                 <CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Date de début:
                 <span class="ml-2 font-semibold text-gray-900">{{ item.debut }}</span>

@@ -17,6 +17,9 @@ const EvaluationService = {
   getSource() {
     return ApiService.get(`gfa/sources-de-verification`);
   },
+  getSoumissionsEvaluation(id) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${id}/soumissions`);
+  },
   submitSumission(id, params) {
     return ApiService.post(`gfa/evaluations-de-gouvernance/${id}/soumissions`, params);
   },
@@ -40,6 +43,9 @@ const EvaluationService = {
 
   destroy(slug) {
     return ApiService.delete(`gfa/evaluations-de-gouvernance/${slug}`);
+  },
+  deleteOneSoumission(slug, soumission) {
+    return ApiService.delete(`gfa/evaluations-de-gouvernance/${slug}/soumissions/${soumission}`);
   },
 
   prolonger(slug, params) {

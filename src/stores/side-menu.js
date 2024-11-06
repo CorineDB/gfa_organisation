@@ -133,17 +133,6 @@ export const useSideMenuStore = defineStore("sideMenu", {
             pageName: "create_form_perception",
             title: "Création Formulaire de Perception",
           },
-          {
-            icon: "SettingsIcon",
-            pageName: "ToolsFactuel",
-            title: "Formulaire Factuel",
-          },
-
-          {
-            icon: "SettingsIcon",
-            pageName: "ToolsPerception",
-            title: "Formulaire de Perception",
-          },
         ],
       },
       {

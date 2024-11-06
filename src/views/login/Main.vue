@@ -75,15 +75,16 @@
               <router-link to="/change-password">Mots de passe oublié?</router-link>
             </div>
             <div class="mt-5 text-center intro-x xl:mt-8 xl:text-left">
-              <button class="w-full px-4 py-3 align-top btn btn-primary bg-primary xl:mr-3">
+              <!-- <button class="w-full px-4 py-3 align-top btn btn-primary bg-primary xl:mr-3">
                 <span class="text-sm font-semibold uppercase"> Se connecter </span>
-                <!-- <span  class="flex items-center justify-center space-x-2">
+                <span  class="flex items-center justify-center space-x-2">
                   <span class="px-4 font-semibold"> chargement ... </span>
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-center animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                </span> -->
-              </button>
+                </span>
+              </button> -->
+              <VButton :loading="chargement" label="Se connecter" class="py-3" />
             </div>
             <div class="mt-10 text-center intro-x xl:mt-24 text-slate-600 dark:text-slate-500 xl:text-left">Célerité holding tout les droits réservés {{ year }}</div>
           </div>
@@ -102,11 +103,12 @@ import { mapState, mapActions, mapMutations, mapGetters } from "vuex";
 
 //import Vmodal from '@/components/Vmodal'
 import axios from "axios";
+import VButton from "@/components/news/VButton.vue";
 import { API_BASE_URL } from "@/services/configs/environment.js";
 
 export default {
   name: "IndexPage",
-  components: {},
+  components: { VButton },
   data() {
     return {
       base_url: API_BASE_URL,
@@ -124,6 +126,7 @@ export default {
       soumettre: false,
       isValidate: false,
       showSend: false,
+      isLoading: false,
     };
   },
   computed: {
