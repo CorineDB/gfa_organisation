@@ -2,10 +2,10 @@
   <div class="px-3 py-5 -mx-3 md:py-0 sm:-mx-8 sm:px-8">
     <!-- <DarkModeSwitcher /> -->
     <!-- <MainColorSwitcher /> -->
-    <MobileMenu />
+    <MobileMenu v-if="!isToolsPerception" />
     <div class="flex mt-[4.7rem] md:mt-0 relative overflow-hidden">
       <!-- BEGIN: Side Menu -->
-      <nav class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
+      <nav v-if="!isToolsPerception" class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
         <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-wrap items-center justify-center mt-3 intro-x">
           <h1 class="font-semibold text-white">Programme de redevabilité</h1>
           <!-- <img alt="Programme de redevabilité" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" /> -->
@@ -85,8 +85,8 @@
       </nav>
       <!-- END: Side Menu -->
       <!-- BEGIN: Content -->
-      <div class="pl-0 content xl:pl-64 md:pl-32">
-        <TopBar />
+      <div class="pl-0 content" :class="[isToolsPerception ? '' : 'xl:pl-64 md:pl-32']">
+        <TopBar v-if="!isToolsPerception" />
         <router-view />
       </div>
       <!-- END: Content -->
@@ -116,7 +116,7 @@ const sideMenu = computed(() => nestedMenu(sideMenuStore.menu, route));
 const updateMenu = reactive([]);
 
 const lastMenu = computed(() => nestedMenu(updateMenu, route));
-
+const isToolsPerception = computed(() => route.path.includes("toolsPerception"));
 provide("forceActiveMenu", (pageName) => {
   route.forceActiveMenu = pageName;
   formattedMenu.value = $h.toRaw(lastMenu.value);
