@@ -170,8 +170,8 @@ export const useSideMenuStore = defineStore("sideMenu", {
         subMenu: [
           {
             icon: "BarChart2Icon",
-            pageName: "optionReponse",
-            title: "Option de réponse",
+            pageName: "sources_verification",
+            title: "Sources de vérification",
           },
           {
             icon: "BarChart2Icon",

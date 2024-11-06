@@ -63,6 +63,8 @@ import Marqueur from "../views/dashboard/marqueur.vue";
 import CreateFormFactuel from "../views/dashboard/CreateFormFactuel.vue";
 import CreateFormPerception from "../views/dashboard/CreateFormPerception.vue";
 import EvaluationFactuel from "@/views/dashboard/EvaluationFactuel.vue";
+import EvaluationPerception from "@/views/dashboard/EvaluationPerception.vue";
+import SourceVerification from "../views/dashboard/SourceVerification.vue";
 
 const routes = [
   {
@@ -154,7 +156,7 @@ const routes = [
       {
         path: "ToolsPerception",
         name: "ToolsPerception",
-        component: ToolsPerception,
+        component: EvaluationPerception,
       },
       {
         path: "create-factuel",
@@ -310,6 +312,11 @@ const routes = [
         path: "suiviIndicateurs",
         name: "SuiviIndicateurs",
         component: SuiviIndicateurs,
+      },
+      {
+        path: "sources-verification",
+        name: "sources_verification",
+        component: SourceVerification,
       },
     ],
   },

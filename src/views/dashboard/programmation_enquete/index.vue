@@ -346,7 +346,7 @@ onMounted(() => {
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
           <InputForm label="Nom" v-model="payload.intitule" />
-          <InputForm label="Description" v-model="payload.description" />
+          <InputForm label="Description" v-model="payload.description" :required="false" />
           <div class="flex w-full gap-4">
             <div class="">
               <label for="objectif" class="form-label">Objectif</label>

@@ -20,6 +20,15 @@ const EvaluationService = {
   submitSumission(id, params) {
     return ApiService.post(`gfa/evaluations-de-gouvernance/${id}/soumissions`, params);
   },
+  submitPerceptionSumission(id, params) {
+    return ApiService.post(`gfa/evaluations-de-gouvernance/${id}/perception-soumission`, params);
+  },
+  validatePerceptionSumission(id, params) {
+    return ApiService.post(`gfa/evaluations-de-gouvernance/${id}/perception-soumission-validation`, params);
+  },
+  validateSumission(id, params) {
+    return ApiService.post(`gfa/evaluations-de-gouvernance/${id}/validate-soumission`, params);
+  },
 
   create(params) {
     return ApiService.post("gfa/evaluations-de-gouvernance/", params);
