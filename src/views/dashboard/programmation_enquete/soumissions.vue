@@ -177,63 +177,107 @@ onMounted(() => {
   <h2 class="mt-10 text-lg font-medium intro-y">Soumissions par organisations</h2>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
+      <!-- <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
         <div class="relative w-56 text-slate-500">
           <input type="text" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
           <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
         </div>
-      </div>
+      </div> -->
       <div class="flex">
         <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal">Remplir formulaire Factuel</button>
 
         <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de perception</button>
       </div>
     </div>
+    <!-- BEGIN: General Report -->
+    <div class="col-span-12 mt-8">
+      <div class="flex items-center h-10 intro-y">
+        <h2 class="mr-5 text-lg font-medium truncate">Statistiques</h2>
+      </div>
+      <div class="grid grid-cols-12 gap-6 mt-5">
+        <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
+          <div class="report-box zoom-in">
+            <div class="p-5 text-center box">
+              <div class="flex justify-center">
+                <GlobeIcon class="report-box__icon text-primary" />
+              </div>
+              <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
+              <div class="mt-1 text-base text-slate-500">Nombre d'organisations</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
+          <div class="report-box zoom-in">
+            <div class="p-5 text-center box">
+              <div class="flex justify-center">
+                <UsersIcon class="report-box__icon text-pending" />
+              </div>
+              <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
+              <div class="mt-1 text-base text-slate-500">Nombre de membres</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
+          <div class="report-box zoom-in">
+            <div class="p-5 text-center box">
+              <div class="flex justify-center">
+                <PercentIcon class="report-box__icon text-warning" />
+              </div>
+              <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
+              <div class="mt-1 text-base text-slate-500">Pourcentage de soumissions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- END: General Report -->
   </div>
 
-  <!-- <div class="p-5 mt-5 intro-y">
+  <div class="p-5 mt-5 intro-y">
     <div class="" v-if="!isLoadingData">
       <section class="w-full">
-        <AccordionGroup :selectedIndex="null" class="space-y-1">
-          <AccordionItem v-for="(ong, index) in datas" :key="index">
-            <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
+        <p class="pb-4 mt-10 text-lg font-medium intro-y">Liste des soumissions par organisations</p>
+
+        <AccordionGroup :selectedIndex="null" class="grid grid-cols-12 gap-3">
+          <AccordionItem v-for="(ong, index) in datas" :key="index" class="col-span-12 xl:col-span-6 intro-y">
+            <Accordion class="text-lg !p-3 font-semibold bg-primary/90 !text-white flex items-center justify-between">
               <p>{{ ong.nom }}</p>
               <ChevronDownIcon />
             </Accordion>
             <AccordionPanel class="p-2 space-y-2">
-              <AccordionGroup :selectedIndex="null" class="space-y-1">
-                <AccordionItem v-if="getFactuelSubmissions(ong.soumissions).length > 0">
+              <AccordionGroup :selectedIndex="0" class="space-y-1">
+                <AccordionItem v-if="ong.factuel?.length > 0">
                   <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
                     <p>Factuel</p>
                     <ChevronDownIcon />
                   </Accordion>
                   <AccordionPanel class="p-2 space-y-2">
-                    <div v-for="(soumission, index) in getFactuelSubmissions(ong.soumissions)" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border-l-2 border-yellow-200 rounded shadow">
+                    <div v-for="(soumission, index) in ong.factuel" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border-l-2 border-yellow-200 rounded shadow">
                       <p>
                         Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
                       </p>
                       <div class="flex items-center gap-4">
                         <div class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</div>
-                        <button class="p-2 text-danger" @click="handleDelete(soumission.id)">
+                        <button v-if="!soumission.statut" class="p-2 text-danger" @click="handleDelete(soumission.id)">
                           <TrashIcon class="size-5" />
                         </button>
                       </div>
                     </div>
                   </AccordionPanel>
                 </AccordionItem>
-                <AccordionItem v-if="getPerceptionSubmissions(ong.soumissions).length > 0">
+                <AccordionItem v-if="ong.perception?.length > 0">
                   <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
                     <p>Perception</p>
                     <ChevronDownIcon />
                   </Accordion>
                   <AccordionPanel class="p-2 space-y-2">
-                    <div v-for="(soumission, index) in getPerceptionSubmissions(ong.soumissions)" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border-l-2 border-yellow-200 rounded shadow">
+                    <div v-for="(soumission, index) in ong.perception" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border-l-2 border-yellow-200 rounded shadow">
                       <p>
                         Soumission n° {{ index + 1 }} ({{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
                       </p>
                       <div class="flex items-center gap-4">
                         <div class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</div>
-                        <button class="p-2 text-danger" @click="handleDelete(soumission.id)">
+                        <button v-if="!soumission.statut" class="p-2 text-danger" @click="handleDelete(soumission.id)">
                           <TrashIcon class="size-5" />
                         </button>
                       </div>
@@ -247,7 +291,7 @@ onMounted(() => {
       </section>
     </div>
     <LoaderSnipper v-if="isLoadingData" />
-  </div> -->
+  </div>
 
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
