@@ -43,7 +43,7 @@ const sources = ref([]);
 
 // Etat de la page et items par page
 const currentPage = ref(1);
-const itemsPerPage = 1;
+const itemsPerPage = 3;
 
 const getDataFormPerception = async () => {
   try {
