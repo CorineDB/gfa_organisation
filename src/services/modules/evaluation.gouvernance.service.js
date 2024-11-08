@@ -37,6 +37,10 @@ const EvaluationService = {
     return ApiService.post("gfa/evaluations-de-gouvernance/", params);
   },
 
+  addParticipantPerception(evaluation, payload) {
+    return ApiService.post(`gfa/evaluations-de-gouvernance/${evaluation}`, payload);
+  },
+
   update(slug, params) {
     return ApiService.update("gfa/evaluations-de-gouvernance/", slug, params);
   },

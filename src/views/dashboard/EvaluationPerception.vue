@@ -11,6 +11,7 @@ import { useRoute } from "vue-router";
 import { getAllErrorMessages } from "@/utils/gestion-error";
 import { computed } from "vue";
 import { ages, categorieDeParticipant, sexes } from "../../utils/constants";
+import { generateUniqueId } from "../../utils/helpers";
 
 const TYPE_ORGANISATION = "organisation";
 
@@ -28,6 +29,7 @@ const payload = reactive({
     response_data: [],
   },
 });
+const clientId = ref();
 const responses = reactive({});
 const formData = reactive({});
 const formDataPerception = ref([]);
@@ -224,6 +226,7 @@ const isLastPage = computed(() => currentPage.value === totalPages.value);
 
 onMounted(async () => {
   idEvaluation.value = route.query.e;
+  clientId.value = generateUniqueId();
   await getDataFormPerception();
   // await getcurrentUserAndFetchOrganization();
   findFormulairePerception();

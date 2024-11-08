@@ -172,7 +172,7 @@ const addNewIndicator = () => {
     resetCurrentForm.value = !resetCurrentForm.value;
     toast.success("Indicateur ajouté.");
   } else {
-    toast.error("Indicateur exisant.");
+    toast.info("Indicateur exisant.");
   }
 };
 const removeIndicator = (indicateur) => {

@@ -1,6 +1,9 @@
 <script setup>
 const props = defineProps({
-  modelValue: String,
+  modelValue: {
+    type: [String, Number],
+    required: true,
+  },
   label: {
     type: String,
     default: "",
@@ -18,7 +21,8 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 function updateValue(event) {
-  emit("update:modelValue", event.target.value);
+  const value = props.type === "number" ? Number(event.target.value) : event.target.value;
+  emit("update:modelValue", value);
 }
 </script>
 

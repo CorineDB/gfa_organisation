@@ -2,7 +2,6 @@
 import { computed, onMounted, reactive, ref } from "vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
-import Tabulator from "tabulator-tables";
 import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
@@ -16,9 +15,9 @@ const route = useRoute();
 
 const payload = reactive({
   nom: "",
+  objectif: "",
 });
 
-const tabulator = ref();
 const idSelect = ref("");
 const showModalCreate = ref(false);
 const deleteModalPreview = ref(false);
@@ -152,6 +151,9 @@ const openFactuelModal = () => {
 const goToPageSynthese = (Idsoumission) => {
   router.push({ name: "FicheSynthese", query: { e: idEvaluation, s: Idsoumission } });
 };
+const opendAddParticipant = () => {
+  router.push({ name: "add_participant", query: { e: idEvaluation } });
+};
 
 const openPerceptionModal = () => {
   router.push({ name: "ToolsPerception", query: { e: idEvaluation } });
@@ -188,6 +190,9 @@ onMounted(() => {
 
         <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de perception</button>
       </div>
+      <div class="flex">
+        <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button>
+      </div>
     </div>
   </div>
 
@@ -217,7 +222,18 @@ onMounted(() => {
                   <UsersIcon class="report-box__icon text-pending" />
                 </div>
                 <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
-                <div class="mt-1 text-base text-slate-500">Nombre de membres</div>
+                <div class="mt-1 text-base text-slate-500">Nombre de membres (En cours)</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
+            <div class="report-box zoom-in">
+              <div class="p-5 text-center box">
+                <div class="flex justify-center">
+                  <UsersIcon class="report-box__icon text-success" />
+                </div>
+                <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
+                <div class="mt-1 text-base text-slate-500">Nombre de membres (Terminé)</div>
               </div>
             </div>
           </div>

@@ -65,6 +65,7 @@ import CreateFormPerception from "../views/dashboard/CreateFormPerception.vue";
 import EvaluationFactuel from "@/views/dashboard/EvaluationFactuel.vue";
 import EvaluationPerception from "@/views/dashboard/EvaluationPerception.vue";
 import SourceVerification from "../views/dashboard/SourceVerification.vue";
+import SendMailPerception from "../views/dashboard/SendMailPerception.vue";
 
 const routes = [
   {
@@ -318,6 +319,11 @@ const routes = [
         name: "sources_verification",
         component: SourceVerification,
       },
+      {
+        path: "add-participant",
+        name: "add_participant",
+        component: SendMailPerception,
+      },
     ],
   },
 
@@ -363,8 +369,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // Permettre l'accès aux routes incluant "toolsPerception" dans leur chemin
-  if (to.path.includes("toolsPerception")) {
+  // Permettre l'accès à la route "toolsPerception" quel que soit l'état d'authentification
+  if (to.name === "ToolsPerception") {
     next();
   }
   // Rediriger vers "/" si non authentifié et que la route n'est pas la page d'accueil
