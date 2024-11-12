@@ -149,7 +149,7 @@ const openFactuelModal = () => {
   router.push({ name: "ToolsFactuel", params: { id: idEvaluation } });
 };
 const goToPageSynthese = (Idsoumission) => {
-  router.push({ name: "FicheSynthese", params: { e: idEvaluation, s: Idsoumission } });
+  router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
 };
 const opendAddParticipant = () => {
   router.push({ name: "add_participant", query: { e: idEvaluation } });
@@ -187,12 +187,10 @@ onMounted(() => {
       </div> -->
       <div class="flex">
         <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal">Remplir formulaire Factuel</button>
-
         <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de perception</button>
       </div>
       <div class="flex">
         <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
-
         <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button>
       </div>
     </div>
@@ -250,6 +248,15 @@ onMounted(() => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="col-span-12 mt-8">
+        <div class="flex items-center h-10 intro-y">
+          <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
+        </div>
+        <div class="grid grid-cols-12 gap-6 mt-5">
+          <div @click="goToPageSynthese" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer hover:border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiche de Synthèse</button> <ArrowRightIcon class="size-5" /></div>
         </div>
       </div>
       <!-- END: General Report -->

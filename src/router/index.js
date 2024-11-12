@@ -192,7 +192,7 @@ const routes = [
       },
 
       {
-        path: "/synthese/:e/:s",
+        path: "/synthese/:e",
         name: "FicheSynthese",
         component: FicheSynthese,
       },

@@ -1,5 +1,5 @@
 export const colors = [
-  { limit: 0.25, color: "rgb(239 68 68 )" },
+  { limit: 0.25, color: "rgb(248 80 80 )" },
   { limit: 0.5, color: "rgb(161, 39, 39)" },
   { limit: 0.75, color: "rgb(234 179 8 )" },
   { limit: 1, color: "rgb(22 163 74 )" },

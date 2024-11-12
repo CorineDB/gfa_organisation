@@ -203,9 +203,17 @@ const deleteData = async () => {
 // Handle edit action
 const handleEdit = (data) => {
   isCreate.value = false;
-  // getOne(data.id);
   idSelect.value = data.id;
   payload.nom = data.nom;
+  payload.departement = data.departement;
+  payload.commune = data.commune;
+  payload.arrondissement = data.arrondissement;
+  payload.arrondissement = data.quartier;
+  payload.addresse = data.addresse ?? "";
+  payload.latitude = data.latitude;
+  payload.longitude = data.longitude;
+  payload.secteurActivite = data.secteurActivite;
+  payload.pays = data.pays;
   payload.email = data.user.email;
   payload.code = data.code;
   payload.sigle = data.sigle;
@@ -342,8 +350,8 @@ onMounted(() => {
                 <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export JSON </DropdownItem>
                 <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export XLSX </DropdownItem>
                 <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export HTML </DropdownItem>
-              </DropdownContent>
-            </DropdownMenu>
+              </DropdownContent> </DropdownMenu
+            >secteurActivite
           </Dropdown>
         </div>
       </div>
@@ -409,19 +417,25 @@ onMounted(() => {
               </TomSelect>
             </div>
           </div>
+          <!-- <div class="grid grid-cols-2 gap-4">
+            <InputForm label="Département" v-model="payload.departement" />
+            <InputForm label="Commune" v-model="payload.commune" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <InputForm label="Arrondissement" v-model="payload.arrondissement" />
+            <InputForm label="Quatier" v-model="payload.quartier" />
+          </div> -->
           <div class="grid grid-cols-2 gap-4">
             <InputForm label="Longitude" v-model.number="payload.longitude" type="number" />
             <InputForm label="Latitude" v-model.number="payload.latitude" type="number" />
           </div>
-          <div class="p-2 form-check">
-            <input id="focal" class="form-check-input" type="checkbox" v-model="addPointFocal" />
-            <label class="form-check-label" for="focal">Cocher pour ajouter un point focal</label>
-          </div>
-          <div v-if="addPointFocal" class="grid grid-cols-2 gap-4">
+
+          <div class="grid grid-cols-2 gap-4">
             <InputForm label="Nom point focal" v-model="payload.nom_point_focal" />
             <InputForm label="Prénom point focal" v-model="payload.prenom_point_focal" />
           </div>
-          <InputForm v-if="addPointFocal" label="Contact point focal" v-model="payload.contact_point_focal" type="number" />
+          <InputForm label="Contact point focal" v-model="payload.contact_point_focal" type="number" />
         </ModalBody>
         <ModalFooter>
           <div class="flex gap-2">

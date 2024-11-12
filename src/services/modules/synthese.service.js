@@ -6,6 +6,11 @@ const SyntheseService = {
     return ApiService.get(`gfa/enquetes-de-collecte/${enqueteDeCollecteId}/resultats/${organisationId}`);
   },
 
+  getForEvaluation(idEvaluation) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/fiches-de-synthese
+`);
+  },
+
   getOrganizations(slug) {
     return ApiService.get(`gfa/organisations`);
   },

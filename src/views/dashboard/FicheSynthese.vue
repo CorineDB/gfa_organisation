@@ -13,6 +13,8 @@ import ChartScroreByPrincipe from "../../components/news/ChartScroreByPrincipe.v
 import ChartOptionResponseByCategorieAndMember from "../../components/news/ChartOptionResponseByCategorieAndMember.vue";
 import ChartProgressionByTime from "../../components/news/ChartProgressionByTime.vue";
 import ChartScorePerceptionByPrincipe from "../../components/news/ChartScorePerceptionByPrincipe.vue";
+import { computed } from "vue";
+import TableSynthesePerception from "../../components/news/TableSynthesePerception.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -20,8 +22,8 @@ const route = useRoute();
 const idEvaluation = route.params.e;
 const organizationId = ref("R5P1oK0OP6DmWGvB21RNoeb9Xpgdwr7PNQ4zy0LAM8KnVZEJa5xlOjYkeWBv8aJy");
 const enqueteDeCollecteId = ref("LrDVRGx0Gmqz79w1j3M2AlBbr6apLE5aKyK8XvDeOJYVZPo4dQgkRnx0mjpzOB7k");
-const selectStructureId = ref("");
-const datasCollection = ref({});
+const idSelectStructure = ref("");
+const dataForAllOrganisation = ref([]);
 const datasFactuel = ref([]);
 const datasPerception = ref([]);
 const structures = ref([]);
@@ -233,39 +235,41 @@ const datas = [
 
 const getDataCollection = async () => {
   isLoadingData.value = true;
-  await SyntheseService.get(enqueteDeCollecteId.value, organizationId.value)
+  await SyntheseService.getForEvaluation(idEvaluation)
     .then((result) => {
-      datasCollection.value = result.data.data;
-      datasFactuel.value = datasCollection.value.analyse_factuel;
-      datasPerception.value = datasCollection.value.analyse_perception;
+      dataForAllOrganisation.value = result.data.data;
+      datasFactuel.value = dataForAllOrganisation.value.analyse_factuel;
+      datasPerception.value = dataForAllOrganisation.value.analyse_perception;
       isLoadingData.value = false;
     })
     .catch((e) => {
       isLoadingData.value = false;
       console.error(e);
-      // toast.error("Une erreur est survenue: Resultats des synthese .");
+      toast.error("Une erreur est survenue: Resultats des synthese .");
     });
 };
 
-const getStructure = async () => {
-  await SyntheseService.getOrganizations()
-    .then((result) => {
-      structures.value = result.data.data;
-    })
-    .catch((e) => {
-      console.error(e);
-      toast.error("Une erreur est survenue: Liste des structures .");
-    });
-};
+const organisationsOfEvaluation = computed(() =>
+  dataForAllOrganisation.value.map((org) => ({
+    id: org.id,
+    nom: org.nom,
+    nom_point_focal: org.nom_point_focal,
+    prenom_point_focal: org.prenom_point_focal,
+  }))
+);
+
+const currentOrganisation = computed(() => dataForAllOrganisation.value.find((org) => org.id == idSelectStructure.value));
+
+const currentFactuel = computed(() => currentOrganisation.value?.factuel);
+const currentPerception = computed(() => currentOrganisation.value?.perception);
 
 const changeStructure = () => {
-  organizationId.value = selectStructureId.value;
-  getDataCollection();
+  organizationId.value = idSelectStructure.value;
 };
 
-onMounted(() => {
-  getDataCollection();
-  getStructure();
+onMounted(async () => {
+  await getDataCollection();
+  idSelectStructure.value = dataForAllOrganisation.value[0].id;
 });
 </script>
 
@@ -295,35 +299,33 @@ onMounted(() => {
                   <td class="p-2 font-medium">Structure :</td>
                   <td>
                     <TomSelect
-                      v-model="selectStructureId"
+                      v-model="idSelectStructure"
                       :options="{
                         placeholder: 'Sélectionner la structure',
                       }"
                       class="w-full"
                       @change="changeStructure"
                     >
-                      <option v-for="(structure, index) in structures" :key="index" :value="structure.id">{{ structure.nom }}</option>
+                      <option v-for="(structure, index) in organisationsOfEvaluation" :key="index" :value="structure.id">{{ structure.nom }}</option>
                     </TomSelect>
                   </td>
                 </tr>
                 <tr class="border-b border-slate-300">
                   <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
-                  <td>{{ datasCollection.nom }}</td>
+                  <td>{{ currentOrganisation?.nom_point_focal }} {{ currentOrganisation?.prenom_point_focal }}</td>
                 </tr>
                 <tr class="border-b border-slate-300">
                   <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td>10/09/2024</td>
+                  <td>{{ currentOrganisation?.evaluatedAt }}</td>
                 </tr>
               </tbody>
             </table>
             <!-- <table v-if="!isLoadingData" class="mt-12 text-sm border-collapse table-fixed w-max">
-              <thead class="text-left bg-gray-300 border border-slate-300">
+              <tbody>
                 <tr>
                   <th class="p-2">Principe</th>
                   <th class="p-2">Indice Factuel</th>
                 </tr>
-              </thead>
-              <tbody>
                 <template v-for="(gouvernance, indexGouvernance) in datasFactuel" :key="indexGouvernance">
                   <tr v-for="(principe, indexPrincipe) in gouvernance.principes_de_gouvernance" class="border-b border-slate-300" :key="indexPrincipe">
                     <td class="p-2 font-medium">{{ principe.nom }}</td>
@@ -454,90 +456,75 @@ onMounted(() => {
             <div class="w-full p-4 font-bold text-center text-white bg-blue-900 rounded">FICHE SYNTHESE SCORE DE PERCEPTION GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
-                <button id="tabulator-print" class="w-1/2 mr-2 btn btn-outline-secondary sm:w-auto"><PrinterIcon class="w-4 h-4 mr-2" /> Imprimer</button>
-                <Dropdown class="w-1/2 sm:w-auto">
-                  <DropdownToggle class="w-full btn btn-outline-secondary sm:w-auto">
-                    <FileTextIcon class="w-4 h-4 mr-2" /> Exporter
-                    <ChevronDownIcon class="w-4 h-4 ml-auto sm:ml-2" />
-                  </DropdownToggle>
-                  <DropdownMenu class="w-40">
-                    <DropdownContent>
-                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter CSV </DropdownItem>
-                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter JSON </DropdownItem>
-                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter XLSX </DropdownItem>
-                      <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Exporter HTML </DropdownItem>
-                    </DropdownContent>
-                  </DropdownMenu>
-                </Dropdown>
+                <TableSynthesePerception :org="currentOrganisation?.nom" :pointfocal="`${currentOrganisation?.nom_point_focal}  ${currentOrganisation?.prenom_point_focal}`" :dateevaluation="currentOrganisation?.evaluatedAt" :current-perception="currentPerception" />
               </div>
             </div>
             <table class="w-full mt-12 text-sm border-collapse table-fixed">
-              <tbody class="text-black bg-green-400">
+              <tbody>
                 <tr class="border-b rounded-sm border-slate-300 bg-slate-300">
                   <td class="p-2 font-medium">Structure :</td>
                   <td>
                     <TomSelect
-                      v-model="selectStructureId"
+                      v-model="idSelectStructure"
                       :options="{
                         placeholder: 'Sélectionner la structure',
                       }"
                       class="w-full"
                       @change="changeStructure"
                     >
-                      <option v-for="(structure, index) in structures" :key="index" :value="structure.id">{{ structure.nom }}</option>
+                      <option v-for="(structure, index) in organisationsOfEvaluation" :key="index" :value="structure.id">{{ structure.nom }}</option>
                     </TomSelect>
                   </td>
                 </tr>
                 <tr class="border-b border-slate-300">
-                  <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
-                  <td>{{ datasCollection.nom }}</td>
+                  <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
+                  <td>{{ currentOrganisation?.nom_point_focal }} {{ currentOrganisation?.prenom_point_focal }}</td>
                 </tr>
                 <tr class="border-b border-slate-300">
-                  <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td>10/09/2024</td>
+                  <td class="p-2 font-medium">Date d’auto-évaluation :</td>
+                  <td>{{ currentOrganisation?.evaluatedAt }}</td>
                 </tr>
               </tbody>
             </table>
-            <table v-if="!isLoadingData" class="mt-12 text-sm border-collapse table-fixed w-max">
-              <thead class="text-left bg-gray-300 border border-slate-300">
-                <tr>
-                  <th class="p-2">Principe</th>
-                  <th class="p-2">Indice de perception</th>
-                </tr>
-              </thead>
+            <table v-if="!isLoadingData" class="w-full mt-12 text-sm border-collapse table-fixed">
               <tbody>
-                <tr v-for="(principe, indexPrincipe) in datasPerception" class="border-b border-slate-300" :key="indexPrincipe">
+                <tr class="font-semibold border-slate-300 bg-slate-300">
+                  <td class="p-2">Principe</td>
+                  <td class="p-2">Indice de perception</td>
+                </tr>
+                <tr v-for="(principe, indexPrincipe) in currentPerception?.synthese" class="border-b border-slate-300" :key="indexPrincipe">
                   <td class="p-2 font-medium">{{ principe.nom }}</td>
-                  <td class="text-center">{{ prinxipe.indice_de_perception }}</td>
+                  <td class="text-center">{{ principe.indice_de_perception }}</td>
                 </tr>
               </tbody>
             </table>
-
             <!-- Tableau de synthese Perception -->
             <table v-if="!isLoadingData" class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
               <thead class="text-left bg-gray-400">
-                <tr class="border-b-8 border-white" :style="{ 'background-color': getColorForValue(datasPerception.indice_de_perception) }">
-                  <td colspan="2" class="p-2 text-center">Indice factuel de gouvernace</td>
-                  <td class="p-2 text-center">{{ datasPerception.indice_de_perception }}</td>
+                <tr class="border-b-8 border-white" :style="{ 'background-color': getColorForValue(currentPerception?.indice_de_gouvernance) }">
+                  <td colspan="2" class="p-2 text-center">Indice factuel de gouvernance</td>
+                  <td class="p-2 text-center">{{ currentPerception?.indice_de_gouvernance }}</td>
                 </tr>
-                <tr class="text-black">
+                <tr class="text-white bg-blue-900">
                   <th class="p-2 text-center border border-slate-600">Principes</th>
                   <th class="p-2 text-center border border-slate-600">Questions opérationnelles</th>
-                  <th class="p-2 text-center border border-slate-600">Score</th>
+                  <th class="p-2 text-center border border-slate-600">Scores</th>
                 </tr>
               </thead>
-
-              <tbody v-for="(principe, index) in datasPerception.fiche_de_synthese_de_perception" :key="principe.id" class="text-black" :style="{ 'background-color': getColorForValue(principe.indice_de_perception) }">
-                <tr v-if="principe.indicateurs_de_gouvernance.length > 0">
-                  <td :rowspan="principe.indicateurs_de_gouvernance.length + 1" class="p-2 border border-slate-600 text-start">{{ principe.nom }}</td>
-                  <td class="p-2 text-center border border-slate-600">{{ principe.indicateurs_de_gouvernance[0].nom }}</td>
-                  <td class="p-2 text-center border border-slate-600">{{ principe.indicateurs_de_gouvernance[0].moyPQO }}</td>
+              <tbody v-for="(principe, index) in currentPerception?.synthese" :key="principe.id" class="text-black" :style="{ 'background-color': getColorForValue(principe.indice_de_perception) }">
+                <!-- Première ligne avec rowspan pour afficher le nom du principe -->
+                <tr v-if="principe.questions_de_gouvernance.length > 0">
+                  <td :rowspan="principe.questions_de_gouvernance.length + 1" class="p-2 border border-slate-600 text-start">{{ principe.nom }}</td>
+                  <td class="p-2 text-center border border-slate-600">{{ principe.questions_de_gouvernance[0].nom }}</td>
+                  <td class="p-2 text-center border border-slate-600">{{ principe.questions_de_gouvernance[0].moyenne_ponderee }}</td>
                 </tr>
-                <tr v-for="(indicateur, index) in principe.indicateurs_de_gouvernance.slice(1)" :key="indicateur.id" :style="{ 'background-color': getColorForValue(indicateur.moyPQO) }">
-                  <td class="p-2 text-center border border-slate-600">{{ indicateur.nom }}</td>
-                  <td class="p-2 text-center border border-slate-600">{{ indicateur.moyPQO }}</td>
+                <!-- Lignes pour afficher chaque question de gouvernance du principe -->
+                <tr v-for="(question, qIndex) in principe.questions_de_gouvernance.slice(1)" :key="question.id" :style="{ 'background-color': getColorForValue(question.moyenne_ponderee) }">
+                  <td class="p-2 text-center border border-slate-600">{{ question.nom }}</td>
+                  <td class="p-2 text-center border border-slate-600">{{ question.moyenne_ponderee }}</td>
                 </tr>
-                <tr class="text-black" v-if="principe.indicateurs_de_gouvernance.length > 0">
+                <!-- Dernière ligne pour afficher l'indice de perception du principe -->
+                <tr class="text-black">
                   <td class="p-2 text-right border border-slate-600">Indice de perception du principe</td>
                   <td class="p-2 text-center border border-slate-600">{{ principe.indice_de_perception }}</td>
                 </tr>
@@ -590,11 +577,10 @@ onMounted(() => {
       </TabGroup>
     </Preview>
   </PreviewComponent>
-  <!-- END: Boxed Tab -->
 </template>
 
 <style scoped>
 table td {
-  border: 1px solid rgb(109, 109, 109);
+  border: 1px solid rgb(0, 0, 0);
 }
 </style>

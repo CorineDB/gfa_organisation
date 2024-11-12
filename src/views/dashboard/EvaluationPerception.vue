@@ -19,6 +19,7 @@ const route = useRoute();
 const idEvaluation = route.params.id;
 
 const payload = reactive({
+  identifier_of_participant: "",
   programmeId: "",
   organisationId: "",
   formulaireDeGouvernanceId: "",
@@ -225,7 +226,7 @@ const isLastPage = computed(() => currentPage.value === totalPages.value);
 // );
 
 onMounted(async () => {
-  clientId.value = generateUniqueId();
+  payload.identifier_of_participant = generateUniqueId();
   await getDataFormPerception();
   // await getcurrentUserAndFetchOrganization();
   findFormulairePerception();
