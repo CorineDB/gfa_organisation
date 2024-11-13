@@ -24,10 +24,12 @@ const deleteModalPreview = ref(false);
 const idEvaluation = route.params.id;
 const isLoading = ref(false);
 const isLoadingStats = ref(false);
+const showModalOrganisation = ref(false);
 const isLoadingData = ref(true);
 const isCreate = ref(true);
 const datas = ref([]);
 const statistiques = ref({});
+const idCurrentOng = ref({});
 
 const createData = async () => {
   isLoading.value = true;
@@ -188,6 +190,14 @@ function getFactuelSubmissions(soumissions) {
 function getPerceptionSubmissions(soumissions) {
   return soumissions.filter((sub) => sub.type === "perception");
 }
+
+function changeCurrentDetailOrganisation(id) {
+  idCurrentOng.value = id;
+  showModalOrganisation.value = true;
+}
+
+const currentOrganisation = computed(() => datas.value.find((item) => item.id == idCurrentOng.value));
+
 onMounted(() => {
   getDatas();
   getEvaluation();
@@ -249,7 +259,7 @@ onMounted(() => {
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
                 <div class="flex justify-center">
-                  <BarChartIcon class="report-box__icon text-success" />
+                  <BarChart2Icon class="report-box__icon text-success" />
                 </div>
                 <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.total_soumissions_de_perception_terminer + statistiques?.total_soumissions_factuel_terminer }}</div>
                 <div class="mt-1 text-base text-slate-500">Total soumissions terminé</div>
@@ -280,6 +290,44 @@ onMounted(() => {
           <div @click="goToPageMarqueur" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiche de Marqueur</button> <ArrowRightIcon class="size-5" /></div>
         </div>
       </div>
+
+      <!-- <section>
+        <p class="pb-4 mt-10 text-lg font-medium intro-y">Liste des soumissions par organisations</p>
+        <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
+          <div v-for="(ong, index) in datas" :key="index" @click="changeCurrentDetailOrganisation(ong.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div class="relative m-5 bg-white">
+              <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ ong.nom }}</div>
+            </div>
+
+            <div class="m-5 text-slate-600 dark:text-slate-500">
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Total de Soumissions:
+                <div class="ml-2 font-bold">{{ (ong?.factuel ? ong.factuel.length : 0) + (ong?.perception ? ong.perception.length : 0) }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions Factuel:
+                <div class="ml-2 font-bold">{{ ong?.factuel ? ong.factuel.length : 0 }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions de Perception:
+                <div class="ml-2 font-bold">{{ ong?.perception ? ong.perception.length : 0 }}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
+              <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">Afficher les soumissions <ExternalLinkIcon class="ml-2 size-5" /></button>
+            </div>
+
+            <div class="absolute top-0 flex w-full">
+              <div class="w-1/3 p-1 bg-green-500"></div>
+              <div class="flex flex-col w-2/3">
+                <div class="p-0.5 bg-yellow-500"></div>
+                <div class="p-0.5 bg-red-500"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section> -->
       <!-- END: General Report -->
       <section class="w-full">
         <p class="pb-4 mt-10 text-lg font-medium intro-y">Liste des soumissions par organisations</p>
@@ -374,6 +422,61 @@ onMounted(() => {
         <DeleteButton :loading="isLoading" @click="deleteData" />
       </div>
     </ModalBody>
+  </Modal>
+  <!-- End Modal -->
+
+  <!-- Modal Register & Update -->
+  <Modal size="modal-xl" :show="showModalOrganisation" @hidden="showModalOrganisation = false">
+    <ModalHeader>
+      <h2 class="mr-auto text-base font-medium">{{ currentOrganisation?.nom }}</h2>
+    </ModalHeader>
+    <ModalBody>
+      <div class="grid grid-cols-1 gap-4">
+        <TabGroup>
+          <TabList class="nav-boxed-tabs">
+            <Tab class="w-full py-2" tag="button">Soumissions Factuelles</Tab>
+            <Tab class="w-full py-2" tag="button">Soumissions de Perception </Tab>
+          </TabList>
+          <TabPanels class="mt-5">
+            <TabPanel class="max-h-[80vh] overflow-y-auto">
+              <div class="flex flex-col gap-2" v-if="currentOrganisation?.factuel">
+                <div v-for="(soumission, index) in currentOrganisation.factuel" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border border-l-4 rounded shadow-md border-primary">
+                  <p>
+                    Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
+                  </p>
+                  <div class="flex items-center gap-4">
+                    <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
+                    <button v-if="!soumission.statut" class="p-2 text-danger" @click="handleDelete(soumission.id)">
+                      <TrashIcon class="size-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+            <TabPanel class="max-h-[80vh] overflow-y-auto">
+              <div class="flex flex-col gap-2" v-if="currentOrganisation?.perception">
+                <div v-for="(soumission, index) in currentOrganisation.perception" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border border-l-4 rounded shadow-md border-primary">
+                  <p>
+                    Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
+                  </p>
+                  <div class="flex items-center gap-4">
+                    <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
+                    <button v-if="!soumission.statut" class="p-2 text-danger" @click="handleDelete(soumission.id)">
+                      <TrashIcon class="size-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </TabPanel>
+          </TabPanels>
+        </TabGroup>
+      </div>
+    </ModalBody>
+    <ModalFooter>
+      <div class="flex gap-2">
+        <button type="button" @click="showModalOrganisation = false" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Fermer</button>
+      </div>
+    </ModalFooter>
   </Modal>
   <!-- End Modal -->
 </template>

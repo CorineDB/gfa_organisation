@@ -222,10 +222,10 @@ onMounted(() => {
     </div> -->
     <LoaderSnipper v-if="isLoadingData" />
     <div class="grid grid-cols-12 gap-6 mt-5">
-      <div v-for="(item, index) in datas" :key="index" class="col-span-12 p-4 md:col-span-6 lg:col-span-4">
+      <div v-for="(item, index) in datas" :key="index" class="col-span-12 p-4 md:col-span-12 lg:col-span-4">
         <div class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
           <!-- En-tête avec sigle et titre -->
-          <div class="relative flex items-start pt-5">
+          <div class="relative flex items-start pt-2">
             <!-- Dropdown for actions -->
             <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
               <DropdownToggle tag="a" class="block w-5 h-5 cursor-pointer">
@@ -247,26 +247,31 @@ onMounted(() => {
                 {{ item.intitule }}
               </span>
             </div>
-
-            <span :class="getStatusText(item.statut).class" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ getStatusText(item.statut).label }}</span>
           </div>
 
           <!-- Description section with distinct styling -->
-          <div @click="gotoSoumissions(item)" class="mt-5 text-center cursor-pointer lg:text-left">
+          <div @click="gotoSoumissions(item)" class="w-full mt-5 text-center cursor-pointer lg:text-left">
             <!-- <div class="" v-if="item.description">
               <p class="mb-3 text-base font-semibold text-primary">Description</p>
               <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description }}</p>
             </div> -->
 
             <!-- Other details with iconized section headers -->
-            <div class="mt-5 space-y-3 text-gray-600">
+            <div class="mt-5 space-y-4 text-gray-600">
               <div class="flex items-center text-sm font-medium text-gray-700">
-                <CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Date de début:
-                <span class="ml-2 font-semibold text-gray-900">{{ item.debut }}</span>
+                <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut: <span :class="getStatusText(item.statut).class" class="px-3 py-2 ml-3 text-xs text-white rounded-full">{{ getStatusText(item.statut).label }}</span>
               </div>
               <div class="flex items-center text-sm font-medium text-gray-700">
-                <CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Date de fin:
-                <span class="ml-2 font-semibold text-gray-900">{{ item.fin }}</span>
+                <CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Période:
+                <span class="ml-2 font-semibold text-gray-900">{{ item.debut }} <span class="font-normal">au</span> {{ item.fin }}</span>
+              </div>
+              <div class="flex items-center text-sm font-medium text-gray-700">
+                <TargetIcon class="w-4 h-4 mr-2 text-primary" /> Objectif attendu:
+                <span class="ml-2 font-semibold text-gray-900">{{ item.objectif_attendu }}</span>
+              </div>
+              <div class="flex items-center text-sm font-medium text-gray-700">
+                <BarChart2Icon class="w-4 h-4 mr-2 text-primary" /> Total soumissions:
+                <span class="ml-2 font-semibold text-gray-900">{{ item.total_soumissions_de_perception + item.total_soumissions_factuel }}</span>
               </div>
             </div>
           </div>
