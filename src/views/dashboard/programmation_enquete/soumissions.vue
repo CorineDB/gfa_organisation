@@ -23,9 +23,11 @@ const showModalCreate = ref(false);
 const deleteModalPreview = ref(false);
 const idEvaluation = route.params.id;
 const isLoading = ref(false);
+const isLoadingStats = ref(false);
 const isLoadingData = ref(true);
 const isCreate = ref(true);
 const datas = ref([]);
+const statistiques = ref({});
 
 const createData = async () => {
   isLoading.value = true;
@@ -54,6 +56,19 @@ const getDatas = async () => {
       console.error(e);
       isLoadingData.value = false;
       toast.error("Une erreur est survenue: Liste des enquêtes.");
+    });
+};
+const getEvaluation = async () => {
+  isLoadingStats.value = true;
+  await EvaluationService.findEvaluation(idEvaluation)
+    .then((result) => {
+      statistiques.value = result.data.data;
+      isLoadingStats.value = false;
+    })
+    .catch((e) => {
+      console.error(e);
+      isLoadingStats.value = false;
+      toast.error("Une erreur est survenue: Statistiques.");
     });
 };
 
@@ -151,6 +166,9 @@ const openFactuelModal = () => {
 const goToPageSynthese = (Idsoumission) => {
   router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
 };
+const goToPageMarqueur = (Idsoumission) => {
+  router.push({ name: "FicheMarqueur", params: { e: idEvaluation } });
+};
 const opendAddParticipant = () => {
   router.push({ name: "add_participant", query: { e: idEvaluation } });
 };
@@ -172,6 +190,7 @@ function getPerceptionSubmissions(soumissions) {
 }
 onMounted(() => {
   getDatas();
+  getEvaluation();
 });
 </script>
 
@@ -199,7 +218,7 @@ onMounted(() => {
   <div class="p-5 mt-5 intro-y">
     <div class="" v-if="!isLoadingData">
       <!-- BEGIN: General Report -->
-      <div class="col-span-12 mt-8">
+      <div v-if="!isLoadingStats" class="col-span-12 mt-8">
         <div class="flex items-center h-10 intro-y">
           <h2 class="mr-5 text-lg font-medium truncate">Statistiques</h2>
         </div>
@@ -221,8 +240,8 @@ onMounted(() => {
                 <div class="flex justify-center">
                   <UsersIcon class="report-box__icon text-pending" />
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
-                <div class="mt-1 text-base text-slate-500">Nombre de membres (En cours)</div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.total_participants_evaluation_factuel + statistiques?.total_participants_evaluation_de_perception }}</div>
+                <div class="mt-1 text-base text-slate-500">Total Participants</div>
               </div>
             </div>
           </div>
@@ -230,10 +249,10 @@ onMounted(() => {
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
                 <div class="flex justify-center">
-                  <UsersIcon class="report-box__icon text-success" />
+                  <BarChartIcon class="report-box__icon text-success" />
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
-                <div class="mt-1 text-base text-slate-500">Nombre de membres (Terminé)</div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.total_soumissions_de_perception_terminer + statistiques?.total_soumissions_factuel_terminer }}</div>
+                <div class="mt-1 text-base text-slate-500">Total soumissions terminé</div>
               </div>
             </div>
           </div>
@@ -243,20 +262,22 @@ onMounted(() => {
                 <div class="flex justify-center">
                   <PercentIcon class="report-box__icon text-warning" />
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">4.710</div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.pourcentage_evolution }}%</div>
                 <div class="mt-1 text-base text-slate-500">Pourcentage de soumissions</div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <LoaderSnipper v-else />
 
       <div class="col-span-12 mt-8">
         <div class="flex items-center h-10 intro-y">
           <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
         </div>
-        <div class="grid grid-cols-12 gap-6 mt-5">
-          <div @click="goToPageSynthese" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer hover:border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiche de Synthèse</button> <ArrowRightIcon class="size-5" /></div>
+        <div class="grid grid-cols-12 gap-6 mt-5 text-lg font-medium">
+          <div @click="goToPageSynthese" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiche de Synthèse</button> <ArrowRightIcon class="size-5" /></div>
+          <div @click="goToPageMarqueur" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiche de Marqueur</button> <ArrowRightIcon class="size-5" /></div>
         </div>
       </div>
       <!-- END: General Report -->

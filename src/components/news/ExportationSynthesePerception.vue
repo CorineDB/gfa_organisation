@@ -15,6 +15,7 @@ export default {
     currentPerception: {
       type: Object,
       required: true,
+      default: {},
     },
 
     pointfocal: {

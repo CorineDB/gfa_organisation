@@ -67,6 +67,7 @@ import EvaluationPerception from "@/views/dashboard/EvaluationPerception.vue";
 import SourceVerification from "../views/dashboard/SourceVerification.vue";
 import SendMailPerception from "../views/dashboard/SendMailPerception.vue";
 import Organisations from "../views/dashboard/organisations.vue";
+import FicheMarqueur from "../views/dashboard/FicheMarqueur.vue";
 
 const routes = [
   {
@@ -190,11 +191,15 @@ const routes = [
         name: "FichePerception",
         component: FichePerception,
       },
-
       {
         path: "/synthese/:e",
         name: "FicheSynthese",
         component: FicheSynthese,
+      },
+      {
+        path: "/marqueur/:e",
+        name: "FicheMarqueur",
+        component: FicheMarqueur,
       },
       {
         path: "/marqueur",

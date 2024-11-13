@@ -5,17 +5,11 @@ import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { getColorForValue } from "../../utils/findColorIndicator";
 import { useRoute, useRouter } from "vue-router";
-import ChartSynthese from "../../components/news/ChartSynthese.vue";
-import ChartCircular from "../../components/news/ChartCircular.vue";
 import ExportationSyntheseFactuel from "../../components/news/ExportationSyntheseFactuel.vue";
-import TabulatorSyntheseFactuel from "../../components/news/TabulatorSyntheseFactuel.vue";
-import ChartScroreByPrincipe from "../../components/news/ChartScroreByPrincipe.vue";
-import ChartOptionResponseByCategorieAndMember from "../../components/news/ChartOptionResponseByCategorieAndMember.vue";
-import ChartProgressionByTime from "../../components/news/ChartProgressionByTime.vue";
-import ChartScorePerceptionByPrincipe from "../../components/news/ChartScorePerceptionByPrincipe.vue";
+import TabulatorMarqueurFactuel from "../../components/news/TabulatorMarqueurFactuel.vue";
 import { computed } from "vue";
 import ExportationSynthesePerception from "../../components/news/ExportationSynthesePerception.vue";
-import TabulatorSynthesePerception from "../../components/news/TabulatorSynthesePerception.vue";
+import TabulatorMarqueurPerception from "../../components/news/TabulatorMarqueurPerception.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -74,68 +68,17 @@ onMounted(async () => {
     <Preview>
       <TabGroup>
         <TabList class="space-x-4 font-bold uppercase nav-boxed-tabs">
-          <Tab class="w-full py-2 bg-white" tag="button">Résultat Synthétique</Tab>
           <Tab class="w-full py-2 bg-white" tag="button">Outil Factuel</Tab>
           <Tab class="w-full py-2 bg-white" tag="button">Outil de Perception</Tab>
         </TabList>
 
         <TabPanels v-show="!isLoadingData" class="mt-5">
-          <!-- Synthétique -->
-          <TabPanel class="leading-relaxed">
-            <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE RÉSULTATS SYNTHÉTIQUE</div>
-            <table class="w-full my-12 text-sm border-collapse table-fixed">
-              <tbody>
-                <tr class="border-b rounded-sm border-slate-300 bg-slate-300">
-                  <td class="p-2 font-medium">Structure :</td>
-                  <td>
-                    <TomSelect
-                      v-model="idSelectStructure"
-                      :options="{
-                        placeholder: 'Sélectionner la structure',
-                      }"
-                      class="w-full"
-                      @change="changeStructure"
-                    >
-                      <option v-for="(structure, index) in organisationsOfEvaluation" :key="index" :value="structure.id">{{ structure.nom }}</option>
-                    </TomSelect>
-                  </td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-medium">Nom, Prénom et qualité du point focal Gouvernance :</td>
-                  <td>{{ currentOrganisation?.nom_point_focal }} {{ currentOrganisation?.prenom_point_focal }}</td>
-                </tr>
-                <tr class="border-b border-slate-300">
-                  <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td class="pl-2">{{ currentPerception?.evaluatedAt }}</td>
-                </tr>
-              </tbody>
-            </table>
-            <table class="w-full mb-12 border-collapse table-auto" cellpadding="4" cellspacing="0">
-              <thead class="text-left bg-blue-900">
-                <tr class="text-slate-800 bg-slate-300">
-                  <th class="py-2 text-left border border-slate-900">Principes</th>
-                  <th class="py-2 text-center border border-slate-900">Indice factuel</th>
-                  <th class="py-2 text-center border border-slate-900">Indice de Perception</th>
-                  <th class="py-2 text-center border border-slate-900">Indice Synthétique</th>
-                </tr>
-              </thead>
-
-              <tbody class="bg-white">
-                <tr v-for="(synthese, index) in currentProfileGouvernance" :key="index" class="pb-2 border border-slate-900">
-                  <td class="py-1 font-">{{ synthese.nom }}</td>
-                  <td class="py-1 text-right" :style="{ 'background-color': getColorForValue(synthese.indice_factuel) }">{{ synthese.indice_factuel }}</td>
-                  <td class="py-1 text-right" :style="{ 'background-color': getColorForValue(synthese.indice_de_perception) }">{{ synthese.indice_de_perception }}</td>
-                  <td class="py-1 text-right" :style="{ 'background-color': getColorForValue(synthese.indice_synthetique) }">{{ synthese.indice_synthetique }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </TabPanel>
           <!-- Factuel -->
           <TabPanel class="leading-relaxed">
             <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE SYNTHESE SCORE FACTUEL GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
-                <ExportationSyntheseFactuel v-if="!isLoadingData" :datas="currentFactuel" />
+                <!-- <ExportationSyntheseFactuel v-if="!isLoadingData" :datas="currentFactuel" /> -->
               </div>
             </div>
 
@@ -166,22 +109,8 @@ onMounted(async () => {
                 </tr>
               </tbody>
             </table>
-            <table v-if="!isLoadingData" class="w-full mt-12 text-sm border-collapse table-fixed">
-              <tbody>
-                <tr class="font-semibold border-slate-300 bg-slate-300">
-                  <td class="p-2">Principe</td>
-                  <td class="p-2">Indice de perception</td>
-                </tr>
-                <template v-for="principe in currentPerception?.synthese">
-                  <tr>
-                    <td class="p-2 font-medium border-b border-slate-300">{{ principe.nom }}</td>
-                    <td :style="{ 'background-color': getColorForValue(principe.indice_de_perception) }" class="text-center border-b border-slate-300">{{ principe.indice_de_perception }}</td>
-                  </tr>
-                </template>
-              </tbody>
-            </table>
-            <!-- Tableau de synthese Factuel -->
-            <TabulatorSyntheseFactuel v-if="!isLoadingData" :data="currentFactuel?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" />
+            <!-- Tableau de marqueur Factuel -->
+            <TabulatorMarqueurFactuel v-if="!isLoadingData" :data="currentFactuel?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" />
             <!-- <ChartScroreByPrincipe />
             <ChartOptionResponseByCategorieAndMember />
             <ChartProgressionByTime />
@@ -223,7 +152,7 @@ onMounted(async () => {
               </tbody>
             </table>
             <!-- Tableau de synthese Perception -->
-            <TabulatorSynthesePerception :data="currentPerception?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" v-if="!isLoadingData" />
+            <TabulatorMarqueurPerception :data="currentPerception?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" v-if="!isLoadingData" />
           </TabPanel>
         </TabPanels>
         <LoaderSnipper v-if="isLoadingData" />

@@ -11,7 +11,7 @@ import { getColorForExcel } from "../../utils/findColorIndicator";
 
 export default {
   props: {
-    datas: { type: Array, required: true },
+    datas: { type: Object, required: true, default: {} },
   },
   data() {
     return {};
@@ -53,7 +53,7 @@ export default {
         this.applyBorders(cell);
       });
 
-      this.datas.forEach((gouvernance) => {
+      this.datas.synthese.forEach((gouvernance) => {
         const gouvernanceRow = worksheet.addRow([gouvernance.nom, "", "", "", gouvernance.indice_factuel, ""]);
         const gouvernanceColor = getColorForExcel(gouvernance.indice_factuel);
 
@@ -68,16 +68,16 @@ export default {
           this.applyBorders(cell);
         });
 
-        gouvernance.principes_de_gouvernance.forEach((principe) => {
+        gouvernance.categories_de_gouvernance.forEach((principe) => {
           let principeDisplayed = false;
 
           const principleColor = getColorForExcel(principe.score_factuel);
 
-          principe.criteres_de_gouvernance.forEach((critere) => {
+          principe.categories_de_gouvernance.forEach((critere) => {
             let critereDisplayed = false;
 
-            critere.indicateurs_de_gouvernance.forEach((indicateur) => {
-              const row = worksheet.addRow([principeDisplayed ? "" : principe.nom, critereDisplayed ? "" : critere.nom, indicateur.nom, indicateur.option_de_reponse, indicateur.note, indicateur.source]);
+            critere.questions_de_gouvernance.forEach((indicateur) => {
+              const row = worksheet.addRow([principeDisplayed ? "" : principe.nom, critereDisplayed ? "" : critere.nom, indicateur.nom, indicateur.reponse.nom, indicateur.reponse.point, indicateur.reponse.sourceDeVerification]);
 
               row.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: principleColor } };
               row.getCell(2).fill = { type: "pattern", pattern: "solid", fgColor: { argb: principleColor } };

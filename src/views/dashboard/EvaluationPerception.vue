@@ -304,7 +304,7 @@ onMounted(async () => {
 
       <ModalBody class="space-y-5">
         <p v-if="payload.organisationId">
-          Organisation: <span class="text-primary">{{ findOrganisation(payload.organisationId) }}</span>
+          Patenaire: <span class="text-primary">{{ findOrganisation(payload.organisationId) }}</span>
         </p>
         <div class="">
           <label class="form-label">Catégorie participant </label>
