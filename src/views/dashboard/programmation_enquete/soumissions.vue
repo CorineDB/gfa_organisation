@@ -52,6 +52,7 @@ const getDatas = async () => {
   await EvaluationService.getSoumissionsEvaluation(idEvaluation)
     .then((result) => {
       datas.value = result.data.data;
+      console.log(datas.value);
       isLoadingData.value = false;
     })
     .catch((e) => {
@@ -168,9 +169,20 @@ const openFactuelModal = () => {
 const goToPageSynthese = (Idsoumission) => {
   router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
 };
+
 const goToPageMarqueur = (Idsoumission) => {
   router.push({ name: "FicheMarqueur", params: { e: idEvaluation } });
 };
+
+
+const goToFactuelSoumissionPage = (Idsoumission) => {
+  router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
+};
+
+const goToPerceptionSoumissionPage = (Idsoumission) => {
+  router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
+};
+
 const opendAddParticipant = () => {
   router.push({ name: "add_participant", query: { e: idEvaluation } });
 };
@@ -196,16 +208,30 @@ function changeCurrentDetailOrganisation(id) {
   showModalOrganisation.value = true;
 }
 
-const currentOrganisation = computed(() => datas.value.find((item) => item.id == idCurrentOng.value));
-
 onMounted(() => {
   getDatas();
   getEvaluation();
 });
 </script>
+<style>
+.circular-progress {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        #4caf50 calc(var(--percentage) * 100%), #ddd 0%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #4caf50;
+}
 
+</style>
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Soumissions par organisations</h2>
+  <h2 class="mt-10 text-lg font-medium intro-y">Soumissions de l'evaluation</h2>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <!-- <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
@@ -216,7 +242,8 @@ onMounted(() => {
       </div> -->
       <div class="flex">
         <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal">Remplir formulaire Factuel</button>
-        <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de perception</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de
+          perception</button>
       </div>
       <div class="flex">
         <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
@@ -233,47 +260,69 @@ onMounted(() => {
           <h2 class="mr-5 text-lg font-medium truncate">Statistiques</h2>
         </div>
         <div class="grid grid-cols-12 gap-6 mt-5">
+
           <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
-                <div class="flex justify-center">
-                  <GlobeIcon class="report-box__icon text-primary" />
+                <div class="flex justify-center space-x-4">
+
+                  <!-- Icon and Text -->
+                  <div class="text-left">
+                    <div class="mt-2 text-3xl font-medium leading-8">
+                      {{ statistiques?.total_soumissions_de_perception_terminer + statistiques?.total_soumissions_factuel_terminer }} / {{ statistiques?.total_participants_evaluation_factuel + statistiques?.total_participants_evaluation_de_perception }}
+                    </div>
+                    <div class="mt-1 text-base text-slate-500" style="color: black;">Nombre des participants</div>
+                  </div>
+
+                  <!-- Circular Progress Bar -->
+                  <div class="mt-8 relative w-60 h-20 flex items-center justify-right" style="width: 8rem;height: 4.5rem;">
+                    <div class="circular-progress" :style="{ '--percentage': statistiques?.pourcentage_evolution }">
+                      {{ Math.round(statistiques?.pourcentage_evolution) }}%
+                    </div>
+                  </div>
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">{{ datas.length }}</div>
-                <div class="mt-1 text-base text-slate-500">Nombre d'organisations</div>
               </div>
             </div>
           </div>
+
           <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
             <div class="report-box zoom-in">
-              <div class="p-5 text-center box">
-                <div class="flex justify-center">
-                  <UsersIcon class="report-box__icon text-pending" />
-                </div>
-                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.total_participants_evaluation_factuel + statistiques?.total_participants_evaluation_de_perception }}</div>
-                <div class="mt-1 text-base text-slate-500">Total Participants</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-            <div class="report-box zoom-in">
-              <div class="p-5 text-center box">
-                <div class="flex justify-center">
+              <div class="p-5 text-left box">
+                <div class="flex justify-left">
                   <BarChart2Icon class="report-box__icon text-success" />
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.total_soumissions_de_perception_terminer + statistiques?.total_soumissions_factuel_terminer }}</div>
-                <div class="mt-1 text-base text-slate-500">Total soumissions terminé</div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{
+          statistiques?.total_soumissions_de_perception_terminer +
+          statistiques?.total_soumissions_factuel_terminer }}</div>
+                <div class="mt-1 text-base text-slate-500" style="color: black;">Total soumissions en attente</div>
               </div>
             </div>
           </div>
+
           <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
             <div class="report-box zoom-in">
-              <div class="p-5 text-center box">
-                <div class="flex justify-center">
-                  <PercentIcon class="report-box__icon text-warning" />
+              <div class="p-5 text-left box">
+                <div class="flex justify-left">
+                  <BarChart2Icon class="report-box__icon text-success" />
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">{{ Math.round(statistiques?.pourcentage_evolution) }}%</div>
-                <div class="mt-1 text-base text-slate-500">Pourcentage de soumissions</div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{
+          statistiques?.total_soumissions_de_perception_terminer +
+          statistiques?.total_soumissions_factuel_terminer }}</div>
+                <div class="mt-1 text-base text-slate-500" style="color: black;">Total soumissions en cours</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+            <div class="report-box zoom-in">
+              <div class="p-5 text-left box">
+                <div class="flex justify-left">
+                  <BarChart2Icon class="report-box__icon text-success" />
+                </div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{
+          statistiques?.total_soumissions_de_perception_terminer +
+          statistiques?.total_soumissions_factuel_terminer }}</div>
+                <div class="mt-1 text-base text-slate-500" style="color: black;">Total soumissions terminé</div>
               </div>
             </div>
           </div>
@@ -286,36 +335,65 @@ onMounted(() => {
           <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
         </div>
         <div class="grid grid-cols-12 gap-6 mt-5 text-lg font-medium">
-          <div @click="goToPageSynthese" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiches de Synthèse</button> <ArrowRightIcon class="size-5" /></div>
-          <div @click="goToPageMarqueur" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiches de Marqueur</button> <ArrowRightIcon class="size-5" /></div>
+          <div @click="goToPageSynthese"
+            class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-4 intro-y">
+            <button class="px-4 py-8">Fiches de Synthèse</button>
+            <ArrowRightIcon class="size-5" />
+          </div>
+          <div @click="goToPageMarqueur"
+            class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-4 intro-y">
+            <button class="px-4 py-8">Fiches de Marqueur</button>
+            <ArrowRightIcon class="size-5" />
+          </div>
         </div>
       </div>
 
       <section>
         <p class="pb-4 mt-10 text-lg font-medium intro-y">Liste des soumissions par organisations</p>
         <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
-          <div v-for="(ong, index) in datas" :key="index" @click="changeCurrentDetailOrganisation(ong.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
-            <div class="relative m-5 bg-white">
-              <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ ong.nom }}</div>
+
+          <div @click="goToFactuelSoumissionPage(datas.id)"
+            class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary" style="max-width: 300px; max-height: 300px;">
+
+            <!-- Type and Status Badge Row for FACTUELLE -->
+            <div class="flex items-center justify-between m-5 bg-white pt-[0.1rem]">
+                <div
+                    class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px]">
+                    FACTUELLE
+                </div>
+                <div :class="[false ? 'bg-green-500' : 'bg-yellow-500', 'px-2 py-1 text-xs font-bold text-white rounded-full']">
+                    {{ datas?.factuel ? datas.factuel.statut ? "Terminer":  "En cours" : "En cours" }}
+                </div>
             </div>
 
             <div class="m-5 text-slate-600 dark:text-slate-500">
               <div class="flex items-center">
-                <BarChart2Icon class="w-4 h-4 mr-2" /> Total de Soumissions:
-                <div class="ml-2 font-bold">{{ (ong?.factuel ? ong.factuel.length : 0) + (ong?.perception ? ong.perception.length : 0) }}</div>
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Start At
+                <div class="ml-2 font-bold">{{ (datas?.factuel ? datas.factuel.created_at: "2024-11-01") }}</div>
               </div>
               <div class="flex items-center">
-                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions Factuel:
-                <div class="ml-2 font-bold">{{ ong?.factuel ? ong.factuel.length : 0 }}</div>
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Submitted At
+                <div class="ml-2 font-bold">{{ (datas?.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : datas.factuel.statut) : "2024-11-01") }}</div>
               </div>
               <div class="flex items-center">
-                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions de Perception:
-                <div class="ml-2 font-bold">{{ ong?.perception ? ong.perception.length : 0 }}</div>
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
+                <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.reponses_de_la_collecte.length : 0 }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Total Membres du comite:
+                <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.comite_members.length : 0 }}</div>
               </div>
             </div>
 
+            <!-- Horizontal Progress Bar -->
+            <div class="w-full h-2 bg-gray-200 mt-2">
+              <div class="h-full bg-green-500" :style="{ width: (datas.factuel ? datas.factuel.pourcentage_evolution : 30) + '%' }"></div>
+            </div>
             <div class="flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
-              <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">Afficher les soumissions <ExternalLinkIcon class="ml-2 size-5" /></button>
+              <button
+                class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary"> {{ (datas?.factuel ? (datas.factuel.statut ? "Voir Soumission" : "Continuer") : "Continuer") }} 
+                <ExternalLinkIcon class="ml-2 size-5" />
+              </button>
             </div>
 
             <div class="absolute top-0 flex w-full">
@@ -325,6 +403,138 @@ onMounted(() => {
                 <div class="p-0.5 bg-red-500"></div>
               </div>
             </div>
+          </div>
+          <div
+            class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+
+            <!-- Type and Status Badge Row for PERCEPTION -->
+            <div class="flex items-center justify-between m-5 bg-white pt-[0.1rem]">
+                <div
+                    class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px]">
+                    PERCEPTION
+                </div>
+                <div :class="[false ? 'bg-green-500' : 'bg-yellow-500', 'px-2 py-1 text-xs font-bold text-white rounded-full']">
+                  {{ datas?.factuel ? datas.factuel.statut ? "Terminer":  "En cours" : "En cours" }}
+                </div>
+            </div>
+
+            <div class="m-5 text-slate-600 dark:text-slate-500">
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Start At
+                <div class="ml-2 font-bold">{{ (datas?.factuel ? datas.factuel.created_at: "2024-11-01") }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Submitted At
+                <div class="ml-2 font-bold">{{ (datas?.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : datas.factuel.statut) : "2024-11-01") }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
+                <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.reponses_de_la_collecte.length : 0 }}</div>
+              </div>
+            </div>
+
+            <!-- Horizontal Progress Bar -->
+            <div class="w-full h-2 bg-gray-200 mt-2">
+              <div class="h-full bg-green-500" :style="{ width: (datas.factuel ? datas.factuel.pourcentage_evolution : 6.25) + '%' }"></div>
+            </div>
+            
+            <div class="absolute bottom-0 flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
+              <button
+                class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary"> {{ (datas?.factuel ? (datas.factuel.statut ? "Voir Soumission" : "Continuer") : "Continuer") }} 
+                <ExternalLinkIcon class="ml-2 size-5" />
+              </button>
+            </div>
+
+            <div class="absolute top-0 flex w-full">
+              <div class="w-1/3 p-1 bg-green-500"></div>
+              <div class="flex flex-col w-2/3">
+                <div class="p-0.5 bg-yellow-500"></div>
+                <div class="p-0.5 bg-red-500"></div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="datas?.factuel" @click="goToFactuelSoumissionPage(datas.id)"
+            class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div class="relative m-5 bg-white">
+              <div
+                class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">
+                {{ datas.factuel.type }}</div>
+            </div>
+            <div class="m-5 text-slate-600 dark:text-slate-500">
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Total de Soumissions:
+                <div class="ml-2 font-bold">{{ (datas?.factuel ? datas.factuel.length : 0) + (datas?.perception ? datas.perception.length : 0) }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions Factuel:
+                <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.length : 0 }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions de Perception:
+                <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception.length : 0 }}</div>
+              </div>
+            </div>
+
+            <div
+              class="absolute bottom-0 flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
+              <button
+                class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">Afficher
+                les soumissions
+                <ExternalLinkIcon class="ml-2 size-5" />
+              </button>
+            </div>
+
+            <div class="absolute top-0 flex w-full">
+              <div class="w-1/3 p-1 bg-green-500"></div>
+              <div class="flex flex-col w-2/3">
+                <div class="p-0.5 bg-yellow-500"></div>
+                <div class="p-0.5 bg-red-500"></div>
+              </div>
+            </div>
+          </div>
+          <div v-if="datas?.perception" v-for="(perception, index) in datas.perception"
+            @click="changeCurrentDetailOrganisation(datas.id)"
+            class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div class="relative m-5 bg-white">
+              <div
+                class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">
+                {{ datas.nom }}</div>
+            </div>
+            <div class="m-5 text-slate-600 dark:text-slate-500">
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Total de Soumissions:
+                <div class="ml-2 font-bold">{{ (datas?.factuel ? datas.factuel.length : 0) + (datas?.perception ? datas.perception.length : 0) }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions Factuel:
+                <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.length : 0 }}</div>
+              </div>
+              <div class="flex items-center">
+                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions de Perception:
+                <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception.length : 0 }}</div>
+              </div>
+            </div>
+
+            <div
+              class="absolute bottom-0 flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
+              <button
+                class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">Afficher
+                les soumissions
+                <ExternalLinkIcon class="ml-2 size-5" />
+              </button>
+            </div>
+
+            <div class="absolute top-0 flex w-full">
+              <div class="w-1/3 p-1 bg-green-500"></div>
+              <div class="flex flex-col w-2/3">
+                <div class="p-0.5 bg-yellow-500"></div>
+                <div class="p-0.5 bg-red-500"></div>
+              </div>
+            </div>
+          </div>
+          <div v-if="!(datas?.factuel && datas?.perception)">
+            Aucune soumission
           </div>
         </div>
       </section>
@@ -346,7 +556,8 @@ onMounted(() => {
       </ModalBody>
       <ModalFooter>
         <div class="flex gap-2">
-          <button type="button" @click="resetForm" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
+          <button type="button" @click="resetForm"
+            class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
           <VButton :loading="isLoading" :label="mode" />
         </div>
       </ModalFooter>
@@ -373,7 +584,7 @@ onMounted(() => {
   <!-- Modal Register & Update -->
   <Modal size="modal-xl" :show="showModalOrganisation" @hidden="showModalOrganisation = false">
     <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">{{ currentOrganisation?.nom }}</h2>
+      <h2 class="mr-auto text-base font-medium">{{ datas?.nom }}</h2>
     </ModalHeader>
     <ModalBody>
       <div class="grid grid-cols-1 gap-4">
@@ -384,10 +595,13 @@ onMounted(() => {
           </TabList>
           <TabPanels class="mt-5">
             <TabPanel class="max-h-[80vh] overflow-y-auto">
-              <div class="flex flex-col gap-2" v-if="currentOrganisation?.factuel">
-                <div v-for="(soumission, index) in currentOrganisation.factuel" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border border-l-4 rounded shadow-md border-primary">
+              <div class="flex flex-col gap-2" v-if="datas?.factuel">
+                <div v-for="(soumission, index) in datas.factuel" :key="index"
+                  class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border border-l-4 rounded shadow-md border-primary">
                   <p>
-                    Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
+                    Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span
+                      :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']"
+                      class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
                   </p>
                   <div class="flex items-center gap-4">
                     <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
@@ -402,10 +616,13 @@ onMounted(() => {
               </div>
             </TabPanel>
             <TabPanel class="max-h-[80vh] overflow-y-auto">
-              <div class="flex flex-col gap-2" v-if="currentOrganisation?.perception">
-                <div v-for="(soumission, index) in currentOrganisation.perception" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border border-l-4 rounded shadow-md border-primary">
+              <div class="flex flex-col gap-2" v-if="datas?.perception">
+                <div v-for="(soumission, index) in datas.perception" :key="index"
+                  class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border border-l-4 rounded shadow-md border-primary">
                   <p>
-                    Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
+                    Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span
+                      :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']"
+                      class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
                   </p>
                   <div class="flex items-center gap-4">
                     <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
@@ -425,7 +642,8 @@ onMounted(() => {
     </ModalBody>
     <ModalFooter>
       <div class="flex gap-2">
-        <button type="button" @click="showModalOrganisation = false" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Fermer</button>
+        <button type="button" @click="showModalOrganisation = false"
+          class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Fermer</button>
       </div>
     </ModalFooter>
   </Modal>

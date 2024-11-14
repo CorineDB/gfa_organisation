@@ -170,9 +170,13 @@ export default {
                 if (response.data.utilisateur.type == "administrateur") {
                   // this.$toast.success("Connexion réussie")
                   this.$router.push("/dashboard/programme");
+                } 
+                else if (response.data.utilisateur.type == "organisation") {
+                  // this.$toast.success("Connexion réussie")
+                  this.gotoOrganisationAppropriateDashboard(response.data.utilisateur.projet);
                 } else {
                   // this.$toast.success("Connexion réussie")
-                  this.$router.push("/dashboard/projets");
+                  this.$router.push("/dashboard/projets/");
                 }
               }
             })
@@ -210,6 +214,15 @@ export default {
       this.statePassword = !this.show ? "text" : "password";
       this.show = !this.show;
       //this.$toast.success('Profile saved',)
+    },
+
+    gotoOrganisationAppropriateDashboard(projet = null) {
+      if(projet != null){
+        this.$router.push({ name: "projets_id_details", params: { id: projet.id, projet: projet } });
+      }
+      else{
+        this.$router.push({ name: "Programmation_enquete" });
+      }
     },
   },
   mounted() {
