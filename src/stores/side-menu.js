@@ -104,6 +104,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
       //   title: "Indicateurs de gouvernance",
       // },
       {
+<<<<<<< HEAD
         icon: "FolderIcon",
         pageName: "projets",
         title: "Outils de collecte",
@@ -134,6 +135,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
             title: "Création Formulaire de Perception",
           },
         ],
+=======
+        icon: "BarChart2Icon",
+        pageName: "indicateursDeGouvernance",
+        title: "Indicateurs de gouvernance",
+>>>>>>> 6b33f96797fca34fd278e2686306100b4bc86fec
       },
       {
         icon: "BarChart2Icon",
