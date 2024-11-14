@@ -1,5 +1,5 @@
 <template>
-  <table class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="4" cellspacing="0">
+  <table class="w-full max-w-screen-lg my-12 border border-collapse table-auto border-slate-500" cellpadding="4" cellspacing="0">
     <thead class="text-left bg-gray-400">
       <tr class="" :style="{ 'background-color': getColorForValue(indicegouvernace) }">
         <td colspan="2" class="py-3 font-semibold text-center">Indice factuel de gouvernance</td>

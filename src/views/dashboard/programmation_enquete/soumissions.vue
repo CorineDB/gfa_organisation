@@ -272,7 +272,7 @@ onMounted(() => {
                 <div class="flex justify-center">
                   <PercentIcon class="report-box__icon text-warning" />
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.pourcentage_evolution }}%</div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{ Math.round(statistiques?.pourcentage_evolution) }}%</div>
                 <div class="mt-1 text-base text-slate-500">Pourcentage de soumissions</div>
               </div>
             </div>
@@ -286,12 +286,12 @@ onMounted(() => {
           <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
         </div>
         <div class="grid grid-cols-12 gap-6 mt-5 text-lg font-medium">
-          <div @click="goToPageSynthese" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiche de Synthèse</button> <ArrowRightIcon class="size-5" /></div>
-          <div @click="goToPageMarqueur" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiche de Marqueur</button> <ArrowRightIcon class="size-5" /></div>
+          <div @click="goToPageSynthese" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiches de Synthèse</button> <ArrowRightIcon class="size-5" /></div>
+          <div @click="goToPageMarqueur" class="flex items-center justify-center col-span-12 gap-1 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-3 intro-y"><button class="px-4 py-8">Fiches de Marqueur</button> <ArrowRightIcon class="size-5" /></div>
         </div>
       </div>
 
-      <!-- <section>
+      <section>
         <p class="pb-4 mt-10 text-lg font-medium intro-y">Liste des soumissions par organisations</p>
         <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
           <div v-for="(ong, index) in datas" :key="index" @click="changeCurrentDetailOrganisation(ong.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
@@ -327,61 +327,6 @@ onMounted(() => {
             </div>
           </div>
         </div>
-      </section> -->
-      <!-- END: General Report -->
-      <section class="w-full">
-        <p class="pb-4 mt-10 text-lg font-medium intro-y">Liste des soumissions par organisations</p>
-
-        <AccordionGroup :selectedIndex="null" class="grid grid-cols-12 gap-3">
-          <AccordionItem v-for="(ong, index) in datas" :key="index" class="col-span-12 xl:col-span-6 intro-y">
-            <Accordion class="text-lg !p-3 font-semibold bg-primary/90 !text-white flex items-center justify-between">
-              <p>{{ ong.nom }}</p>
-              <ChevronDownIcon />
-            </Accordion>
-            <AccordionPanel class="p-2 space-y-2">
-              <AccordionGroup :selectedIndex="0" class="space-y-1">
-                <AccordionItem v-if="ong.factuel?.length > 0">
-                  <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
-                    <p>Factuel</p>
-                    <ChevronDownIcon />
-                  </Accordion>
-                  <AccordionPanel class="p-2 space-y-2">
-                    <div v-for="(soumission, index) in ong.factuel" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border-l-2 border-yellow-200 rounded shadow">
-                      <p>
-                        Soumission n° {{ index + 1 }} ( {{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
-                      </p>
-                      <div class="flex items-center gap-4">
-                        <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
-                        <button v-if="!soumission.statut" class="p-2 text-danger" @click="handleDelete(soumission.id)">
-                          <TrashIcon class="size-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </AccordionPanel>
-                </AccordionItem>
-                <AccordionItem v-if="ong.perception?.length > 0">
-                  <Accordion class="text-lg !p-3 font-semibold bg-gray-700 !text-white flex items-center justify-between">
-                    <p>Perception</p>
-                    <ChevronDownIcon />
-                  </Accordion>
-                  <AccordionPanel class="p-2 space-y-2">
-                    <div v-for="(soumission, index) in ong.perception" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border-l-2 border-yellow-200 rounded shadow">
-                      <p>
-                        Soumission n° {{ index + 1 }} ({{ soumission.submitted_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
-                      </p>
-                      <div class="flex items-center gap-4">
-                        <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
-                        <button v-if="!soumission.statut" class="p-2 text-danger" @click="handleDelete(soumission.id)">
-                          <TrashIcon class="size-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </AccordionPanel>
-                </AccordionItem>
-              </AccordionGroup>
-            </AccordionPanel>
-          </AccordionItem>
-        </AccordionGroup>
       </section>
     </div>
     <LoaderSnipper v-if="isLoadingData" />
@@ -452,6 +397,9 @@ onMounted(() => {
                   </div>
                 </div>
               </div>
+              <div v-else class="text-lg text-center">
+                <p>Liste de soumissions vide.</p>
+              </div>
             </TabPanel>
             <TabPanel class="max-h-[80vh] overflow-y-auto">
               <div class="flex flex-col gap-2" v-if="currentOrganisation?.perception">
@@ -466,6 +414,9 @@ onMounted(() => {
                     </button>
                   </div>
                 </div>
+              </div>
+              <div v-else class="text-lg text-center">
+                <p>Liste de soumissions vide.</p>
               </div>
             </TabPanel>
           </TabPanels>

@@ -7,7 +7,6 @@
 <script>
 import * as ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import { type } from "jquery";
 import { getColorForExcel } from "../../utils/findColorIndicator";
 
 export default {
@@ -23,7 +22,7 @@ export default {
       required: false,
       default: "",
     },
-    structure: {
+    org: {
       type: String,
       required: false,
       default: "",
@@ -34,6 +33,7 @@ export default {
       default: "",
     },
   },
+
   methods: {
     async generateExcel() {
       const workbook = new ExcelJS.Workbook();
@@ -43,39 +43,6 @@ export default {
       worksheet.addRow(["Structure", this.org]).font = { bold: true };
       worksheet.addRow(["Nom et prénom point focal", this.pointfocal]);
       worksheet.addRow(["Date d'auto-évaluation", this.dateevaluation]);
-      worksheet.addRow([]); // Blank row for spacing
-      worksheet.addRow([]); // Blank row for spacing
-
-      //Table 2  Indice de Gouvernance
-      const headerIndice = worksheet.addRow(["Principe", "Indice de perception"]);
-      headerIndice.eachCell((cell) => {
-        cell.font = { bold: true };
-        cell.alignment = { vertical: "middle", horizontal: "center" };
-        cell.border = {
-          top: { style: "thin" },
-          left: { style: "thin" },
-          bottom: { style: "thin" },
-          right: { style: "thin" },
-        };
-      });
-
-      this.currentPerception.synthese.forEach((principe) => {
-        const rowPrincipe = worksheet.addRow([principe.nom, principe.indice_de_perception]);
-        rowPrincipe.eachCell((cell) => {
-          cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: getColorForExcel(principe.indice_de_perception) },
-          };
-          cell.alignment = { vertical: "middle", horizontal: "center" };
-          cell.border = {
-            top: { style: "thin" },
-            left: { style: "thin" },
-            bottom: { style: "thin" },
-            right: { style: "thin" },
-          };
-        });
-      });
       worksheet.addRow([]); // Blank row for spacing
       worksheet.addRow([]); // Blank row for spacing
 
@@ -184,9 +151,9 @@ export default {
         column.width = 50;
       });
 
-      // Génération et sauvegarde du fichier
       const buffer = await workbook.xlsx.writeBuffer();
-      saveAs(new Blob([buffer]), "perception_gouvernance.xlsx");
+      const date = new Date().getTime();
+      saveAs(new Blob([buffer]), `SYNTHESSE_PERCEPTION_${date}.xlsx`);
     },
   },
 };

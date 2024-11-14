@@ -1,7 +1,7 @@
 <template>
   <table class="w-full my-12 border border-collapse table-auto border-slate-500" cellpadding="2" cellspacing="0">
     <thead class="text-left bg-gray-400">
-      <tr class="py-2 border-b-8 border-white" :style="{ 'background-color': getColorForValue(indicegouvernace) }">
+      <tr class="py-3 border-b-8 border-white" :style="{ 'background-color': getColorForValue(indicegouvernace) }">
         <td colspan="2" class="font-semibold text-center">Indice factuel de gouvernance</td>
         <td class="text-left">{{ indicegouvernace }}</td>
       </tr>

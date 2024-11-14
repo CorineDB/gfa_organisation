@@ -3,12 +3,11 @@ import { onMounted, ref } from "vue";
 import SyntheseService from "@/services/modules/synthese.service";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
-import { getColorForValue } from "../../utils/findColorIndicator";
 import { useRoute, useRouter } from "vue-router";
 import ExportationSyntheseFactuel from "../../components/news/ExportationSyntheseFactuel.vue";
 import TabulatorMarqueurFactuel from "../../components/news/TabulatorMarqueurFactuel.vue";
 import { computed } from "vue";
-import ExportationSynthesePerception from "../../components/news/ExportationSynthesePerception.vue";
+import ExportationMarqueurPerception from "../../components/news/ExportationMarqueurPerception.vue";
 import TabulatorMarqueurPerception from "../../components/news/TabulatorMarqueurPerception.vue";
 
 const router = useRouter();
@@ -111,17 +110,13 @@ onMounted(async () => {
             </table>
             <!-- Tableau de marqueur Factuel -->
             <TabulatorMarqueurFactuel v-if="!isLoadingData" :data="currentFactuel?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" />
-            <!-- <ChartScroreByPrincipe />
-            <ChartOptionResponseByCategorieAndMember />
-            <ChartProgressionByTime />
-            <ChartScorePerceptionByPrincipe /> -->
           </TabPanel>
           <!-- Perception-->
           <TabPanel class="leading-relaxed">
-            <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE SYNTHESE SCORE DE PERCEPTION GOUVERNANCE</div>
+            <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE MARQUEUR DE PERCEPTION GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
-                <ExportationSynthesePerception v-if="!isLoadingData" :org="currentOrganisation?.nom" :pointfocal="`${currentOrganisation?.nom_point_focal}  ${currentOrganisation?.prenom_point_focal}`" :dateevaluation="currentPerception?.evaluatedAt" :current-perception="currentPerception" />
+                <ExportationMarqueurPerception v-if="!isLoadingData && currentPerception" :org="currentOrganisation?.nom" :pointfocal="`${currentOrganisation?.nom_point_focal}  ${currentOrganisation?.prenom_point_focal}`" :dateevaluation="currentPerception?.evaluatedAt" :datas="currentPerception" />
               </div>
             </div>
             <table class="w-full mt-12 text-sm border-collapse table-fixed">
