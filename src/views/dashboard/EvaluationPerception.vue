@@ -21,11 +21,7 @@ const token = route.params.id;
 const payload = reactive({
   identifier_of_participant: "",
   programmeId: "",
-<<<<<<< HEAD
   token: token,
-=======
-  token,
->>>>>>> 08d5b7b43f8677b753322742f26855200829c4cc
   formulaireDeGouvernanceId: "",
   perception: {
     categorieDeParticipant: "",
@@ -58,11 +54,7 @@ const getDataFormPerception = async () => {
     formDataPerception.value = data.data;
     formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance;
     idEvaluation.value = formDataPerception.value.id;
-<<<<<<< HEAD
     payload.formulaireDeGouvernanceId = formulairePerception.value.id;
-=======
-    payload.formulaireDeGouvernanceId = formDataPerception.value.formulaire_de_gouvernance.id;
->>>>>>> 08d5b7b43f8677b753322742f26855200829c4cc
     payload.programmeId = formDataPerception.value.programmeId;
   } catch (e) {
     toast.error("Erreur lors de la récupération des données.");
