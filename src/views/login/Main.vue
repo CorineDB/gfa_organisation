@@ -30,7 +30,7 @@
             <div class="mt-2 text-center intro-x text-slate-400 xl:hidden">Responsabilité partagée, Qualité améliorée : Unis pour un meilleur service social.</div>
             <div class="mt-8 intro-x">
               <div>
-                <input type="text" v-model.trim="login" class="block px-4 py-3 intro-x login__input form-control" placeholder="Email" />
+                <input type="text" v-model.trim="login" class="block px-4 py-3 intro-x login__input form-control" autocomplete  placeholder="Email" />
                 <!-- <div class="py-2 text-sm font-semibold text-red-500" v-if='!$v.login.required && soumettre'>
                   Ce champ est obligatoire
                       </div> -->

@@ -2,6 +2,7 @@
 
 import GouvernanceChart from "./GouvernanceChart.vue";
 import RankingChart from "./RankingChart.vue";
+import ActionPlan from "./ActionPlan.vue";
 import SubmissionsProgressionGraph from "./SubmissionsProgressionGraph.vue";
 import AverageOptionResponsePerCategorieOfRepondentPie from './AverageOptionResponsePerCategorieOfRepondentPie.vue'
 import { computed, onMounted, reactive, ref } from "vue";
@@ -36,7 +37,6 @@ const datas = ref([]);
 const statistiques = ref({});
 const idCurrentOng = ref({});
 
-
 // Sample data
 const labels = ["Transparence", "Équité", "Responsabilité", "Participation", "Redevabilité"];
 const orgImg = "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Y29tcGFueSUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D";
@@ -53,6 +53,46 @@ const rankingData = [
   { id: 4, name: "Care-Benin", percent: 0.35, image: orgImg },
   { id: 4, name: "Care-Benin", percent: 0.12, image: orgImg },
 ];
+
+const actions_a_mener = reactive({
+  "progressSummary": [
+    {
+      "progressCategory": "Terminer",
+      "progressCurrent": 0,
+      "progressTotal": 160
+    },
+    {
+      "progressCategory": "En cours",
+      "progressCurrent": 139,
+      "progressTotal": 160
+    },
+    {
+      "progressCategory": "En retard",
+      "progressCurrent": 0,
+      "progressTotal": 160
+    }
+  ],
+  "activities": [
+    {
+      "activityId": 1,
+      "activity": "Recruter la mission de surveillance et contrôle général et suivi de la mise en œuvre du PGES dans les bassins Pa3 et Y",
+      "tepActuel": 8.75,
+      "status": "En cours"
+    },
+    {
+      "activityId": 2,
+      "activity": "Construire les collecteurs d'assainissement pluvial et aménager les voies connexes dans les bassins Pa3 et Y",
+      "tepActuel": 21.00,
+      "status": "En cours"
+    },
+    {
+      "activityId": 3,
+      "activity": "Construire les collecteurs d'assainissement pluvial et aménager les voies connexes dans les bassins Pa3 et Y",
+      "tepActuel": 19.00,
+      "status": "En cours"
+    }
+  ]
+});
 
 const synthetiqueResultsData = {labels: labels, "years": [
   {
@@ -274,6 +314,10 @@ const opendAddParticipant = () => {
   router.push({ name: "add_participant", query: { e: idEvaluation } });
 };
 
+const recommandation = () => {
+  router.push({ name: "Recommandation", query: { e: idEvaluation } });
+};
+
 const openPerceptionModal = () => {
   router.push({ name: "ToolsPerception", params: { id: idEvaluation } });
 };
@@ -456,13 +500,17 @@ onMounted(() => {
 
 
           <!-- Ranking Chart -->
-          <div class="flex flex-col justify-start p-4 bg-white shadow rounded-md">
-
-            <!-- Section Header -->
-            <div class="flex items-center h-10 intro-y">
-              <h2 class="mr-5 text-lg font-medium truncate">Classement des soumissions par organisation</h2>
+          <div class="overflow-x-auto flex flex-col justify-start p-4 bg-white shadow rounded-md">
+            
+            <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
+              <div class="flex">
+                <h2 class="mr-5 text-lg font-medium truncate">Actions a mener</h2>
+              </div>
+              <div class="flex">
+                <button class="mr-2 shadow-md btn btn-primary" >Voir le plan d'action</button>
+              </div>
             </div>
-            <RankingChart :rankingData="rankingData" />
+            <ActionPlan />
           </div>
         </div>
       </div>

@@ -328,11 +328,16 @@ const routes = [
         component: SourceVerification,
       },
       {
+        path: "add-participant",
+        name: "add_participant",
+        component: SendMailPerception,
+      },
+      {
         path: "enquetes/:id/recommandations",
         name: "Recommandation",
-        component: Recommandation
+        component: Recommandation,
       }
-    ]
+    ],
   },
 
   {

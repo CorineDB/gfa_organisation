@@ -22,7 +22,7 @@ const idEvaluation = ref("");
 const payload = reactive({
   identifier_of_participant: "",
   programmeId: "",
-  organisationId: "",
+  token: token,
   formulaireDeGouvernanceId: "",
   perception: {
     categorieDeParticipant: "",
@@ -55,7 +55,7 @@ const getDataFormPerception = async () => {
     formDataPerception.value = data.data;
     formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance
     idEvaluation.value = formDataPerception.value.id;
-    payload.formulaireDeGouvernanceId = formDataPerception.value.id;
+    payload.formulaireDeGouvernanceId = formulairePerception.value.id;
     payload.programmeId = formDataPerception.value.programmeId;
   } catch (e) {
     toast.error("Erreur lors de la récupération des données.");
@@ -92,6 +92,7 @@ const submitData = async () => {
     try {
       const result = await action;
       if (isValidate.value) toast.success(`${result.data.message}`);
+      await getDataFormPerception();
     } catch (e) {
       console.error(e);
       if (isValidate.value) toast.error(getAllErrorMessages(e));
