@@ -15,7 +15,8 @@ const TYPE_ORGANISATION = "organisation";
 
 const route = useRoute();
 
-const idEvaluation = route.params.id;
+// const idEvaluation = route.params.id;
+const token = route.params.id;
 
 const payload = reactive({
   organisationId: "",
@@ -37,6 +38,8 @@ const isValidate = ref(false);
 const isLoadingDataFactuel = ref(true);
 const organisationSelected = ref(false);
 const currentPage = ref(0);
+const authUser = reactive({});
+const idEvaluation = ref("");
 const currentMember = ref({
   nom: "",
   prenom: "",
@@ -46,10 +49,13 @@ const sources = ref([]);
 
 const getDataFormFactuel = async () => {
   try {
-    const { data } = await EvaluationService.findEvaluation(idEvaluation);
+    const { data } = await EvaluationService.getFactuelFormEvaluation(token);
     formDataFactuel.value = data.data;
-    payload.formulaireDeGouvernanceId = formDataFactuel.value.formulaire_factuel_de_gouvernance;
+    formulaireFactuel.value = formDataFactuel.value.formulaire_de_gouvernance;
+    payload.formulaireDeGouvernanceId = formulaireFactuel.value.id;
+    idEvaluation.value = formDataFactuel.value.id;
   } catch (e) {
+    console.log(e);
     toast.error("Erreur lors de la récupération des données.");
   } finally {
     isLoadingDataFactuel.value = false;
@@ -128,7 +134,7 @@ const submitData = async () => {
       }
     });
     isLoading.value = true;
-    const action = isValidate.value ? EvaluationService.validateSumission(idEvaluation, formData) : EvaluationService.submitSumission(idEvaluation, formData);
+    const action = isValidate.value ? EvaluationService.validateSumission(idEvaluation.value, formData) : EvaluationService.submitSumission(idEvaluation.value, formData);
 
     try {
       const result = await action;
@@ -145,6 +151,25 @@ const submitData = async () => {
 };
 
 const initializeFormData = () => {
+  // Initialisation des réponses
+  formulaireFactuel.value.categories_de_gouvernance.forEach((typeGouvernance) => {
+    typeGouvernance.categories_de_gouvernance.forEach((principe) => {
+      principe.categories_de_gouvernance.forEach((critere) => {
+        critere.questions_de_gouvernance.forEach((question) => {
+          responses[question.id] = {
+            questionId: question.id,
+            optionDeReponseId: "null",
+            sourceDeVerificationId: sources.value[0].id,
+            sourceDeVerification: "",
+            preuves: [],
+          };
+        });
+      });
+    });
+  });
+};
+
+const initializeFormDataAfterSoumission = () => {
   // Initialisation des réponses
   formulaireFactuel.value.categories_de_gouvernance.forEach((typeGouvernance) => {
     typeGouvernance.categories_de_gouvernance.forEach((principe) => {
@@ -259,10 +284,12 @@ const isPreview = computed(() => currentPage.value === totalPages.value - 1);
 // );
 
 onMounted(async () => {
+  authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
+  payload.organisationId = authUser.value.profil.id;
   await getSource();
   await getDataFormFactuel();
   // await getcurrentUserAndFetchOrganization();
-  findFormulaireFactuel();
+  // findFormulaireFactuel();
   initializeFormData();
 });
 </script>
@@ -326,7 +353,7 @@ onMounted(async () => {
                                   </div>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                  <div class="flex items-center gap-3" v-if="responses[question.id].sourceDeVerificationId === 'null'">
+                                  <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null'">
                                     <label class="">Autre source</label>
                                     <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
                                   </div>
@@ -439,18 +466,18 @@ onMounted(async () => {
                                 <!-- v-for Option -->
                                 <div class="inline-flex flex-wrap items-center gap-3">
                                   <p class="text-base font-medium">
-                                    Réponse : <span class="text-primary"> {{ findResponse(responses[question.id].optionDeReponseId) }}</span>
+                                    Réponse : <span class="text-primary"> {{ findResponse(responses[question.id]?.optionDeReponseId) }}</span>
                                   </p>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                  <div class="flex items-center gap-3" v-if="responses[question.id].sourceDeVerificationId === 'others'">
+                                  <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'others'">
                                     <p class="text-base font-medium">
                                       Autre source: <span class="text-primary">{{ responses[question.id].sourceDeVerification }}</span>
                                     </p>
                                   </div>
                                   <div v-else class="flex items-center gap-3">
                                     <p class="text-base font-medium">
-                                      Source : <span class="text-primary">{{ findSource(responses[question.id].sourceDeVerificationId) }}</span>
+                                      Source : <span class="text-primary">{{ findSource(responses[question.id]?.sourceDeVerificationId) }}</span>
                                     </p>
                                   </div>
                                 </div>
@@ -458,7 +485,7 @@ onMounted(async () => {
                               <div class="">
                                 <ul class="flex justify-center">
                                   Fichiers:
-                                  <li class="text-base font-medium text-primary" v-for="(file, index) in responses[question.id].preuves" :key="index">{{ file.name }}</li>
+                                  <li class="text-base font-medium text-primary" v-for="(file, index) in responses[question.id]?.preuves" :key="index">{{ file.name }}</li>
                                 </ul>
                               </div>
                             </div>
