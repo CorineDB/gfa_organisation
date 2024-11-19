@@ -49,6 +49,10 @@
               placeholder="Libellé du role" />
           </div>
           <div class="my-2">
+            <label for="regular-form-2" class="form-label">Description</label>
+            <textarea id="regular-form-2" placeholder="Description du role" v-model="formData.description" required class="form-control px-3 py-2 mt-1 border-2 border-gray-300 w-full focus:outline-none focus:ring-2  focus:border-transparent" rows="2"></textarea>
+          </div>
+          <div class="my-2">
             <label for="regular-form-1" class="form-label">Permissions </label>
             <TomSelect v-model="formData.permissions" multiple :options="{ placeholder: 'Selectionez une permissions' }"
               class="w-full">
@@ -79,6 +83,11 @@
             <input id="regular-form-1" type="text" required v-model="saveUpdate.nom" class="form-control"
               placeholder="Libellé du role" />
           </div>
+          <div>
+            <label for="regular-form-2" class="form-label">Description</label>
+            <textarea id="regular-form-2" placeholder="Description du role" v-model="saveUpdate.description" required class="px-3 py-2 mt-1 border-2 border-gray-300 w-full focus:outline-none focus:ring-2  focus:border-transparent" rows="3"></textarea>
+          </div>
+
           <div class="my-2">
             <label for="regular-form-1" class="form-label">Permissions </label>
             <TomSelect v-model="saveUpdate.permissions" multiple :options="{ placeholder: 'Selectionez une permissions' }"
@@ -128,7 +137,6 @@
             <th class="whitespace-nowrap">Role</th>
             <th class="whitespace-nowrap">Permissions</th>
             <th class="whitespace-nowrap">Date creation</th>
-            <th class="whitespace-nowrap">Date mise à jours</th>
             <th v-if="$h.getPermission('write.role')" class="whitespace-nowrap">Actions</th>
           </tr>
         </thead>
@@ -146,7 +154,6 @@
               </div>
             </td>
             <td> {{ data.created_at }} </td>
-            <td> {{ data.updated_at }}</td>
             <td v-if="$h.getPermission('write.role')" class="space-y-3 ">
               <Tippy tag="a" href="javascript:;" class="tooltip " content="cliquez pour modifier">
                 <span @click="modifier(index, data)" class="text-blue-500 cursor-pointer">
@@ -262,8 +269,8 @@ const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const formData = reactive({
   nom: '',
-  permissions: [],
-  entrepriseId: ''
+  description: '',
+  permissions: []
 })
 
 const message = reactive({
@@ -287,19 +294,16 @@ const resultQuery = computed(() => {
 })
 
 onMounted(function () {
-  if (!$h.getPermission('read.role')) {
+  /* if (!$h.getPermission('read.role')) {
    // router.push('/error-page')
-  }
+  } */
 
 
 
   const usersInfo = JSON.parse(localStorage.getItem('authenticateUser'));
-  if (usersInfo) {
-    permissions.value = usersInfo.users.role.permissions
-    formData.entrepriseId = usersInfo.users.entrepriseId
-    saveUpdate.entrepriseId = usersInfo.users.id
+  if (usersInfo.role) {
+    permissions.value = usersInfo.role[0].permissions
   }
-  console.log(usersInfo)
   getData()
 })
 
@@ -314,6 +318,7 @@ const getData = function () {
 
 function close() {
   formData.nom = ''
+  formData.description= ''
   formData.permissions = []
   showModal.value = false
 }
@@ -380,6 +385,7 @@ const supprimer = function (index, data) {
   deleteModalPreview.value = true
   deleteData.id = data.id
   deleteData.nom = data.nom
+  deleteData.description = data.description
   deleteData.index = index
 }
 const deleteRole = function () {
@@ -408,6 +414,7 @@ const deleteRole = function () {
 
 const modifier = function (index, data) {
   saveUpdate.nom = data.nom
+  saveUpdate.description = data.description
   saveUpdate.id = data.id
   saveUpdate.permissions = []
   data.permissions.forEach((data) => {
@@ -423,8 +430,8 @@ const updateRole = function () {
     chargement.value = true
     const formData = {
       nom: saveUpdate.nom,
-      permissions: saveUpdate.permissions,
-      entrepriseId: saveUpdate.entrepriseId
+      description: saveUpdate.description,
+      permissions: saveUpdate.permissions
     }
     RoleService.update(saveUpdate.id, formData).then((data) => {
       chargement.value = false

@@ -16,7 +16,8 @@ import { generateUniqueId } from "../../utils/helpers";
 const TYPE_ORGANISATION = "organisation";
 
 const route = useRoute();
-const idEvaluation = route.params.id;
+const token = route.params.id;
+const idEvaluation = ref("");
 
 const payload = reactive({
   identifier_of_participant: "",
@@ -50,9 +51,11 @@ const itemsPerPage = 3;
 
 const getDataFormPerception = async () => {
   try {
-    const { data } = await EvaluationService.findEvaluation(idEvaluation);
+    const { data } = await EvaluationService.getPerceptionFormEvaluation(payload.identifier_of_participant, token);
     formDataPerception.value = data.data;
-    payload.formulaireDeGouvernanceId = formDataPerception.value.formulaire_perception_de_gouvernance;
+    formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance
+    idEvaluation.value = formDataPerception.value.id;
+    payload.formulaireDeGouvernanceId = formDataPerception.value.id;
     payload.programmeId = formDataPerception.value.programmeId;
   } catch (e) {
     toast.error("Erreur lors de la récupération des données.");
@@ -84,7 +87,7 @@ const submitData = async () => {
 
   if (payload.perception.response_data.length > 0) {
     isLoading.value = true;
-    const action = isValidate.value ? EvaluationService.validatePerceptionSumission(idEvaluation, payload) : EvaluationService.submitPerceptionSumission(idEvaluation, payload);
+    const action = isValidate.value ? EvaluationService.validatePerceptionSumission(idEvaluation.value, payload) : EvaluationService.submitPerceptionSumission(idEvaluation.value, payload);
 
     try {
       const result = await action;
@@ -229,14 +232,14 @@ onMounted(async () => {
   payload.identifier_of_participant = generateUniqueId();
   await getDataFormPerception();
   // await getcurrentUserAndFetchOrganization();
-  findFormulairePerception();
+  //findFormulairePerception();
   initializeFormData();
 });
 </script>
 <template>
   <div v-if="!isLoadingDataPerception" class="mx-auto mt-5 max-w-screen-2xl">
-    <div v-if="formDataPerception.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataPerception.intitule }}</div>
-    <div v-if="formDataPerception.organisations" class="flex items-center justify-end mt-5">
+    <div v-if="formulairePerception.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataPerception.intitule }}</div>
+    <!-- <div v-if="formDataPerception.organisations" class="flex items-center justify-end mt-5">
       <div class="min-w-[250px] flex items-center gap-3">
         <label class="form-label">Organisations</label>
         <TomSelect v-model="payload.organisationId" @change="changeOrganisation" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
@@ -244,9 +247,9 @@ onMounted(async () => {
           <option v-for="(ong, index) in formDataPerception.organisations" :key="index" :value="ong.id">{{ ong.nom }}</option>
         </TomSelect>
       </div>
-    </div>
+    </div> -->
     <div>
-      <div class="py-5 intro-x" v-if="formDataPerception.id">
+      <div class="py-5 intro-x" v-if="formulairePerception.id">
         <div class="space-y-8">
           <div class="space-y-6">
             <AccordionGroup class="space-y-2">
@@ -356,7 +359,7 @@ onMounted(async () => {
                       <!-- v-for Option -->
                       <div class="inline-flex flex-wrap items-center gap-3">
                         <p class="text-base font-medium">
-                          Réponse : <span class="text-primary"> {{ findResponse(responses[question.id].optionDeReponseId) }}</span>
+                          Réponse : <span class="text-primary"> {{ findResponse(responses[question.id]?.optionDeReponseId) }}</span>
                         </p>
                       </div>
                     </div>

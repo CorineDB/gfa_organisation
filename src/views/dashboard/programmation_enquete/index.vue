@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
+import GouvernanceChart from "./GouvernanceChart.vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
 import Tabulator from "tabulator-tables";
@@ -39,6 +40,48 @@ const datas = ref([]);
 const organisations = ref([]);
 const formulairesFactuel = ref([]);
 const formulairesPerception = ref([]);
+// Sample data
+const labels = ["Transparence", "Équité", "Responsabilité", "Participation", "Redevabilité"];
+
+
+// Values for each of the indices
+const synthetiqueValues = [0.8, 0.6, 0.7, 0.85, 0.75]; // Example for synthetique indices (between 0 and 1)
+const factuelValues = [0.7, 0.65, 0.6, 0.8, 0.72];    // Example for factuel indices (between 0 and 1)
+const perceptionValues = [0.65, 0.5, 0.55, 0.75, 0.7]; // Example for perception indices (between 0 and 1)
+
+
+const synthetiqueResultsData = {labels: labels, "years": [
+  {
+    year: 2020,
+    synthetiqueValues: [0.7, 0.8, 0.75, 0.85, 0.7],
+    factuelValues: [0.6, 0.65, 0.7, 0.72, 0.7],
+    perceptionValues: [0.8, 0.82, 0.78, 0.9, 0.7],
+  },
+  {
+    year: 2021,
+    synthetiqueValues: [0.78, 0.68, 0.57, 0.95, 0.7],
+    factuelValues: [0.7, 0.85, 0.9, 0.82, 0.7],
+    perceptionValues: [0.8, 0.82, 0.78, 0.9, 0.7],
+  },
+  {
+    year: 2022,
+    synthetiqueValues: [0.8, 0.75, 0.7, 0.88, 0.75],
+    factuelValues: [0.72, 0.75, 0.85, 0.9, 0.72],
+    perceptionValues: [0.85, 0.88, 0.8, 0.92, 0.7],
+  },
+  {
+    year: 2023,
+    synthetiqueValues: [0.82, 0.7, 0.68, 0.9, 0.7],
+    factuelValues: [0.75, 0.78, 0.85, 0.88, 0.7],
+    perceptionValues: [0.9, 0.85, 0.8, 0.92, 0.7],
+  },
+  {
+    year: 2024,
+    synthetiqueValues: [0.85, 0.72, 0.65, 0.92, 0.7],
+    factuelValues: [0.77, 0.80, 0.87, 0.9, 0.7],
+    perceptionValues: [0.92, 0.9, 0.85, 0.94, 0.7],
+  },
+]};
 
 const createData = async () => {
   isLoading.value = true;
@@ -163,6 +206,7 @@ const handleEdit = (params) => {
   // idFormPerception.value = params.formulaire;
   showModalCreate.value = true;
 };
+
 const handleDelete = (params) => {
   idSelect.value = params.id;
   deleteModalPreview.value = true;
@@ -183,6 +227,7 @@ const resetForm = () => {
   payload.organisations = [];
   showModalCreate.value = false;
 };
+
 const openCreateModal = () => {
   getFormsFactuel();
   getFormsPerception();
@@ -221,6 +266,26 @@ onMounted(() => {
       <div id="tabulator" class="mt-5 table-report table-report--tabulator"></div>
     </div> -->
     <LoaderSnipper v-if="isLoadingData" />
+
+
+    <div class="col-span-12 mt-8">
+
+      <!-- Chart and Ranking Layout -->
+      <div class="grid grid-cols-1 mt-5">
+        <!-- Gouvernance Chart -->
+        <div class="overflow-x-auto p-4 bg-white shadow rounded-md justify-left ">
+          <!-- Section Header -->
+          <div class="flex items-center h-10 intro-y">
+            <h2 class="mr-5 text-lg font-medium truncate">Resultats synthetique</h2>
+          </div>
+          <!-- <GouvernanceChart :synthetiqueResultsData="synthetiqueResultsData" class="w-full h-auto max-w-[600px] max-h-[400px]" /> -->
+
+          <GouvernanceChart :labels="labels" :synthetiqueValues="synthetiqueValues" :factuelValues="factuelValues"
+            :perceptionValues="perceptionValues" class="w-full h-auto max-w-[600px] max-h-[400px]" />
+        </div>
+      </div>
+    </div>
+
     <div class="grid grid-cols-12 gap-6 mt-5">
       <div v-for="(item, index) in datas" :key="index" class="col-span-12 p-4 md:col-span-12 lg:col-span-4">
         <div class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">

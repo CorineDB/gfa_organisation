@@ -20,15 +20,15 @@ const AuthService = {
     },
 
     changeProfil(slug, params) {
-      return ApiService.update("users", slug, params);
+      return ApiService.update("utilisateurs", slug, params);
     },
 
     role(slug) {
-      return ApiService.get(`users/${slug}/roles`);
+      return ApiService.get(`utilisateurs/${slug}/roles`);
     },
 
     permissions(slug, roleSlug) {
-      return ApiService.get(`users/${slug}/roles/${roleSlug}/permissions`);
+      return ApiService.get(`utilisateurs/${slug}/roles/${roleSlug}/permissions`);
     }
 
   };

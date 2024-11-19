@@ -77,38 +77,6 @@ export const useSideMenuStore = defineStore("sideMenu", {
         ],
       },
       {
-        icon: "ServerIcon",
-        pageName: "audit",
-        title: "Audit",
-      },
-      {
-        icon: "ArchiveIcon",
-        pageName: "rapport",
-        title: "Rapport",
-      },
-      {
-        icon: "ZapIcon",
-        pageName: "finances_suivi",
-        title: "Suivi Financier",
-      },
-
-      {
-        icon: "CpuIcon",
-        pageName: "Ongs",
-        title: "Organisations",
-      },
-
-      // {
-      //   icon: "BarChart2Icon",
-      //   pageName: "indicateursDeGouvernance",
-      //   title: "Indicateurs de gouvernance",
-      // },
-      {
-        icon: "BarChart2Icon",
-        pageName: "indicateursDeGouvernance",
-        title: "Indicateurs de gouvernance",
-      },
-      {
         icon: "BarChart2Icon",
         pageName: "Programmation_enquete",
         title: "Évaluations & Résulats",
@@ -119,11 +87,22 @@ export const useSideMenuStore = defineStore("sideMenu", {
         pageName: "EnqueteIndividuel",
         title: "Enquête individuelle",
       },
-
       {
         icon: "UsersIcon",
-        pageName: "Utilisateur",
-        title: "Utilisateurs",
+        pageName: "personnel",
+        title: "Personnel",
+        subMenu: [
+          {
+            icon: "UsersIcon",
+            pageName: "Utilisateur",
+            title: "Membres",
+          },
+          {
+            icon: "KeyIcon",
+            pageName: "Roles",
+            title: "Roles",
+          },
+        ],
       },
       {
         icon: "SettingsIcon",

@@ -66,6 +66,8 @@ import EvaluationFactuel from "@/views/dashboard/EvaluationFactuel.vue";
 import EvaluationPerception from "@/views/dashboard/EvaluationPerception.vue";
 import SourceVerification from "../views/dashboard/SourceVerification.vue";
 import SendMailPerception from "../views/dashboard/SendMailPerception.vue";
+import Recommandation from "../views/dashboard/recommandation.vue";
+import PlanAction from "../views/dashboard/recommandation.vue";
 import Organisations from "../views/dashboard/organisations.vue";
 import FicheMarqueur from "../views/dashboard/FicheMarqueur.vue";
 
@@ -326,11 +328,11 @@ const routes = [
         component: SourceVerification,
       },
       {
-        path: "add-participant",
-        name: "add_participant",
-        component: SendMailPerception,
-      },
-    ],
+        path: "enquetes/:id/recommandations",
+        name: "Recommandation",
+        component: Recommandation
+      }
+    ]
   },
 
   {

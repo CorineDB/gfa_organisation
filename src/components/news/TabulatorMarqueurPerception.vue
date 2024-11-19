@@ -2,7 +2,7 @@
   <table class="w-full max-w-screen-lg my-12 border border-collapse table-auto border-slate-500" cellpadding="4" cellspacing="0">
     <thead class="text-left bg-gray-400">
       <tr class="" :style="{ 'background-color': getColorForValue(indicegouvernace) }">
-        <td colspan="2" class="py-3 font-semibold text-center">Indice factuel de gouvernance</td>
+        <td colspan="2" class="py-3 font-semibold text-center">Indice de perception de gouvernance</td>
       </tr>
     </thead>
     <thead>
@@ -16,13 +16,12 @@
         </th>
       </tr>
     </thead>
-    <tbody class="text-black">
+    <tbody class="text-black bg-white">
       <template v-for="(principe, pIndex) in data" :key="principe.id">
-        <tr :style="{ 'background-color': getColorForValue(principe.indice_de_perception) }">
-          <td colspan="2" class="p-2 font-semibold">{{ principe.nom }}</td>
+        <tr :style="{ 'background-color': getColorForValue(principe.indice_de_perception) }" class="border-b-4 border-white">
+          <td colspan="2" class="px-2 py-3 font-semibold">{{ principe.nom }}</td>
         </tr>
-
-        <tr v-for="(question, qIndex) in principe.questions_de_gouvernance" :key="question.id" :style="{ 'background-color': getColorForValue(question.moyenne_ponderee) }">
+        <tr v-for="(question, qIndex) in principe.questions_de_gouvernance" :key="question.id" class=" border-b-2 border-white" :style="{ 'background-color': getColorForValue(question.moyenne_ponderee) }">
           <td class="py-2 font-semibold">QOP{{ cumulativeIndex(pIndex, qIndex) }}</td>
           <td class="py-2">{{ question.nom }}</td>
         </tr>

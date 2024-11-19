@@ -55,7 +55,7 @@
             </div>
             <div>
               <label for="regular-form-1" class="form-label">Prenoms</label>
-              <input id="regular-form-1" type="text" required v-model="formData.prenoms" class="form-control"
+              <input id="regular-form-1" type="text" required v-model="formData.prenom" class="form-control"
                 placeholder="Prenoms" />
             </div>
             <!-- <div>
@@ -68,13 +68,25 @@
                 placeholder="Email" />
             </div>
 
+            <div>
+              <label for="regular-form-1" class="form-label">Contact</label>
+              <input id="regular-form-1" type="number" v-model="formData.contact" class="form-control"
+                placeholder="Contact" />
+            </div>
+
+            <div>
+              <label for="regular-form-1" class="form-label">Poste</label>
+              <input id="regular-form-1" type="text" v-model="formData.poste" class="form-control"
+                placeholder="Poste" />
+            </div>
+
             <div class="">
-              <label for="regular-form-1" class="form-label">Roles </label>
-              <TomSelect v-model="formData.roleId" :options="{ placeholder: 'Selectionez un role' }" class="w-full">
+              <label class="form-label">Roles</label>
+              <TomSelect v-model="formData.roles" multiple :options="{ placeholder: 'Selectionez les roles' }"
+                class="w-full">
                 <option v-for="(role, index) in roles" :key="index" :value="role.id">{{ role.nom }}</option>
               </TomSelect>
             </div>
-
           </div>
 
           <button class="btn btn-primary py-3 px-4 w-full my-3  xl:mr-3 align-top">
@@ -167,9 +179,10 @@
             <th class="whitespace-nowrap">Nom</th>
             <th class="whitespace-nowrap">Prenoms </th>
             <th class="whitespace-nowrap">Email </th>
+            <th class="whitespace-nowrap">Contact </th>
+            <th class="whitespace-nowrap">Poste </th>
             <th class="whitespace-nowrap">Type utilisateur </th>
             <th class="whitespace-nowrap">Date creation</th>
-            <th class="whitespace-nowrap">Date mise à jours</th>
             <th v-if="$h.getPermission('write.utilisateur')" class="whitespace-nowrap">Actions</th>
           </tr>
         </thead>
@@ -181,11 +194,25 @@
             <td>{{ data.prenom }}</td>
 
             <td>{{ data.email }}</td>
-            <td>{{ data.role.nom }}</td>
+            <td>{{ data.contact }}</td>
+            <td :class="data.poste ? 'text-black' : 'text-red-500'"
+              :style="{ color: data.poste ? '#000000' : '#a9aaad', fontStyle: data.poste ? 'normal' : 'italic' }">{{
+      data.poste ?? "Non défini" }}</td>
+            <td>
+              <div class="flex flex-wrap gap-1">
+                <span v-for="(role, index) in data.roles" class="bg-primary text-white rounded-md px-2 py-1 text-xs">
+                  {{ role.nom }}
+                </span>
+              </div>
+            </td>
 
             <td> {{ data.created_at }} </td>
-            <td> {{ data.updated_at }}</td>
             <td v-if="$h.getPermission('write.utilisateur')" class="flex space-x-2 items-center">
+              <Tippy tag="a" href="javascript:;" class="tooltip " content="cliquez pour modifier">
+                <span @click="modifier(index, data)" class="text-blue-500 cursor-pointer">
+                  <EditIcon />
+                </span>
+              </Tippy>
 
               <Tippy tag="a" href="javascript:;" class="tooltip " content="cliquez pour modifier">
                 <span @click="supprimer(index, data)" class="text-red-500 cursor-pointer">
@@ -240,8 +267,8 @@
             <button
               class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none"
               :class="{ 'bg-gray-400': pageNumber === currentPage }"
-              v-for="pageNumber in [totalPages() - 3, totalPages() - 2, totalPages() - 1, totalPages()]" :key="pageNumber"
-              @click="goToPage(pageNumber)">
+              v-for="pageNumber in [totalPages() - 3, totalPages() - 2, totalPages() - 1, totalPages()]"
+              :key="pageNumber" @click="goToPage(pageNumber)">
               {{ pageNumber }}
             </button>
           </template>
@@ -296,7 +323,7 @@ const itemsPerPage = ref(10)
 const isUpdate = ref(false)
 /* const formData = reactive({
   nom:'',
-  prenoms:'',
+  prenom:'',
   password:'demo1234',
   email:'',
   entrepriseNom:'',
@@ -305,10 +332,12 @@ const isUpdate = ref(false)
 
 const formData = reactive({
   nom: '',
-  prenoms: '',
+  prenom: '',
   password: 'demo1234',
-  email: '',
-  roleId: '',
+  email: "@gmail.com",
+  contact: "",
+  poste: "",
+  roles: [],
 })
 
 const message = reactive({
@@ -322,6 +351,8 @@ const resultQuery = computed(() => {
       return search.value.toLowerCase().split(' ').every(v => item.nom.toLowerCase().includes(v)) ||
         search.value.toLowerCase().split(' ').every(v => item.prenom.toLowerCase().includes(v)) ||
         search.value.toLowerCase().split(' ').every(v => item.email.toLowerCase().includes(v)) ||
+        search.value.toLowerCase().split(' ').every(v => item.poste.toLowerCase().includes(v)) ||
+        search.value.toLowerCase().split(' ').every(v => item.contact.toLowerCase().includes(v)) ||
         search.value.toLowerCase().split(' ').every(v => item.role.nom.toLowerCase().includes(v)) ||
         //search.value.toLowerCase().split(' ').every(v => item.entreprise.nom.toLowerCase().includes(v)) ||
         search.value.toLowerCase().split(' ').every(v => item.created_at.toLowerCase().includes(v))
@@ -374,9 +405,11 @@ const goToPage = (pageNumber) => {
 }
 function close() {
   formData.nom = ''
-  formData.prenoms = '',
-    formData.email = '',
-    formData.roleId = ''
+  formData.prenom = '',
+    formData.contact = '',
+    formData.poste = '',
+    formData.email = "@gmail.com",
+    formData.roles = []
   showModal.value = false
 }
 
@@ -460,8 +493,13 @@ const supprimer = function (index, data) {
   deleteModalPreview.value = true
   deleteData.id = data.id
   deleteData.nom = data.nom
+  deleteData.prenom = data.prenom
+  deleteData.poste = data.poste
+  deleteData.email = data.email
+  deleteData.contact = data.contact
   deleteData.index = index
 }
+
 const deleteUser = function () {
   deleteModalPreview.value = false
   users.value.splice(users.value.indexOf(deleteData.index), 1);

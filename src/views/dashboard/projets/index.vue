@@ -1,10 +1,10 @@
 <template>
  
   <div class="flex flex-col items-center mt-8 mb-4 intro-y sm:flex-row">
-    <h2 class="mr-auto text-lg font-medium">Liste des projets</h2>
-    <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
+    <h2 class="mr-auto text-lg font-medium">Dashboard projet : {{ currentUser.projet?.nom }}</h2>
+    <!-- <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
       <button class="mr-2 shadow-md btn btn-primary" @click="addProjet()">Ajouter un projet</button>
-    </div>
+    </div> -->
   </div>
   
   <!-- <div style="height:600px; width:800px">
@@ -96,9 +96,9 @@
     </ModalBody>
   </Modal>
   <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
-  <div href="#" class="relative shadow-2xl box group _bg-white zoom-in border-l-4 border-primary hover:border-secondary transition-all duration-500" v-for="(item, index) in projets" :key="index">
+  <div href="#" class="relative shadow-2xl box group _bg-white zoom-in border-l-4 border-primary hover:border-secondary transition-all duration-500">
     <div class="relative m-5 bg-white">
-      <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ item.nom }}</div>
+      <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ projet.nom }}</div>
     </div>
 
     <div class="relative mt-[12px] m-5 h-40 2xl:h-56 image-fit rounded-md overflow-hidden before:block before:absolute before:w-full before:h-full before:top-0 before:left-0 before:z-10 before:bg-gradient-to-t before:from-black before:to-black/10">
@@ -111,7 +111,7 @@
         <div class="absolute inset-0 flex items-start justify-center p-5 text-white transition-opacity duration-500 bg-black opacity-0 bg-opacity-80 group-hover:opacity-100">
           <div>
             <p class="text-base font-bold lg:text-lg">Description du projet</p>
-            <p class="px-2 text-sm lg:text-base line-clamp-7">{{ item.description }} {{ key }}</p>
+            <p class="px-2 text-sm lg:text-base line-clamp-7">{{ projet.description }} {{ key }}</p>
           </div>
         </div>
       </div>
@@ -119,35 +119,35 @@
 
     <div class="m-5 text-slate-600 dark:text-slate-500">
       <div class="flex items-center">
-        <LinkIcon class="w-4 h-4 mr-2" /> Budget: {{ $h.formatCurrency(item.budgetNational) }} 
+        <LinkIcon class="w-4 h-4 mr-2" /> Budget: {{ $h.formatCurrency(projet.budgetNational) }} 
         <div class="italic font-bold ml-2">Fcfa</div>
       </div>
-      <div v-if="item.owner !== null" class="flex items-center">
+      <div v-if="projet.owner !== null" class="flex items-center">
         <GlobeIcon class="w-4 h-4 mr-2" /> Organisation:  
-        <span class="pl-2 shadow-md p-1 rounded-md bg-green-400 text-white">{{ item.owner.user.nom }}</span>
+        <span class="pl-2 shadow-md p-1 rounded-md bg-green-400 text-white">{{ projet?.owner?.user?.nom }}</span>
       </div>
       <div class="flex items-center mt-2">
         <ClockIcon class="w-4 h-4 mr-2" />
-        <div>Date : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(item.debut) }}</span> au  <span class="font-bold"> {{ $h.reformatDate(item.fin) }}</span></div>
+        <div>Date : Du <span class="pr-1 font-bold"> {{ projet.debut ?$h.reformatDate(projet.debut) : "non defini" }}</span> au  <span class="font-bold"> {{ projet.fin ?$h.reformatDate(projet.fin) : "non defini" }}</span></div>
       </div>
       <div class="flex items-center mt-2">
         <CheckSquareIcon class="w-4 h-4 mr-2" /> Statut :
-        <span class="pl-2 shadow-md p-1 rounded-md bg-black text-white" v-if="item.statut == -2"> Non validé </span>
-        <span class="pl-2 shadow-md p-1 rounded-md bg-green-500 text-white" v-else-if="item.statut == -1"> Validé </span>
-        <span class="pl-1 shadow-md p-1 rounded-md bg-yellow-500 text-white" v-else-if="item.statut == 0"> En cours </span>
-        <span class="pl-1 shadow-md p-1 rounded-md bg-red-500 text-white" v-else-if="item.statut == 1"> En retard </span>
-        <span class="pl-2" v-else-if="item.statut == 2">Terminé</span>
+        <span class="pl-2 shadow-md p-1 rounded-md bg-black text-white" v-if="projet.statut == -2"> Non validé </span>
+        <span class="pl-2 shadow-md p-1 rounded-md bg-green-500 text-white" v-else-if="projet.statut == -1"> Validé </span>
+        <span class="pl-1 shadow-md p-1 rounded-md bg-yellow-500 text-white" v-else-if="projet.statut == 0"> En cours </span>
+        <span class="pl-1 shadow-md p-1 rounded-md bg-red-500 text-white" v-else-if="projet.statut == 1"> En retard </span>
+        <span class="pl-2" v-else-if="projet.statut == 2">Terminé</span>
       </div>
     </div>
 
     <div class="flex items-center justify-center p-5 border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
-      <a class="flex items-center mr-auto text-primary" href="javascript:;" @click="goToDetail(item)"> 
+      <a class="flex items-center mr-auto text-primary" href="javascript:;" @click="goToDetail(projet)"> 
         <EyeIcon class="w-4 h-4 mr-1" /> Détail 
       </a>
-      <a class="flex items-center mr-3" href="javascript:;" @click="modifierProjet(item)"> 
+      <a class="flex items-center mr-3" href="javascript:;" @click="modifierProjet(projet)"> 
         <CheckSquareIcon class="w-4 h-4 mr-1" /> Modifier 
       </a>
-      <a class="flex items-center text-danger" href="javascript:;" @click="supprimerProjet(item)"> 
+      <a class="flex items-center text-danger" href="javascript:;" @click="supprimerProjet(projet)"> 
         <Trash2Icon class="w-4 h-4 mr-1" /> Supprimer 
       </a>
     </div>
@@ -307,7 +307,7 @@ export default {
         { name: "supprimer" },
         /*  { name: "continuer" }, */
       ],
-      projetId: "",
+      projetId: this.currentUser?.projet?.id,
       projetVisible: false,
       projetAdd: false,
       projetDelete: false,
@@ -318,6 +318,7 @@ export default {
       sendRequest: false,
       fichiers: [],
       image: {},
+      projet: {},
       projets: [],
       bailleurs: [],
       deleteData: {},
@@ -529,6 +530,33 @@ export default {
         .then((data) => {
           const datas = data.data.data;
           this.projets = datas;
+
+          //   this.disabled();
+        })
+        .catch((error) => {
+          this.disabled();
+          if (error.response) {
+            // Requête effectuée mais le serveur a répondu par une erreur.
+            const message = error.response.data.message;
+            this.$toast.error(message);
+          } else if (error.request) {
+            // Demande effectuée mais aucune réponse n'est reçue du serveur.
+            //console.log(error.request);
+          } else {
+            // Une erreur s'est produite lors de la configuration de la demande
+          }
+        });
+    },
+
+    fetchProjetDetails(id) {
+      console.log(id);
+      this.active();
+      ProjetService.get(id)
+        .then((data) => {
+          const datas = data.data.data;
+          this.projet = datas;
+
+          console.log(this.projet)
 
           //   this.disabled();
         })
@@ -823,7 +851,6 @@ export default {
     },
   },
   mounted() {
-
         // Initialiser la carte lorsque le composant est monté
   // Configurer l'icône
   this.myIcon = L.icon({
@@ -872,7 +899,7 @@ export default {
 
     // Initialiser Dropzone après le montage du composant
     //  this.initializeDropzone();
-    this.fetchOngs();
+    //this.fetchOngs();
   },
 
   watch: {
@@ -893,13 +920,17 @@ export default {
       this.$router.push("/401-non-autorise");
     }
     this.programmeId = this.currentUser.programme.id;
+
+    this.projetId = this.currentUser.projet.id;
+    
     if (this.programmeId) {
-      if (this.bailleurVisible) {
+      this.fetchProjetDetails(this.projetId);
+      /* if (this.bailleurVisible) {
         this.fetchBailleurs();
         this.fetchProjets();
       } else {
         this.fetchProjets();
-      }
+      } */
     }
   },
 };
