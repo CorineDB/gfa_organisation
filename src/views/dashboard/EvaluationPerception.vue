@@ -17,12 +17,15 @@ const TYPE_ORGANISATION = "organisation";
 
 const route = useRoute();
 const token = route.params.id;
-const idEvaluation = ref("");
 
 const payload = reactive({
   identifier_of_participant: "",
   programmeId: "",
+<<<<<<< HEAD
   token: token,
+=======
+  token,
+>>>>>>> 08d5b7b43f8677b753322742f26855200829c4cc
   formulaireDeGouvernanceId: "",
   perception: {
     categorieDeParticipant: "",
@@ -32,7 +35,7 @@ const payload = reactive({
     response_data: [],
   },
 });
-const clientId = ref();
+const idEvaluation = ref("");
 const responses = reactive({});
 const formData = reactive({});
 const formDataPerception = ref([]);
@@ -53,9 +56,13 @@ const getDataFormPerception = async () => {
   try {
     const { data } = await EvaluationService.getPerceptionFormEvaluation(payload.identifier_of_participant, token);
     formDataPerception.value = data.data;
-    formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance
+    formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance;
     idEvaluation.value = formDataPerception.value.id;
+<<<<<<< HEAD
     payload.formulaireDeGouvernanceId = formulairePerception.value.id;
+=======
+    payload.formulaireDeGouvernanceId = formDataPerception.value.formulaire_de_gouvernance.id;
+>>>>>>> 08d5b7b43f8677b753322742f26855200829c4cc
     payload.programmeId = formDataPerception.value.programmeId;
   } catch (e) {
     toast.error("Erreur lors de la récupération des données.");
@@ -104,6 +111,17 @@ const submitData = async () => {
   }
 };
 const initializeFormData = () => {
+  // Initialisation des réponses
+  formulairePerception.value.categories_de_gouvernance.forEach((principe) => {
+    principe.questions_de_gouvernance.forEach((question) => {
+      responses[question.id] = {
+        questionId: question.id,
+        optionDeReponseId: question.reponse_de_la_collecte?.optionDeReponseId ?? "null",
+      };
+    });
+  });
+};
+const initializeFormDataBeforeSoumission = () => {
   // Initialisation des réponses
   formulairePerception.value.categories_de_gouvernance.forEach((principe) => {
     principe.questions_de_gouvernance.forEach((question) => {
@@ -233,14 +251,14 @@ onMounted(async () => {
   payload.identifier_of_participant = generateUniqueId();
   await getDataFormPerception();
   // await getcurrentUserAndFetchOrganization();
-  //findFormulairePerception();
+  // findFormulairePerception();
   initializeFormData();
 });
 </script>
 <template>
   <div v-if="!isLoadingDataPerception" class="mx-auto mt-5 max-w-screen-2xl">
-    <div v-if="formulairePerception.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataPerception.intitule }}</div>
-    <!-- <div v-if="formDataPerception.organisations" class="flex items-center justify-end mt-5">
+    <div v-if="formDataPerception.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataPerception.intitule }}</div>
+    <div v-if="formDataPerception.organisations" class="flex items-center justify-end mt-5">
       <div class="min-w-[250px] flex items-center gap-3">
         <label class="form-label">Organisations</label>
         <TomSelect v-model="payload.organisationId" @change="changeOrganisation" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
@@ -248,9 +266,9 @@ onMounted(async () => {
           <option v-for="(ong, index) in formDataPerception.organisations" :key="index" :value="ong.id">{{ ong.nom }}</option>
         </TomSelect>
       </div>
-    </div> -->
+    </div>
     <div>
-      <div class="py-5 intro-x" v-if="formulairePerception.id">
+      <div class="py-5 intro-x" v-if="formDataPerception.id">
         <div class="space-y-8">
           <div class="space-y-6">
             <AccordionGroup class="space-y-2">
@@ -317,13 +335,13 @@ onMounted(async () => {
             <option v-for="(categorie, index) in categorieDeParticipant" :key="index" :value="categorie.id">{{ categorie.label }}</option>
           </TomSelect>
         </div>
-        <div class="flex items-center justify-around gap-2">
+        <div class="flex flex-wrap items-center justify-around gap-2">
           <div>
             <label class="form-label">Sexe</label>
             <div class="flex gap-2">
               <div v-for="(sexe, index) in sexes" :key="index" class="form-check">
-                <input v-model="payload.perception.sexe" :id="sexe.id" class="form-check-input" type="radio" name="sexe" :value="sexe.id" />
-                <label class="form-check-label" :for="sexe.id">{{ sexe.label }}</label>
+                <input v-model="payload.perception.sexe" :id="`sex-${sexe.id}${index}`" class="form-check-input" type="radio" name="sexe" :value="sexe.id" />
+                <label class="form-check-label" :for="`sex-${sexe.id}${index}`">{{ sexe.label }}</label>
               </div>
             </div>
           </div>
@@ -331,8 +349,8 @@ onMounted(async () => {
             <label class="form-label">Âge</label>
             <div class="flex gap-2">
               <div v-for="(age, index) in ages" :key="index" class="form-check">
-                <input v-model="payload.perception.age" :id="age.id" class="form-check-input" type="radio" name="age" :value="age.id" />
-                <label class="form-check-label" :for="age.id">{{ age.label }}</label>
+                <input v-model="payload.perception.age" :id="`age-${age.id}${index}`" class="form-check-input" type="radio" name="age" :value="age.id" />
+                <label class="form-check-label" :for="`age-${age.id}${index}`">{{ age.label }}</label>
               </div>
             </div>
           </div>
@@ -345,8 +363,8 @@ onMounted(async () => {
         </div>
         <div class="max-h-[40vh] h-[40vh] overflow-y-auto">
           <p class="mb-3">Formulaire</p>
-          <AccordionGroup class="space-y-2">
-            <AccordionItem v-for="(principe, principeIndex) in formulairePerception.categories_de_gouvernance" :key="principeIndex" class="!px-0">
+          <AccordionGroup :selectedIndex="null" class="space-y-2">
+            <AccordionItem v-for="(principe, principeIndex) in formulairePerception.categories_de_gouvernance" :key="`${principeIndex}-${principe.id}`" class="!px-0">
               <Accordion class="text-xl !p-4 font-semibold bg-primary/90 !text-white flex items-center justify-between">
                 <h2>{{ principe.nom }}</h2>
                 <ChevronDownIcon />
