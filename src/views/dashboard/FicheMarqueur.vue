@@ -538,8 +538,7 @@ onMounted(async () => {
 
           <!-- Synthétique -->
           <TabPanel class="leading-relaxed">
-            <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE RÉSULTATS SYNTHÉTIQUE
-            </div>
+            <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">RÉSULTATS SYNTHÉTIQUE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
                 <ExportationResultatSynthese v-if="!isLoadingData && currentProfileGouvernance" :org="authUser?.nom"

@@ -27,7 +27,6 @@ const payload = reactive({
   },
 });
 const responses = reactive({});
-const responsesFiles = reactive({});
 const formData = reactive({});
 const formDataFactuel = ref([]);
 const formulaireFactuel = ref({});
@@ -55,8 +54,6 @@ const getDataFormFactuel = async () => {
     formulaireFactuel.value = formDataFactuel.value.formulaire_de_gouvernance;
     payload.formulaireDeGouvernanceId = formulaireFactuel.value.id;
     idEvaluation.value = formDataFactuel.value.id;
-    initializeFormData();
-    getFilesFormData();
   } catch (e) {
     console.log(e);
     toast.error("Erreur lors de la récupération des données.");
@@ -142,7 +139,7 @@ const submitData = async () => {
     try {
       const result = await action;
       if (isValidate.value) toast.success(`${result.data.message}`);
-      // await getDataFormFactuel();
+      await getDataFormFactuel();
     } catch (e) {
       console.error(e);
       if (isValidate.value) toast.error(getAllErrorMessages(e));
@@ -162,9 +159,29 @@ const initializeFormData = () => {
         critere.questions_de_gouvernance.forEach((question) => {
           responses[question.id] = {
             questionId: question.id,
-            optionDeReponseId: question.reponse_de_la_collecte?.optionDeReponseId ?? "null",
-            sourceDeVerificationId: question.reponse_de_la_collecte?.sourceDeVerificationId ?? sources.value[0].id,
-            sourceDeVerification: question.reponse_de_la_collecte?.sourceDeVerification ?? " ",
+            optionDeReponseId: question.reponse_de_la_collecte != NULL ? question.reponse_de_la_collecte.optionDeReponseId : "null",
+            //sourceDeVerificationId: sources.value[0].id,
+            sourceDeVerificationId: question.reponse_de_la_collecte ? question.reponse_de_la_collecte.sourceDeVerificationId : sources.value[0].id,
+            sourceDeVerification: !question.reponse_de_la_collecte?.sourceDeVerificationId ? question.reponse_de_la_collecte.sourceDeVerification : "",
+            preuves: question.reponse_de_la_collecte?.preuves ?? []
+          };
+        });
+      });
+    });
+  });
+};
+
+const initializeFormDataAfterSoumission = () => {
+  // Initialisation des réponses
+  formulaireFactuel.value.categories_de_gouvernance.forEach((typeGouvernance) => {
+    typeGouvernance.categories_de_gouvernance.forEach((principe) => {
+      principe.categories_de_gouvernance.forEach((critere) => {
+        critere.questions_de_gouvernance.forEach((question) => {
+          responses[question.id] = {
+            questionId: question.id,
+            optionDeReponseId: "null",
+            sourceDeVerificationId: sources.value[0].id,
+            sourceDeVerification: "",
             preuves: [],
           };
         });
@@ -172,21 +189,6 @@ const initializeFormData = () => {
     });
   });
 };
-
-const getFilesFormData = () => {
-  formulaireFactuel.value.categories_de_gouvernance.forEach((typeGouvernance) => {
-    typeGouvernance.categories_de_gouvernance.forEach((principe) => {
-      principe.categories_de_gouvernance.forEach((critere) => {
-        critere.questions_de_gouvernance.forEach((question) => {
-          responsesFiles[question.id] = {
-            preuvesFiles: question.reponse_de_la_collecte?.preuves ?? [],
-          };
-        });
-      });
-    });
-  });
-};
-
 const handleFileUpload = (event, questionIndex) => {
   const files = Array.from(event.target.files);
   responses[questionIndex].preuves = files; // Store files directly as an array of File objects
@@ -291,7 +293,6 @@ onMounted(async () => {
   // await getcurrentUserAndFetchOrganization();
   // findFormulaireFactuel();
   initializeFormData();
-  getFilesFormData();
 });
 </script>
 <template>
@@ -353,6 +354,7 @@ onMounted(async () => {
                                     </label>
                                   </div>
                                 </div>
+
                                 <div class="flex items-center gap-3">
                                   <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null'">
                                     <label class="">Autre source</label>
@@ -371,15 +373,21 @@ onMounted(async () => {
                                     <input type="file" :id="question.id" multiple :ref="question.id" @change="handleFileUpload($event, question.id)" />
                                   </div>
                                 </div>
-                                <!-- Display uploaded files -->
-                                <div v-if="responsesFiles[question.id]?.preuvesFiles.length" class="flex flex-wrap items-center gap-3 mt-2">
-                                  <p class="text-sm font-bold">Fichiers:</p>
-
-                                  <span class="flex items-center px-2 py-1 text-blue-500 truncate bg-white rounded-full shadow-md max-w-[200px]" v-for="(file, index) in responsesFiles[question.id]?.preuvesFiles" :key="index">
-                                    <a :href="file.url" target="_blank" rel="noopener noreferrer" class="truncate max-w-[200px]">
-                                      {{ file.nom }}
-                                    </a>
-                                  </span>
+                                 <!-- Display uploaded files -->
+                                <div v-if="responses[question.id]?.preuves.length" class="mt-2">
+                                  <p class="text-sm font-bold">Uploaded Files:</p>
+                                  <ul>
+                                    <li v-for="(file, index) in responses[question.id]?.preuves" :key="index">
+                                      <a
+                                        :href="file.url"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="text-blue-500 underline"
+                                      >
+                                        {{ file.nom }}
+                                      </a>
+                                    </li>
+                                  </ul>
                                 </div>
                               </div>
                             </div>

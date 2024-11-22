@@ -58,9 +58,11 @@ const organisationsOfEvaluation = computed(() =>
   }))
 );
 
-const currentOrganisation = computed(() => dataForAllOrganisation.value.find((org) => org.id == idSelectStructure.value));
+const currentOrganisation = computed(() => authUser.value);
 
-/* const currentFactuel = computed(() => currentOrganisation.value?.factuel);
+/*const currentOrganisation = computed(() => dataForAllOrganisation.value.find((org) => org.id == idSelectStructure.value));
+
+const currentFactuel = computed(() => currentOrganisation.value?.factuel);
 const currentPerception = computed(() => currentOrganisation.value?.perception);
 const currentProfileGouvernance = computed(() => currentOrganisation.value?.profile_de_gouvernance); */
 
@@ -562,8 +564,8 @@ onMounted(async () => {
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
                 <ExportationSynthesePerception v-if="!isLoadingData && currentPerception"
-                  :org="currentOrganisation?.nom"
-                  :pointfocal="`${currentOrganisation?.nom_point_focal}  ${currentOrganisation?.prenom_point_focal}`"
+                  :org="authUser?.nom"
+                  :pointfocal="`${ authUser?.profil?.nom_point_focal } ${ authUser?.profil?.prenom_point_focal }`"
                   :dateevaluation="currentPerception?.evaluatedAt" :current-perception="currentPerception" />
               </div>
             </div>

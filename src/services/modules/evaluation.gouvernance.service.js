@@ -26,6 +26,19 @@ const EvaluationService = {
   getSoumissionsEvaluation(id) {
     return ApiService.get(`gfa/evaluations-de-gouvernance/${id}/soumissions`);
   },
+
+  getFormulaireFactuelEvaluation(id) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${id}/formulaire-factuel`);
+  },
+  
+  getOneSoumissionsEvaluation(idEvaluation, idSoumissions) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/soumissions/${idSoumissions}`);
+  },
+
+  sendReminderToPerceptionParticipants(id) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${id}/rappel-soumission`);
+  },
+
   submitSumission(id, params) {
     return ApiService.post(`gfa/evaluations-de-gouvernance/${id}/soumissions`, params);
   },
@@ -61,6 +74,14 @@ const EvaluationService = {
 
   prolonger(slug, params) {
     return ApiService.post(`gfa/evaluations-de-gouvernance/${slug}/ajouterDuree`, params);
+  },
+
+  getRecommandationsEvaluation(idEvaluation) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/recommandations`);
+  },
+  
+  getFeuilleDeRouteEvaluation(idEvaluation) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/actions-a-mener`);
   },
 };
 

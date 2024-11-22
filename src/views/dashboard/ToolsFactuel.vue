@@ -203,7 +203,12 @@ const getDataFormFactuel = async () => {
   try {
     isLoadingDataFactuel.value = true;
     const { data } = await EvaluationService.getOneEvaluation(idEvaluation);
+
+    console.log(data);
+
     formDataFactuel.value = data.data;
+      isLoadingDataFactuel.value = false;
+      initializeFormData();
   } catch (e) {
     toast.error("Erreur lors de la récupération des données.");
   } finally {
@@ -220,6 +225,7 @@ const getOrganizations = async () => {
       toast.error("Une erreur est survenue: Liste des organisations .");
     });
 };
+
 const getcurrentUserAndFetchOrganization = async () => {
   await AuthService.getCurrentUser()
     .then((result) => {
@@ -235,6 +241,7 @@ const getcurrentUserAndFetchOrganization = async () => {
       toast.error("Une erreur est survenue: Utilisateur connecté .");
     });
 };
+
 const submitData = async () => {
   isLoading.value = true;
   filterFormData();
@@ -314,9 +321,9 @@ function findFormulaireFactuel() {
 
 onMounted(async () => {
   // await getcurrentUserAndFetchOrganization();
-  // await getDataFormFactuel();
-  initializeFormData();
-  findFormulaireFactuel();
+  await getDataFormFactuel();
+  /* initializeFormData();
+  findFormulaireFactuel(); */
 });
 </script>
 <template>

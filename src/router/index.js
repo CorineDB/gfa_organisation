@@ -23,6 +23,8 @@ import { Indent, QrCode } from "lucide-vue-next";
 
 import FormulaireFactuel from "../views/voter/formulaireFactuel.vue";
 import ToolsFactuel from "../views/dashboard/ToolsFactuel.vue";
+import DetailSoumission from "../views/dashboard/programmation_enquete/DetailSoumission.vue";
+import MesuresAPrendre from "../views/dashboard/programmation_enquete/MesuresAPrendre.vue";
 import ToolsPerception from "../views/dashboard/ToolsPerception.vue";
 import FicheFactuel from "../views/dashboard/FicheFactuel.vue";
 import pta from "../views/dashboard/organisation/pta.vue";
@@ -135,6 +137,17 @@ const routes = [
         name: "ToolsFactuel",
         component: EvaluationFactuel,
       },
+      {
+        path: "enquetes/:e/soumissions/:s",
+        name: "DetailSoumission",
+        component: DetailSoumission,
+      },
+      {
+        path: "enquetes/:e/mesures-a-prendre/:s",
+        name: "MesuresAPrendre",
+        component: MesuresAPrendre,
+      },
+      
       {
         path: "audit",
         name: "audit",
