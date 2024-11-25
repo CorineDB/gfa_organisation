@@ -11,7 +11,7 @@ import { useRoute } from "vue-router";
 import { getAllErrorMessages } from "@/utils/gestion-error";
 import { computed } from "vue";
 import { ages, categorieDeParticipant, sexes } from "../../utils/constants";
-import { generateUniqueId } from "../../utils/helpers";
+import { generateUniqueId, generatevalidateKey, getvalidateKey } from "../../utils/helpers";
 
 const TYPE_ORGANISATION = "organisation";
 
@@ -38,6 +38,7 @@ const formDataPerception = ref([]);
 const formulairePerception = ref({});
 const isOrganisation = ref(false);
 const isLoading = ref(false);
+const showAlertValidate = ref(false);
 const showModalPreview = ref(false);
 const organisationSelected = ref(false);
 const isValidate = ref(false);
@@ -91,6 +92,8 @@ const submitData = async () => {
     try {
       const result = await action;
       if (isValidate.value) toast.success(`${result.data.message}`);
+      generatevalidateKey("perception");
+      showAlertValidate.value = true;
       await getDataFormPerception();
     } catch (e) {
       console.error(e);
@@ -240,74 +243,88 @@ const isLastPage = computed(() => currentPage.value === totalPages.value);
 // );
 
 onMounted(async () => {
-  payload.identifier_of_participant = generateUniqueId();
-  await getDataFormPerception();
-  // await getcurrentUserAndFetchOrganization();
-  // findFormulairePerception();
-  initializeFormData();
+  if (getvalidateKey("perception")) {
+    showAlertValidate.value = true;
+  } else {
+    payload.identifier_of_participant = generateUniqueId();
+    await getDataFormPerception();
+    // await getcurrentUserAndFetchOrganization();
+    // findFormulairePerception();
+    initializeFormData();
+  }
 });
 </script>
 <template>
-  <div v-if="!isLoadingDataPerception" class="mx-auto mt-5 max-w-screen-2xl">
-    <div v-if="formDataPerception.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataPerception.intitule }}</div>
-    <div v-if="formDataPerception.organisations" class="flex items-center justify-end mt-5">
-      <div class="min-w-[250px] flex items-center gap-3">
-        <label class="form-label">Organisations</label>
-        <TomSelect v-model="payload.organisationId" @change="changeOrganisation" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
-          <option value=""></option>
-          <option v-for="(ong, index) in formDataPerception.organisations" :key="index" :value="ong.id">{{ ong.nom }}</option>
-        </TomSelect>
+  <div v-if="!showAlertValidate" class="">
+    <div v-if="!isLoadingDataPerception" class="mx-auto mt-5 max-w-screen-2xl">
+      <div v-if="formDataPerception.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataPerception.intitule }}</div>
+      <div v-if="formDataPerception.organisations" class="flex items-center justify-end mt-5">
+        <div class="min-w-[250px] flex items-center gap-3">
+          <label class="form-label">Organisations</label>
+          <TomSelect v-model="payload.organisationId" @change="changeOrganisation" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
+            <option value=""></option>
+            <option v-for="(ong, index) in formDataPerception.organisations" :key="index" :value="ong.id">{{ ong.nom }}</option>
+          </TomSelect>
+        </div>
       </div>
-    </div>
-    <div>
-      <div class="py-5 intro-x" v-if="formDataPerception.id">
-        <div class="space-y-8">
-          <div class="space-y-6">
-            <AccordionGroup class="space-y-2">
-              <AccordionItem v-for="(principe, principeIndex) in paginatedData" :key="principeIndex" class="!px-0">
-                <Accordion class="text-xl !p-4 font-semibold bg-primary/90 !text-white flex items-center justify-between">
-                  <h2>{{ principe.nom }}</h2>
-                  <ChevronDownIcon />
-                </Accordion>
-                <!-- v-for Indicateur -->
-                <AccordionPanel class="!border-none pt-1">
-                  <div v-for="(question, questionIndex) in principe.questions_de_gouvernance" :key="questionIndex" class="relative px-4 pt-2 my-3 transition-all">
-                    <div class="p-2 py-3 space-y-2 border-l-8 border-yellow-500 rounded shadow box">
-                      <p class="w-full text-lg font-semibold text-center text-primary">{{ questionIndex + 1 }} - {{ question.nom }}</p>
-                      <div class="flex flex-col items-center justify-center w-full gap-3">
-                        <!-- v-for Option -->
-                        <div class="inline-flex flex-wrap items-center gap-3">
-                          <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="form-check-input" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
-                          <div v-for="(option, optionIndex) in formulairePerception.options_de_reponse" :key="optionIndex">
-                            <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}${optionIndex}`" class="form-check-input" type="radio" :name="`${question.id}-${question.slug}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" />
-                            <label class="text-base form-check-label" :for="`radio${question.id}${optionIndex}`">
-                              {{ option.libelle }}
-                            </label>
+      <div>
+        <div class="py-5 intro-x" v-if="formDataPerception.id">
+          <div class="space-y-8">
+            <div class="space-y-6">
+              <AccordionGroup class="space-y-2">
+                <AccordionItem v-for="(principe, principeIndex) in paginatedData" :key="principeIndex" class="!px-0">
+                  <Accordion class="text-xl !p-4 font-semibold bg-primary/90 !text-white flex items-center justify-between">
+                    <h2>{{ principe.nom }}</h2>
+                    <ChevronDownIcon />
+                  </Accordion>
+                  <!-- v-for Indicateur -->
+                  <AccordionPanel class="!border-none pt-1">
+                    <div v-for="(question, questionIndex) in principe.questions_de_gouvernance" :key="questionIndex" class="relative px-4 pt-2 my-3 transition-all">
+                      <div class="p-2 py-3 space-y-2 border-l-8 border-yellow-500 rounded shadow box">
+                        <p class="w-full text-lg font-semibold text-center text-primary">{{ questionIndex + 1 }} - {{ question.nom }}</p>
+                        <div class="flex flex-col items-center justify-center w-full gap-3">
+                          <!-- v-for Option -->
+                          <div class="inline-flex flex-wrap items-center gap-3">
+                            <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="form-check-input" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
+                            <div v-for="(option, optionIndex) in formulairePerception.options_de_reponse" :key="optionIndex">
+                              <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}${optionIndex}`" class="form-check-input" type="radio" :name="`${question.id}-${question.slug}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" />
+                              <label class="text-base form-check-label" :for="`radio${question.id}${optionIndex}`">
+                                {{ option.libelle }}
+                              </label>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </AccordionPanel>
-              </AccordionItem>
-            </AccordionGroup>
+                  </AccordionPanel>
+                </AccordionItem>
+              </AccordionGroup>
+            </div>
           </div>
-        </div>
-        <div class="flex justify-center w-full mt-5">
-          <VButton v-if="isLastPage" label="Prévisualiser" class="px-8 py-3 w-max" @click="openPreview" />
-        </div>
-        <div class="flex justify-center gap-3 my-8">
-          <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
-          <button v-for="page in totalPages" :key="page" @click="goToPage(page)" :class="page === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn">{{ page }}</button>
-          <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-3 btn btn-outline-primary">Suivant</button>
-          <!-- <button @click="prevPage()" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
-          <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
-          <button @click="nextPage()" class="px-4 py-3 btn btn-outline-primary">Suivant</button> -->
+          <div class="flex justify-center w-full mt-5">
+            <VButton v-if="isLastPage" label="Prévisualiser" class="px-8 py-3 w-max" @click="openPreview" />
+          </div>
+          <div class="flex justify-center gap-3 my-8">
+            <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
+            <button v-for="page in totalPages" :key="page" @click="goToPage(page)" :class="page === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn">{{ page }}</button>
+            <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-3 btn btn-outline-primary">Suivant</button>
+            <!-- <button @click="prevPage()" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
+            <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
+            <button @click="nextPage()" class="px-4 py-3 btn btn-outline-primary">Suivant</button> -->
+          </div>
         </div>
       </div>
     </div>
+    <LoaderSnipper v-else />
   </div>
-  <LoaderSnipper v-else />
+  <div v-else class="flex w-full justify-center items-center h-[40vh]">
+    <Alert class="mb-2 alert-primary">
+      <div class="flex items-center">
+        <div class="text-lg font-medium">Formulaire de perception</div>
+      </div>
+      <div class="mt-3">Formulaire de perception déjà remplir. Merci</div>
+    </Alert>
+  </div>
 
   <!-- BEGIN: Modal Content -->
   <Modal backdrop="static" size="modal-xl" :show="showModalPreview" @hidden="resetValidation">
