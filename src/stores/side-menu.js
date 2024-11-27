@@ -15,6 +15,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
         subMenu: [
           {
             icon: "FolderIcon",
+            pageName: "pta",
+            title: "PTA",
+          },
+          {
+            icon: "FolderIcon",
             pageName: "projets",
             title: "Projets",
           },

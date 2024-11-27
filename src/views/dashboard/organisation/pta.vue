@@ -351,6 +351,7 @@ export default {
       exporterSuiviPta: false,
       exporterSuiviRePpm: false,
       exporterSuiviRePta: false,
+
     };
   },
   computed: {
@@ -1506,7 +1507,7 @@ export default {
       let data = {};
 
       data = {
-        organisationId: this.$route.params.ongId,
+        organisationId: this.$route.params.ongId ?? this.currentUser?.profil?.id,
       };
       // if (this.annee == null) {
       //   const year = new Date().getFullYear();
@@ -1636,6 +1637,7 @@ export default {
     },
   },
   mounted() {
+    console.log(this.currentUser);
     this.getPermission();
 
     if (this.revisionVisible || this.ppmVisible || this.ptaVisible) {

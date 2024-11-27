@@ -225,6 +225,11 @@ const routes = [
         component: pta,
       },
       {
+        path: "pta",
+        name: "pta",
+        component: pta,
+      },
+      {
         path: "type-gouvernance",
         name: "typeGouvernance",
         component: typeGouvernance,
