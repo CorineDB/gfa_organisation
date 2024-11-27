@@ -198,7 +198,11 @@ export default {
 
   created() {},
   mounted() {
-    this.getListeProjet();
+    //this.getListeProjet();
+
+    this.projetId = this.currentUser.projet.id;
+
+    this.getProjetById();
   },
 };
 </script>

@@ -88,7 +88,7 @@ export default {
           this.deleteLoader = false;
           this.showDeleteModal = false;
           toast.success("Suppression  éffectuée avec succès");
-          this.getListeProjet();
+          //this.getListeProjet();
         })
         .catch((error) => {
           this.deleteLoader = false;
@@ -113,7 +113,6 @@ export default {
     },
     sendForm() {
       console.log(this.formData)
-
       
       if (this.update) {
         
@@ -127,7 +126,7 @@ export default {
               this.formData.projetId = this.projetId;
 
               this.clearObjectValues(this.formData);
-              this.getListeProjet();
+              //this.getListeProjet();
               //this.sendRequest = false;
             }
           })
@@ -147,7 +146,7 @@ export default {
               this.showModal = false;
               this.clearObjectValues(this.formData);
 
-              this.getListeProjet();
+              //this.getListeProjet();
             }
           })
           .catch((error) => {
@@ -168,7 +167,8 @@ export default {
     },
     getProjetById() {
       if (this.projetId == "") {
-        this.projetId = this.projets[0].id;
+        this.projetId = this.currentUser.projet.id;
+        //this.projetId = this.projets[0].id;
       }
 
       ProjetService.getDetailProjet(this.projetId)
@@ -179,6 +179,7 @@ export default {
           console.log(error);
         });
     },
+
     getListeComposants(data) {
       this.composants = data.composantes;
     },
@@ -187,7 +188,11 @@ export default {
 
   created() {},
   mounted() {
-    this.getListeProjet();
+    //this.getListeProjet();
+
+    this.projetId = this.currentUser.projet.id;
+
+    this.getProjetById();
   },
 };
 </script>
@@ -242,12 +247,7 @@ export default {
   </div>
 </div>
 
-
-
-
-
-
-  <h2 class="mt-10 text-lg font-medium intro-y">OutComes</h2>
+<h2 class="mt-10 text-lg font-medium intro-y">OutComes</h2>
 
   <!-- Filtre -->
   <div class="container px-4 mx-auto">
@@ -386,7 +386,7 @@ export default {
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
       <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
       <InputForm v-model="formData.poids" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
-      <div class="flex col-span-12">
+      <div v-if="this.currentUser.type == 'unitee-de-gestion'" class="flex col-span-12">
         <v-select class="w-full" :reduce="(projet) => projet.id" v-model="formData.projetId" label="nom" :options="projets">
           <template #search="{ attributes, events }">
             <input class="vs__search form-input" :required="!formData.projetId" v-bind="attributes" v-on="events" />
