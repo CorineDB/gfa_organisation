@@ -20,7 +20,18 @@ const IndicateursService = {
   create(params) {
     return ApiService.post("/gfa/indicateurs", params);
   },
-
+  createSuivi(params) {
+    return ApiService.post("/gfa/suivi-indicateurs", params);
+  },
+  getAllSuivis() {
+    return ApiService.get(`/gfa/suivi-indicateurs`);
+  },
+  detailSuivi(id) {
+    return ApiService.get(`/gfa/indicateurs/${id}/suivis`);
+  },
+  validateSuivi(id) {
+    return ApiService.post(`/gfa/suivi-indicateurs/${id}/valider`);
+  },
   filtre(params) {
     return ApiService.post("/gfa/indicateurs/filtres", params);
   },
