@@ -54,7 +54,7 @@
       <div>
         <!-- Button to open modal -->
         <div class="flex items-center justify-end gap-2 mb-2">
-          <button class="text-base btn btn-primary" @click="openCreateModal"><PlusIcon class="mr-1 size-4" />Ajouter</button>
+          <button v-if="authUserType=='unitee-de-gestion'" class="text-base btn btn-primary" @click="openCreateModal"><PlusIcon class="mr-1 size-4" />Ajouter</button>
         </div>
 
         <!-- Data List -->
@@ -317,6 +317,7 @@ const isLoadingDataCadre = ref(false);
 const idProgramme = ref("");
 const debutProgramme = ref("");
 const finProgramme = ref("");
+const authUserType = ref("");
 
 const showMenu = ref(false);
 const idSelect = ref("");
@@ -657,6 +658,9 @@ watch(
 // Fetch data on component mount
 onMounted(async () => {
   await getcurrentUser();
+
+  authUserType.value = JSON.parse(localStorage.getItem("authenticateUser")).type;
+
   getDatasCadre();
   getDatas();
 });

@@ -76,7 +76,7 @@ import FicheMarqueur from "../views/dashboard/FicheMarqueur.vue";
 import CreateIndicateur from "../views/dashboard/indicateurs/CreateIndicateur.vue";
 /*import CadreMesure from "../views/dashboard/CadreMesure.vue";
 import ActionsMener from "../views/dashboard/actionsMener.vue";*/
-//import SuiviIndicateur from "../views/dashboard/indicateurs/SuiviIndicateur.vue";
+import SuiviIndicateur from "../views/dashboard/indicateurs/SuiviIndicateur.vue";
 import DetailSuivi from "../views/dashboard/indicateurs/DetailSuivi.vue";
 
 const routes = [
@@ -137,12 +137,12 @@ const routes = [
         path: "indicateur/:id",
         name: "detail_indicateur",
         component: DetailSuivi,
-      },
+      },/*
       {
         path: "actions",
         name: "action_a_mener",
         component: ActionsMener,
-      },
+      },*/
       {
         path: "suivi-indicateur",
         name: "suivi_indicateur",

@@ -5,6 +5,24 @@ export const colors = [
   { limit: 1, color: "#00B050" },
 ];
 
+export function findColorCadreMesure(value) {
+  switch (value) {
+    case "impact":
+      return "#7030A0";
+      break;
+    case "effet":
+      return "#002060";
+      break;
+    case "produit":
+      return "#C6E0B4";
+      break;
+
+    default:
+      return "white";
+      break;
+  }
+}
+
 export const colorsExcel = [
   { limit: 0.25, color: "EF4444" },
   { limit: 0.5, color: "BA3030" },
