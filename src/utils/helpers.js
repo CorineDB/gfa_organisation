@@ -8,7 +8,12 @@ export function generateUniqueId() {
   }
   return uniqueId;
 }
-
+export function generatevalidateKey(key) {
+  localStorage.setItem(key, "true");
+}
+export function getvalidateKey(key) {
+  return localStorage.getItem(key);
+}
 // Fonction pour créer un identifiant unique
 // export function createUniqueId() {
 //   const userAgent = navigator.userAgent;

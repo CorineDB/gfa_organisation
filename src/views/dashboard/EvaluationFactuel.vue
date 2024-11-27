@@ -33,6 +33,7 @@ const formDataFactuel = ref([]);
 const formulaireFactuel = ref({});
 const isOrganisation = ref(false);
 const isLoading = ref(false);
+const showAlertValidate = ref(false);
 const showModal = ref(false);
 const showModalPreview = ref(false);
 const isValidate = ref(false);
@@ -142,7 +143,8 @@ const submitData = async () => {
     try {
       const result = await action;
       if (isValidate.value) toast.success(`${result.data.message}`);
-      // await getDataFormFactuel();
+      generatevalidateKey("factuel");
+      showAlertValidate.value = true;
     } catch (e) {
       console.error(e);
       if (isValidate.value) toast.error(getAllErrorMessages(e));
@@ -284,91 +286,96 @@ const isPreview = computed(() => currentPage.value === totalPages.value - 1);
 // );
 
 onMounted(async () => {
-  authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
-  payload.organisationId = authUser.value.profil.id;
-  await getSource();
-  await getDataFormFactuel();
-  // await getcurrentUserAndFetchOrganization();
-  // findFormulaireFactuel();
-  initializeFormData();
-  getFilesFormData();
+  if (getvalidateKey("factuel")) {
+    showAlertValidate.value = true;
+  } else {
+    authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
+    payload.organisationId = authUser.value.profil.id;
+    await getSource();
+    await getDataFormFactuel();
+    // await getcurrentUserAndFetchOrganization();
+    // findFormulaireFactuel();
+    initializeFormData();
+  }
 });
 </script>
 <template>
-  <div v-if="!isLoadingDataFactuel" class="">
-    <div v-if="formDataFactuel.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataFactuel.intitule }}</div>
-    <div v-if="formDataFactuel.organisations" class="flex items-center justify-between mt-5">
-      <div class="min-w-[250px]">
-        <button class="btn btn-primary" @click="showModal = true">Ajouter membres</button>
-        <div v-if="payload.factuel.comite_members.length > 0" class="mt-3 space-y-1">
-          <label class="text-lg form-label">Membres</label>
-          <ul class="space-y-2">
-            <li class="text-base text-primary" v-for="(member, index) in payload.factuel.comite_members" :key="index">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</li>
-          </ul>
+  <div v-if="!showAlertValidate" class="">
+    <div v-if="!isLoadingDataFactuel" class="">
+      <div v-if="formDataFactuel.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataFactuel.intitule }}</div>
+      <div v-if="formDataFactuel.organisations" class="flex items-center justify-between mt-5">
+        <div class="min-w-[250px]">
+          <button class="btn btn-primary" @click="showModal = true">Ajouter membres</button>
+          <div v-if="payload.factuel.comite_members.length > 0" class="mt-3 space-y-1">
+            <label class="text-lg form-label">Membres</label>
+            <ul class="space-y-2">
+              <li class="text-base text-primary" v-for="(member, index) in payload.factuel.comite_members" :key="index">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="min-w-[250px] flex items-center gap-3">
+          <label class="form-label">Organisations</label>
+          <TomSelect v-model="payload.organisationId" @change="changeOrganisation" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
+            <option value=""></option>
+            <option v-for="(ong, index) in formDataFactuel.organisations" :key="index" :value="ong.id">{{ ong.nom }}</option>
+          </TomSelect>
         </div>
       </div>
-      <div class="min-w-[250px] flex items-center gap-3">
-        <label class="form-label">Organisations</label>
-        <TomSelect v-model="payload.organisationId" @change="changeOrganisation" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
-          <option value=""></option>
-          <option v-for="(ong, index) in formDataFactuel.organisations" :key="index" :value="ong.id">{{ ong.nom }}</option>
-        </TomSelect>
-      </div>
-    </div>
-    <div>
-      <div class="py-5 intro-x" v-if="formDataFactuel.id">
-        <div class="space-y-0">
-          <!-- v-for type_gouvernance -->
-          <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="transition-all">
-            <h1 class="mb-5 text-2xl font-semibold text-gray-800">{{ typeGouvernance.nom }}</h1>
-            <!-- v-for Principe -->
-            <div class="space-y-6">
-              <AccordionGroup :selectedIndex="null" v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex" class="border-primary">
-                <AccordionItem>
-                  <Accordion class="text-xl !px-4 font-semibold bg-primary !text-white flex items-center justify-between">
-                    <h2>{{ principe.nom }}</h2>
-                    <ChevronDownIcon />
-                  </Accordion>
-                  <AccordionPanel class="!px-8 !shadow-md !bg-white !py-6">
-                    <!-- v-for Critere -->
-                    <AccordionGroup class="space-y-2">
-                      <AccordionItem v-for="(critere, critereIndex) in principe.categories_de_gouvernance" :key="critereIndex" class="!px-0">
-                        <Accordion class="text-xl !p-4 font-semibold bg-primary/90 !text-white flex items-center justify-between">
-                          <h2>{{ critere.nom }}</h2>
-                          <ChevronDownIcon />
-                        </Accordion>
-                        <!-- v-for Indicateur -->
-                        <AccordionPanel class="!border-none pt-1">
-                          <div v-for="(question, questionIndex) in critere.questions_de_gouvernance" :key="questionIndex" class="relative px-4 pt-2 my-3 transition-all">
-                            <div class="p-2 py-3 space-y-2 border-l-8 border-yellow-500 rounded shadow box">
-                              <p class="w-full text-lg font-semibold text-center text-primary">{{ questionIndex + 1 }} - {{ question.nom }}</p>
-                              <div class="flex flex-col items-center justify-center w-full gap-3">
-                                <!-- v-for Option -->
-                                <div class="inline-flex flex-wrap items-center gap-3">
-                                  <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="form-check-input" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
-                                  <div v-for="(option, optionIndex) in formulaireFactuel.options_de_reponse" :key="optionIndex">
-                                    <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}${optionIndex}`" class="form-check-input" type="radio" :name="`${question.id}-${question.slug}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" />
-                                    <label class="text-base form-check-label" :for="`radio${question.id}${optionIndex}`">
-                                      {{ option.libelle }}
-                                    </label>
-                                  </div>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                  <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null'">
-                                    <label class="">Autre source</label>
-                                    <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
-                                  </div>
-                                  <div v-else class="flex items-center gap-3">
-                                    <label class="">Source</label>
-                                    <div class="min-w-[230px]">
-                                      <TomSelect v-if="responses[question.id]?.sourceDeVerificationId" :options="{ placeholder: 'Sélectionnez une source' }" class="w-full" v-model="responses[question.id].sourceDeVerificationId">
-                                        <option v-for="(source, indexSource) in sources" :key="indexSource" :value="source.id">{{ source.intitule }}</option>
-                                        <option value="null">Autre Source</option>
-                                      </TomSelect>
+      <div>
+        <div class="py-5 intro-x" v-if="formDataFactuel.id">
+          <div class="space-y-0">
+            <!-- v-for type_gouvernance -->
+            <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="transition-all">
+              <h1 class="mb-5 text-2xl font-semibold text-gray-800">{{ typeGouvernance.nom }}</h1>
+              <!-- v-for Principe -->
+              <div class="space-y-6">
+                <AccordionGroup :selectedIndex="null" v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex" class="border-primary">
+                  <AccordionItem>
+                    <Accordion class="text-xl !px-4 font-semibold bg-primary !text-white flex items-center justify-between">
+                      <h2>{{ principe.nom }}</h2>
+                      <ChevronDownIcon />
+                    </Accordion>
+                    <AccordionPanel class="!px-8 !shadow-md !bg-white !py-6">
+                      <!-- v-for Critere -->
+                      <AccordionGroup class="space-y-2">
+                        <AccordionItem v-for="(critere, critereIndex) in principe.categories_de_gouvernance" :key="critereIndex" class="!px-0">
+                          <Accordion class="text-xl !p-4 font-semibold bg-primary/90 !text-white flex items-center justify-between">
+                            <h2>{{ critere.nom }}</h2>
+                            <ChevronDownIcon />
+                          </Accordion>
+                          <!-- v-for Indicateur -->
+                          <AccordionPanel class="!border-none pt-1">
+                            <div v-for="(question, questionIndex) in critere.questions_de_gouvernance" :key="questionIndex" class="relative px-4 pt-2 my-3 transition-all">
+                              <div class="p-2 py-3 space-y-2 border-l-8 border-yellow-500 rounded shadow box">
+                                <p class="w-full text-lg font-semibold text-center text-primary">{{ questionIndex + 1 }} - {{ question.nom }}</p>
+                                <div class="flex flex-col items-center justify-center w-full gap-3">
+                                  <!-- v-for Option -->
+                                  <div class="inline-flex flex-wrap items-center gap-3">
+                                    <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="form-check-input" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
+                                    <div v-for="(option, optionIndex) in formulaireFactuel.options_de_reponse" :key="optionIndex">
+                                      <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}${optionIndex}`" class="form-check-input" type="radio" :name="`${question.id}-${question.slug}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" />
+                                      <label class="text-base form-check-label" :for="`radio${question.id}${optionIndex}`">
+                                        {{ option.libelle }}
+                                      </label>
                                     </div>
                                   </div>
-                                  <div>
-                                    <input type="file" :id="question.id" multiple :ref="question.id" @change="handleFileUpload($event, question.id)" />
+                                  <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null'">
+                                      <label class="">Autre source</label>
+                                      <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
+                                    </div>
+                                    <div v-else class="flex items-center gap-3">
+                                      <label class="">Source</label>
+                                      <div class="min-w-[230px]">
+                                        <TomSelect v-if="responses[question.id]?.sourceDeVerificationId" :options="{ placeholder: 'Sélectionnez une source' }" class="w-full" v-model="responses[question.id].sourceDeVerificationId">
+                                          <option v-for="(source, indexSource) in sources" :key="indexSource" :value="source.id">{{ source.intitule }}</option>
+                                          <option value="null">Autre Source</option>
+                                        </TomSelect>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <input type="file" :id="question.id" multiple :ref="question.id" @change="handleFileUpload($event, question.id)" />
+                                    </div>
                                   </div>
                                 </div>
                                 <!-- Display uploaded files -->
@@ -383,28 +390,36 @@ onMounted(async () => {
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </AccordionPanel>
-                      </AccordionItem>
-                    </AccordionGroup>
-                  </AccordionPanel>
-                </AccordionItem>
-              </AccordionGroup>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </AccordionGroup>
+                    </AccordionPanel>
+                  </AccordionItem>
+                </AccordionGroup>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="flex justify-center w-full mt-5">
-          <VButton v-if="isPreview" label="Prévisualiser" class="px-8 py-3 w-max" @click="openPreview" />
-        </div>
-        <div class="flex justify-center gap-3 my-8">
-          <button @click="prevPage()" :disabled="currentPage === 0" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
-          <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
-          <button @click="nextPage()" class="px-4 py-3 btn btn-outline-primary" :disabled="currentPage === totalPages - 1">Suivant</button>
+          <div class="flex justify-center w-full mt-5">
+            <VButton v-if="isPreview" label="Prévisualiser" class="px-8 py-3 w-max" @click="openPreview" />
+          </div>
+          <div class="flex justify-center gap-3 my-8">
+            <button @click="prevPage()" :disabled="currentPage === 0" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
+            <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
+            <button @click="nextPage()" class="px-4 py-3 btn btn-outline-primary" :disabled="currentPage === totalPages - 1">Suivant</button>
+          </div>
         </div>
       </div>
     </div>
+    <LoaderSnipper v-else />
   </div>
-  <LoaderSnipper v-else />
+  <div v-else class="flex w-full justify-center items-center h-[40vh]">
+    <Alert class="mb-2 alert-primary">
+      <div class="flex items-center">
+        <div class="text-lg font-medium">Formulaire factuel</div>
+      </div>
+      <div class="mt-3">Formulaire factuel déjà remplir. Merci</div>
+    </Alert>
+  </div>
 
   <!-- BEGIN: Modal Content -->
   <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
