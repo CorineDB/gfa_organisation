@@ -46,9 +46,9 @@ export const useSideMenuStore = defineStore("sideMenu", {
         subMenu: [
           {
             icon: "BarChart2Icon",
-            pageName: "Indicateurs",
+            pageName: "create_indicateur",
             title: "Indicateurs",
-          },
+          },/* 
           {
             icon: "BarChart2Icon",
             pageName: "UniteDeMesure",
@@ -73,7 +73,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "BarChart2Icon",
             pageName: "TypeResultat",
             title: "Résultats Cadre de rendement",
-          },
+          }, */
         ],
       },
       {
