@@ -15,6 +15,7 @@ const showModalValidate = ref(false);
 const isLoadingData = ref(true);
 const isLoading = ref(false);
 const datas = ref([]);
+const authUserType = ref("");
 
 const getDatas = async () => {
   isLoadingData.value = true;
@@ -112,7 +113,7 @@ const initTabulator = () => {
             handleValidate(cell.getData());
           });
 
-          if (!cell.getData().estValider) {
+          if ((!cell.getData().estValider) && (authUserType=='unitee-de-gestion')) {
             container.append(validateButton);
           }
           return container;
@@ -162,6 +163,7 @@ const validateData = async () => {
 };
 
 onMounted(() => {
+  authUserType.value = JSON.parse(localStorage.getItem("authenticateUser")).type;
   getDatas();
 });
 </script>
