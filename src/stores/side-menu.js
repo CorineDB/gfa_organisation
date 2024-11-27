@@ -42,6 +42,22 @@ export const useSideMenuStore = defineStore("sideMenu", {
       },
       {
         icon: "FolderIcon",
+        title: "Gestion Financier",
+        subMenu: [
+          {
+            icon: "BarChart2Icon",
+            pageName: "plan_de_decaissement",
+            title: "Plan De decaissement",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "finances_suivi",
+            title: "Suivi financier",
+          }
+        ]
+      },
+      {
+        icon: "FolderIcon",
         title: "Cadre Mesure Rendement",
         subMenu: [
           {

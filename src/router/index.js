@@ -50,6 +50,7 @@ import CategorieIndicateurs from "@/views/dashboard/categoriesIndicateurs.vue";
 import Sites from "@/views/dashboard/sites.vue";
 import TypeResultat from "@/views/dashboard/typeResultat.vue";
 import finances_suivi from "../views/dashboard/finances/suivi.vue";
+import plan_de_decaissement from "../views/dashboard/finances/plan_decaissement.vue";
 import indicateurs_suivi_details from "../views/dashboard/indicateurs/_id/suivi.vue";
 
 //Projet/Outcomes/Activité/Taches
@@ -195,6 +196,12 @@ const routes = [
         component: finances_suivi,
 
         name: "finances_suivi",
+      },
+      {
+        path: "/dashboard/finances/plan-de-decaissement",
+        component: plan_de_decaissement,
+
+        name: "plan_de_decaissement",
       },
 
       {
