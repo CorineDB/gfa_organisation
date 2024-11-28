@@ -139,9 +139,11 @@ const submitData = async () => {
 
     try {
       const result = await action;
-      if (isValidate.value) toast.success(`${result.data.message}`);
-      generatevalidateKey("factuel");
-      showAlertValidate.value = true;
+      if (isValidate.value) {
+        toast.success(`${result.data.message}`);
+        generatevalidateKey("factuel");
+        showAlertValidate.value = true;
+      }
     } catch (e) {
       console.error(e);
       if (isValidate.value) toast.error(getAllErrorMessages(e));
