@@ -94,9 +94,10 @@ const submitData = async () => {
       if (isValidate.value) {
         toast.success(`${result.data.message}`);
         generatevalidateKey("perception");
+        showModalPreview.value = false;
         showAlertValidate.value = true;
       }
-      await getDataFormPerception();
+      // await getDataFormPerception();
     } catch (e) {
       console.error(e);
       if (isValidate.value) toast.error(getAllErrorMessages(e));
@@ -320,11 +321,11 @@ onMounted(async () => {
     <LoaderSnipper v-else />
   </div>
   <div v-else class="flex w-full justify-center items-center h-[40vh]">
-    <Alert class="mb-2 alert-primary">
+    <Alert class="w-full max-w-screen-md mb-2 alert-primary">
       <div class="flex items-center">
-        <div class="text-lg font-medium">Formulaire de perception</div>
+        <div class="text-xl font-medium">Formulaire de perception</div>
       </div>
-      <div class="mt-3">Formulaire de perception déjà remplir. Merci</div>
+      <div class="mt-3 text-lg">Formulaire de perception déjà remplir. Merci</div>
     </Alert>
   </div>
 
