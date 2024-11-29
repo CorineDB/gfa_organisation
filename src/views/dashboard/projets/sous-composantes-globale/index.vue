@@ -6,11 +6,13 @@ import ProjetService from "@/services/modules/projet.service.js";
 import ComposantesService from "@/services/modules/composante.service";
 import InputForm from "@/components/news/InputForm.vue";
 import VButton from "@/components/news/VButton.vue";
+import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
 import { toast } from "vue3-toastify";
 export default {
   components: {
     InputForm,
     VButton,
+    NoRecordsMessage
   },
   data() {
     return {
@@ -27,6 +29,7 @@ export default {
         poids: "",
         composanteId: "",
         budgetNational: 0,
+        pret: 0,
       },
       composantsId: "",
       sousComposantId: "",
@@ -54,6 +57,9 @@ export default {
   },
 
   methods: {
+
+    text() { },
+
     clearObjectValues(obj) {
       for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
@@ -87,7 +93,8 @@ export default {
           this.deleteLoader = false;
           this.showDeleteModal = false;
           toast.success("Suppression  éffectuée avec succès");
-          this.getListeProjet();
+          //this.getProjetById();
+          this.getComposantById(this.composantsId);
         })
         .catch((error) => {
           this.deleteLoader = false;
@@ -101,6 +108,7 @@ export default {
       this.formData.nom = data.nom;
       this.formData.poids = data.poids;
       this.formData.composanteId = data.composanteId;
+      this.formData.pret = data.pret;
       this.formData.budgetNational = data.budgetNational;
       this.sousComposantId = data.id;
     },
@@ -124,7 +132,9 @@ export default {
               this.composantsId = this.formData.composanteId
               this.clearObjectValues(this.formData);
               // delete this.formData.projetId;
-              this.getListeProjet();
+              
+              //this.getProjetById();
+              this.getComposantById(this.composantsId);
               //this.sendRequest = false;
             }
           })
@@ -135,6 +145,7 @@ export default {
           });
       } else {
         this.isLoading = true;
+        this.formData.pret = parseInt(this.formData.pret);
         this.formData.budgetNational = parseInt(this.formData.budgetNational);
         ComposantesService.create(this.formData)
           .then((response) => {
@@ -144,7 +155,8 @@ export default {
               this.showModal = false;
               this.clearObjectValues(this.formData);
 
-              this.getListeProjet();
+              //this.getProjetById();
+              this.getComposantById(this.composantsId);
             }
           })
           .catch((error) => {
@@ -160,7 +172,8 @@ export default {
           this.isLoadingData = false
           this.projets = data.data.data;
           if (this.projetId == "") {
-            this.projetId = this.projets[0].id;
+            this.projetId = this.currentUser.projet.id;
+            //this.projetId = this.projets[0].id;
           }
 
           this.getProjetById(this.projetId);
@@ -169,14 +182,24 @@ export default {
           console.log(error);
         });
     },
-    getProjetById(data) {
+    getProjetById(data = null) {
+      console.log(data);
+      if (data == null) {
+        data = this.projetId = this.projetId ?? this.currentUser.projet.id;
+        //this.projetId = this.projets[0].id;
+      }
+
       ProjetService.getDetailProjet(data)
         .then((datas) => {
           this.composants = datas.data.data.composantes;
-          if (this.composantsId == "") {
+
+          if ((this.composantsId == "") && (this.composants.length > 0) ) {
             this.composantsId = this.composants[0].id;
           }
-          this.getComposantById(this.composantsId);
+          if(this.composantsId != "" && this.composantsId != null && this.composantsId != undefined){
+            this.getComposantById(this.composantsId);
+          }
+
         })
         .catch((error) => {
           console.log(error);
@@ -216,8 +239,8 @@ export default {
     <div class="relative p-6 mt-3 space-y-3 bg-white rounded-lg shadow-md">
       <h2 class="mb-4 text-base font-bold">Filtre</h2>
 
-      <div class="grid grid-cols-2 gap-4">
-        <div class="flex w-full">
+      <div class="grid grid-cols-1 gap-0">
+        <div v-if="this.currentUser.type == 'unitee-de-gestion'" class="flex w-full">
           <v-select class="w-full" :reduce="(projet) => projet.id" v-model="projetId" label="nom" :options="projets">
             <template #search="{ attributes, events }">
               <input class="vs__search form-input" :required="!projetId" v-bind="attributes" v-on="events" />
@@ -225,14 +248,20 @@ export default {
           </v-select>
           <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
         </div>
+
         <div class="flex w-full">
-          <v-select class="w-full" :reduce="(composant) => composant.id" v-model="composantsId" label="nom" :options="composants">
-            <template #search="{ attributes, events }">
-              <input class="vs__search form-input" :required="!composantsId" v-bind="attributes" v-on="events" />
-            </template>
-          </v-select>
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OUtComes</label>
+          <label for="_input-wizard-10"
+              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
+          <TomSelect v-model="composantsId" :options="{
+              placeholder: 'Choisir un OutCome',
+              create: false,
+              onOptionAdd: text(),
+            }" class="w-full">
+              <option v-for="(composant, index) in composants" :key="index" :value="composant.id">{{ composant.codePta }} - {{ composant.nom }}
+              </option>
+          </TomSelect>
         </div>
+
       </div>
 
       <!-- <button class="absolute px-4 py-2 text-white transform -translate-x-1/2 bg-blue-500 rounded -bottom-3 left-1/2" @click="filter()">Filtrer</button> -->
@@ -262,7 +291,7 @@ export default {
   <div v-if="!isLoadingData" class="grid grid-cols-12 gap-6 mt-5">
     <!-- BEGIN: Users Layout -->
      <!-- <pre>{{sousComposants}}</pre>   -->
-    <div v-for="(item, index) in sousComposants" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
+    <div v-if="sousComposants.length > 0" v-for="(item, index) in sousComposants" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
       <div class="p-5 box">
         <div class="flex items-start pt-5 _px-5">
           <div class="flex flex-col items-center w-full lg:flex-row">
@@ -300,7 +329,8 @@ export default {
             {{ item.description }}
           </div>
           <div class="m-5 text-slate-600 dark:text-slate-500">
-            <div class="flex items-center"><LinkIcon class="w-4 h-4 mr-2" /> Budget: {{ item.budgetNational }}</div>
+            <div class="flex items-center"><LinkIcon class="w-4 h-4 mr-2" /> Fond propre: {{ item.budgetNational }}</div>
+            <div class="flex items-center"><LinkIcon class="w-4 h-4 mr-2" /> Montant financier: {{ item.pret }}</div>
             <div class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Taux d'exécution physique: {{ item.tep }}</div>
 
             <div class="flex items-center mt-2">
@@ -317,6 +347,11 @@ export default {
       </div>
     </div>
   </div>
+
+  <NoRecordsMessage v-if="!sousComposants.length"
+      title="No outputs Found"
+      description="It seems there are no outputs to display. Please check back later."
+    />
   <!-- END: Users Layout -->
   <LoaderSnipper v-if="isLoadingData" />
 
@@ -328,16 +363,23 @@ export default {
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
       <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
       <InputForm v-model="formData.poids" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
-      <div class="flex col-span-12">
-        <v-select class="w-full" :reduce="(composant) => composant.id" v-model="formData.composanteId" label="nom" :options="composants">
-          <template #search="{ attributes, events }">
-            <input class="vs__search form-input" :required="!formData.composanteId" v-bind="attributes" v-on="events" />
-          </template>
-        </v-select>
-        <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
-      </div>
 
-      <InputForm v-model="formData.budgetNational" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Budget national" />
+      <div class="flex col-span-12 mt-3">
+          <label for="_input-wizard-10"
+              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
+          <TomSelect v-model="formData.composanteId" :options="{
+              placeholder: 'Choisir un OutCome',
+              create: false,
+              onOptionAdd: text(),
+            }" class="w-full">
+              <option v-for="(composant, index) in composants" :key="index" :value="composant.id">{{ composant.codePta }} - {{ composant.nom }}
+              </option>
+          </TomSelect>
+        </div>
+
+      <InputForm v-model="formData.budgetNational" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
+
+      <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Montant financier" />
     </ModalBody>
     <ModalFooter>
       <div class="flex items-center justify-center">

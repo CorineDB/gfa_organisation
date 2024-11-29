@@ -7,22 +7,38 @@ import ComposantesService from "@/services/modules/composante.service";
 import ActiviteService from "@/services/modules/activite.service";
 import InputForm from "@/components/news/InputForm.vue";
 import VButton from "@/components/news/VButton.vue";
-import ActivitiesComponent from "./activities.vue";
-import PlanDecaissementComponent from "./plan-decaissement.vue";
-
-
+import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
 import { toast } from "vue3-toastify";
 export default {
+  name: "ActivitiesComponent",
   components: {
     InputForm,
     VButton,
-    ActivitiesComponent,
-    PlanDecaissementComponent
+    NoRecordsMessage
+  },
+  props: {
+
+    getProjetById: {
+      type: Function,
+      required: false,
+    },
+    sousComposantsId: {
+      type: String,
+      required: true,
+    },
+    composantId: {
+      type: String,
+      required: true,
+    },
+    projetId: {
+      required: true,
+      type: String
+    }
   },
   data() {
     return {
       projets: [],
-      projetId: "",
+      //projetId: "",
       composants: [],
       sousComposants: [],
       activites: [],
@@ -35,6 +51,7 @@ export default {
       seeStatistique: false,
       seePlan: false,
       seeActivite: true,
+      seeActivitiesOfState: 0,
 
       formData: {
         nom: "",
@@ -47,7 +64,6 @@ export default {
         budgetNational: 0,
       },
       composantsId: "",
-      sousComposantsId: "",
       sousComposantId: "",
       activiteId: "",
       labels: "Ajouter",
@@ -61,29 +77,32 @@ export default {
   watch: {
     projetId(newValue, oldValue) {
       if (this.projets.length > 0) {
-        console.log(newValue);
-
-        this.getProjetById(newValue);
+        //this.getProjetById(newValue);
       }
+    },
+    composantId(newValue, oldValue) {
+      this.composantsId = newValue;
     },
     composantsId(newValue, oldValue) {
-      if (this.composants.length > 0) {
+      console.log(newValue);
+      //if (this.composants.length > 0) {
         this.getComposantById(newValue);
-      }
-    },
-    sousComposantsId(newValue, oldValue) {
-        //this.getCompoById(newValue);
+      //}
     },
     sousComposantId(newValue, oldValue) {
-      if (this.sousComposants.length > 0) {
+      //if (this.sousComposants.length > 0) {
         this.getComposantById(newValue);
-      }
+      //}
     },
+    sousComposantsId(newValue, oldValue) {
+      console.log(newValue);
+      this.sousComposantId = newValue;
+    },/* 
     composantId(newValue, oldValue) {
       if (this.sousComposants.length > 0) {
         this.getComposantById(newValue);
       }
-    },
+    }, */
   },
 
   methods: {
@@ -110,18 +129,17 @@ export default {
         }
       }
     },
-    supprimerComposant(data) {
+    supprimerActivite(data) {
       this.showDeleteModal = true;
       this.sousComposantId = data.id;
     },
-    deleteComposants() {
+    deleteActivite() {
       this.deleteLoader = true;
       ActiviteService.destroy(this.activiteId)
         .then((data) => {
           this.deleteLoader = false;
           this.showDeleteModal = false;
           toast.success("Suppression  éffectuée avec succès");
-          //this.getListeProjet();
           this.getComposantById(this.composantsId);
         })
         .catch((error) => {
@@ -129,6 +147,21 @@ export default {
           toast.error("Erreur lors de la suppression");
         });
     },
+
+    addActivite() {
+      this.getProjetById();
+      this.showModal = true;
+      this.isUpdate = false;
+      this.formData.type = "pta";
+      if (this.haveSousComposantes) {
+        this.formData.composanteId = this.sousComposantId;
+      } else {
+        this.formData.composanteId = this.composantsId;
+      }
+
+      this.labels = "Ajouter";
+    },
+
     modifierActivite(data) {
       this.labels = "Modifier";
       this.showModal = true;
@@ -142,17 +175,6 @@ export default {
       this.formData.pret = data.pret;
       this.formData.budgetNational = data.budgetNational;
       this.activiteId = data.id;
-    },
-    addActivite() {
-      this.showModal = true;
-      this.isUpdate = false;
-      if (this.haveSousComposantes) {
-        this.formData.composanteId = this.sousComposantId;
-      } else {
-        this.formData.composanteId = this.composantsId;
-      }
-
-      this.labels = "Ajouter";
     },
     sendForm() {
       if (this.update) {
@@ -202,35 +224,16 @@ export default {
           });
       }
     },
-    getListeProjet() {
-      this.isLoadingData = true;
-      ProjetService.get()
-        .then((data) => {
-          this.isLoadingData = false;
-          this.projets = data.data.data;
-
-          if ((this.projetId == "") && (this.projets.length > 0) ) {
-            this.projetId = this.projets[0].id;
-          }
-          if(this.projetId != "" && this.projetId != null && this.projetId != undefined){
-            this.getProjetById(this.projetId);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
     getProjetById(data = null) {
       console.log(data);
       if (data == null) {
-        data = this.projetId = this.projetId ?? this.currentUser.projet.id;
+        data = this.projetId ?? this.currentUser.projet.id;
         //this.projetId = this.projets[0].id;
       }
 
       ProjetService.getDetailProjet(data)
         .then((datas) => {
           this.composants = datas.data.data.composantes;
-
           if ((this.composantsId == "") && (this.composants.length > 0) ) {
             this.composantsId = this.composants[0].id;
           }
@@ -246,38 +249,12 @@ export default {
       ComposantesService.detailComposant(data)
         .then((data) => {
 
+          console.log(data);
           this.activites = data.data.data.activites;
 
           if (data.data.data.souscomposantes.length > 0) {
             this.sousComposants = data.data.data.souscomposantes;
             this.haveSousComposantes = true;
-
-            if ((this.sousComposantsId == "") && (this.sousComposants.length > 0) ) {
-              this.sousComposantsId = this.sousComposants[0].id;
-            }
-
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getCompoById(data) {
-      ComposantesService.detailComposant(data)
-        .then((data) => {
-
-          if (data.data.data.souscomposantes.length > 0) {
-            this.sousComposants = data.data.data.souscomposantes;
-
-            if ((this.sousComposantsId == "") && (this.sousComposants.length > 0) ) {
-              this.sousComposantsId = this.sousComposants[0].id;
-            }
-            this.haveSousComposantes = true;
-          }
-          else{
-            console.log("Fetch sous composantes");
-            console.log(data.data.data.activites);
-            this.activites = data.data.data.activites;
           }
         })
         .catch((error) => {
@@ -287,194 +264,61 @@ export default {
 
     filter() { },
 
-
-    seeActivities() {
-      this.seePlan = false;
-      this.seeActivite = true;
-      this.seeStatistique = false;
-      this.fetchActivites(this.composanteId)
-    },
-
-    seeStats() {
-      this.seePlan = false;
-      this.seeActivite = false;
-      this.seeStatistique = true;
-    },
-
-    seePlanDecaissement() {
-      this.seePlan = true;
-      this.seeActivite = false;
-      this.seeStatistique = false;
+    seeActivities(state = 0) {
+      this.seeActivitiesOfState = state;
     },
   },
 
   created() { },
   mounted() {
-    //this.getListeProjet();
-
-    this.projetId = this.currentUser.projet.id;
-
-    this.getProjetById();
+    console.log([this.projetId, this.composantsId]);
+    //this.getComposantById(this.composantsId);
   },
 };
 </script>
 
 <template>
 
-  <div class="flex items-center justify-between my-2 flex-wrap sm:flex-nowrap">
-    <div class="flex space-x-2  md:space-x-4 w-full sm:w-4/5  ">
-      <span :class="{ 'border-primary border-b-8 font-bold': seeActivite }" @click="seeActivities()"
-        class="inline-block cursor-pointer text-xs sm:text-sm  md:text-base uppercase border-primary py-2 mb-2">Activités</span>
-      <span :class="{ 'border-primary border-b-8 font-bold': seePlan }" @click="seePlanDecaissement()"
-        class="inline-block cursor-pointer text-xs sm:text-sm  md:text-base uppercase py-2 mb-2">Plan de décaissement
-      </span>
-
-      <span :class="{ 'border-primary border-b-8 font-bold': seeStatistique }" @click="seeStats()"
-        class="inline-block cursor-pointer text-xs sm:text-sm  md:text-base uppercase py-2 mb-2">Statistiques
-      </span>
-    </div>
-    <div>
-      <button v-if="seeActivite && activiteAdd" @click="addActivite" title="ajouter une activite"
-        class="px-4 py-2 flex overflow-hidden items-center text-xs font-semibold text-white uppercase bg-primary focus:outline-none focus:shadow-outline">
-        <span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-            style="fill: rgba(255, 255, 255, 1); transform: ; msfilter: ">
-            <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"></path>
-          </svg></span>
-        <span class="mx-2 text-xs font-semibold">ajouter </span>
-      </button>
-
-      <button v-if="seePlan && planDeDecaissement" @click="addPlan" title="ajouter"
-        class="p-2 overflow-hidden flex space-x-2 items-center text-xs font-semibold text-white uppercase  bg-primary focus:outline-none focus:shadow-outline">
-        <span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-            style="fill: rgba(255, 255, 255, 1); transform: ; msfilter: ">
-            <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"></path>
-          </svg></span>
-        <span class="mx-2 text-xs  md:text-sm font-semibold">ajouter</span>
-      </button>
-    </div>
-  </div>
-
-    <!-- Filtre -->
-    <div>
-      <!-- Combined Filter Section -->
-      <div class="relative p-6 mt-3 space-y-3 bg-white rounded-lg shadow-md">
-        <h2 class="mb-4 text-base font-bold">Filtre</h2>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div v-if="this.currentUser.type == 'unitee-de-gestion'" class="flex w-full">
-            <v-select class="w-full" :reduce="(projet) => projet.id" v-model="projetId" label="nom" :options="projets">
-              <template #search="{ attributes, events }">
-                <input class="vs__search form-input" :required="!projetId" v-bind="attributes" v-on="events" />
-              </template>
-            </v-select>
-            <label for="_input-wizard-10"
-              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
-          </div>
-          <!-- <div class="flex w-full">
-            <v-select class="w-full" :reduce="(composant) => composant.id" v-model="composantsId" label="codePta"
-              :options="composants">
-              <template #search="{ attributes, events }">
-                <input class="vs__search form-input" :required="!composantsId" v-bind="attributes" v-on="events" />
-              </template>
-            </v-select>
-            <label for="_input-wizard-10"
-              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OUtComes</label>
-          </div>
-          <div class="flex w-full" v-if="haveSousComposantes">
-            <v-select class="w-full" :reduce="(souscomposant) => souscomposant.id" v-model="sousComposantId" label="nom" :options="sousComposants">
-              <template #search="{ attributes, events }">
-                <input class="vs__search form-input" :required="!sousComposantId" v-bind="attributes" v-on="events" />
-              </template>
-            </v-select>
-            <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OUtComes</label>
-          </div> -->
-
-          <div class="flex w-full">
-            <label for="_input-wizard-10"
-              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
-            <TomSelect v-model="composantsId" :options="{
-              placeholder: 'Choisir un OutCome',
-              create: false,
-              onOptionAdd: text(),
-            }" class="w-full">
-              <option v-for="(composant, index) in composants" :key="index" :value="composant.id">{{ composant.codePta }} {{ composant.nom }}
-              </option>
-            </TomSelect>
-          </div>
-
-          <div class="flex w-full" v-if="haveSousComposantes">
-            <label for="_input-wizard-10"
-              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OUtPut</label>
-            <TomSelect v-model="sousComposantsId" :options="{
-              placeholder: 'Choisir un Output',
-              create: false,
-              onOptionAdd: text(),
-            }" class="w-full">
-              <option v-for="(element, index) in sousComposants" :key="index" :value="element.id">{{ element.codePta }} {{ element.nom }}
-              </option>
-            </TomSelect>
-          </div>
-        </div>
-
-        <!-- <button class="absolute px-4 py-2 text-white transform -translate-x-1/2 bg-blue-500 rounded -bottom-3 left-1/2" @click="filter()">Filtrer</button> -->
-      </div>
-
-      <!-- Results or other components -->
-      <div class="mt-6">
-        <!-- Place the table or grid component here -->
-      </div>
-    </div>
-
-    <ActivitiesComponent v-if="seeActivite" :projetId="projetId" :composantId="composantsId" :sousComposantsId="sousComposantsId" @getProjetById="getProjetById"/>
-    <PlanDecaissementComponent v-if="seePlan" :projetId="projetId" :composantsId="sousComposantsId ?? composantsId" />
-
-  <div v-if="false == true">
-
-    <!-- Titre de la page -->
-    <div class="grid grid-cols-12 gap-6 mt-5">
-      <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
-        <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-          <div class="relative w-56 text-slate-500">
-            <input type="text" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
-            <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
-          </div>
-        </div>
-        <div class="flex">
-          <button class="mr-2 shadow-md btn btn-primary" @click="addActivite()">
-            <PlusIcon class="w-4 h-4 mr-3" />Ajouter une Activité
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Filtre -->
     <div class="container mx-auto">
       <!-- Combined Filter Section -->
       <div class="relative p-6 mt-3 space-y-3 bg-white rounded-lg shadow-md">
-        <h2 class="mb-4 text-base font-bold">Activites</h2>
 
-          
-          <div class="flex items-center justify-between my-2 flex-wrap sm:flex-nowrap">
-            <div class="flex space-x-2  md:space-x-4 w-full sm:w-4/5  ">
-              <span :class="{ 'border-primary border-b-8 font-bold': seeActivite }" @click="seeActivities()"
-                class="inline-block cursor-pointer text-xs sm:text-sm  md:text-base uppercase border-primary py-2 mb-2">Non demarre</span>
-              <span :class="{ 'border-primary border-b-8 font-bold': seePlan }" @click="seePlanDecaissement()"
-                class="inline-block cursor-pointer text-xs sm:text-sm  md:text-base uppercase py-2 mb-2">En cours
+        <div class="flex flex-wrap items-center justify-between col-span-12 sm:flex-nowrap">
+          <div class="flex">
+            <h2 class="text-base font-bold">Activites</h2>
+          </div>
+          <div class="flex">
+            <button class="mr-2 shadow-md btn btn-primary" @click="addActivite()">
+              <PlusIcon class="w-4 h-4 mr-3" />Ajouter une Activité
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between col-span-12 sm:flex-nowrap xs:flex-nowrap space-y-4 md:space-y-0">
+          <div class="flex space-x-2 md:space-x-4">
+            
+            <span :class="{ 'border-primary border-b-4 font-bold': seeActivitiesOfState == -1 }" @click="seeActivities(-1)"
+                class="inline-block cursor-pointer text-xs sm:text-sm uppercase border-primary py-2 mb-2">Non demarre</span>
+              <span :class="{ 'border-primary border-b-4 font-bold': seeActivitiesOfState == 0 }" @click="seeActivities()"
+                class="inline-block cursor-pointer text-xs sm:text-sm uppercase py-2 mb-2">En cours
               </span>
 
-              <span :class="{ 'border-primary border-b-8 font-bold': seeStatistique }" @click="seeStats()"
-                class="inline-block cursor-pointer text-xs sm:text-sm  md:text-base uppercase py-2 mb-2">En retard
+              <span :class="{ 'border-primary border-b-4 font-bold': seeActivitiesOfState == 1 }" @click="seeActivities(1)"
+                class="inline-block cursor-pointer text-xs sm:text-sm uppercase py-2 mb-2">En retard
               </span>
 
-              <span :class="{ 'border-primary border-b-8 font-bold': seeStatistique }" @click="seeStats()"
-                class="inline-block cursor-pointer text-xs sm:text-sm  md:text-base uppercase py-2 mb-2">Termine
+              <span :class="{ 'border-primary border-b-4 font-bold': seeActivitiesOfState == 2 }" @click="seeActivities(2)"
+                class="inline-block cursor-pointer text-xs sm:text-sm uppercase py-2 mb-2">Termine
               </span>
-            </div>
-            <div>
+          </div>
+          <div class="flex">
+            <div class="relative text-slate-500">
+                <input type="text" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
+                <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
             </div>
           </div>
+        </div>
 
       </div>
 
@@ -483,12 +327,12 @@ export default {
         <!-- Place the table or grid component here -->
       </div>
     </div>
-    
+
     <div v-if="!isLoadingData" class="grid grid-cols-12 gap-6 mt-5">
       <!-- BEGIN: Users Layout -->
       <!-- <pre>{{sousComposants}}</pre>   -->
 
-      <div v-for="(item, index) in activites" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
+      <div v-if="activites.length > 0" v-for="(item, index) in activites" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
         <div class="p-5 box">
           <div class="flex items-start pt-5 _px-5">
             <div class="flex flex-col items-center w-full lg:flex-row">
@@ -522,7 +366,7 @@ export default {
                   <DropdownItem @click="modifierActivite(item)">
                     <Edit2Icon class="w-4 h-4 mr-2" /> Modifier
                   </DropdownItem>
-                  <DropdownItem @click="supprimerComposant(item)">
+                  <DropdownItem @click="supprimerActivite(item)">
                     <TrashIcon class="w-4 h-4 mr-2" /> Supprimer
                   </DropdownItem>
                 </DropdownContent>
@@ -562,6 +406,12 @@ export default {
         </div>
       </div>
     </div>
+
+    <NoRecordsMessage v-if="!activites.length" 
+      title="No Activities Found"
+      description="It seems there are no activities to display. Please check back later."
+    />
+
     <!-- END: Users Layout -->
     <LoaderSnipper v-if="isLoadingData" />
 
@@ -611,21 +461,13 @@ export default {
           <label for="_input-wizard-10"
             class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
           <TomSelect v-model="formData.composanteId" :options="{
-          placeholder: 'Choisir un Output',
-          create: false,
-          onOptionAdd: text(),
-        }" class="w-full">
+            placeholder: 'Choisir un OutCome',
+            create: false,
+            onOptionAdd: text(),
+          }" class="w-full">
             <option v-for="(element, index) in composants" :key="index" :value="element.id">{{ element.nom }}</option>
           </TomSelect>
         </div>
-        <!--<div class="flex col-span-12">
-          <v-select class="w-full" :reduce="(composant) => composant.id" v-model="formData.composanteId" label="nom" :options="composants">
-            <template #search="{ attributes, events }">
-              <input class="vs__search form-input" :required="!formData.composanteId" v-bind="attributes" v-on="events" />
-            </template>
-          </v-select>
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
-        </div>-->
         <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2"
           label="Fond propre" />
 
@@ -650,11 +492,8 @@ export default {
         <div class="flex gap-2 px-5 pb-8 text-center">
           <button type="button" @click="showDeleteModal = false"
             class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>
-          <VButton :loading="isLoading" label="Supprimer" @click="deleteComposants" />
+          <VButton :loading="isLoading" label="Supprimer" @click="deleteActivite" />
         </div>
       </ModalBody>
     </Modal>
-  </div>
 </template>
-
-<style></style>

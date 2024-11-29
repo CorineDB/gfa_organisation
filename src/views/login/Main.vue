@@ -170,11 +170,11 @@ export default {
                 if (response.data.utilisateur.type == "administrateur") {
                   // this.$toast.success("Connexion réussie")
                   this.$router.push("/dashboard/programme");
-                } 
+                } /*
                 else if (response.data.utilisateur.type == "organisation") {
                   // this.$toast.success("Connexion réussie")
                   this.gotoOrganisationAppropriateDashboard(response.data.utilisateur.projet);
-                } else {
+                }*/ else {
                   // this.$toast.success("Connexion réussie")
                   this.$router.push("/dashboard/projets/");
                 }

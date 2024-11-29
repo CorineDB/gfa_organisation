@@ -1,817 +1,459 @@
-<template>
- 
-</template>
-
 <script>
+import { mapGetters, mapActions } from "vuex";
 
-import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
-import { extractFormData, getStringValueOfStatutCode } from "@/utils/index";
-import Composante from "@/store/modules/composantes/composante";
-
+import { getStringValueOfStatutCode } from "@/utils/index";
+import ProjetService from "@/services/modules/projet.service.js";
+import ComposantesService from "@/services/modules/composante.service";
+import ActiviteService from "@/services/modules/activite.service";
+import TachesService from '@/services/modules/tache.service';
+import InputForm from "@/components/news/InputForm.vue";
+import VButton from "@/components/news/VButton.vue";
+import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
+import { toast } from "vue3-toastify";
 export default {
+  name: "PlanDecaissementComponent",
   components: {
-   
+    InputForm,
+    VButton,
+    NoRecordsMessage
+  },
+
+  props: {
+    composantsId: {
+      type: String,
+      required: true,
+    },
+    projetId: {
+      required: true,
+      type: String
+    }
   },
   data() {
     return {
-      valueFiltre: null,
-      composanteId: null,
-      projetFiltre: null,
-      composanteFiltre: null,
-      pending: false,
-      success: true,
-      rejected: false,
-      programmeId: this.currentUser?.programme.id,
-      cols: 1,
-      sendRequest: false,
-      submitText: "Enregistrer",
-      rangeValue: 0,
-      showFiltre: false,
-      
-      activiteAttributs : ['nom', 'description', 'debut', 'fin', 'budgetNational', 'structureResponsableId', 'structureAssocieId', 'types', 'pret', 'tepPrevu', 'statut', 'poids'],
-
-      champs:[
-
-        {name: 'Nom de l\'activite', key: "nom", type: 'text', placeholdere: "Nom de l\'activité", isSelect: false, isTextArea: false, data:'', required: true, errors : []},
-        {name: 'Type', key: "types", type: '', placeholdere: 'Selectionnez le type d\'activite', isSelect: true, isTextArea: false, data:'', required: true, options: this.$store.state.types, cle: 'type', value: 'nom',  errors : []},
-        {name: 'Poids', type: 'number', key: "poids", placeholdere: "", isSelect: false, isTextArea: false, data:'', required: true, errors : []},
-        {name: 'Taux d\'execution physique', key: "tepPrevu", type: 'number', placeholdere: "", isSelect: false, isTextArea: false, data:'', required: true, errors : []},
-        {name: 'Pret', type: 'number', key: "pret", placeholdere: "", isSelect: false, isTextArea: false, data:'', required: true, errors : []},
-        {name: 'Budget National', key: "budgetNational", type: 'number', placeholdere: "", isSelect: false, isTextArea: false, data:'', required: true, errors : []},
-        {name: 'Date de debut', key: "debut", type: 'date', placeholdere: "", isSelect: false, isTextArea: false, data:'', required: true, errors : []},
-        {name: 'Date de fin', key: "fin", type: 'date', placeholdere: "", isSelect: false, isTextArea: false, data:'', required: true, errors : []},
-        {name: 'Structure Responsable', key: "structureResponsableId", type: '', placeholdere: 'Veuillez selectionnez la structure responsable', isSelect: true, isTextArea: false, data:'', required: true, options: this.entreprisesExecutante, cle: 'id', value: 'nom',  errors : []},
-        {name: 'Structure associée', key: "structureAssocieId", type: '', placeholdere: 'Veuillez selectionnez la structure associée', isSelect: true, isTextArea: false, data:'', required: true, options: this.mods, cle: 'id', value: 'nom',  errors : []},
-        {name: 'Statut', key: "statut", type: '', placeholdere: 'Selectionnez le statut', isSelect: true, isTextArea: false, data:'', required: true, options: this.$store.state.statuts, cle: 'etat', value: 'nom',  errors : []},
-        {name: 'Description', type: '', key: "description", placeholdere: 'Description de l\'activité', isSelect: false, isTextArea: true, data:'', required: false, errors : []},
-        
-      ],
-
+      projets: [],
+      projetId: "",
+      composants: [],
+      sousComposants: [],
+      activites: [],
+      haveSousComposantes: false,
+      isLoadingData: false,
       showModal: false,
-      showModal2: false,
-      line: false,
-      mosaique: true,
-      showInput: true,
-      isStateChange: false,
-      seeStatistique: false,
-      seePlan: false,
-      seeActivite: true,
-      seeSuivi: false,
-      option: [{ name: "supprimer" }, { name: "modifier" }],
-
-      optionActivite: [
-        { name: "Voir plan decaissement" },
-        { name: "supprimer" },
-        { name: "modifier" },
-      ],
-
-      dates: [{}],
-
-      series: [
-        {
-          name: "Inflation",
-          data: [2.3, 3.1, 4.0, 10.1, 4.0, 3.6, 3.2, 2.3, 1.4, 0.8, 0.5, 0.2],
-        },
-      ],
-
-      chartOptionsExBar: {
-        chart: {
-          height: 350,
-          type: "bar",
-        },
-
-        plotOptions: {
-          bar: {
-            borderRadius: 10,
-            dataLabels: {
-              position: "top", // top, center, bottom
-            },
-          },
-        },
-
-        dataLabels: {
-          enabled: true,
-          formatter: function (val) {
-            return val + "%";
-          },
-
-          offsetY: -20,
-          style: {
-            fontSize: "12px",
-            colors: ["#304758"],
-          },
-        },
-
-        xaxis: {
-          categories: [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ],
-          position: "top",
-          axisBorder: {
-            show: false,
-          },
-
-          axisTicks: {
-            show: false,
-          },
-
-          crosshairs: {
-            fill: {
-              type: "gradient",
-              gradient: {
-                colorFrom: "#D8E3F0",
-                colorTo: "#BED1E6",
-                stops: [0, 100],
-                opacityFrom: 0.4,
-                opacityTo: 0.5,
-              },
-            },
-          },
-          tooltip: {
-            enabled: true,
-          },
-        },
-
-        yaxis: {
-          axisBorder: {
-            show: false,
-          },
-          axisTicks: {
-            show: false,
-          },
-          labels: {
-            show: false,
-            formatter: function (val) {
-              return val + "%";
-            },
-          },
-        },
-
-        title: {
-          text: "Taux execution du projet",
-          floating: true,
-          offsetY: 330,
-          align: "center",
-          style: {
-            color: "#444",
-          },
-        }
+      isUpdate: false,
+      isLoading: false,
+      formData: {
+        annee: 0,
+        trimestre: 0,
+        pret: 0,
+        budgetNational: 0,
+        activiteId: ""
       },
-
-      chartOptionsFiBar: {
-        chart: {
-          height: 350,
-          type: "bar",
-        },
-
-        plotOptions: {
-          bar: {
-            borderRadius: 10,
-            dataLabels: {
-              position: "top", // top, center, bottom
-            },
-          },
-        },
-
-        dataLabels: {
-          enabled: true,
-          formatter: function (val) {
-            return val + "%";
-          },
-          offsetY: -20,
-          style: {
-            fontSize: "12px",
-            colors: ["#304758"],
-          },
-        },
-
-        xaxis: {
-          categories: [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ],
-          position: "top",
-          axisBorder: {
-            show: false,
-          },
-          axisTicks: {
-            show: false,
-          },
-          crosshairs: {
-            fill: {
-              type: "gradient",
-              gradient: {
-                colorFrom: "#D8E3F0",
-                colorTo: "#BED1E6",
-                stops: [0, 100],
-                opacityFrom: 0.4,
-                opacityTo: 0.5,
-              },
-            },
-          },
-          tooltip: {
-            enabled: true,
-          },
-        },
-        yaxis: {
-          axisBorder: {
-            show: false,
-          },
-          axisTicks: {
-            show: false,
-          },
-          labels: {
-            show: false,
-            formatter: function (val) {
-              return val + "%";
-            },
-          },
-        },
-        title: {
-          text: "Taux financier",
-          floating: true,
-          offsetY: 330,
-          align: "center",
-          style: {
-            color: "#444",
-          },
-        },
-      },
-
-      chartOptions: {
-        series: [44, 55],
-        chart: {
-          width: 380,
-          type: "pie",
-        },
-
-        labels: ["Executé", "Non éxecute"],
-        title: {
-          text: "STATISTIQUE TAUX FINANCIER",
-          align: "left",
-          style: {
-            fontSize: "18px",
-          },
-        },
-
-        responsive: [
-          {
-            breakpoint: 480,
-            options: {
-              chart: {
-                width: 200,
-              },
-              legend: {
-                position: "bottom",
-              },
-            },
-          },
-        ]
-      },
-
-      chartOptionsFi: {
-        series: [44, 55],
-        chart: {
-          width: 380,
-          type: "pie",
-        },
-
-        labels: ["Utilisé", "Non utilise"],
-        title: {
-          text: "STATISTIQUE TAUX FINANCIER",
-          align: "left",
-          style: {
-            fontSize: "18px",
-          },
-        },
-
-        responsive: [
-          {
-            breakpoint: 480,
-            options: {
-              chart: {
-                width: 200,
-              },
-              legend: {
-                position: "bottom",
-              },
-            },
-          },
-        ]
-      },
-
-      headers: [
-        { name: "activite", cle: "activite" },
-        { name: "Budget Nationnal", cle: "bn" },
-        { name: "Pret", cle: "pret" },
-        { name: "Poids", cle: "poids" },
-        { name: "Structure responsable", cle: "struct_resp" },
-        { name: "Structure associé", cle: "struct_assoc" },
-        { name: "Status", cle: "status" },
-      ],
-
-      dataTable: [
-        {
-          activite: "activite 1",
-          bn: "200000000",
-          pret: "9540000000",
-          poids: "5",
-          struct_resp: "agetur",
-          struct_assoc: "",
-          status: "en cours",
-        },
-      ],
-      actions: [{ name: "supprimer", iconne: "" }],
+      //composantsId: "",
+      sousComposantId: "",
+      activitesId: "",
+      labels: "Ajouter",
+      showDeleteModal: false,
+      deleteLoader: false,
+      taches: [],
+      tacheId: ''
     };
   },
-
   computed: {
-    //importation des variables du module activites
-    ...mapState({
-      activite: (state) => state.activites.activite,
-      loading: (state) => state.loading,
-      errors: (state) => state.errors,
-    }),
+    ...mapGetters("auths", { currentUser: "GET_AUTHENTICATE_USER" }),
+  },
+  watch: {
+    projetId(newValue, oldValue) {
+      if (this.projets.length > 0) {
+        console.log(newValue);
 
-    ...mapGetters({
-      mods: "mods/getMods",
-      projets: "projets/getProjets",
-      composantes: "composantes/getComposantes",
-      sousComposantes: "sousComposantes/getSousComposantes",
-      entreprisesExecutante: "entreprisesExecutante/getEntreprisesExecutante",
-      activites: "activites/getActivites",
-      activite: "activites/getActivite",
-      currentUser : 'auths/GET_AUTHENTICATE_USER'
-    }),
+        this.getProjetById(newValue);
+      }
+    },
+    composantsId(newValue, oldValue) {
+      if (this.composants.length > 0) {
+        this.getComposantById(newValue);
+      }
+    },
+    sousComposantId(newValue, oldValue) {
+      if (this.sousComposants.length > 0) {
+        this.getComposantById(newValue);
+      }
+    },
+    activitesId(newValue, oldValue) {
+      if (this.activites.length > 0) {
+        this.getActiviteById(newValue);
+      }
+    },
   },
 
   methods: {
-    //Charger les fonctions de communication avec le serveur
-    ...mapMutations({
-      setErrors: "SET_ERRORS_MESSAGE", // map `this.setErrors()` to `this.$store.commit('SET_ERRORS_MESSAGE')`,
-      setActivite: "activites/FILL", // map `this.CREATE_INSTANCE_PROJET()` to `this.$store.commit('CREATE_INSTANCE_PROJET')`
-      setActivites: "activites/SET_LIST_ACTIVITES",
-      setComposantes: 'composantes/SET_LIST_COMPOSANTES',
-      setSousComposantes: 'sousComposantes/SET_LIST_SOUSCOMPOSANTE'
-    }),
+    text() {},
+    clearObjectValues(obj) {
+      for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          let value = obj[key];
 
-    ...mapActions("activites", {
-      fetchActivites: "FETCH_LIST_ACTIVITE_OF_COMPOSANTE",
-      saveActivite: "STORE_ACTIVITE",
-      updateActivite: "UPDATE_ACTIVITE",
-      deleteActivite: "DESTROY_ACTIVITE",
-    }),
-
-    ...mapActions({
-      fetchMods: "mods/FETCH_LIST_MOD_OF_PROGRAMME",
-      fetchEntreprisesExecutante: "entreprisesExecutante/FETCH_LIST_ENTREPRISE_EXECUTANTE_OF_PROGRAMME",
-      fetchComposantes: "composantes/FETCH_LIST_COMPOSANTE_OF_PROJET",
-      fetchSousComposantes: "sousComposantes/FETCH_LIST_SOUS_COMPOSANTE_OF_COMPOSANTE",
-      fetchProjets: "projets/FETCH_LIST_PROJET_OF_PROGRAMME",
-    }),
-
-    supprimerT() {},
-
-    filtreRange(value) {
-      this.rangeValue = value;
-    },
-
-    gotoActivite() {
-      this.seePlan = false;
-      this.seeActivite = true;
-      this.seeSuivi = false;
-      this.seeStatistique = false;
-    },
-
-    gotoStatistique() {
-      this.seePlan = false;
-      this.seeActivite = false;
-      this.seeSuivi = false;
-      this.seeStatistique = true;
-    },
-
-    gotoPlan() {
-      this.seePlan = true;
-      this.seeActivite = false;
-      this.seeSuivi = false;
-      this.seeStatistique = false;
-    },
-
-    gotoSuivi() {
-      this.seeSuivi = true;
-      this.seePlan = false;
-      this.seeActivite = false;
-      this.seeStatistique = false;
-    },
-
-    addDate() {
-      this.dates.push({});
-    },
-
-    switch1() {
-      this.mosaique = true;
-      this.line = false;
-    },
-
-    switch2() {
-      this.mosaique = false;
-      this.line = true;
-    },
-
-    close2() {
-      this.showModal2 = false;
-    },
-
-    addPlan() {
-      this.title = "Ajouter un plan decaissement";
-      this.showModal2 = true;
-    },
-
-    modifierPlan() {
-      this.title = "Modifier un plan de decaissement";
-      this.showModal2 = true;
-    },
-
-    dupliquerPlan() {
-      this.title = "Dupliquer un plan decaissement";
-      this.showModal2 = true;
-    },
-
-    addActivite() {
-
-      this.title ="Ajouter une activité"
-
-      this.submitText="Enregistrer",
-
-      this.showCloseModal(true)
-
-    },
-
-    getNom(nom, prenom) {
-
-      let name = ''
-
-      if(nom !== undefined && nom !== null) name+= nom
-
-      if(prenom !== undefined && prenom !== null ) name+= prenom
-
-      return name;
-    },
-
-    supprimer(activite) {
-      if(window.confirm("Voulez-vous supprimer l'activite " + activite.nom)){
-        if(this.sendRequest === false){
-          this.sendRequest = true;
-          this.deleteActivite(activite.id)
-          this.sendRequest = false;
+          if (typeof value === "string") {
+            obj[key] = "";
+          } else if (typeof value === "number") {
+            obj[key] = 0;
+          } else if (typeof value === "boolean") {
+            obj[key] = false;
+          } else if (Array.isArray(value)) {
+            obj[key] = [];
+          } else if (typeof value === "object" && value !== null) {
+            obj[key] = {}; // ou appliquer récursion pour vider les objets imbriqués
+            clearObjectValues(obj[key]); // récursion pour les objets imbriqués
+          } else {
+            obj[key] = null; // pour les autres types (null, undefined, etc.)
+          }
         }
       }
     },
-
-    modifier(activite) {
-
-      this.title = 'Modifier une activite'
-
-      this.setActivite(activite)
-
-      this.activiteAttributs.forEach((item) => {
-
-        this.champs.find((value, index) => {
-
-          if( value.key === "statut" && item === "statut"){
-
-            this.$store.state.statuts.map((value) => {
-              if(value.etat === activite[item]){
-                this.champs[index]['data'] = value
-              }
-            });
-
-          }
-          else if(value.key === item){
-            this.champs[index]['data'] = activite[item]
-          }
-
-        });
-
-      });
-
-      this.submitText = "Modifier",
-
-      this.showCloseModal(true)
+    supprimerTache(data) {
+      this.showDeleteModal = true;
+      this.tacheId = data.id;
     },
-
-    dupliquer() {
-      this.title = "Dupliquer une activité";
-      this.showModal = true;
-    },
-    gotoNext() {
-      this.$router.push("/dashboard/projets/taches-globale");
-    },
-    editerSuivi() {
-      this.showInput = false;
-    },
-
-    toggle() {
-      this.pending = false;
-      this.rejected = false;
-      this.success = true;
-    },
-
-    toggle2() {
-      this.success = false;
-      this.rejected = false;
-      this.pending = true;
-    },
-
-    toggle3() {
-      this.pending = false;
-      this.success = false;
-      this.rejected = true;
-    },
-
-    getStatus(status) {
-      return getStringValueOfStatutCode(status);
-    },
-
-    validation(activite) {
-      if (this.sendRequest === false) {
-        this.sendRequest = true;
-
-        this.updateActivite({
-          activite: { statut: -1, composanteId: this.composanteId },
-          id: activite.id,
+    deleteTache() {
+      this.deleteLoader = true;
+      TachesService.destroy(this.tacheId)
+        .then((data) => {
+          this.deleteLoader = false;
+          this.showDeleteModal = false;
+          toast.success("Suppression  éffectuée avec succès");
+          //this.getProjetById();
+          this.getActiviteById(this.activitesId);
         })
+        .catch((error) => {
+          this.deleteLoader = false;
+          toast.error("Erreur lors de la suppression");
+        });
+    },
+    modifierTache(data) {
+      this.labels = "Modifier";
+      this.showModal = true;
+      this.update = true;
+      this.formData.annee = data.annee;
+      this.formData.trimestre = data.trimestre;
+      this.formData.pret = data.pret;
+      this.formData.budgetNational = data.budgetNational;
+      this.formData.activiteId = data.activiteId;
+      this.tacheId = data.id;
+    },
+    addTache() {
+      this.showModal = true;
+      this.isUpdate = false;
+      
+      this.formData.activiteId = this.activitesId;
+
+      this.labels = "Ajouter";
+    },
+    sendForm() {
+        this.formData.annee = parseInt(this.formData.annee);
+        this.formData.trimestre = parseInt(this.formData.trimestre);
+        this.formData.budgetNational = parseInt(this.formData.budgetNational);
+        this.formData.pret = parseInt(this.formData.pret);
+      if (this.update) {
+        // this.formData.projetId = this.projetId
+        this.isLoading = true;
+        TachesService.update(this.tacheId, this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
-              this.close();
-
-              this.sendRequest = false;
+              this.update = false;
+              this.isLoading = false;
+              this.showModal = false;
+              toast.success("Modification éffectuée");
+              this.activitesId = this.formData.activiteId;
+              this.clearObjectValues(this.formData);
+              // delete this.formData.projetId;
+              //this.getProjetById();
+              this.getActiviteById(this.activitesId);
+              //this.sendRequest = false;
             }
           })
           .catch((error) => {
-            this.setErrors({
-              message: error?.response?.data?.message,
-              errors: error.response.data.errors,
-            });
-
-            this.champs.map(
-              (value) => (value.errors = this.erreurs[value.key])
-            );
-
-            this.sendRequest = false;
+            // delete this.formData.projetId;
+            this.isLoading = false;
+            toast.error(error.message);
           });
-      }
-    },
-
-    sendForm() {
-      if (this.sendRequest === false) {
-        this.sendRequest = true;
-
-        this.champs = this.champs.map((item) => {
-          item.errors = [];
-          return item;
-        });
-
-        let activite = extractFormData(this.champs, this.activiteAttributs);
-
-        activite.composanteId = this.composanteId;
-
-        activite.structureResponsableId = activite.structureResponsableId.id;
-
-        activite.structureAssocieId = activite.structureAssocieId.id;
-
-        activite.userId = activite.structureAssocieId;
-
-        activite["type"] = activite.types.type;
-
-        activite.statut = activite.statut.etat;
-
-        if (this.activite?.id) {
-          this.updateActivite({ activite: activite, id: this.activite?.id })
-            .then((response) => {
-              if (response.status == 200 || response.status == 201) {
-                this.close();
-              }
-            })
-            .catch((error) => {
-              this.setErrors({
-                message: error?.response?.data?.message,
-                errors: error.response.data.errors,
-              });
-
-              this.champs.map(
-                (value) => (value.errors = this.erreurs[value.key])
-              );
-            });
-        } else {
-          this.saveActivite(activite).then((response) => {
+      } else {
+        this.isLoading = true;
+        //this.formData.budgetNational = parseInt(this.formData.budgetNational);
+        TachesService.create(this.formData)
+          .then((response) => {
             if (response.status == 200 || response.status == 201) {
-              this.close();
+              this.isLoading = false;
+              toast.success("Ajout éffectué");
+              this.showModal = false;
+              this.clearObjectValues(this.formData);
+
+              //this.getProjetById();
+              this.getActiviteById(this.activitesId);
             }
+          })
+          .catch((error) => {
+            this.isLoading = false;
+            toast.error("Erreur lors de la modification");
           });
-        }
-
-        this.sendRequest = false;
       }
     },
+    getListeProjet() {
+      this.isLoadingData = true;
+      ProjetService.get()
+        .then((data) => {
+          this.isLoadingData = false;
+          this.projets = data.data.data;
 
-    close() {
-      this.showCloseModal();
+          if ((this.projetId == "") && (this.projets.length > 0) ) {
+            this.projetId = this.projets[0].id;
+          }
+          if(this.projetId != "" && this.projetId != null && this.projetId != undefined){
+            this.getProjetById(this.projetId);
+          }
 
-      this.resetForm();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getProjetById(data = null) {
+      console.log(data);
+      if (data == null) {
+        data = this.projetId = this.projetId ?? this.currentUser.projet.id;
+        //this.projetId = this.projets[0].id;
+      }
 
-      this.sendRequest = false;
+      ProjetService.getDetailProjet(data)
+        .then((datas) => {
+          this.composants = datas.data.data.composantes;
+
+          if ((this.composantsId == "") && (this.composants.length > 0) ) {
+            this.composantsId = this.composants[0].id;
+          }
+          if(this.composantsId != "" && this.composantsId != null && this.composantsId != undefined){
+            this.getComposantById(this.composantsId);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getComposantById(data) {
+      ComposantesService.detailComposant(data)
+        .then((data) => {        
+         
+          this.activites = data.data.data.activites;
+
+          if (data.data.data.souscomposantes.length > 0) {
+            this.sousComposants = data.data.data.souscomposantes;
+            this.haveSousComposantes = true;
+          }
+
+          if ((this.activitesId == "") && this.activites.length > 0) {
+            this.activitesId = this.activites[0].id;
+          }
+          if(this.activitesId != "" && this.activitesId != null && this.activitesId != undefined){
+            this.getActiviteById(this.activitesId);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
-    resetForm(){
-
-      this.champs = this.champs.map(item => { item['data'] = ''; return item})
-      
-      window.document.getElementById('vform').reset()
-
-      this.setActivite({})
+    getActiviteById(data) {
+      ActiviteService.get(data)
+        .then((response) => {
+          this.taches = response.data.data.taches;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
-    
-    showCloseModal(value = false) {
-      this.showModal = value;
-    }
+
+    filter() {},
   },
 
-  watch: {
-    loading: function (value) {
-      //this.loading = value
-    },
+  created() {},
+  mounted() {
+    //this.getListeProjet();
 
-    errors: function (errors) {
-      this.champs.forEach((value) => {
-        if(value.key === "types"){
-        
-          value.errors = errors["type"];
+    this.projetId = this.currentUser.projet.id;
 
-        }
-        else value.errors = errors[value.key];
-      });
-  
-    },/* 
-    
-    */
-
-    entreprisesExecutante: function (entreprisesExecutante) {
-
-      this.champs.map((item) => {
-
-        if (item.key === "structureResponsableId") {
-
-          item.options = entreprisesExecutante.map((entrepriseExecutante) => {
-
-            return {
-              id: entrepriseExecutante.user.id,
-              nom: entrepriseExecutante.user.nom,
-            };
-
-          });
-
-        }
-
-        return item;
-
-      });
-
-    },
-
-    mods: function (mods) {
-
-      this.champs.map((item) => {
-
-        if (item.key === "structureAssocieId") {
-
-          item.options = mods.map((mod) => {
-
-            return {
-              id: mod.user.id,
-              nom: mod.user.nom,
-            };
-
-          });
-
-        }
-
-        return item;
-        
-      });
-    },
-
-
-    projets: function(projets){
-      if(projets.length > 0){
-        this.projetFiltre = projets[0]
-      }
-    },
-
-    projetFiltre: function(valeur){
-
-      if( valeur instanceof Composante || valeur instanceof Object )
-      {
-        this.fetchComposantes(valeur.id);
-      }
-      else if( valeur !== null && typeof valeur !== 'undefined' && valeur.length !== 0 ){
-        this.fetchComposantes(valeur);
-      }
-      else{ 
-        this.setComposantes([])
-      }
-    },
-    
-    composantes: function (composantes) {
-      if(composantes.length > 0){
-        this.composanteFiltre = composantes[0]
-      }
-      else{
-        this.composanteFiltre = null
-      }
-    },
-
-    composanteFiltre: function(valeur){
-
-      if( valeur instanceof Composante || valeur instanceof Object )
-      {
-        this.fetchSousComposantes(valeur.id);
-      }
-      else if( valeur !== null && typeof valeur !== 'undefined' && valeur.length !== 0 ){
-        this.fetchSousComposantes(valeur);
-      }
-      else{ 
-        this.setSousComposantes([])
-      }
-    }, 
-
-    sousComposantes: function (sousComposantes) {
-      if(sousComposantes.length > 0){ 
-        this.valueFiltre = sousComposantes[0];
-      }
-      else if(this.composanteFiltre !== null && typeof this.composanteFiltre !== 'undefined' && this.composanteFiltre.length !== 0  ){
-        this.fetchActivites(this.composanteFiltre.id);
-        this.composanteId = this.composanteFiltre.id
-        this.valueFiltre = null;
-      }
-      else{
-        this.valueFiltre = null;
-      }
-    },
-
-    valueFiltre: function (valeur) {
-      
-      if (valeur instanceof Composante || valeur instanceof Object) {
-        this.fetchActivites(valeur.id);
-        this.composanteId = valeur.id
-      } 
-
-      else if( valeur !== null && typeof valeur !== 'undefined' && valeur.length !== 0 ){
-        this.fetchActivites(valeur);
-        this.composanteId = valeur
-      }
-
-    },
-
+    this.getProjetById();
   },
-
-  created() {
-
-    this.programmeId = this.currentUser.programme.id
-
-    if(this.programmeId){
-      Promise.all([this.fetchProjets(this.programmeId) ]).then((value) => {
-  
-          this.fetchMods(this.programmeId)
-
-          this.fetchEntreprisesExecutante(this.programmeId)
-      });
-    }
-
-  }
-
 };
 </script>
 
-<style></style>
+<template>
+
+
+
+    <!-- Filtre -->
+    <div class="container mx-auto">
+      <!-- Combined Filter Section -->
+      <div class="relative p-6 mt-3 space-y-3 bg-white rounded-lg shadow-md">
+
+
+
+        <div class="flex w-full">
+            <label for="_input-wizard-10"
+              class="absolute z-10 px-3 ml-1 text-base font-bold duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activites</label>
+            <TomSelect v-model="activitesId" :options="{
+              placeholder: 'Choisir une activite',
+              create: false,
+              onOptionAdd: text(),
+            }" class="w-full">
+              <option v-for="(activite, index) in activites" :key="index" :value="activite.id">{{ activite.codePta }} {{ activite.nom }}
+              </option>
+            </TomSelect>
+          </div>
+            
+
+        <div class="flex flex-wrap items-center justify-between col-span-12 sm:flex-nowrap">
+          <div class="flex">
+            <h2 class="text-base font-bold">Plan de decaissement</h2>
+          </div>
+          <div class="flex">
+            <button class="mr-2 shadow-md btn btn-primary" @click="addTache()">
+              <PlusIcon class="w-4 h-4 mr-3" />Ajouter un plan de decaissement
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between col-span-12 sm:flex-nowrap xs:flex-nowrap space-y-4 md:space-y-0">
+          <div class="flex space-x-2 md:space-x-4">
+
+          </div>
+          <div class="flex">
+            <div class="relative text-slate-500">
+                <input type="text" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
+                <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Results or other components -->
+      <div class="mt-6">
+        <!-- Place the table or grid component here -->
+      </div>
+    </div>
+
+  <div v-if="!isLoadingData" class="grid grid-cols-12 gap-6 mt-5">
+    <!-- BEGIN: Users Layout -->
+    <!-- <pre>{{sousComposants}}</pre>   -->
+
+    <div v-if="taches.length > 0" v-for="(item, index) in taches" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
+      <div class="p-5 box">
+        <div class="flex items-start pt-5 _px-5">
+          <div class="flex flex-col items-center w-full lg:flex-row">
+            <div class="flex items-center justify-center w-16 h-16 text-white rounded-full image-fit bg-primary">
+              {{ item.type }}
+              <!-- <img alt="Midone Tailwind HTML Admin Template" class="rounded-full" :src="faker.photos[0]" /> -->
+            </div>
+            <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0">
+              <a href="" class="font-medium">{{ item.nom }}</a>
+              <div class="mt-2 text-xs text-slate-500">
+                <span class="px-2 py-1 m-5 text-xs text-white rounded bg-primary/80" v-if="item.statut == -2"> Non validé </span>
+                <span class="px-2 py-1 m-5 text-xs text-white rounded bg-success/80" v-else-if="item.statut == -1"> Validé </span>
+                <span class="px-2 py-1 m-5 text-xs text-white rounded bg-pending/80" v-else-if="item.statut == 0"> En cours </span>
+                <span class="px-2 py-1 m-5 text-xs text-white rounded bg-danger/80" v-else-if="item.statut == 1"> En retard </span>
+                <span class="pl-2" v-else-if="item.statut == 2">Terminé</span>
+              </div>
+            </div>
+          </div>
+          <Dropdown class="absolute top-0 right-0 mt-3 mr-5">
+            <DropdownToggle tag="a" class="block w-5 h-5" href="javascript:;">
+              <MoreVerticalIcon class="w-5 h-5 text-slate-500" />
+            </DropdownToggle>
+            <DropdownMenu class="w-40">
+              <DropdownContent>
+                <DropdownItem @click="modifierTache(item)"> <Edit2Icon class="w-4 h-4 mr-2" /> Modifier </DropdownItem>
+                <DropdownItem @click="supprimerTache(item)"> <TrashIcon class="w-4 h-4 mr-2" /> Supprimer </DropdownItem>
+              </DropdownContent>
+            </DropdownMenu>
+          </Dropdown>
+        </div>
+        <div class="text-center lg:text-left">
+          <div class="my-5 text-left">
+            <p class="mx-auto font-semibold text-center">Description</p>
+
+            {{ item.description }}
+          </div>
+          <div class="m-5 text-slate-600 dark:text-slate-500">
+            <div class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Taux d'exécution physique: {{ item.tep }}</div>
+
+            <div class="flex items-center mt-2">
+              <CheckSquareIcon class="w-4 h-4 mr-2" /> Statut :
+              <span class="pl-2" v-if="item.statut == -2"> Non validé </span>
+              <span class="pl-2" v-else-if="item.statut == -1"> Validé </span>
+              <span class="pl-2" v-else-if="item.statut == 0"> En cours </span>
+              <span class="pl-2" v-else-if="item.statut == 1"> En retard </span>
+              <span class="pl-2" v-else-if="item.statut == 2">Terminé</span>
+            </div>
+            <div class="flex items-center mt-2"><CheckSquareIcon class="w-4 h-4 mr-2" /> Poids : {{ item.poids }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <NoRecordsMessage v-if="!sousComposants.length"
+      title="No outputs Found"
+      description="It seems there are no outputs to display. Please check back later."
+    />
+
+  <!-- END: Users Layout -->
+  <LoaderSnipper v-if="isLoadingData" />
+
+  <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
+    <ModalHeader>
+      <h2 v-if="!update" class="mr-auto text-base font-medium">Ajouter une tache</h2>
+      <h2 v-else class="mr-auto text-base font-medium">Modifier une tache</h2>
+    </ModalHeader>
+    <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
+      
+      <InputForm v-model="formData.annee" class="col-span-12" type="number" required="required" placeHolder="Ex : 2024"
+          label="Annee de base" />
+      <InputForm v-model="formData.trimestre" class="col-span-12" type="number" required="required" placeHolder="Ex : 2"
+          label="Trimestre" />
+      <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2000000"
+          label="Fond propre" />
+
+      <InputForm v-model="formData.budgetNational" class="col-span-12" type="number" required="required"
+          placeHolder="Ex : 500000" label="Montant financier" />
+
+       <div class="flex col-span-12">
+        <v-select class="w-full" :reduce="(activite) => activite.id" v-model="formData.activiteId" label="nom" :options="activites">
+          <template #search="{ attributes, events }">
+            <input class="vs__search form-input" :required="!formData.activiteId" v-bind="attributes" v-on="events" />
+          </template>
+        </v-select>
+        <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activites</label>
+      </div>
+
+    </ModalBody>
+    <ModalFooter>
+      <div class="flex items-center justify-center">
+        <button type="button" @click="showModal = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+        <VButton class="inline-block" :label="labels" :loading="isLoading" @click="sendForm" />
+      </div>
+    </ModalFooter>
+  </Modal>
+
+  <Modal :show="showDeleteModal" @hidden="showDeleteModal = false">
+    <ModalBody class="p-0">
+      <div class="p-5 text-center">
+        <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">Etes vous sûr?</div>
+        <div class="mt-2 text-slate-500">Voulez vous supprimer la tache ? <br />Cette action ne peut être annulé</div>
+      </div>
+      <div class="flex gap-2 px-5 pb-8 text-center">
+        <button type="button" @click="showDeleteModal = false" class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>
+        <VButton :loading="isLoading" label="Supprimer" @click="deleteTache" />
+      </div>
+    </ModalBody>
+  </Modal>
+</template>

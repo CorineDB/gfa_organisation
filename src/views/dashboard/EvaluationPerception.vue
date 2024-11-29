@@ -92,8 +92,8 @@ const submitData = async () => {
     try {
       const result = await action;
       if (isValidate.value) toast.success(`${result.data.message}`);
-      generatevalidateKey("perception");
-      showAlertValidate.value = true;
+      if (isValidate.value) {generatevalidateKey("perception");
+      showAlertValidate.value = true;}
       await getDataFormPerception();
     } catch (e) {
       console.error(e);

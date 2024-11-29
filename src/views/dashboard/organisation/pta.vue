@@ -27,7 +27,22 @@
                 <span v-if="pta.isTache" class="text-sm text-red-600"> {{ pta.code }}</span>
               </td>
               <td>
-                <button
+
+            <TomSelect v-if="pta.isTache"
+              v-model="poidsActuel"
+              :options="{
+                placeholder: 'Choisir le poidActuel',
+              }"
+              class="w-full"
+              @change="togglesuivie(pta)"
+            >
+              <option>Choisir un type d'activité</option>
+              <option :selected="pta.poidsActuel==0" value="0">0%</option>
+              <option :selected="pta.poidsActuel==50"  value="50">50%</option>
+              <option :selected="pta.poidsActuel==100"  value="100">100%</option>
+            </TomSelect>
+
+                <!-- <button
                   v-if="pta.isTache"
                   @click="togglesuivie(pta)"
                   class="flex items-center justify-between px-1 text-white transition-all rounded-full shadow w-14 h-7"
@@ -43,7 +58,7 @@
                       'translate-x-full': pta.poidsActuel > 0 || translatetoggle || tabletoggle[pta.id] == 1,
                     }"
                   ></div>
-                </button>
+                </button> -->
               </td>
             </tr>
           </tbody>
@@ -111,7 +126,7 @@
           <tbody>
             <tr v-for="pta in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span v-if="pta.isProjet" class="text-lg font-bold">projet: {{ pta.nom }}</span>
+                <span v-if="pta.isProjet" class="text-lg font-bold">projet: {{ pta.nom }} {{pta.poidsActuel}}</span>
                 <span v-if="pta.isComposante" class="text-sm text-blue-500">Composante: {{ pta.nom }}</span>
                 <span v-if="pta.isSC" class="text-sm text-yellow-600"> <span class="text-sm text-yellow-600" v-if="pta.code != 0">Sous composante:</span> {{ pta.nom }}</span>
                 <span v-if="pta.isActivite" class="text-sm text-green-600 shadow bg-gradient-to-br from-yellow-400 to-yellow-600">Activite: {{ pta.nom }}</span>
@@ -307,6 +322,8 @@
 import PtabService from "@/services/modules/pta.service.js";
 import BailleursService from "@/services/modules/bailleur.service.js";
 import TacheService from "@/services/modules/tache.service.js";
+import PtaService from "@/services/modules/pta.service.js";
+
 
 import { mapGetters, mapMutations, mapActions, mapState } from "vuex";
 export default {
@@ -331,6 +348,7 @@ export default {
       openFiltre: false,
       statutActuel: false,
       annee: null,
+      poidsActuel: 0,
       bailleur: "",
       bailleurs: [],
       version: "current",
@@ -1362,10 +1380,12 @@ export default {
 
       this.chargement = true;
       var form = {
+        poidsActuel: poidsActuel,
         tacheId: pta.id,
       };
+
       //  console.log(id)
-      if (pta.poidsActuel > 0) {
+      /* if (pta.poidsActuel > 0) {
         this.tabletoggle[pta.id] = 0;
         TacheService.deleteSuivis(pta.id)
           .then((data) => {
@@ -1387,7 +1407,7 @@ export default {
               //console.log('dernier message', error.message);
             }
           });
-      } else {
+      } else { */
         this.tabletoggle[pta.id] = 1;
 
         TacheService.suiviTache(form)
@@ -1410,7 +1430,7 @@ export default {
               //console.log('dernier message', error.message);
             }
           });
-      }
+      //}
       this.chargement = false;
     },
     // exportToExcel() {
@@ -1523,7 +1543,7 @@ export default {
 
       // }
       this.active();
-      PtabService.getOrganisationPta(data)
+      PtabService.getPta({annee: 2024})
         .then((data) => {
           this.ptab = data.data.data;
           this.disabled();

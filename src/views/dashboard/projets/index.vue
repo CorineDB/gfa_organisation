@@ -43,8 +43,9 @@
       <InputForm v-model="formData.debut" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de début" label="Début du projet" />
       <InputForm v-model="formData.fin" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de fin" label="Fin du projet " />
       <InputForm v-model="formData.nombreEmploie" class="col-span-12" type="number" required="required" placeHolder="Ex : 10" label="Nombre d'employé" />
-      <InputForm v-model="formData.ville" class="col-span-12" type="text" required="required" placeHolder="Ex : Cotonou" label="Ville" />
-      <InputForm v-model="formData.budgetNational" class="col-span-12" type="text" required="required" placeHolder="Ex : 100000" label="Budget " />
+      <InputForm v-model="formData.pays" class="col-span-12" type="text" required="required" placeHolder="Ex : Cotonou" label="Pays" />
+      <InputForm v-model="formData.pret" class="col-span-12" type="text" required="required" placeHolder="Ex : 100000" label="Montant financier" />
+      <InputForm v-model="formData.budgetNational" class="col-span-12" type="text" required="required" placeHolder="Ex : 100000" label="Fond Propre " />
 
       <div class="col-span-12" v-if="!isUpdate">
         <InputForm class="col-span-12" type="file" @change="handleFileChange" required="required" placeHolder="choisir une image" label="Images" accept="image/*" />
@@ -54,7 +55,7 @@
         </div>
       </div>
 
-      <div class="col-span-12">
+      <!-- <div class="col-span-12">
         <label>Organisation</label>
         <div class="mt-2">
           <TomSelect
@@ -67,7 +68,8 @@
             <option v-for="(org, index) in ongs" :key="index" :value="org.id">{{ org.nom }}</option>
           </TomSelect>
         </div>
-      </div>
+      </div> -->
+
       <!-- Choix de fichier -->
       <!-- <div class="relative col-span-12">
         <label for="modal-form-1" class="font-medium form-label">Fichier(s)</label>
@@ -98,7 +100,7 @@
   <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
   <div href="#" class="relative shadow-2xl box group _bg-white zoom-in border-l-4 border-primary hover:border-secondary transition-all duration-500">
     <div class="relative m-5 bg-white">
-      <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ projet.nom }}</div>
+      <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ projet.codePta }} - {{ projet.nom }}</div>
     </div>
 
     <div class="relative mt-[12px] m-5 h-40 2xl:h-56 image-fit rounded-md overflow-hidden before:block before:absolute before:w-full before:h-full before:top-0 before:left-0 before:z-10 before:bg-gradient-to-t before:from-black before:to-black/10">
@@ -119,7 +121,11 @@
 
     <div class="m-5 text-slate-600 dark:text-slate-500">
       <div class="flex items-center">
-        <LinkIcon class="w-4 h-4 mr-2" /> Budget: {{ $h.formatCurrency(projet.budgetNational) }} 
+        <LinkIcon class="w-4 h-4 mr-2" /> Fond propre: {{ $h.formatCurrency(projet.budgetNational) }} 
+        <div class="italic font-bold ml-2">Fcfa</div>
+      </div>
+      <div class="flex items-center">
+        <LinkIcon class="w-4 h-4 mr-2" /> Montant financier: {{ $h.formatCurrency(projet.pret) }} 
         <div class="italic font-bold ml-2">Fcfa</div>
       </div>
       <div v-if="projet.owner !== null" class="flex items-center">
@@ -289,8 +295,8 @@ export default {
       projetId: "",
       title: "",
       search: "",
-      projetAttributs: ["nom", "description", "debut", "fin", "objectifGlobaux", "budgetNational", "pret", "couleur", "ville", "bailleurId", "tauxEngagement"],
-      projetAttributsUpdate: ["nom", "description", "debut", "fin", "objectifGlobaux", "budgetNational", "pret", "couleur", "ville", "tauxEngagement"],
+      projetAttributs: ["nom", "description", "debut", "fin", "objectifGlobaux", "budgetNational", "pret", "couleur", "pays", "bailleurId", "tauxEngagement"],
+      projetAttributsUpdate: ["nom", "description", "debut", "fin", "objectifGlobaux", "budgetNational", "pret", "couleur", "pays", "tauxEngagement"],
       champs: [],
       champsUpdate: [],
       option: [
@@ -336,9 +342,10 @@ export default {
         couleur: "",
         debut: "",
         fin: "",
-        ville: "",
-        organisationId: "",
+        pays: "",
+        //organisationId: "",
         nombreEmploie: Number,
+        pret: Number,
         budgetNational: Number,
       },
       dropzoneMultipleRef: null,
@@ -622,7 +629,7 @@ export default {
 
     addProjet() {
       $h.clearObjectValues(this.formData);
-      this.formData.organisationId = "";
+      //this.formData.organisationId = "";
       this.title = "Ajouter";
       // this.submitText = "Enregistrer";:
       this.isUpdate = false;
@@ -642,9 +649,10 @@ export default {
       this.formData.couleur = projet.couleur;
       this.formData.debut = projet.debut;
       this.formData.fin = projet.fin;
-      this.formData.ville = projet.commune;
-      this.formData.organisationId = projet.organisationId;
+      this.formData.pays = projet.pays;
+      //this.formData.organisationId = projet.organisationId;
       this.formData.nombreEmploie = projet.nombreEmploie;
+      this.formData.pret = projet.pret;
       this.formData.budgetNational = projet.budgetNational;
 
       console.log(this.formData)
@@ -730,7 +738,8 @@ export default {
             if (response.status == 200 || response.status == 201) {
               this.isLoading = false;
 
-              this.fetchProjets();
+              this.fetchProjetDetails(this.projetId);
+              //this.fetchProjets();
               toast.success("Modification éffectuée avec succès");
               this.showModal = false;
             }
@@ -774,7 +783,9 @@ export default {
               toast.success("Ajout éffectuée avec succès");
 
               console.log(this.programmeId);
-              this.fetchProjets(this.programmeId);
+              //this.fetchProjets(this.programmeId);
+
+              this.fetchProjetDetails(this.projetId);
             }
           })
           .catch((error) => {
@@ -819,8 +830,8 @@ export default {
           this.bailleurs = datas;
           this.champs = [
             { name: "Nom du projet", key: "nom", type: "text", placeholdere: "Nom du projet", isSelect: false, isTextArea: false, data: "", required: true, title: "renseigner le nom du projet", errors: [] },
-            { name: "Prêt", type: "number", key: "pret", placeholdere: "", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
-            { name: "Budget Nationnal", key: "budgetNational", type: "number", placeholdere: "", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
+            { name: "Fond propre", type: "number", key: "budgetNational", placeholdere: "Fond propre", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
+            { name: "Montant financier", key: "pret", type: "number", placeholdere: "Montant financier", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
             { name: "Date début", key: "debut", type: "date", placeholdere: "", isSelect: false, isTextArea: false, data: "", required: true },
             { name: "Date fin", type: "date", key: "fin", placeholdere: "", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
             { name: "Couleur", type: "color", key: "couleur", placeholdere: "Choississez une couleur", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
@@ -835,8 +846,8 @@ export default {
           ];
           this.champsUpdate = [
             { name: "Nom du projet", key: "nom", type: "text", placeholdere: "Nom du projet", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
-            { name: "Prêt", type: "text", key: "pret", placeholdere: "", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
-            { name: "Budget Nationnal", key: "budgetNational", type: "text", placeholdere: "", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
+            { name: "Fond propre", type: "text", key: "budgetNational", placeholdere: "Fond propre", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
+            { name: "Montant financier", key: "pret", type: "text", placeholdere: "Montant financier", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
             { name: "Date début", key: "debut", type: "date", placeholdere: "", isSelect: false, isTextArea: false, data: "", required: true },
             { name: "Date fin", type: "date", key: "fin", placeholdere: "", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },
             { name: "Couleur", type: "color", key: "couleur", placeholdere: "Choississez une couleur", isSelect: false, isTextArea: false, data: "", required: true, errors: [] },

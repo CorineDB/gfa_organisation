@@ -8,11 +8,13 @@ import ActiviteService from "@/services/modules/activite.service";
 import TachesService from '@/services/modules/tache.service';
 import InputForm from "@/components/news/InputForm.vue";
 import VButton from "@/components/news/VButton.vue";
+import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
 import { toast } from "vue3-toastify";
 export default {
   components: {
     InputForm,
     VButton,
+    NoRecordsMessage
   },
   data() {
     return {
@@ -106,7 +108,8 @@ export default {
           this.deleteLoader = false;
           this.showDeleteModal = false;
           toast.success("Suppression  éffectuée avec succès");
-          this.getListeProjet();
+          //this.getProjetById();
+          this.getActiviteById(this.activitesId);
         })
         .catch((error) => {
           this.deleteLoader = false;
@@ -148,7 +151,8 @@ export default {
               this.activitesId = this.formData.activiteId;
               this.clearObjectValues(this.formData);
               // delete this.formData.projetId;
-              this.getListeProjet();
+              //this.getProjetById();
+              this.getActiviteById(this.activitesId);
               //this.sendRequest = false;
             }
           })
@@ -168,7 +172,8 @@ export default {
               this.showModal = false;
               this.clearObjectValues(this.formData);
 
-              this.getListeProjet();
+              //this.getProjetById();
+              this.getActiviteById(this.activitesId);
             }
           })
           .catch((error) => {
@@ -183,24 +188,36 @@ export default {
         .then((data) => {
           this.isLoadingData = false;
           this.projets = data.data.data;
-          if (this.projetId == "") {
+
+          if ((this.projetId == "") && (this.projets.length > 0) ) {
             this.projetId = this.projets[0].id;
           }
+          if(this.projetId != "" && this.projetId != null && this.projetId != undefined){
+            this.getProjetById(this.projetId);
+          }
 
-          this.getProjetById(this.projetId);
         })
         .catch((error) => {
           console.log(error);
         });
     },
-    getProjetById(data) {
+    getProjetById(data = null) {
+      console.log(data);
+      if (data == null) {
+        data = this.projetId = this.projetId ?? this.currentUser.projet.id;
+        //this.projetId = this.projets[0].id;
+      }
+
       ProjetService.getDetailProjet(data)
         .then((datas) => {
           this.composants = datas.data.data.composantes;
-          if (this.composantsId == "") {
+
+          if ((this.composantsId == "") && (this.composants.length > 0) ) {
             this.composantsId = this.composants[0].id;
           }
-          this.getComposantById(this.composantsId);
+          if(this.composantsId != "" && this.composantsId != null && this.composantsId != undefined){
+            this.getComposantById(this.composantsId);
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -217,8 +234,12 @@ export default {
             this.haveSousComposantes = true;
           }
 
-          this.activitesId = this.activites[0].id;
-          this.getActiviteById(this.activitesId);
+          if ((this.activitesId == "") && this.activites.length > 0) {
+            this.activitesId = this.activites[0].id;
+          }
+          if(this.activitesId != "" && this.activitesId != null && this.activitesId != undefined){
+            this.getActiviteById(this.activitesId);
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -240,7 +261,11 @@ export default {
 
   created() {},
   mounted() {
-    this.getListeProjet();
+    //this.getListeProjet();
+
+    this.projetId = this.currentUser.projet.id;
+
+    this.getProjetById();
   },
 };
 </script>
@@ -255,7 +280,7 @@ export default {
       <h2 class="mb-4 text-base font-bold">Filtre</h2>
 
       <div class="grid grid-cols-2 gap-4">
-        <div class="flex w-full">
+        <div v-if="this.currentUser.type == 'unitee-de-gestion'" class="flex w-full">
           <v-select class="w-full" :reduce="(projet) => projet.id" v-model="projetId" label="nom" :options="projets">
             <template #search="{ attributes, events }">
               <input class="vs__search form-input" :required="!projetId" v-bind="attributes" v-on="events" />
@@ -334,7 +359,7 @@ export default {
     <!-- BEGIN: Users Layout -->
     <!-- <pre>{{sousComposants}}</pre>   -->
 
-    <div v-for="(item, index) in taches" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
+    <div v-if="taches.length > 0" v-for="(item, index) in taches" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
       <div class="p-5 box">
         <div class="flex items-start pt-5 _px-5">
           <div class="flex flex-col items-center w-full lg:flex-row">
@@ -388,6 +413,13 @@ export default {
       </div>
     </div>
   </div>
+
+
+  <NoRecordsMessage v-if="!sousComposants.length"
+      title="No outputs Found"
+      description="It seems there are no outputs to display. Please check back later."
+    />
+
   <!-- END: Users Layout -->
   <LoaderSnipper v-if="isLoadingData" />
 

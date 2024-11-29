@@ -10,6 +10,7 @@ import InputForm from "@/components/news/InputForm.vue";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
 import { getAllErrorMessages } from "@/utils/gestion-error";
+import { generateUniqueId, generatevalidateKey, getvalidateKey } from "../../utils/helpers";
 
 const TYPE_ORGANISATION = "organisation";
 
@@ -143,8 +144,8 @@ const submitData = async () => {
     try {
       const result = await action;
       if (isValidate.value) toast.success(`${result.data.message}`);
-      generatevalidateKey("factuel");
-      showAlertValidate.value = true;
+      if (isValidate.value) {generatevalidateKey("factuel");
+      showAlertValidate.value = true;}
     } catch (e) {
       console.error(e);
       if (isValidate.value) toast.error(getAllErrorMessages(e));

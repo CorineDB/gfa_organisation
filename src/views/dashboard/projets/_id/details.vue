@@ -15,7 +15,7 @@
   <!-- Budget -->
   <section class="mb-8">
     <h2 class="mb-4 text-2xl font-semibold">Budget</h2>
-    <p class="text-gray-700">Montant du budget alloué : <strong>$500,000</strong></p>
+    <p class="text-gray-700">Montant du Montant financier : <strong>$500,000</strong></p>
   </section>
 
   <!-- Durée du projet -->
