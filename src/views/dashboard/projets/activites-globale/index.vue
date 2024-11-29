@@ -221,7 +221,7 @@ export default {
         });
     },
     getProjetById(data = null) {
-      console.log(data);
+      
       if (data == null) {
         data = this.projetId = this.projetId ?? this.currentUser.projet.id;
         //this.projetId = this.projets[0].id;

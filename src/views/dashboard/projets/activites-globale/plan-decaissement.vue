@@ -5,7 +5,7 @@ import { getStringValueOfStatutCode } from "@/utils/index";
 import ProjetService from "@/services/modules/projet.service.js";
 import ComposantesService from "@/services/modules/composante.service";
 import ActiviteService from "@/services/modules/activite.service";
-import TachesService from '@/services/modules/tache.service';
+import PlanDeDecaissementService from '@/services/modules/plan.decaissement.service';
 import InputForm from "@/components/news/InputForm.vue";
 import VButton from "@/components/news/VButton.vue";
 import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
@@ -53,7 +53,7 @@ export default {
       labels: "Ajouter",
       showDeleteModal: false,
       deleteLoader: false,
-      taches: [],
+      planDeDecaissement: [],
       tacheId: ''
     };
   },
@@ -115,7 +115,7 @@ export default {
     },
     deleteTache() {
       this.deleteLoader = true;
-      TachesService.destroy(this.tacheId)
+      PlanDeDecaissementService.destroy(this.tacheId)
         .then((data) => {
           this.deleteLoader = false;
           this.showDeleteModal = false;
@@ -155,7 +155,7 @@ export default {
       if (this.update) {
         // this.formData.projetId = this.projetId
         this.isLoading = true;
-        TachesService.update(this.tacheId, this.formData)
+        PlanDeDecaissementService.update(this.tacheId, this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
               this.update = false;
@@ -178,7 +178,7 @@ export default {
       } else {
         this.isLoading = true;
         //this.formData.budgetNational = parseInt(this.formData.budgetNational);
-        TachesService.create(this.formData)
+        PlanDeDecaissementService.create(this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
               this.isLoading = false;
@@ -261,9 +261,9 @@ export default {
     },
 
     getActiviteById(data) {
-      ActiviteService.get(data)
+      ActiviteService.plansDeDecaissement(data)
         .then((response) => {
-          this.taches = response.data.data.taches;
+          this.planDeDecaissement = response.data.data;
         })
         .catch((error) => {
           console.log(error);
@@ -292,8 +292,6 @@ export default {
     <div class="container mx-auto">
       <!-- Combined Filter Section -->
       <div class="relative p-6 mt-3 space-y-3 bg-white rounded-lg shadow-md">
-
-
 
         <div class="flex w-full">
             <label for="_input-wizard-10"
@@ -344,16 +342,12 @@ export default {
     <!-- BEGIN: Users Layout -->
     <!-- <pre>{{sousComposants}}</pre>   -->
 
-    <div v-if="taches.length > 0" v-for="(item, index) in taches" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
+    <div v-if="planDeDecaissement.length > 0" v-for="(item, index) in planDeDecaissement" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
       <div class="p-5 box">
         <div class="flex items-start pt-5 _px-5">
           <div class="flex flex-col items-center w-full lg:flex-row">
-            <div class="flex items-center justify-center w-16 h-16 text-white rounded-full image-fit bg-primary">
-              {{ item.type }}
-              <!-- <img alt="Midone Tailwind HTML Admin Template" class="rounded-full" :src="faker.photos[0]" /> -->
-            </div>
-            <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0">
-              <a href="" class="font-medium">{{ item.nom }}</a>
+            <div class="mt-3 text-left lg:ml-4 lg:text-left lg:mt-0">
+              <a href="" class="font-medium"> Activite: {{ item.activite.nom }}</a>
               <div class="mt-2 text-xs text-slate-500">
                 <span class="px-2 py-1 m-5 text-xs text-white rounded bg-primary/80" v-if="item.statut == -2"> Non validé </span>
                 <span class="px-2 py-1 m-5 text-xs text-white rounded bg-success/80" v-else-if="item.statut == -1"> Validé </span>
@@ -376,23 +370,27 @@ export default {
           </Dropdown>
         </div>
         <div class="text-center lg:text-left">
-          <div class="my-5 text-left">
-            <p class="mx-auto font-semibold text-center">Description</p>
-
-            {{ item.description }}
-          </div>
           <div class="m-5 text-slate-600 dark:text-slate-500">
+            <!-- 
             <div class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Taux d'exécution physique: {{ item.tep }}</div>
 
             <div class="flex items-center mt-2">
               <CheckSquareIcon class="w-4 h-4 mr-2" /> Statut :
-              <span class="pl-2" v-if="item.statut == -2"> Non validé </span>
-              <span class="pl-2" v-else-if="item.statut == -1"> Validé </span>
-              <span class="pl-2" v-else-if="item.statut == 0"> En cours </span>
-              <span class="pl-2" v-else-if="item.statut == 1"> En retard </span>
-              <span class="pl-2" v-else-if="item.statut == 2">Terminé</span>
-            </div>
-            <div class="flex items-center mt-2"><CheckSquareIcon class="w-4 h-4 mr-2" /> Poids : {{ item.poids }}</div>
+              <span class="pl-2" v-if="item.activite.statut == -2"> Non validé </span>
+              <span class="pl-2" v-else-if="item.activite.statut == -1"> Validé </span>
+              <span class="pl-2" v-else-if="item.activite.statut == 0"> En cours </span>
+              <span class="pl-2" v-else-if="item.activite.statut == 1"> En retard </span>
+              <span class="pl-2" v-else-if="item.activite.statut == 2">Terminé</span>
+            </div> -->
+            <div class="flex items-center mt-2"> Annee : {{ item.annee }}</div>
+
+            <div class="flex items-center mt-2"> Trimestre : {{ item.trimestre }}</div>
+
+            <div class="flex items-center mt-2"> Fond propre : {{ item.budgetNational }}</div>
+
+            <div class="flex items-center mt-2"> Montant alloue : {{ item.pret }}</div>
+
+            <div class="flex items-center mt-2"> De {{ item.debut }} {{ item.fin }}</div>
           </div>
         </div>
       </div>
@@ -419,13 +417,14 @@ export default {
           label="Annee de base" />
       <InputForm v-model="formData.trimestre" class="col-span-12" type="number" required="required" placeHolder="Ex : 2"
           label="Trimestre" />
-      <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2000000"
-          label="Fond propre" />
 
       <InputForm v-model="formData.budgetNational" class="col-span-12" type="number" required="required"
-          placeHolder="Ex : 500000" label="Montant financier" />
+          placeHolder="Ex : 500000" label="Fond propre" />
 
-       <div class="flex col-span-12">
+      <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2000000"
+          label="Montant financier" />
+
+       <div class="flex mt-2 col-span-12">
         <v-select class="w-full" :reduce="(activite) => activite.id" v-model="formData.activiteId" label="nom" :options="activites">
           <template #search="{ attributes, events }">
             <input class="vs__search form-input" :required="!formData.activiteId" v-bind="attributes" v-on="events" />

@@ -84,7 +84,6 @@ export default {
       this.composantsId = newValue;
     },
     composantsId(newValue, oldValue) {
-      console.log(newValue);
       //if (this.composants.length > 0) {
         this.getComposantById(newValue);
       //}
@@ -95,7 +94,6 @@ export default {
       //}
     },
     sousComposantsId(newValue, oldValue) {
-      console.log(newValue);
       this.sousComposantId = newValue;
     },/* 
     composantId(newValue, oldValue) {
@@ -249,8 +247,8 @@ export default {
       ComposantesService.detailComposant(data)
         .then((data) => {
 
-          console.log(data);
           this.activites = data.data.data.activites;
+          console.log(this.activites);
 
           if (data.data.data.souscomposantes.length > 0) {
             this.sousComposants = data.data.data.souscomposantes;
@@ -271,7 +269,6 @@ export default {
 
   created() { },
   mounted() {
-    console.log([this.projetId, this.composantsId]);
     //this.getComposantById(this.composantsId);
   },
 };
