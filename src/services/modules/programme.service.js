@@ -93,8 +93,8 @@ const ProgrammeService = {
     getCadreRendement(id) {
       return ApiService.get(`gfa/programmes/${id}/cadre-de-mesure-rendement`);
     },
-    scoresAuFilDuTemps(id, organisationId) {
-      return ApiService.get(`gfa/programmes/${id}/evolution-des-scores-au-fil-du-temps/${organisationId}`);
+    scoresAuFilDuTemps(organisationId) {
+      return ApiService.get(`gfa/programmes/evolution-des-scores-au-fil-du-temps/${organisationId}`);
     },
 };
 

@@ -116,9 +116,9 @@ const getDatas = async () => {
   // initTabulator();
 };
 
-const getScoresStats = async (programmeId, organisationId) => {
+const getScoresStats = async (organisationId) => {
   isLoadingData.value = true;
-  await ProgrammeService.scoresAuFilDuTemps(programmeId, organisationId)
+  await ProgrammeService.scoresAuFilDuTemps(organisationId)
     .then((result) => {
       console.log(result);
     })
@@ -257,7 +257,7 @@ const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 onMounted(() => {
 
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
-  getScoresStats(authUser.value.programme.id, authUser.value.profil.id);
+  getScoresStats(authUser.value.profil.id);
   getDatas();
   // getFormsFactuel();
   // getFormsPerception();
