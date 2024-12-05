@@ -1,54 +1,55 @@
 <template>
   <div class="overflow-x-auto">
-    <table class="w-full max-w-full my-10 border-collapse editor_listing_table border-slate-500" cellpadding="6" cellspacing="0">
-      <thead class="text-black">
+    <table class="w-full max-w-full my-10 bg-white border-collapse editor_listing_table border-slate-500" cellpadding="6" cellspacing="0">
+      <thead class="text-white border-white bg-primary">
         <tr>
-          <th rowspan="2" class="py-3 border border-slate-900 min-w-[500px]">Résultats escomptés</th>
-          <th rowspan="2" class="py-3 border border-slate-900 min-w-[80px]">Indice</th>
-          <th rowspan="2" class="py-3 border border-slate-900 min-w-[500px]">Indicateurs</th>
-          <th :colspan="years.length + 1" class="py-3 border border-slate-900 min-w-[70px]">Cibles</th>
-          <th :colspan="years.length + 1" class="py-3 border border-slate-900 min-w-[70px]">Réalisation</th>
-          <th rowspan="2" class="py-3 border border-slate-900 min-w-[150px]">Taux de réalisation</th>
-          <th rowspan="2" class="py-3 border border-slate-900 min-w-[150px]">Sources de données</th>
-
-          <th rowspan="2" class="py-3 border border-slate-900 min-w-[200px]">Actions</th>
+          <th rowspan="2" class="py-3 border border-white min-w-[500px]">Indicateurs</th>
+          <!-- <th class="py-3 border border-white min-w-[80px]">Indice</th> -->
+          <th rowspan="2" class="py-3 border border-white min-w-[280px]">Auteur</th>
+          <th rowspan="2" class="py-3 border border-white min-w-[80px]">Trimestre</th>
+          <th rowspan="2" class="py-3 border border-white min-w-[80px]">Cumul</th>
+          <th :colspan="years.length + 1" class="py-3 border border-white min-w-[70px]">Cibles</th>
+          <th :colspan="years.length + 1" class="py-3 border border-white min-w-[70px]">Réalisation</th>
+          <th rowspan="2" class="py-3 border border-white min-w-[180px]">Taux de realisation</th>
+          <!-- <th class="py-3 border border-white min-w-[280px]">Source de données</th>
+          <th class="py-3 border border-white min-w-[180px]">Fréquence de la collecte de données</th>
+          <th class="py-3 border border-white min-w-[280px]">Méthode de collecte</th> -->
+          <th rowspan="2" class="py-3 border border-white min-w-[120px]">Date de suivie</th>
+          <!-- <th class="py-3 border border-white min-w-[120px]">Responsables</th> -->
         </tr>
         <tr>
-          <th v-for="(year, index) in years" :key="index" class="py-3 border border-slate-900 min-w-[70px]">{{ year }}</th>
-          <th class="py-3 border border-slate-900 min-w-[100px]">Total</th>
-          <th v-for="(year, index) in years" :key="index" class="py-3 border border-slate-900 min-w-[70px]">{{ year }}</th>
-          <th class="py-3 border border-slate-900 min-w-[100px]">Total</th>
+          <th v-for="(year, index) in years" :key="index" class="py-3 border border-white min-w-[70px]">{{ year }}</th>
+          <th class="py-3 border border-white min-w-[100px]">Total</th>
+          <th v-for="(year, index) in years" :key="index" class="py-3 border border-white min-w-[70px]">{{ year }}</th>
+          <th class="py-3 border border-white min-w-[100px]">Total</th>
         </tr>
       </thead>
       <tbody>
-        <template v-for="(result, i) in data" :key="result.id">
-          <tr class="uppercase" :class="[result.type == 'produit' ? 'text-black' : 'text-white']" :style="{ 'background-color': findColorCadreMesure(result.type) }">
-            <td :colspan="8 + years.length * 2" class="font-semibold">{{ result.type }} {{ result.indice }}</td>
+        <template v-for="(indicateur, j) in data" :key="indicateur.id">
+          <tr>
+            <td class="font-semibold">
+              {{ indicateur.indicateur.nom }}
+            </td>
+            <!-- <td class="font-semibold">Ind {{ indicateur.indicateur.code }}</td> -->
+            <td class="">{{ indicateur.auteur.nom }}</td>
+            <td class="text-center">{{ indicateur.trimestre }}</td>
+            <td class="">{{ indicateur.cumul.join(", ") }}</td>
+            <td v-for="(year, index) in years" :key="index">
+              <span v-html="formatObject(indicateur.indicateur.valeursCible.find((valeur) => valeur.annee === year)?.valeurCible)"></span>
+            </td>
+            <td v-html="formatObject(indicateur.indicateur.valeurCibleTotal)"></td>
+
+            <td v-for="(year, index) in years" :key="index">
+              <span v-html="formatObject(indicateur.indicateur.valeursCible.find((valeur) => valeur.annee === year)?.valeur_realiser)"></span>
+            </td>
+            <td v-html="formatObject(indicateur.indicateur.valeurRealiserTotal)"></td>
+            <td v-html="formatObject(indicateur.indicateur.taux_realisation)"></td>
+            <!-- <td class="">{{ indicateur.sources_de_donnee }}</td>
+            <td class="">{{ indicateur.indicateur.frequence_de_la_collecte }}</td>
+            <td class="">{{ indicateur.indicateur.methode_de_la_collecte }}</td> -->
+            <td class="text-center">{{ formatDateOnly(indicateur.dateSuivie) }}</td>
+            <!-- <td class="">{{ indicateur.indicateur.ug_responsable ? indicateur.indicateur.ug_responsable.nom : "" }}</td> -->
           </tr>
-          <template v-for="(indicateur, j) in result.indicateurs" :key="indicateur.id">
-            <tr>
-              <td class="font-semibold" v-if="j === 0" :rowspan="result.indicateurs.length">
-                {{ result.nom }}
-              </td>
-              <td class="font-semibold">Ind {{ indicateur.code }}</td>
-              <td>{{ indicateur.nom }}</td>
-              <td v-for="(year, index) in years" :key="index">
-                <span v-html="formatObject(indicateur.valeursCible.find((valeur) => valeur.annee === year)?.valeurCible)"></span>
-              </td>
-              <td></td>
-              <td v-for="(year, index) in years" :key="index">
-                <span v-html="formatObject(indicateur.valeursCible.find((valeur) => valeur.annee === year)?.valeurCible)"></span>
-              </td>
-              <td></td>
-              <td></td>
-              <td>{{ indicateur.sources_de_donnee }}</td>
-              <td class="space-x-3">
-                <button @click="handleEdit(result)" class="btn text-pending"><Edit3Icon class="size-5" /></button>
-                <button @click="handleEdit(result)" class="btn text-primary"><EyeIcon class="size-5" /></button>
-                <!-- <button @click="handleDelete(result)" class="btn btn-danger"><TrashIcon class="size-5" /></button>  -->
-              </td>
-            </tr>
-          </template>
         </template>
       </tbody>
     </table>
@@ -119,6 +120,22 @@ const nameSelect = ref("");
 const showModalSuivi = ref(false);
 const deleteModalPreview = ref(false);
 const isLoading = ref(false);
+
+function formatDateOnly(dateTimeString) {
+  // Vérifie si la chaîne est valide
+  if (!dateTimeString) return null;
+
+  // Utilise split pour extraire uniquement la date
+  const [date] = dateTimeString.split(" ");
+  return date;
+}
+
+function formatObject(obj) {
+  if (!obj) return "";
+  return Object.entries(obj)
+    .map(([key, value]) => (key === "moy" ? value : `${key}: ${value}`))
+    .join("<br>");
+}
 
 // Submit data (create or update)
 const submitData = async () => {
@@ -191,13 +208,6 @@ function formatResponsable(responsable) {
 
 function valeurCibleForYear(year, valeur_cible) {
   return valeur_cible.find((valeur) => valeur.annee === year)?.valeurCible;
-}
-
-function formatObject(obj) {
-  if (!obj) return "";
-  return Object.entries(obj)
-    .map(([key, value]) => `${key}: ${value}`)
-    .join("<br>");
 }
 </script>
 

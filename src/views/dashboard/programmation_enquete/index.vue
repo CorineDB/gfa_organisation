@@ -1,6 +1,5 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import GouvernanceChart from "./GouvernanceChart.vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
 import Tabulator from "tabulator-tables";
@@ -8,18 +7,27 @@ import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
-import ProgrammeService from "@/services/modules/programme.service";
 import FormulaireFactuel from "@/services/modules/formFactuel.service";
 import { useRouter } from "vue-router";
 import OngService from "@/services/modules/ong.service";
 import { getAllErrorMessages } from "@/utils/gestion-error";
+import ChartProgressionByTime from "../../../components/news/ChartProgressionByTime.vue";
+import ProgressBar from "../../../components/news/ProgressBar.vue";
+import ChartScroreByPrincipe from "../../../components/news/ChartScroreByPrincipe.vue";
+import { getFieldErrors } from "../../../utils/helpers";
+import SyntheseService from "../../../services/modules/synthese.service";
+import { data } from "jquery";
 
 const router = useRouter();
 
-const authUser = reactive({});
 const idFormFactuel = ref("");
 const idFormPerception = ref("");
-
+const currentProfileGouvernance = [
+  { id: 35, nom: "Redevabilité", indice_de_perception: 0.4017361111111111, indice_factuel: 0, indice_synthetique: 0.4017361111111111 },
+  { id: 32, nom: "Transparence", indice_de_perception: 0.4375, indice_factuel: 0, indice_synthetique: 0.4375 },
+  { id: 33, nom: "Participation", indice_de_perception: 0.3958333333333333, indice_factuel: 0, indice_synthetique: 0.3958333333333333 },
+  { id: 36, nom: "Egalité et non- discrimination / inclusion", indice_de_perception: 0.4416666666666666, indice_factuel: 0, indice_synthetique: 0.4416666666666666 },
+];
 const payload = reactive({
   intitule: "",
   description: "",
@@ -37,71 +45,39 @@ const showModalCreate = ref(false);
 const deleteModalPreview = ref(false);
 const isLoading = ref(false);
 const isLoadingData = ref(true);
+const isLoadingDataScore = ref(false);
 const isCreate = ref(true);
 const datas = ref([]);
+const datasScore = ref([]);
 const organisations = ref([]);
 const formulairesFactuel = ref([]);
 const formulairesPerception = ref([]);
-// Sample data
-const labels = ["Transparence", "Équité", "Responsabilité", "Participation", "Redevabilité"];
-
-
-// Values for each of the indices
-const synthetiqueValues = [0.8, 0.6, 0.7, 0.85, 0.75]; // Example for synthetique indices (between 0 and 1)
-const factuelValues = [0.7, 0.65, 0.6, 0.8, 0.72];    // Example for factuel indices (between 0 and 1)
-const perceptionValues = [0.65, 0.5, 0.55, 0.75, 0.7]; // Example for perception indices (between 0 and 1)
-
-
-const synthetiqueResultsData = {labels: labels, "years": [
-  {
-    year: 2020,
-    synthetiqueValues: [0.7, 0.8, 0.75, 0.85, 0.7],
-    factuelValues: [0.6, 0.65, 0.7, 0.72, 0.7],
-    perceptionValues: [0.8, 0.82, 0.78, 0.9, 0.7],
-  },
-  {
-    year: 2021,
-    synthetiqueValues: [0.78, 0.68, 0.57, 0.95, 0.7],
-    factuelValues: [0.7, 0.85, 0.9, 0.82, 0.7],
-    perceptionValues: [0.8, 0.82, 0.78, 0.9, 0.7],
-  },
-  {
-    year: 2022,
-    synthetiqueValues: [0.8, 0.75, 0.7, 0.88, 0.75],
-    factuelValues: [0.72, 0.75, 0.85, 0.9, 0.72],
-    perceptionValues: [0.85, 0.88, 0.8, 0.92, 0.7],
-  },
-  {
-    year: 2023,
-    synthetiqueValues: [0.82, 0.7, 0.68, 0.9, 0.7],
-    factuelValues: [0.75, 0.78, 0.85, 0.88, 0.7],
-    perceptionValues: [0.9, 0.85, 0.8, 0.92, 0.7],
-  },
-  {
-    year: 2024,
-    synthetiqueValues: [0.85, 0.72, 0.65, 0.92, 0.7],
-    factuelValues: [0.77, 0.80, 0.87, 0.9, 0.7],
-    perceptionValues: [0.92, 0.9, 0.85, 0.94, 0.7],
-  },
-]};
+const currentScore = ref({});
+const currentOrganisationScore = ref("");
+const ongSelectedScore = ref("");
+const yearSelectedOng = ref("");
+const errors = ref({});
 
 const createData = async () => {
-  isLoading.value = true;
   payload.formulaires_de_gouvernance = [idFormFactuel.value, idFormPerception.value];
+  isLoading.value = true;
   await EnqueteDeColleteService.create(payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
       resetForm();
-      toast.success("Enquête créer.");
+      toast.success("évaluation créer.");
     })
     .catch((e) => {
       isLoading.value = false;
+      if (e.response && e.response.status === 422) {
+        errors.value = e.response.data.errors;
+      } else {
+        toast.error(getAllErrorMessages(e));
+      }
       console.error(e);
-      toast.error(getAllErrorMessages(e));
     });
 };
-
 const getDatas = async () => {
   isLoadingData.value = true;
   await EnqueteDeColleteService.get()
@@ -111,24 +87,24 @@ const getDatas = async () => {
     })
     .catch((e) => {
       isLoadingData.value = false;
-      toast.error("Une erreur est survenue: Liste des enquêtes.");
+      toast.error("Une erreur est survenue: Liste des évaluations.");
     });
   // initTabulator();
 };
 
-const getScoresStats = async (organisationId) => {
-  isLoadingData.value = true;
-  await ProgrammeService.scoresAuFilDuTemps(organisationId)
+const getEvolutionByScore = async (id) => {
+  isLoadingDataScore.value = true;
+  await SyntheseService.getEvolutionByScrore(id)
     .then((result) => {
-      console.log(result);
+      datasScore.value = result.data.data;
+      currentScore.value = datasScore.value[0]?.scores;
+      isLoadingDataScore.value = false;
     })
     .catch((e) => {
-      isLoadingData.value = false;
-      toast.error("Une erreur est survenue: Liste des enquêtes.");
+      isLoadingDataScore.value = false;
+      e.response?.data?.message ? toast.error(e.response?.data?.message) : toast.error("Une erreur est survenue: Score.");
     });
-  // initTabulator();
 };
-
 const getFormsFactuel = async () => {
   await FormulaireFactuel.get()
     .then((result) => {
@@ -159,15 +135,20 @@ const getOrganisations = async () => {
 
 const updateData = async () => {
   isLoading.value = true;
+  payload.formulaires_de_gouvernance = [idFormFactuel.value, idFormPerception.value];
   await EnqueteDeColleteService.update(idSelect.value, payload)
     .then(() => {
       getDatas();
       resetForm();
-      toast.success("Enquête modifiée.");
+      toast.success("Évaluation modifiée.");
     })
     .catch((e) => {
+      if (e.response && e.response.status === 422) {
+        errors.value = e.response.data.errors;
+      } else {
+        toast.error(getAllErrorMessages(e));
+      }
       console.error(e);
-      toast.error("Vérifier les informations et ressayer.");
     })
     .finally(() => {
       isLoading.value = false;
@@ -180,7 +161,7 @@ const deleteData = async () => {
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;
-      toast.success("Enquête de gouvernance supprimé");
+      toast.success("Évaluation  supprimée");
       getDatas();
     })
     .catch((e) => {
@@ -194,7 +175,7 @@ const getStatusText = (param) => {
     case 1:
       return { label: "Terminé", class: "bg-success" };
     case 0:
-      return { label: "En cours", class: "bg-warning" };
+      return { label: "En cours", class: "bg-pending" };
     case -1:
       return { label: "Non demarré", class: "bg-primary" };
     default:
@@ -210,20 +191,32 @@ function gotoAppreciations(enquete) {
   router.push({ name: "EnqueteAppreciations", query: { enqueteId: enquete.id } });
 }
 
+async function changeOrganisationScore() {
+  await getEvolutionByScore(ongSelectedScore.value);
+  yearSelectedOng.value = yearsCurrentScore.value[0];
+}
+
+function fetchOrganisationsAndFormulaires() {
+  getFormsFactuel();
+  getFormsPerception();
+  // getOrganisations();
+}
+
 const handleEdit = (params) => {
+  fetchOrganisationsAndFormulaires();
   isCreate.value = false;
   idSelect.value = params.id;
   payload.intitule = params.intitule;
-  payload.description = params.description;
+  payload.description = params.description ?? "";
   payload.annee_exercice = params.annee_exercice;
   payload.objectif_attendu = params.objectif_attendu;
   payload.debut = params.debut;
   payload.fin = params.fin;
-  // idFormFactuel.value = params.formulaire;
-  // idFormPerception.value = params.formulaire;
+  idFormFactuel.value = params.formulaire_factuel_de_gouvernance;
+  idFormPerception.value = params.formulaire_perception_de_gouvernance;
+  payload.organisations = params.organisations.map((ong) => ong.id);
   showModalCreate.value = true;
 };
-
 const handleDelete = (params) => {
   idSelect.value = params.id;
   deleteModalPreview.value = true;
@@ -239,35 +232,34 @@ const resetForm = () => {
   payload.debut = "";
   payload.description = "";
   payload.fin = "";
-  idFormFactuel.value = "";
-  idFormPerception.value = "";
+  idFormFactuel.value = formulairesFactuel.value[0].id;
+  idFormPerception.value = formulairesPerception.value[0].id;
   payload.organisations = [];
   showModalCreate.value = false;
+  errors.value = {};
 };
-
 const openCreateModal = () => {
-  getFormsFactuel();
-  getFormsPerception();
-  getOrganisations();
+  fetchOrganisationsAndFormulaires();
   showModalCreate.value = isCreate.value = true;
 };
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
-onMounted(() => {
+const yearsCurrentScore = computed(() => Object.keys(currentScore.value));
 
-  authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
-  getScoresStats(authUser.value.profil.id);
-  getDatas();
+onMounted(async () => {
+  await getDatas();
+  await getOrganisations();
+  // ongSelectedScore.value = organisations.value[0].id;
+  // changeOrganisationScore();
   // getFormsFactuel();
   // getFormsPerception();
-  // getOrganisations();
 });
 </script>
 
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Évaluation de gouvernace</h2>
-  <div class="grid grid-cols-12 gap-6 mt-5">
+  <h2 class="my-10 text-lg font-medium intro-y">Évaluation de gouvernace</h2>
+  <div class="grid grid-cols-12 gap-6 mb-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
         <div class="relative w-56 text-slate-500">
@@ -280,90 +272,123 @@ onMounted(() => {
       </div>
     </div>
   </div>
-
-  <div class="p-5 mt-5 intro-y">
-    <!-- <div class="overflow-x-auto scrollbar-hidden" v-if="!isLoadingData">
+  <TabGroup>
+    <TabList class="space-x-4 font-bold uppercase nav-boxed-tabs">
+      <Tab class="w-full py-2 bg-white" tag="button">LISTE DES ÉVALUATIONS</Tab>
+      <Tab class="w-full py-2 bg-white" tag="button">ANALYSES DES DONNÉES</Tab>
+    </TabList>
+    <TabPanels class="mt-5">
+      <TabPanel>
+        <div class="p-5 mt-5 intro-y">
+          <!-- <div class="overflow-x-auto scrollbar-hidden" v-if="!isLoadingData">
       <div id="tabulator" class="mt-5 table-report table-report--tabulator"></div>
     </div> -->
-    <LoaderSnipper v-if="isLoadingData" />
+          <LoaderSnipper v-if="isLoadingData" />
+          <div v-else class="grid grid-cols-12 gap-6 mt-5">
+            <div v-for="(item, index) in datas" :key="index" class="col-span-12 p-4 md:col-span-12 lg:col-span-4">
+              <div class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
+                <!-- En-tête avec sigle et titre -->
+                <div class="relative flex items-start pt-2">
+                  <!-- Dropdown for actions -->
+                  <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
+                    <DropdownToggle tag="a" class="block w-5 h-5 cursor-pointer">
+                      <MoreVerticalIcon class="w-5 h-5 text-gray-400 transition-colors hover:text-gray-600" />
+                    </DropdownToggle>
+                    <DropdownMenu class="w-40 bg-white rounded-md shadow-lg">
+                      <DropdownContent>
+                        <DropdownItem @click="handleEdit(item)"> <Edit2Icon class="w-4 h-4 mr-2 text-gray-600" /> Modifier </DropdownItem>
+                        <DropdownItem @click="handleDelete(item)"> <TrashIcon class="w-4 h-4 mr-2 text-red-500" /> Supprimer </DropdownItem>
+                      </DropdownContent>
+                    </DropdownMenu>
+                  </Dropdown>
+                </div>
 
+                <div @click="gotoSoumissions(item)" class="flex flex-col items-start w-full gap-2 mt-2 cursor-pointer">
+                  <!-- Item details -->
+                  <div class="text-center lg:text-left lg:mt-0">
+                    <span class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary">
+                      {{ item.intitule }}
+                    </span>
+                  </div>
+                </div>
 
-    <div class="col-span-12 mt-8">
-
-      <!-- Chart and Ranking Layout -->
-      <div class="grid grid-cols-1 mt-5">
-        <!-- Gouvernance Chart -->
-        <div class="overflow-x-auto p-4 bg-white shadow rounded-md justify-left ">
-          <!-- Section Header -->
-          <div class="flex items-center h-10 intro-y">
-            <h2 class="mr-5 text-lg font-medium truncate">Resultats synthetique</h2>
-          </div>
-          <!-- <GouvernanceChart :synthetiqueResultsData="synthetiqueResultsData" class="w-full h-auto max-w-[600px] max-h-[400px]" /> -->
-
-          <GouvernanceChart :labels="labels" :synthetiqueValues="synthetiqueValues" :factuelValues="factuelValues"
-            :perceptionValues="perceptionValues" class="w-full h-auto max-w-[600px] max-h-[400px]" />
-        </div>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-12 gap-6 mt-5">
-      <div v-for="(item, index) in datas" :key="index" class="col-span-12 p-4 md:col-span-12 lg:col-span-4">
-        <div class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
-          <!-- En-tête avec sigle et titre -->
-          <div class="relative flex items-start pt-2">
-            <!-- Dropdown for actions -->
-            <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
-              <DropdownToggle tag="a" class="block w-5 h-5 cursor-pointer">
-                <MoreVerticalIcon class="w-5 h-5 text-gray-400 transition-colors hover:text-gray-600" />
-              </DropdownToggle>
-              <DropdownMenu class="w-40 bg-white rounded-md shadow-lg">
-                <DropdownContent>
-                  <DropdownItem @click="handleEdit(item)"> <Edit2Icon class="w-4 h-4 mr-2 text-gray-600" /> Modifier </DropdownItem>
-                  <DropdownItem @click="handleDelete(item)"> <TrashIcon class="w-4 h-4 mr-2 text-red-500" /> Supprimer </DropdownItem>
-                </DropdownContent>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-
-          <div @click="gotoSoumissions(item)" class="flex flex-col items-start w-full gap-2 mt-2 cursor-pointer">
-            <!-- Item details -->
-            <div class="text-center lg:text-left lg:mt-0">
-              <span class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary">
-                {{ item.intitule }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Description section with distinct styling -->
-          <div @click="gotoSoumissions(item)" class="w-full mt-5 text-center cursor-pointer lg:text-left">
-            <!-- <div class="" v-if="item.description">
+                <!-- Description section with distinct styling -->
+                <div @click="gotoSoumissions(item)" class="w-full mt-5 text-center cursor-pointer lg:text-left">
+                  <!-- <div class="" v-if="item.description">
               <p class="mb-3 text-base font-semibold text-primary">Description</p>
               <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description }}</p>
             </div> -->
 
-            <!-- Other details with iconized section headers -->
-            <div class="mt-5 space-y-4 text-gray-600">
-              <div class="flex items-center text-sm font-medium text-gray-700">
-                <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut: <span :class="getStatusText(item.statut).class" class="px-3 py-2 ml-3 text-xs text-white rounded-full">{{ getStatusText(item.statut).label }}</span>
-              </div>
-              <div class="flex items-center text-sm font-medium text-gray-700">
-                <CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Période:
-                <span class="ml-2 font-semibold text-gray-900">{{ item.debut }} <span class="font-normal">au</span> {{ item.fin }}</span>
-              </div>
-              <div class="flex items-center text-sm font-medium text-gray-700">
-                <TargetIcon class="w-4 h-4 mr-2 text-primary" /> Objectif attendu:
-                <span class="ml-2 font-semibold text-gray-900">{{ item.objectif_attendu }}</span>
-              </div>
-              <div class="flex items-center text-sm font-medium text-gray-700">
-                <BarChart2Icon class="w-4 h-4 mr-2 text-primary" /> Total soumissions:
-                <span class="ml-2 font-semibold text-gray-900">{{ item.total_soumissions_de_perception + item.total_soumissions_factuel }}</span>
+                  <!-- Other details with iconized section headers -->
+                  <div class="mt-5 space-y-4 text-gray-600">
+                    <div class="flex items-center text-sm font-medium text-gray-700">
+                      <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut: <span :class="getStatusText(item.statut).class" class="px-3 py-2 ml-3 text-xs text-white rounded-full">{{ getStatusText(item.statut).label }}</span>
+                    </div>
+                    <div class="flex items-center text-sm font-medium text-gray-700">
+                      <CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Période:
+                      <span class="ml-2 font-semibold text-gray-900">{{ item.debut }} <span class="font-normal">au</span> {{ item.fin }}</span>
+                    </div>
+                    <div class="flex items-center text-sm font-medium text-gray-700">
+                      <TargetIcon class="w-4 h-4 mr-2 text-primary" /> Objectif attendu:
+                      <span class="ml-2 font-semibold text-gray-900">{{ item.objectif_attendu }}</span>
+                    </div>
+                    <div class="flex items-center text-sm font-medium text-gray-700">
+                      <BarChart2Icon class="w-4 h-4 mr-2 text-primary" /> Total soumissions:
+                      <span class="ml-2 font-semibold text-gray-900">{{ item.total_soumissions_de_perception + item.total_soumissions_factuel }}</span>
+                    </div>
+                    <div class="flex items-center text-sm font-medium text-gray-700">
+                      <ProgressBar :percent="item.pourcentage_evolution" />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+      </TabPanel>
+      <TabPanel>
+        <div class="">
+          <div class="flex flex-col items-center w-full gap-8">
+            <div class="flex justify-center w-full p-3 bg-white">
+              <div class="w-full max-w-screen-lg">
+                <p class="p-3 text-lg font-medium">Résultats synthetique par année</p>
+                <div class="!w-[250px] p-3">
+                  <label for="ongs" class="form-label">Organisation</label>
+                  <TomSelect name="organisations" v-model="ongSelectedScore" @change="changeOrganisationScore" :options="{ placeholder: 'Selectionez une organisation' }">
+                    <option value=""></option>
+                    <option v-for="organisation in organisations" :key="organisation.id" :value="organisation.id">{{ organisation.nom }}</option>
+                  </TomSelect>
+                </div>
+                <ChartProgressionByTime :chartData="currentScore" v-if="ongSelectedScore && !isLoadingDataScore" />
+                <div class="h-[600px] flex justify-center items-center" v-if="!ongSelectedScore && !isLoadingDataScore">
+                  <p class="text-xl font-medium text-slate-600">Veuillez choisir une organisation pour afficher le graphique</p>
+                </div>
+                <div class="h-[600px] flex justify-center items-center" v-if="isLoadingDataScore">
+                  <LoaderSnipper />
+                </div>
+              </div>
+            </div>
+            <div class="flex justify-center w-full p-3 bg-white">
+              <div class="w-full max-w-screen-lg">
+                <p class="p-3 text-lg font-medium">Score des indices par principe</p>
+                <div class="!w-[250px] p-3">
+                  <label for="years" class="form-label">Année</label>
+                  <TomSelect name="years" v-model="yearSelectedOng" :options="{ placeholder: 'Selectionez une organisation' }">
+                    <option value=""></option>
+                    <option v-for="year in yearsCurrentScore" :key="year" :value="year">{{ year }}</option>
+                  </TomSelect>
+                </div>
+                <ChartScroreByPrincipe v-if="currentScore[yearSelectedOng]?.length > 0" :datas="currentScore[yearSelectedOng]" />
+                <div v-else class="h-[600px] flex justify-center items-center">
+                  <p class="text-xl font-medium text-slate-600">Aucune données disponible</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </TabPanel>
+    </TabPanels>
+  </TabGroup>
 
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
@@ -373,39 +398,44 @@ onMounted(() => {
     <form @submit.prevent="submitData">
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
-          <InputForm label="Nom" v-model="payload.intitule" />
-          <InputForm label="Description" v-model="payload.description" :required="false" />
-          <div class="flex w-full gap-4">
+          <InputForm label="Nom" v-model="payload.intitule" :control="getFieldErrors(errors.intitule)" />
+          <InputForm label="Description" :control="getFieldErrors(errors.description)" v-model="payload.description" :required="false" />
+          <div class="flex items-center justify-between w-full gap-4">
             <div class="">
               <label for="objectif" class="form-label">Objectif</label>
               <input id="objectif" type="number" min="0.05" step="0.05" max="1" required v-model.number="payload.objectif_attendu" class="form-control" placeholder="Objectif" />
+              <div v-if="errors.objectif_attendu" class="mt-2 text-danger">{{ getFieldErrors(errors.objectif_attendu) }}</div>
             </div>
             <div class="">
               <label for="annee" class="form-label">Année</label>
               <input id="annee" type="number" required v-model.number="payload.annee_exercice" class="form-control" placeholder="Année exercice" />
+              <div v-if="errors.annee_exercice" class="mt-2 text-danger">{{ getFieldErrors(errors.annee_exercice) }}</div>
             </div>
           </div>
           <div class="flex w-full gap-4">
-            <InputForm label="Début de l'enquete " v-model="payload.debut" type="date" />
-            <InputForm label="Fin de l'enquete " v-model="payload.fin" type="date" />
+            <InputForm label="Début de l'enquete " v-model="payload.debut" type="date" :control="getFieldErrors(errors.debut)" />
+            <InputForm label="Fin de l'enquete " v-model="payload.fin" type="date" :control="getFieldErrors(errors.fin)" />
           </div>
           <div class="">
             <label class="form-label">Formulaires Factuel</label>
             <TomSelect v-model="idFormFactuel" :options="{ placeholder: 'Selectionez un formulaire' }" class="w-full">
               <option v-for="(form, index) in formulairesFactuel" :key="index" :value="form.id">{{ form.libelle }}</option>
             </TomSelect>
+            <div v-if="errors.formulaires_de_gouvernance" class="mt-2 text-danger">{{ getFieldErrors(errors.formulaires_de_gouvernance) }}</div>
           </div>
           <div class="">
             <label class="form-label">Formulaires de perception</label>
             <TomSelect v-model="idFormPerception" :options="{ placeholder: 'Selectionez un formulaire' }" class="w-full">
               <option v-for="(form, index) in formulairesPerception" :key="index" :value="form.id">{{ form.libelle }}</option>
             </TomSelect>
+            <div v-if="errors.formulaires_de_gouvernance" class="mt-2 text-danger">{{ getFieldErrors(errors.formulaires_de_gouvernance) }}</div>
           </div>
           <div class="">
             <label class="form-label">Organisations</label>
             <TomSelect v-model="payload.organisations" multiple :options="{ placeholder: 'Selectionez les organisations' }" class="w-full">
               <option v-for="(organisation, index) in organisations" :key="index" :value="organisation.id">{{ organisation.nom }}</option>
             </TomSelect>
+            <div v-if="errors.organisations" class="mt-2 text-danger">{{ getFieldErrors(errors.organisations) }}</div>
           </div>
         </div>
       </ModalBody>
