@@ -90,6 +90,12 @@ const ProgrammeService = {
     emailRapports() {
         return ApiService.get(`programme/emailRapports`);
     },
+    getCadreRendement(id) {
+      return ApiService.get(`gfa/programmes/${id}/cadre-de-mesure-rendement`);
+    },
+    scoresAuFilDuTemps(id, organisationId) {
+      return ApiService.get(`gfa/programmes/${id}/evolution-des-scores-au-fil-du-temps/${organisationId}`);
+    },
 };
 
 export default ProgrammeService;

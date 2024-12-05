@@ -4,11 +4,11 @@
     <div class="flex items-center justify-between">
       <!-- Organization Name and Logo -->
       <div class="flex items-center space-x-2">
-        <img :src="org.image" alt="Org Logo" class="w-6 h-6 rounded-full" />
-        <span class="text-sm font-medium organization-name">{{ org.name }}</span>
+        <img :src="orgImg" alt="Org Logo" class="w-6 h-6 rounded-full" />
+        <span class="text-sm font-medium organization-name">{{ org.nom }}</span>
       </div>
       <!-- Submission Count -->
-      <span class="text-sm font-bold text-gray-800"> {{ org.percent * 100 }} % </span>
+      <span class="text-sm font-bold text-gray-800"> {{ org.pourcentage_evolution }} % </span>
     </div>
 
     <!-- Horizontal Progress Bar -->
@@ -16,10 +16,10 @@
       <div class="relative w-full h-1 bg-gray-200 rounded-full" style="height: 5px">
         <div
           class="absolute top-0 left-0 h-1 rounded-full"
-          :class="getProgressBarColor(org.percent)"
+          :class="getProgressBarColor(org.pourcentage_evolution)"
           :style="{
-            width: org.percent * 100 + '%',
-            backgroundColor: getBarColor(org.percent),
+            width: org.pourcentage_evolution + '%',
+            backgroundColor: getBarColor(org.pourcentage_evolution),
             borderRadius: '10px',
             height: '4px',
           }"
@@ -37,12 +37,13 @@ const props = defineProps({
     required: true,
   },
 });
+const orgImg = "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Y29tcGFueSUyMHByb2ZpbGV8ZW58MHx8MHx8fDA%3D";
 
 // Function to determine the color based on the percent value
 const getBarColor = (percent) => {
-  if (percent < 0.25) return "#FF0000"; // Red for below 25%
-  if (percent < 0.5) return "#C00000"; // Dark Red for 25% to 50%
-  if (percent < 0.75) return "#FFC000"; // Yellow for 50% to 75%
+  if (percent < 25) return "#FF0000"; // Red for below 25%
+  if (percent < 50) return "#C00000"; // Dark Red for 25% to 50%
+  if (percent < 75) return "#FFC000"; // Yellow for 50% to 75%
   return "#00B050"; // Green for above 75%
 };
 

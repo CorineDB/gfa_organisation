@@ -30,10 +30,13 @@ const getDataCollection = async () => {
   isLoadingData.value = true;
   await SyntheseService.getForEvaluation(idEvaluation)
     .then((result) => {
+      currentProfileGouvernance.value =result.data.data.profile_de_gouvernance;
+      currentFactuel.value=result.data.data.factuel;
+      currentPerception.value=result.data.data.perception;
+      isLoadingData.value = false;/* 
       dataForAllOrganisation.value = result.data.data;
       datasFactuel.value = dataForAllOrganisation.value.analyse_factuel;
-      datasPerception.value = dataForAllOrganisation.value.analyse_perception;
-      isLoadingData.value = false;
+      datasPerception.value = dataForAllOrganisation.value.analyse_perception; */
     })
     .catch((e) => {
       isLoadingData.value = false;
@@ -62,12 +65,12 @@ const changeStructure = () => {
 };
 
 onMounted(async () => {
-  /* await getDataCollection();
-  idSelectStructure.value = dataForAllOrganisation.value[0].id; */
 
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
+  await getDataCollection();
+  //idSelectStructure.value = dataForAllOrganisation.value[0].id; */
 
-  currentProfileGouvernance.value = [
+  /* currentProfileGouvernance.value = [
     {
       "id": 34,
       "nom": "Efficacité et efficience",
@@ -520,7 +523,7 @@ onMounted(async () => {
     "evaluationDeGouvernanceId": "WmdbEOP3Vw8mazrolOYnJkpGWQ9EdjDp9x4geB6b2PZ5LyRAvX013KNMRGLXBnl0",
     "programmeId": "Kd6Zov9ybW9PRxngKpQv81oeXMr6YOJgmV5ZlG47dkq2zjwABDLma3y0DGj3BP7w",
     "created_at": "2024-11-11"
-  };
+  }; */
 });
 </script>
 
@@ -632,9 +635,10 @@ onMounted(async () => {
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
                 <ExportationMarqueurPerception v-if="!isLoadingData && currentPerception"
-                  :org="currentOrganisation?.nom"
-                  :pointfocal="`${currentOrganisation?.nom_point_focal}  ${currentOrganisation?.prenom_point_focal}`"
-                  :dateevaluation="currentPerception?.evaluatedAt" :datas="currentPerception" />
+                  :org="authUser?.nom"
+                  :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`"
+                  :dateevaluation="currentPerception?.evaluatedAt" :datas="currentPerception"
+                  />
               </div>
             </div>
 

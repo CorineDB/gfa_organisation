@@ -8,6 +8,7 @@ import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
+import ProgrammeService from "@/services/modules/programme.service";
 import FormulaireFactuel from "@/services/modules/formFactuel.service";
 import { useRouter } from "vue-router";
 import OngService from "@/services/modules/ong.service";
@@ -15,6 +16,7 @@ import { getAllErrorMessages } from "@/utils/gestion-error";
 
 const router = useRouter();
 
+const authUser = reactive({});
 const idFormFactuel = ref("");
 const idFormPerception = ref("");
 
@@ -99,6 +101,7 @@ const createData = async () => {
       toast.error(getAllErrorMessages(e));
     });
 };
+
 const getDatas = async () => {
   isLoadingData.value = true;
   await EnqueteDeColleteService.get()
@@ -112,6 +115,20 @@ const getDatas = async () => {
     });
   // initTabulator();
 };
+
+const getScoresStats = async (programmeId, organisationId) => {
+  isLoadingData.value = true;
+  await ProgrammeService.scoresAuFilDuTemps(programmeId, organisationId)
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((e) => {
+      isLoadingData.value = false;
+      toast.error("Une erreur est survenue: Liste des enquêtes.");
+    });
+  // initTabulator();
+};
+
 const getFormsFactuel = async () => {
   await FormulaireFactuel.get()
     .then((result) => {
@@ -238,6 +255,9 @@ const openCreateModal = () => {
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
 onMounted(() => {
+
+  authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
+  getScoresStats(authUser.value.programme.id, authUser.value.profil.id);
   getDatas();
   // getFormsFactuel();
   // getFormsPerception();

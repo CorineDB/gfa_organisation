@@ -37,9 +37,13 @@ const getDataCollection = async () => {
   isLoadingData.value = true;
   await SyntheseService.getForEvaluation(idEvaluation)
     .then((result) => {
+      console.log(result.data);
+      currentProfileGouvernance.value =result.data.data.profile_de_gouvernance;
+      currentFactuel.value=result.data.data.factuel;
+      currentPerception.value=result.data.data.perception;/* 
       dataForAllOrganisation.value = result.data.data;
       datasFactuel.value = dataForAllOrganisation.value.analyse_factuel;
-      datasPerception.value = dataForAllOrganisation.value.analyse_perception;
+      datasPerception.value = dataForAllOrganisation.value.analyse_perception; */
       isLoadingData.value = false;
     })
     .catch((e) => {
@@ -77,7 +81,7 @@ onMounted(async () => {
 
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
 
-  currentProfileGouvernance.value = [
+  /* currentProfileGouvernance.value = [
     {
       "id": 34,
       "nom": "Efficacité et efficience",
@@ -493,7 +497,7 @@ onMounted(async () => {
     "evaluationDeGouvernanceId": "WmdbEOP3Vw8mazrolOYnJkpGWQ9EdjDp9x4geB6b2PZ5LyRAvX013KNMRGLXBnl0",
     "programmeId": "Kd6Zov9ybW9PRxngKpQv81oeXMr6YOJgmV5ZlG47dkq2zjwABDLma3y0DGj3BP7w",
     "created_at": "2024-11-11"
-  };
+  }; */
 
 });
 </script>

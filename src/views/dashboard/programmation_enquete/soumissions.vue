@@ -282,13 +282,16 @@ const addPhone = () => {
   }
 };
 
-const resetInvitationForm = () => {
+const resetInvitationForm = () => {/* 
+  invitationPayload.participants = [];
+  invitationPayload.nbreParticipants = 0; */
 
-  const invitationPayload = reactive({"participants": []});
-  showInvitationModal.value = false
+  getEvaluation();
+  showInvitationModal.value = false;
 };
 
 const sendInvitationLink = () => {
+  invitationPayload.nbreParticipants = statistiques.value.nbreDeParticipants;
   showInvitationModal.value = true
 };
 
@@ -391,7 +394,7 @@ const participant = reactive({
   
 const currentOption = ref(options[0].id);
 const currentPhone = ref("");
-const invitationPayload = reactive({"participants": []});
+const invitationPayload = reactive({"participants": [], "nbreParticipants": 0});
 
 const openFactuelModal = () => {
   router.push({ name: "ToolsFactuel", params: { id: formulaireFactuel.value.token } });
@@ -490,9 +493,10 @@ onMounted(() => {
         <!-- <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal">Remplir formulaire Factuel</button>
         <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de perception</button> -->
       </div>
-      <div class="flex">
+      <div v-if="statistiques.nbreDeParticipants > 0" class="flex">
         <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
-        <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button>       
+        <!-- @click="opendAddParticipant" -->
+        <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation perception</button>       
       </div>
     </div>
   </div>
@@ -511,8 +515,8 @@ onMounted(() => {
                 <div class="flex justify-center space-x-4">
                   <!-- Icon and Text -->
                   <div class="text-left">
-                    <div class="mt-2 text-3xl font-medium leading-8">{{ statistiques?.total_soumissions_de_perception_terminer + statistiques?.total_soumissions_factuel_terminer }} / {{ statistiques?.total_participants_evaluation_factuel + statistiques?.total_participants_evaluation_de_perception }}</div>
-                    <div class="mt-1 text-base text-slate-500" style="color: black">Nombre des participants</div>
+                    <div class="mt-2 text-3xl font-medium leading-8">{{ statistiques?.total_participants_evaluation_de_perception }}</div>
+                    <div class="mt-1 text-base text-slate-500" style="color: black">Nombre de participants</div>
                   </div>
 
                   <!-- Circular Progress Bar -->
@@ -530,7 +534,7 @@ onMounted(() => {
                 <div class="flex justify-left">
                   <BarChart2Icon class="report-box__icon text-success" />
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.total_soumissions_de_perception_terminer + statistiques?.total_soumissions_factuel_terminer }}</div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques.total_soumissions_de_perception_non_demarrer + statistiques.total_soumissions_factuel_non_demarrer }}</div>
                 <div class="mt-1 text-base text-slate-500" style="color: black">Total soumissions en attente</div>
               </div>
             </div>
@@ -542,7 +546,7 @@ onMounted(() => {
                 <div class="flex justify-left">
                   <BarChart2Icon class="report-box__icon text-success" />
                 </div>
-                <div class="mt-6 text-3xl font-medium leading-8">{{ statistiques?.total_soumissions_de_perception_terminer + statistiques?.total_soumissions_factuel_terminer }}</div>
+                <div class="mt-6 text-3xl font-medium leading-8">{{ (statistiques?.total_soumissions_de_perception + statistiques?.total_soumissions_factuel) - (statistiques?.total_soumissions_de_perception_terminer + statistiques?.total_soumissions_factuel_terminer) }}</div>
                 <div class="mt-1 text-base text-slate-500" style="color: black">Total soumissions en cours</div>
               </div>
             </div>
@@ -714,23 +718,23 @@ onMounted(() => {
 
               <!-- Horizontal Progress Bar -->
               <div class="w-full h-2 mt-2 bg-gray-200">
-                <div class="h-full bg-green-500" :style="{ width: (datas.factuel ? datas.factuel.pourcentage_evolution : 30) + '%' }"></div>
+                <div class="h-full bg-green-500" :style="{ width: (datas.factuel ? datas.factuel.pourcentage_evolution : 0) + '%' }"></div>
               </div>
 
               <div class="flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
                 <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
-                  {{ datas?.factuel ? (datas.factuel.statut ? "Voir Soumission" : "Continuer") : "Continuer" }}
+                  {{ datas.factuel ? (datas.factuel.statut ? "Voir Soumission" : "Continuer") : "Demarrer" }}
                   <ExternalLinkIcon class="ml-2 size-5" />
                 </button>
               </div>
 
             <div v-if="(datas?.factuel?.statut) && (formulaireFactuel?.terminer)" class="absolute bottom-0 flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
               <button @click="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
-                Voir Details de la soumission
+                Details de la soumission
                 <ExternalLinkIcon class="ml-2 size-5" />
               </button>
               <button @click="goToPageSynthese" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
-                Consulter la Fiche de synthese
+                Fiche de synthese
                 <ExternalLinkIcon class="ml-2 size-5" />
               </button>
             </div>
@@ -748,14 +752,14 @@ onMounted(() => {
                   <div class="p-0.5 bg-yellow-500"></div>
                   <div class="p-0.5 bg-red-500"></div>
                 </div>
-              </div>
+              </div>s
             </div>
             <div @click="goToPerceptionSynthesePage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
             <!-- Type and Status Badge Row for PERCEPTION -->
             <div class="flex items-center justify-between m-5 bg-white pt-[0.1rem]">
               <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px]">PERCEPTION</div>
               <div :class="[false ? 'bg-green-500' : 'bg-yellow-500', 'px-2 py-1 text-xs font-bold text-white rounded-full']">
-                {{ datas?.perception ? (datas.perception.pourcentage_evolution == 100 ? "Terminer" : "En cours") : "En cours" }}
+                {{ datas?.perception ? (datas.pourcentage_evolution_des_soumissions_de_perception == 100 ? "Terminer" : "En cours") : "En cours" }}
               </div>
             </div>
 
@@ -776,10 +780,10 @@ onMounted(() => {
 
             <!-- Horizontal Progress Bar -->
             <div class="w-full h-2 mt-2 bg-gray-200">
-              <div class="h-full bg-green-500" :style="{ width: (datas?.perception ? datas.perception.pourcentage_evolution : 6.25) + '%' }"></div>
+              <div class="h-full bg-green-500" :style="{ width: (datas?.perception ? datas.pourcentage_evolution_des_soumissions_de_perception : 0) + '%' }"></div>
             </div>
 
-            <div v-if="statistiques?.statut" class="absolute bottom-0 flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
+            <div v-if="pourcentage_evolution_des_soumissions_de_perception == 100" class="absolute bottom-0 flex items-center justify-center w-full border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
               <button @click="goToPageMarqueur" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                 {{ statistiques ? (statistiques.statut ? "Voir Fiche de synthese" : "") : "" }}
                 <ExternalLinkIcon class="ml-2 size-5" />
@@ -888,7 +892,7 @@ onMounted(() => {
 
           <div class="">
             <!-- List rankings dynamically -->
-            <RankingChart :rankingData="rankingData" />
+            <RankingChart :rankingData="statistiques.organisations_ranking" />
             <!-- <div
               v-for="(org, index) in rankingData"
               :key="index"
@@ -904,11 +908,11 @@ onMounted(() => {
         </div>
       </div>
 
-      <section>
+      <!-- <section>
         <p class="pb-4 mt-10 text-lg font-medium intro-y">Liste des soumissions par organisations</p>
         <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
           <div @click="goToFactuelSoumissionPage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
-            <!-- Type and Status Badge Row for FACTUELLE -->
+            <-- Type and Status Badge Row for FACTUELLE ->
             <div class="flex items-center justify-between m-5 bg-white pt-[0.1rem]">
               <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px]">FACTUELLE</div>
               <div :class="[false ? 'bg-green-500' : 'bg-yellow-500', 'px-2 py-1 text-xs font-bold text-white rounded-full']">
@@ -935,7 +939,7 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Horizontal Progress Bar -->
+            <-- Horizontal Progress Bar ->
             <div class="w-full h-2 mt-2 bg-gray-200">
               <div class="h-full bg-green-500" :style="{ width: (datas.factuel ? datas.factuel.pourcentage_evolution : 30) + '%' }"></div>
             </div>
@@ -955,7 +959,7 @@ onMounted(() => {
             </div>
           </div>
           <div @click="goToPerceptionSynthesePage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
-            <!-- Type and Status Badge Row for PERCEPTION -->
+            <-- Type and Status Badge Row for PERCEPTION ->
             <div class="flex items-center justify-between m-5 bg-white pt-[0.1rem]">
               <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px]">PERCEPTION</div>
               <div :class="[false ? 'bg-green-500' : 'bg-yellow-500', 'px-2 py-1 text-xs font-bold text-white rounded-full']">
@@ -978,7 +982,7 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Horizontal Progress Bar -->
+            <-- Horizontal Progress Bar ->
             <div class="w-full h-2 mt-2 bg-gray-200">
               <div class="h-full bg-green-500" :style="{ width: (datas?.perception ? datas.perception.pourcentage_evolution : 6.25) + '%' }"></div>
             </div>
@@ -1010,7 +1014,7 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- <div v-if="datas?.factuel" @click="goToFactuelSoumissionPage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+          <-- <div v-if="datas?.factuel" @click="goToFactuelSoumissionPage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
             <div class="relative m-5 bg-white">
               <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">
                 {{ datas.factuel.type }}
@@ -1081,10 +1085,10 @@ onMounted(() => {
                 <div class="p-0.5 bg-red-500"></div>
               </div>
             </div>
-          </div> -->
+          </div> ->
           <div v-if="!(datas?.factuel && datas?.perception)">Aucune soumission</div>
         </div>
-      </section>
+      </section> -->
     </div>
     <LoaderSnipper v-if="isLoadingData" />
   </div>
@@ -1118,8 +1122,12 @@ onMounted(() => {
     </ModalHeader>
     <form @submit.prevent="sendInvitation">
       <ModalBody>
-            
-        <div class="max-w-screen-lg p-4 mx-auto mt-10 box">
+        
+        <div class="max-w-screen-lg p-4 mx-auto mt-4 box">
+          <InputForm class="" label="Nombre de participants" pattern="\d{1,8}" maxlength="8" v-model.number="invitationPayload.nbreParticipants" type="number" />
+        </div>
+        <hr class="my-5" />
+        <div class="max-w-screen-lg p-4 mx-auto mt-6 box">
           <p class="text-base font-medium">Ajouter des participants</p>
           <hr class="my-4" />
           <div class="gap-4 m-h-[50vh] flex flex-col justify-between">

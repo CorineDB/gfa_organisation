@@ -1,6 +1,6 @@
 import ApiService from "@/services/configs/api.service";
 
-const OptionReponse = {
+const RecommandationService = {
   query(type, params) {
     return ApiService.query("gfa/recommandations", {
       params: params,
@@ -24,4 +24,4 @@ const OptionReponse = {
   },
 };
 
-export default OptionReponse;
+export default RecommandationService;

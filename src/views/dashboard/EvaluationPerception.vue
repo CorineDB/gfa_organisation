@@ -52,11 +52,14 @@ const itemsPerPage = 3;
 const getDataFormPerception = async () => {
   try {
     const { data } = await EvaluationService.getPerceptionFormEvaluation(payload.identifier_of_participant, token);
-    formDataPerception.value = data.data;
-    formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance;
-    idEvaluation.value = formDataPerception.value.id;
-    payload.formulaireDeGouvernanceId = formulairePerception.value.id;
-    payload.programmeId = formDataPerception.value.programmeId;
+    //showAlertValidate.value = data.data.terminer;
+    if(!showAlertValidate.value){
+      formDataPerception.value = data.data;
+      formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance;
+      idEvaluation.value = formDataPerception.value.id;
+      payload.formulaireDeGouvernanceId = formulairePerception.value.id;
+      payload.programmeId = formDataPerception.value.programmeId;
+    }
   } catch (e) {
     toast.error("Erreur lors de la récupération des données.");
   } finally {
@@ -91,10 +94,23 @@ const submitData = async () => {
 
     try {
       const result = await action;
+
+      if(result.statutCode == 206){
+        showAlertValidate.value = result.data.terminer;
+      }
+      
+      if (isValidate.value) {
+        toast.success(`${result.data.message}`);
+        generatevalidateKey("perception");
+        showAlertValidate.value = true;
+        showModalPreview.value=false;
+      }
+      
+      /* 
       if (isValidate.value) toast.success(`${result.data.message}`);
       if (isValidate.value) {generatevalidateKey("perception");
       showAlertValidate.value = true;}
-      await getDataFormPerception();
+      await getDataFormPerception(); */
     } catch (e) {
       console.error(e);
       if (isValidate.value) toast.error(getAllErrorMessages(e));
@@ -248,9 +264,12 @@ onMounted(async () => {
   } else {
     payload.identifier_of_participant = generateUniqueId();
     await getDataFormPerception();
-    // await getcurrentUserAndFetchOrganization();
-    // findFormulairePerception();
-    initializeFormData();
+    
+    if(!showAlertValidate.value){
+      // await getcurrentUserAndFetchOrganization();
+      // findFormulairePerception();
+      initializeFormData();
+    }
   }
 });
 </script>
@@ -301,13 +320,15 @@ onMounted(async () => {
               </AccordionGroup>
             </div>
           </div>
-          <div class="flex justify-center w-full mt-5">
+          <!-- <div class="flex justify-center w-full mt-5">
             <VButton v-if="isLastPage" label="Prévisualiser" class="px-8 py-3 w-max" @click="openPreview" />
-          </div>
+          </div> -->
           <div class="flex justify-center gap-3 my-8">
             <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
             <button v-for="page in totalPages" :key="page" @click="goToPage(page)" :class="page === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn">{{ page }}</button>
-            <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-3 btn btn-outline-primary">Suivant</button>
+            <button v-if="!isLastPage" @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-3 btn btn-outline-primary">Suivant</button>
+
+            <button v-if="isLastPage" @click="openPreview" class="px-4 py-3 btn btn-outline-primary">Prévisualiser</button>
             <!-- <button @click="prevPage()" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
             <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
             <button @click="nextPage()" class="px-4 py-3 btn btn-outline-primary">Suivant</button> -->
