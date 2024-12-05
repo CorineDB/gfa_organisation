@@ -24,3 +24,8 @@ export function getvalidateKey(key) {
 //   // Combiner les informations et générer un hash simple
 //   return `${userAgent}-${language}-${timezone}-${randomUUID}`;
 // }
+
+export const getFieldErrors = (errors) => {
+  if (!errors || !Array.isArray(errors)) return "";
+  return errors.join(", ");
+};
