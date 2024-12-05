@@ -69,6 +69,11 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "BarChart2Icon",
             pageName: "create_indicateur",
             title: "Indicateurs",
+          },
+          {
+            icon: "BarChart2Icon",
+            pageName: "suivi_indicateur",
+            title: "Suivis Indicateur",
           },/* 
           {
             icon: "BarChart2Icon",

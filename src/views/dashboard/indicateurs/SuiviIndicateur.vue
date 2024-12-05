@@ -10,7 +10,6 @@
 import { ref } from "vue";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { onMounted } from "vue";
-import ResultatCadreRendementService from "@/services/modules/resultat.cadre.rendement.service";
 import IndicateursService from "@/services/modules/indicateur.service";
 import AuthService from "@/services/modules/auth.service";
 import { toast } from "vue3-toastify";
