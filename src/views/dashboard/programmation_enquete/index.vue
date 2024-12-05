@@ -15,11 +15,11 @@ import ChartProgressionByTime from "../../../components/news/ChartProgressionByT
 import ProgressBar from "../../../components/news/ProgressBar.vue";
 import ChartScroreByPrincipe from "../../../components/news/ChartScroreByPrincipe.vue";
 import { getFieldErrors } from "../../../utils/helpers";
-import SyntheseService from "../../../services/modules/synthese.service";
-import { data } from "jquery";
+import ProgrammeService from "@/services/modules/programme.service";
 
 const router = useRouter();
 
+const authUser = reactive({});
 const idFormFactuel = ref("");
 const idFormPerception = ref("");
 const currentProfileGouvernance = [
@@ -94,7 +94,8 @@ const getDatas = async () => {
 
 const getEvolutionByScore = async (id) => {
   isLoadingDataScore.value = true;
-  await SyntheseService.getEvolutionByScrore(id)
+
+  await ProgrammeService.scoresAuFilDuTemps(id)
     .then((result) => {
       datasScore.value = result.data.data;
       currentScore.value = datasScore.value[0]?.scores;
@@ -248,10 +249,11 @@ const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 const yearsCurrentScore = computed(() => Object.keys(currentScore.value));
 
 onMounted(async () => {
+  authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
   await getDatas();
-  await getOrganisations();
-  // ongSelectedScore.value = organisations.value[0].id;
-  // changeOrganisationScore();
+  //await getOrganisations();
+  ongSelectedScore.value = authUser.value.profil.id;
+  changeOrganisationScore();
   // getFormsFactuel();
   // getFormsPerception();
 });
@@ -266,9 +268,6 @@ onMounted(async () => {
           <input type="text" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
           <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
         </div>
-      </div>
-      <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal"><PlusIcon class="w-4 h-4 mr-3" />Ajouter une évaluation de gouvernace</button>
       </div>
     </div>
   </div>
@@ -352,13 +351,13 @@ onMounted(async () => {
             <div class="flex justify-center w-full p-3 bg-white">
               <div class="w-full max-w-screen-lg">
                 <p class="p-3 text-lg font-medium">Résultats synthetique par année</p>
-                <div class="!w-[250px] p-3">
+                <!-- <div class="!w-[250px] p-3">
                   <label for="ongs" class="form-label">Organisation</label>
                   <TomSelect name="organisations" v-model="ongSelectedScore" @change="changeOrganisationScore" :options="{ placeholder: 'Selectionez une organisation' }">
                     <option value=""></option>
                     <option v-for="organisation in organisations" :key="organisation.id" :value="organisation.id">{{ organisation.nom }}</option>
                   </TomSelect>
-                </div>
+                </div> -->
                 <ChartProgressionByTime :chartData="currentScore" v-if="ongSelectedScore && !isLoadingDataScore" />
                 <div class="h-[600px] flex justify-center items-center" v-if="!ongSelectedScore && !isLoadingDataScore">
                   <p class="text-xl font-medium text-slate-600">Veuillez choisir une organisation pour afficher le graphique</p>

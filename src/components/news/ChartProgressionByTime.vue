@@ -1,79 +1,38 @@
 <template>
   <div>
-    <canvas ref="lineChartCanvas"></canvas>
+    <canvas ref="chartCanvas" style="height: 600px; width: 100%"></canvas>
   </div>
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { Chart, registerables } from "chart.js";
 
-// Enregistrement des composants de Chart.js
 Chart.register(...registerables);
 
-export default {
+export default defineComponent({
   name: "LineChart",
-  setup() {
-    const lineChartCanvas = ref(null);
+  props: {
+    chartData: {
+      type: Object,
+      required: true,
+    },
+  },
+  setup(props) {
+    const chartCanvas = ref(null);
+    const chartInstance = ref(null);
 
-    const createChart = () => {
-      const ctx = lineChartCanvas.value.getContext("2d");
-      new Chart(ctx, {
+    const createChart = (processedData) => {
+      if (chartInstance.value) {
+        chartInstance.value.destroy();
+      }
+      chartInstance.value = new Chart(chartCanvas.value, {
         type: "line",
-        data: {
-          labels: ["2020", "2021", "2022"],
-          datasets: [
-            {
-              label: "Redevabilité",
-              data: [0.5, 0.6, 0.7],
-              borderColor: "orange",
-              fill: false,
-              tension: 0.1,
-              pointBackgroundColor: "orange",
-            },
-            {
-              label: "Participation",
-              data: [0.4, 0.5, 0.6],
-              borderColor: "red",
-              fill: false,
-              tension: 0.1,
-              pointBackgroundColor: "red",
-            },
-            {
-              label: "Transparence",
-              data: [0.6, 0.68, 0.8],
-              borderColor: "yellow",
-              fill: false,
-              tension: 0.1,
-              pointBackgroundColor: "yellow",
-            },
-            {
-              label: "Efficacité",
-              data: [0.7, 0.8, 0.85],
-              borderColor: "pink",
-              fill: false,
-              tension: 0.1,
-              pointBackgroundColor: "pink",
-            },
-            {
-              label: "Inclusion",
-              data: [0.65, 0.7, 0.9],
-              borderColor: "blue",
-              fill: false,
-              tension: 0.1,
-              pointBackgroundColor: "blue",
-            },
-          ],
-        },
+        data: processedData,
         options: {
           responsive: true,
           plugins: {
-            title: {
-              display: true,
-              text: "Progression des Scores au Fil du Temps",
-            },
             legend: {
-              display: true,
               position: "top",
             },
           },
@@ -85,24 +44,80 @@ export default {
               },
             },
             y: {
-              beginAtZero: true,
               title: {
                 display: true,
                 text: "Score",
               },
+              min: 0,
+              max: 1,
             },
           },
         },
       });
     };
 
+    const processChartData = () => {
+      const defaultYear = "0";
+      const defaultValues = {
+        indice_factuel: 0,
+        indice_de_perception: 0,
+        indice_synthetique: 0,
+      };
+
+      const extendedData = { [defaultYear]: [defaultValues], ...props.chartData };
+
+      const labels = Object.keys(extendedData);
+      const datasets = [
+        {
+          label: "indice_factuel",
+          data: labels.map((year) => extendedData[year].reduce((sum, item) => sum + item.indice_factuel, 0) / extendedData[year].length),
+          borderColor: "red",
+          backgroundColor: "red",
+          fill: false,
+        },
+        {
+          label: "indice_de_perception",
+          data: labels.map((year) => extendedData[year].reduce((sum, item) => sum + item.indice_de_perception, 0) / extendedData[year].length),
+          borderColor: "orange",
+          backgroundColor: "orange",
+          fill: false,
+        },
+        {
+          label: "indice_synthetique",
+          data: labels.map((year) => extendedData[year].reduce((sum, item) => sum + item.indice_synthetique, 0) / extendedData[year].length),
+          borderColor: "pink",
+          backgroundColor: "pink",
+          fill: false,
+        },
+      ];
+
+      return { labels, datasets };
+    };
+
     onMounted(() => {
-      createChart();
+      const initialData = processChartData();
+      createChart(initialData);
     });
 
+    watch(
+      () => props.chartData,
+      () => {
+        const updatedData = processChartData();
+        createChart(updatedData);
+      },
+      { deep: true }
+    );
+
     return {
-      lineChartCanvas,
+      chartCanvas,
     };
   },
-};
+});
 </script>
+
+<style scoped>
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+</style>

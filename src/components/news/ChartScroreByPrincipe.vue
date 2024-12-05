@@ -1,72 +1,104 @@
 <template>
   <div>
-    <canvas ref="chartCanvas"></canvas>
+    <canvas ref="chartCanvas" style="height: 600px; width: 100%"></canvas>
   </div>
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, defineProps, computed, nextTick } from "vue";
 import { Chart, registerables } from "chart.js";
 
 Chart.register(...registerables);
 
 export default {
   name: "GroupedBarChart",
-  setup() {
+  props: {
+    datas: {
+      type: Array,
+      required: true,
+    },
+  },
+  setup(props) {
     const chartCanvas = ref(null);
 
+    // Log de props.data pour vérifier si les données sont bien reçues
     onMounted(() => {
-      const ctx = chartCanvas.value.getContext("2d");
+      // Vérification de la présence des données
+      if (props.datas && Array.isArray(props.datas) && props.datas.length > 0) {
+      } else {
+        console.error("Aucune donnée reçue ou les données sont mal formattées.");
+      }
 
-      new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: ["Redevabilité", "Participation", "Transparence", "Efficacité", "Inclusion"],
-          datasets: [
-            {
-              label: "Score Perception",
-              data: [0.6, 0.7, 0.4, 0.85, 0.9],
-              backgroundColor: "rgba(54, 162, 235, 0.5)",
-              borderColor: "rgba(54, 162, 235, 1)",
-              borderWidth: 1,
+      nextTick(() => {
+        // Vérification si le canvas existe
+        const ctx = chartCanvas.value ? chartCanvas.value.getContext("2d") : null;
+
+        if (ctx) {
+          const labels = props.datas.map((item) => item.nom);
+          const factuel = props.datas.map((item) => item.indice_factuel);
+          const perception = props.datas.map((item) => item.indice_de_perception);
+          const synthese = props.datas.map((item) => item.indice_synthetique);
+
+          new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels, // Les labels extraits des données
+              datasets: [
+                {
+                  label: "Indice Factuel",
+                  data: factuel, // Données pour "Indice Factuel"
+                  backgroundColor: "rgba(54, 162, 235, 0.5)",
+                  borderColor: "rgba(54, 162, 235, 1)",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Indice Perception",
+                  data: perception, // Données pour "Indice Perception"
+                  backgroundColor: "rgba(75, 192, 192, 0.5)",
+                  borderColor: "rgba(75, 192, 192, 1)",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Indice Synthétique",
+                  data: synthese, // Données pour "Indice Synthétique"
+                  backgroundColor: "rgba(255, 205, 86, 0.8)",
+                  borderColor: "rgba(255, 205, 86, 1)",
+                  borderWidth: 1,
+                },
+              ],
             },
-            {
-              label: "Score Factuel",
-              data: [0.65, 0.75, 0.65, 0.75, 0.9],
-              backgroundColor: "rgba(75, 192, 192, 0.5)",
-              borderColor: "rgba(75, 192, 192, 1)",
-              borderWidth: 1,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              display: true,
-              position: "top",
-            },
-            title: {
-              display: true,
-              text: "Scores par Principe (Perception vs Factuel)",
-            },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: "Score",
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "top",
+                },
+                title: {
+                  display: true,
+                  text: "Scores par Indice",
+                },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: "Score",
+                  },
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: "Principe",
+                  },
+                },
               },
             },
-            x: {
-              title: {
-                display: true,
-                text: "Principe",
-              },
-            },
-          },
-        },
+          });
+        } else {
+          console.error("Le contexte du canvas est introuvable");
+        }
       });
     });
 
