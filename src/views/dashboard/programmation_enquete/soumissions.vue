@@ -8,8 +8,9 @@ import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
 import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
 import { useRouter, useRoute } from "vue-router";
-import ProgressBar from "../../../components/news/ProgressBar.vue";
-import ChartPerceptionOption from "../../../components/news/ChartPerceptionOption.vue";
+import ProgressBar from "../../../components/news/ProgressBar.vue";/* 
+import ChartPerceptionOption from "../../../components/news/ChartPerceptionOption.vue"; */
+import RankingChart from "./RankingChart.vue";
 import { data } from "jquery";
 
 const router = useRouter();
@@ -21,6 +22,7 @@ const payload = reactive({
   objectif: "",
 });
 
+const authUser = reactive({});
 const idSelect = ref("");
 const showModalCreate = ref(false);
 const deleteModalPreview = ref(false);
@@ -32,11 +34,23 @@ const isLoadingData = ref(true);
 const isCreate = ref(true);
 const loadingOption = ref(true);
 const datas = ref([]);
+const formulaireFactuel = ref({});
 const statistiques = ref({});
 const idCurrentOng = ref({});
 const currentOptionsPerception = ref({});
 const currentOrganisationsOptions = ref("");
+const invitationPayload = reactive({"participants": [], "nbreParticipants": 0});
+const showInvitationModal = ref(false);
 
+const options = [
+{ label: "Adresse Email", id: "email" },
+{ label: "Numéro de téléphone", id: "contact" },
+];
+const participant = reactive({
+    type_de_contact: options[0].id,
+    email: "",
+    phone: "",
+  });
 const createData = async () => {
   isLoading.value = true;
   await EnqueteDeColleteService.create(payload)
@@ -66,13 +80,26 @@ const getDatas = async () => {
       toast.error("Une erreur est survenue: Liste des enquêtes.");
     });
 };
+
+const getFormulaireFactuel = async () => {
+  isLoadingData.value = true;
+  await EvaluationService.getFormulaireFactuelEvaluation(idEvaluation)
+    .then((result) => {
+      formulaireFactuel.value = result.data.data;
+      isLoadingData.value = false;
+    })
+    .catch((e) => {
+      console.error(e);
+      isLoadingData.value = false;
+      toast.error("Une erreur est survenue: Liste des enquêtes.");
+    });
+};
+
 const getEvaluation = async () => {
   isLoadingStats.value = true;
   await EvaluationService.findEvaluation(idEvaluation)
     .then((result) => {
       statistiques.value = result.data.data;
-      currentOrganisationsOptions.value = statistiques.value.options_de_reponse_stats[0].id;
-      changeOrganisationOptions();
       isLoadingStats.value = false;
     })
     .catch((e) => {
@@ -125,6 +152,114 @@ const getStatusText = (param) => {
   }
 };
 
+
+
+const openFactuelModal = () => {
+  router.push({ name: "ToolsFactuel", params: { id: formulaireFactuel.value.token } });
+};
+
+const goToDetailSoumission = (idSoumission) => {
+  router.push({ name: "DetailSoumission", params: { e: idEvaluation, s: idSoumission } });
+};
+
+const goToPageSynthese = () => {
+  router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
+};
+
+const goToPageMarqueur = () => {
+  router.push({ name: "FicheMarqueur", params: { e: idEvaluation } });
+};
+
+const goToMesuresAPrendre = (org = null) => {
+  router.push({ name: "MesuresAPrendre", params: { e: idEvaluation, s: org ?? authUser.value?.profil?.id } });
+};
+
+const goToFactuelSoumissionPage = (Idsoumission, status = false) => {
+  if (status == true) {
+    router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
+  }
+};
+
+
+const sendReminder = async () => {
+  isLoading.value = true;
+  await EvaluationService.sendReminderToPerceptionParticipants(idEvaluation)
+    .then(() => {
+      toast.success("Rappel envoyé.");
+    })
+    .catch((e) => {
+      isLoading.value = false;
+      console.error(e);
+      toast.error("Echec envoi du rappel.");
+    });
+};
+
+
+const addEmail = () => {
+  if (participant.email) {
+    // Check if an email already exists in the payload
+    const isEmailAdded = invitationPayload.participants.some((item) => item.email === participant.email);
+
+    if (!isEmailAdded) {
+      // Add the participant to the payload
+      invitationPayload.participants.unshift({ ...participant }); // Use spread to avoid reference issues
+      participant.email = ""; // Clear the email field after adding
+    } else {
+      // Show a message if the email is already added
+      toast.info("Adresse email déjà ajoutée");
+    }
+  }
+};
+
+const addPhone = () => {
+  if (participant.phone) {
+    // Check if an phone already exists in the payload
+    const isPhoneAdded = invitationPayload.participants.some((item) => item.phone === participant.phone);
+
+    if (!isPhoneAdded) {
+      // Add the participant to the payload
+      invitationPayload.participants.unshift({ ...participant }); // Use spread to avoid reference issues
+      participant.phone = ""; // Clear the phone field after adding
+    } else {
+      // Show a message if the phone is already added
+      toast.info("Numéro de téléphone déja ajouté");
+    }
+  }
+};
+
+const resetInvitationForm = () => {/* 
+  invitationPayload.participants = [];
+  invitationPayload.nbreParticipants = 0; */
+
+  getEvaluation();
+  showInvitationModal.value = false;
+};
+
+const sendInvitationLink = () => {
+  invitationPayload.nbreParticipants = statistiques.value.nbreDeParticipants;
+  showInvitationModal.value = true
+};
+
+const sendInvitation = async () => {
+  isLoading.value = true;
+  try {
+    await EvaluationService.addParticipantPerception(idEvaluation, invitationPayload);
+    toast.success(`Invitation envoye.`);
+    resetInvitationForm();
+  } catch (e) {
+    toast.error(getAllErrorMessages(e));
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+
+const goToPerceptionSynthesePage = (Idsoumission, status = false) => {
+  if (status == true) {
+    router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
+  }
+};
+
 function gotoAppreciations(enquete) {
   router.push({ name: "EnqueteAppreciations", query: { enqueteId: enquete.id } });
 }
@@ -170,12 +305,7 @@ const resetForm = () => {
   payload.fin = "";
   showModalCreate.value = false;
 };
-const openFactuelModal = () => {
-  router.push({ name: "ToolsFactuel", params: { id: idEvaluation } });
-};
-const goToPageSynthese = () => {
-  router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
-};
+
 const goToPageSyntheseWithOng = (ong) => {
   router.push({ name: "FicheSynthese", params: { e: idEvaluation }, query: { ong } });
 };
@@ -183,9 +313,7 @@ const goToPageSoumission = (Idsoumission) => {
   showModalOrganisation.value = false;
   router.push({ name: "soumission", params: { e: idEvaluation, s: Idsoumission } });
 };
-const goToPageMarqueur = (Idsoumission) => {
-  router.push({ name: "FicheMarqueur", params: { e: idEvaluation } });
-};
+
 const opendAddParticipant = () => {
   router.push({ name: "add_participant", query: { e: idEvaluation } });
 };
@@ -232,10 +360,16 @@ const organisationsOptions = computed(() => datas.value.options_de_reponse_stats
 // });
 
 onMounted(async () => {
-  await getDatas();
+  /* await getDatas();
   if (route.query.ong) {
     changeCurrentDetailOrganisation(route.query.ong.toString());
   }
+  getEvaluation(); */
+
+
+  authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
+  getDatas();
+  getFormulaireFactuel();
   getEvaluation();
 });
 </script>
@@ -359,12 +493,14 @@ onMounted(async () => {
                   <div class="flex gap-2 text-lg text-left">
                     <div class="mt-1 text-primary">
                       Factuel:
-                      <span class="font-semibold"> {{ Math.round(statistiques?.pourcentage_evolution_des_soumissions_factuel) }}% </span>
+                      <span class="font-semibold"> {{
+      Math.round(statistiques?.pourcentage_evolution_des_soumissions_factuel) }}% </span>
                     </div>
                     <div class="w-px h-8 bg-slate-400"></div>
                     <div class="mt-1 text-primary">
                       Perception:
-                      <span class="font-semibold"> {{ Math.round(statistiques?.pourcentage_evolution_des_soumissions_de_perception) }}% </span>
+                      <span class="font-semibold"> {{
+      Math.round(statistiques?.pourcentage_evolution_des_soumissions_de_perception) }}% </span>
                     </div>
                   </div>
                 </div>
@@ -380,72 +516,235 @@ onMounted(async () => {
           <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
         </div>
         <div class="grid grid-cols-12 gap-6 mt-5 text-lg font-medium">
-          <div @click="goToPageSynthese" class="flex items-center justify-center col-span-12 gap-1 px-2 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-4 intro-y"><button class="px-4 py-8">Fiches de Synthèse</button> <ArrowRightIcon class="size-5" /></div>
-          <div @click="goToPageMarqueur" class="flex items-center justify-center col-span-12 gap-1 px-2 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-4 intro-y"><button class="px-4 py-8">Marqueur de gouvernance</button> <ArrowRightIcon class="size-5" /></div>
+          <div @click="goToPageSynthese"
+            class="flex items-center justify-center col-span-12 gap-1 px-2 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-4 intro-y">
+            <button class="px-4 py-8">Fiches de Synthèse</button>
+            <ArrowRightIcon class="size-5" />
+          </div>
+          <div @click="goToPageMarqueur"
+            class="flex items-center justify-center col-span-12 gap-1 px-2 transition-all border-l-4 cursor-pointer border-l-primary box hover:shadow-md sm:col-span-4 intro-y">
+            <button class="px-4 py-8">Marqueur de gouvernance</button>
+            <ArrowRightIcon class="size-5" />
+          </div>
         </div>
       </div>
 
-      <section>
-        <p class="pb-4 mt-10 text-lg font-medium intro-y">Liste des soumissions par organisations</p>
-        <div class="grid h-auto grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
-          <div v-for="(ong, index) in datas" :key="index" @click="changeCurrentDetailOrganisation(ong.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
-            <div class="relative m-5 bg-white">
-              <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ ong.nom }}</div>
+
+
+      <div class="grid grid-cols-12 gap-4 mt-8">
+        <!-- Factuel and Perception Tools Section -->
+        <div class="col-span-8 p-6 bg-white rounded-md shadow-lg">
+
+          <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
+            <h2 class="mb-6 text-lg font-bold">Outils Auto-Evaluation</h2>
+
+            <div v-if="statistiques?.statut" class="flex">
+              <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
+              <button class="mr-2 shadow-md btn btn-primary" @click="goToPageMarqueur">Consulter le resultat de
+                l'evaluation</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-2">
+            <div @click="goToFactuelSoumissionPage(datas.id)"
+              class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+              <div class="relative m-5 bg-white">
+                <div
+                  class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">
+                  Evaluation factuel </div>
+              </div>
+
+              <div class="m-5 text-slate-600 dark:text-slate-500">
+                <div class="flex items-center">
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Start At:
+                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.created_at : "Not Defined" }}</div>
+                </div>
+                <div class="flex items-center">
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Submitted_at At:
+                  <div class="ml-2 font-bold">{{ datas?.factuel ? (datas.factuel.submitted_at != null ?
+      datas.factuel.submitted_at : "Not Defined") : "Not Defined" }}</div>
+                </div>
+                <div class="flex items-center">
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
+                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.reponses_de_la_collecte.length : 0 }}
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total Membres du comite:
+                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
+                </div>
+                <div class="mt-4">
+                  <p>Évolution soumissions</p>
+                  <ProgressBar :percent="(datas.factuel ? datas.factuel.pourcentage_evolution : 0)" />
+                </div>
+              </div>
+
+              <div
+                v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)"
+                class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                  <button
+                    v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)"
+                    @click.self="goToDetailSoumission(datas?.factuel?.id)"
+                    class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">Details
+                    de la soumission
+                    <ExternalLinkIcon class="ml-2 size-5" />
+                  </button>
+
+                  <button v-else class="w-full gap-2 py-[22px]"></button>
+                  <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
+                </div>
+                <button
+                  v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)"
+                  @click.self="goToPageSynthese"
+                  class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                  Fiche de synthèse
+                  <ArrowRightIcon class="ml-2 size-5" />
+                </button>
+              </div>
+
+              <div
+                v-if="!datas.factuel || (datas.factuel && datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)"
+                class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                  <button
+                    v-if="(datas.factuel && datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)"
+                    @click.self="openFactuelModal"
+                    class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">Continuer
+                    <ArrowRightIcon class="ml-2 size-5" />
+                  </button>
+
+                  <button v-else-if="!datas.factuel" @click.self="openFactuelModal"
+                    class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">Demarrer
+                    <ArrowRightIcon class="ml-2 size-5" />
+                  </button>
+                  <button v-else class="w-full gap-2 py-[22px]"></button>
+                  <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
+                </div>
+                <button
+                  v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)"
+                  @click="goToDetailSoumission(datas?.factuel?.id)"
+                  class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                  Details de la soumission
+                  <ExternalLinkIcon class="ml-2 size-5" />
+                </button>
+              </div>
+
+              <div class="absolute top-0 flex w-full">
+                <div class="w-1/3 p-1 bg-green-500"></div>
+                <div class="flex flex-col w-2/3">
+                  <div class="p-0.5 bg-yellow-500"></div>
+                  <div class="p-0.5 bg-red-500"></div>
+                </div>
+              </div>
             </div>
 
-            <div class="m-5 text-slate-600 dark:text-slate-500">
-              <div class="flex items-center">
-                <BarChart2Icon class="w-4 h-4 mr-2" /> Total de Soumissions:
-                <div class="ml-2 font-bold">{{ (ong?.factuel ? ong.factuel.length : 0) + (ong?.perception ? ong.perception.length : 0) }}</div>
+            <div
+              class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+              <div class="relative m-5 bg-white">
+                <div
+                  class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">
+                  Evaluation factuel </div>
               </div>
-              <div class="flex items-center">
-                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions Factuel:
-                <div class="ml-2 font-bold">{{ ong?.factuel ? ong.factuel.length : 0 }}</div>
-              </div>
-              <div class="flex items-center">
-                <BarChart2Icon class="w-4 h-4 mr-2" /> Soumissions de Perception:
-                <div class="ml-2 font-bold">{{ ong?.perception ? ong.perception.length : 0 }}</div>
-              </div>
-              <div class="mt-4">
-                <p>Évolution soumissions</p>
-                <ProgressBar :percent="getPercentEvolutionOng(ong.id)" />
-              </div>
-            </div>
 
-            <div class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-              <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                <button v-if="(ong.factuel && ong.factuel[0].statut) || (ong.factuel && ong.factuel[0].pourcentage_evolution >= 100)" @click.self="goToPageSyntheseWithOng(ong.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">Fiche de synthèse <ArrowRightIcon class="ml-2 size-5" /></button>
-                <button v-else class="w-full gap-2 py-[22px]"></button>
-                <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
-              </div>
-              <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">Afficher les soumissions <ExternalLinkIcon class="ml-2 size-5" /></button>
-            </div>
+              <div class="m-5 text-slate-600 dark:text-slate-500">
 
-            <div class="absolute top-0 flex w-full">
-              <div class="w-1/3 p-1 bg-green-500"></div>
-              <div class="flex flex-col w-2/3">
-                <div class="p-0.5 bg-yellow-500"></div>
-                <div class="p-0.5 bg-red-500"></div>
+                <div class="flex items-center">
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Start At
+                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception.created_at : "Not Defined" }}
+                  </div>
+                </div>
+                <div class="flex items-center">
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total participants:
+                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.length : 0 }}</div>
+                </div>
+                <div class="flex items-center">
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
+                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.reponses_de_la_collecte?.length :
+      0 }}</div>
+                </div>
+                <div class="flex items-center">
+                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.reponses_de_la_collecte?.length :
+      0 }}</div>
+                </div>
+
+                <div class="mt-4">
+                  <p>Évolution soumissions</p>
+                  <ProgressBar
+                    :percent="(datas.perception ? datas.pourcentage_evolution_des_soumissions_de_perception : 0)" />
+                </div>
+              </div>
+
+              <div v-if="(datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception >= 100)"
+                class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+
+                <button @click.self="goToPageMarqueur"
+                  class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                  Voir Fiche de synthese
+                  <ArrowRightIcon class="ml-2 size-5" />
+                </button>
+              </div>
+
+              <div
+                v-else-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)"
+                class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                  <button v-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)"
+                    @click.self="sendInvitationLink"
+                    class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">Envoyer
+                    une invitation
+                    <ArrowRightIcon class="ml-2 size-5" />
+                  </button>
+
+                  <button v-else class="w-full gap-2 py-[22px]"></button>
+
+                </div>
+                <button v-if="(datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)"
+                  @click="sendReminder"
+                  class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                  Envoyer un rappel
+                  <ExternalLinkIcon class="ml-2 size-5" />
+                </button>
+              </div>
+
+              <div class="absolute top-0 flex w-full">
+                <div class="w-1/3 p-1 bg-green-500"></div>
+                <div class="flex flex-col w-2/3">
+                  <div class="p-0.5 bg-yellow-500"></div>
+                  <div class="p-0.5 bg-red-500"></div>
+                </div>
               </div>
             </div>
+            
           </div>
         </div>
-      </section>
-      <section v-if="statistiques?.options_de_reponse_stats">
-        <p class="pb-4 mt-10 text-lg font-medium intro-y">Évolution des options de réponse de perception</p>
-        <div class="py-4 mt-6 box">
-          <div class="!w-[250px] p-3">
-            <TomSelect name="organisations" v-model="currentOrganisationsOptions" @change="changeOrganisationOptions" :options="{ placeholder: 'Selectionez une organisation' }">
-              <option value=""></option>
-              <option v-for="organisation in organisations" :key="organisation.id" :value="organisation.id">{{ organisation.nom }}</option>
-            </TomSelect>
-          </div>
-          <ChartPerceptionOption v-if="loadingOption" :datasx="currentOptionsPerception.categories" class="py-4 mt-6" />
-          <div v-else class="box h-[500px] flex justify-center items-center">
-            <LoaderSnipper />
+
+        <!-- Ranking Section -->
+        <div v-if="data.pourcentage_evolution < 100" class="col-span-4 p-6 bg-white rounded-md shadow-lg">
+          <h2 class="mb-4 text-lg font-bold">Ranking of Submissions</h2>
+
+          <div class="">
+            <!-- List rankings dynamically -->
+            <RankingChart :rankingData="statistiques.organisations_ranking" />
           </div>
         </div>
-      </section>
+
+
+        <div v-else class="col-span-4 p-6 overflow-x-auto flex flex-col justify-start p-4 bg-white shadow rounded-md">
+            
+            <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
+              <div class="flex">
+                <h2 class="mr-5 text-lg font-medium truncate">Actions correctionnelle en cours</h2>
+              </div>
+              <div class="flex">
+                <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button>
+                <button class="mr-2 shadow-md btn btn-primary" >Consulter la Feuille de route</button>
+              </div>
+            </div>
+            <ActionPlan />
+          </div>
+      </div>
+
       <!-- <ActionsMener v-if="idEvaluation && statistiques.statut == 1" :evaluation="idEvaluation" /> -->
     </div>
     <LoaderSnipper v-if="isLoadingData" />
@@ -465,7 +764,8 @@ onMounted(async () => {
       </ModalBody>
       <ModalFooter>
         <div class="flex gap-2">
-          <button type="button" @click="resetForm" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
+          <button type="button" @click="resetForm"
+            class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
           <VButton :loading="isLoading" :label="mode" />
         </div>
       </ModalFooter>
@@ -489,67 +789,68 @@ onMounted(async () => {
   </Modal>
   <!-- End Modal -->
 
-  <!-- Modal Register & Update -->
-  <Modal size="modal-xl" :show="showModalOrganisation" @hidden="showModalOrganisation = false">
-    <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">{{ currentOrganisation?.nom }}</h2>
-    </ModalHeader>
-    <ModalBody>
-      <div class="grid grid-cols-1 gap-4">
-        <TabGroup>
-          <TabList class="nav-boxed-tabs">
-            <Tab class="w-full py-2" tag="button">Soumissions Factuelles</Tab>
-            <Tab class="w-full py-2" tag="button">Soumissions de Perception </Tab>
-          </TabList>
-          <TabPanels class="mt-5">
-            <TabPanel class="max-h-[80vh] overflow-y-auto">
-              <div class="flex flex-col gap-2" v-if="currentOrganisation?.factuel">
-                <div @click="goToPageSoumission(soumission.id)" v-for="(soumission, index) in currentOrganisation.factuel" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border border-l-4 rounded shadow-md cursor-pointer border-primary">
-                  <p>
-                    Soumission n° {{ index + 1 }} ( {{ soumission.created_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
-                  </p>
-                  <ProgressBar :percent="soumission.pourcentage_evolution" class="max-w-[200px]" />
-                  <!-- <div class="flex items-center gap-4">
-                    <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button>
-                    <button v-if="!soumission.statut" class="p-2 text-danger" @click="handleDelete(soumission.id)">
-                      <TrashIcon class="size-5" />
-                    </button>
-                  </div> -->
-                </div>
-              </div>
-              <div v-else class="text-lg text-center">
-                <p>Liste de soumissions vide.</p>
-              </div>
-            </TabPanel>
-            <TabPanel class="max-h-[80vh] overflow-y-auto">
-              <div class="flex flex-col gap-2" v-if="currentOrganisation?.perception">
-                <div @click="goToPageSoumission(soumission.id)" v-for="(soumission, index) in currentOrganisation.perception" :key="index" class="flex items-center justify-between w-full gap-2 px-2 py-3 text-base font-medium text-black truncate transition-all bg-white border border-l-4 rounded shadow-md cursor-pointer border-primary">
-                  <p>
-                    Soumission n° {{ index + 1 }} ( {{ soumission.created_at }}) <span :class="[soumission.statut ? 'bg-green-500' : 'bg-yellow-500']" class="px-2 py-1 mr-1 text-xs text-white rounded-full">{{ soumission.statut ? "Terminé" : "En cours" }}</span>
-                  </p>
-                  <ProgressBar :percent="soumission.pourcentage_evolution" class="max-w-[200px]" />
 
-                  <!-- <div class="flex items-center gap-4">
-                    <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button>
-                    <button v-if="!soumission.statut" class="p-2 text-danger" @click="handleDelete(soumission.id)">
-                      <TrashIcon class="size-5" />
-                    </button>
-                  </div> -->
+
+  <!-- Invitation Modal -->
+  <Modal backdrop="static" :show="showInvitationModal" @hidden="showInvitationModal = false">
+    <ModalHeader>
+      <h2 class="mr-auto text-base font-medium">Invitation</h2>
+    </ModalHeader>
+    <form @submit.prevent="sendInvitation">
+      <ModalBody>
+        
+        <div class="max-w-screen-lg p-4 mx-auto mt-4 box">
+          <InputForm class="" label="Nombre de participants" pattern="\d{1,8}" maxlength="8" v-model.number="invitationPayload.nbreParticipants" type="number" />
+        </div>
+        <hr class="my-5" />
+        <div class="max-w-screen-lg p-4 mx-auto mt-6 box">
+          <p class="text-base font-medium">Ajouter des participants</p>
+          <hr class="my-4" />
+          <div class="gap-4 m-h-[50vh] flex flex-col justify-between">
+            <div class="space-y-6">
+              <div>
+                <label class="form-label">Type de données</label>
+                <div class="flex gap-2">
+                  <div v-for="(option, index) in options" :key="index" class="form-check">
+                    <input v-model="participant.type_de_contact" :id="option.id" class="form-check-input" type="radio" name="option" :value="option.id" />
+                    <label class="form-check-label" :for="option.id">{{ option.label }}</label>
+                  </div>
                 </div>
               </div>
-              <div v-else class="text-lg text-center">
-                <p>Liste de soumissions vide.</p>
+              <form v-show="participant.type_de_contact === options[0].id" @submit.prevent="addEmail">
+                <div class="flex items-end gap-4">
+                  <InputForm class="" label="Adresse email" v-model="participant.email" type="email" />
+                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                </div>
+              </form>
+              <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
+                <div class="flex items-end gap-4">
+                  <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="8" v-model.number="participant.phone" type="number" />
+                  <!-- <div class="">
+                    <label for="Numéro de téléphone" class="form-label">Numéro de téléphone</label>
+                    <input id="Numéro de téléphone" type="number" pattern="\d{1,8}" maxlength="8" required v-model.number="currentPhone" class="form-control" placeholder="Numéro de téléphone" />
+                  </div> -->
+                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                </div>
+              </form>
+
+              <div class="flex flex-wrap items-center w-full max-w-full gap-3">
+                <div class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium bg-blue rounded-sm shadow cursor-pointer text-primary" v-for="(participant, index) in invitationPayload.participants" :key="index">
+                  <span>{{ participant.type_de_contact === 'email' ? participant?.email : participant?.phone }}</span>
+                  <button @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
+                </div>
               </div>
-            </TabPanel>
-          </TabPanels>
-        </TabGroup>
-      </div>
-    </ModalBody>
-    <ModalFooter>
-      <div class="flex gap-2">
-        <button type="button" @click="showModalOrganisation = false" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Fermer</button>
-      </div>
-    </ModalFooter>
+            </div>
+          </div>
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <div class="flex gap-2">
+          <button type="button" @click="resetInvitationForm" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
+          <VButton :loading="isLoading" label="Envoyer l'invitation" />
+        </div>
+      </ModalFooter>
+    </form>
   </Modal>
   <!-- End Modal -->
 </template>
