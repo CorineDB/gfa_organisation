@@ -463,6 +463,7 @@ const addUsers = function () {
 const storeUser = function () {
   if (chargement.value == false) {
     chargement.value = true
+    console.log(formData);
     UsersService.addUsers(formData).then((data) => {
       message.type = 'success'
       message.message = 'Nouveau utilisateur'
