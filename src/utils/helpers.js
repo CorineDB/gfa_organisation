@@ -8,6 +8,15 @@ export function generateUniqueId() {
   }
   return uniqueId;
 }
+
+export function generateUniqueIdSurvey() {
+  let uniqueId = localStorage.getItem("surveyClientId");
+  if (!uniqueId) {
+    uniqueId = uuidv4(); // Générer un nouvel UUID si l'ID n'existe pas
+    localStorage.setItem("surveyClientId", uniqueId); // Sauvegarder l'ID pour les sessions suivantes
+  }
+  return uniqueId;
+}
 export function generatevalidateKey(key) {
   localStorage.setItem(key, "true");
 }
