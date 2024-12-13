@@ -245,6 +245,15 @@ const getFeuilleDeRouteData = async () => {
 const changeStructure = () => {
   organizationId.value = idSelectStructure.value;
 };
+const getStatus = (statut) => {
+      const statuses = {
+        "-1": "Non demarre",
+        "0": "En cours",
+        "1": "En retard",
+        "2": "Terminer",
+      };
+      return statuses[statut] || "Unknown";
+};
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
@@ -279,7 +288,44 @@ onMounted(async () => {
               </div>
 
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Feuille de Route des mesures a prendre</h2>
-                <table class="min-w-full border-collapse border border-gray-300">
+               
+                <div>
+                  <table cellspacing="0" cellpadding="10">
+                    <thead>
+                      <tr>
+                        <th>Recommendation</th>
+                        <th>Action</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Validated At</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Loop through recommendations -->
+                      <template v-for="recommendation in feuilleDeRoute.recommandations" :key="recommendation.id">
+                        <!-- Recommendation row -->
+                        <tr>
+                          <td :rowspan="recommendation.actions_a_mener.length + 1">{{ recommendation.recommandation }}</td>
+                          <td colspan="5" class="actions-header">
+                            <!-- Placeholder for the first action row -->
+                          </td>
+                        </tr>
+
+                        <!-- Loop through actions of the current recommendation -->
+                        <tr v-for="action in recommendation.actions_a_mener" :key="action.id">
+                          <td>{{ action.action }}</td>
+                          <td>{{ getStatus(action.statut) }}</td>
+                          <td>{{ action.start_at }}</td>
+                          <td>{{ action.end_at }}</td>
+                          <td>{{ action.validated_at }}</td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- <table class="min-w-full border-collapse border border-gray-300">
                   <thead>
                     <tr class="bg-gray-200">
                       <th class="border border-gray-300 px-4 py-2 text-left">Action à mener</th>
@@ -313,7 +359,7 @@ onMounted(async () => {
                       <td colspan="3" class="text-center py-4">Aucune action disponible</td>
                     </tr>
                   </tbody>
-                </table>
+                </table> -->
 
 
           </TabPanel>
@@ -507,5 +553,20 @@ onMounted(async () => {
 }
 .text-yellow-600 {
   color: #d69e2e;
+}
+</style>
+
+<style scoped>
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+.actions-header {
+  text-align: center;
+  font-weight: bold;
 }
 </style>

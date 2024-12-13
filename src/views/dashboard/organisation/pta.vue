@@ -13,7 +13,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="pta in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <tr v-for="(pta,indice) in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <!-- <th scope="row" class=" p-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 {{ pta.owner_nom }}
                  <pre>{{ pta.nom }}</pre>
@@ -28,19 +28,32 @@
               </td>
               <td>
 
-            <TomSelect v-if="pta.isTache"
-              v-model="poidsActuel"
+            <!-- <TomSelect v-if="pta.isTache"
               :options="{
                 placeholder: 'Choisir le poidActuel',
               }"
-              class="w-full"
-              @change="togglesuivie(pta)"
+              class="w-full" :id="'select-' + pta.id" 
+              @change="togglesuivie(pta, indice, $event)"
+
             >
               <option>Choisir un type d'activité</option>
-              <option :selected="pta.poidsActuel==0" value="0">0%</option>
-              <option :selected="pta.poidsActuel==50"  value="50">50%</option>
-              <option :selected="pta.poidsActuel==100"  value="100">100%</option>
-            </TomSelect>
+              <option value="0">0%</option>
+              <option value="50">50%</option>
+              <option value="100">100%</option>
+            </TomSelect> -->
+
+              <TomSelect v-if="pta.isTache"
+                :options="{ placeholder: 'Choisir le poidActuel' }"
+                class="w-full"
+                :id="'select-' + pta.id"
+                v-model="pta.poidsActuel"
+                @change="togglesuivie(pta, indice, $event)"
+              >
+                <option v-for="option in poidsOptions" :key="option" :value="option">
+                  {{ option }} %
+                </option>
+              </TomSelect>
+
 
                 <!-- <button
                   v-if="pta.isTache"
@@ -349,6 +362,7 @@ export default {
       statutActuel: false,
       annee: null,
       poidsActuel: 0,
+      poidsOptions: [0,50,100],
       bailleur: "",
       bailleurs: [],
       version: "current",
@@ -1368,7 +1382,15 @@ export default {
         this.activeItems.push(index);
       }
     },
-    togglesuivie(pta) {
+
+    /* togglesuivie(pta, index, event) {
+      console.log("changeTEP");
+      // Access the selected value
+      const selectedValue = event.target.value;
+
+      // Update the specific item's selected option
+      pta.poidsActuel = selectedValue;
+
       //this.dataNew;
 
       this.redtoggle = false;
@@ -1379,13 +1401,9 @@ export default {
       //console.log(this.tabletoggle[id]);
 
       this.chargement = true;
-      var form = {
-        poidsActuel: poidsActuel,
-        tacheId: pta.id,
-      };
 
       //  console.log(id)
-      /* if (pta.poidsActuel > 0) {
+      if (pta.poidsActuel > 0) {
         this.tabletoggle[pta.id] = 0;
         TacheService.deleteSuivis(pta.id)
           .then((data) => {
@@ -1393,6 +1411,7 @@ export default {
             // this.dataNew;
             this.$toast.success("suivie supprimé avec succès");
             // window.location.reload();
+            this.getPta();
           })
           .catch((error) => {
             if (error.response) {
@@ -1407,7 +1426,11 @@ export default {
               //console.log('dernier message', error.message);
             }
           });
-      } else { */
+      } else {
+        var form = {
+          poidsActuel: pta.poidsActuel,
+          tacheId: pta.id,
+        };
         this.tabletoggle[pta.id] = 1;
 
         TacheService.suiviTache(form)
@@ -1416,6 +1439,7 @@ export default {
             // this.dataNew;
             this.$toast.success("suivie éffectué avec succès");
             // window.location.reload();
+            this.getPta();
           })
           .catch((error) => {
             if (error.response) {
@@ -1430,9 +1454,18 @@ export default {
               //console.log('dernier message', error.message);
             }
           });
-      //}
+      }
       this.chargement = false;
     },
+    */
+
+    togglesuivie(pta, indice, event) {
+      const selectedValue = event.target.value; // Get the selected value
+      console.log(`Selected value for ${pta.code} (Index ${indice}):`, selectedValue);
+      // Perform your logic with the selected value
+      pta.poidsActuel = selectedValue; // Example: Update the item's property
+    },
+    
     // exportToExcel() {
     //   //  console.log('gghghghgh');
     //   //  console.log(this.dataNew);

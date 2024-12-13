@@ -7,6 +7,7 @@ import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
 import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+import ActionAMenerService from "@/services/modules/action_a_mener.service";
 import { useRouter, useRoute } from "vue-router";
 import ProgressBar from "../../../components/news/ProgressBar.vue";/* 
 import ChartPerceptionOption from "../../../components/news/ChartPerceptionOption.vue"; */
@@ -34,6 +35,7 @@ const isLoadingData = ref(true);
 const isCreate = ref(true);
 const loadingOption = ref(true);
 const datas = ref([]);
+const feuilleDeRoute = ref([]);
 const formulaireFactuel = ref({});
 const statistiques = ref({});
 const idCurrentOng = ref({});
@@ -77,6 +79,20 @@ const getDatas = async () => {
     .catch((e) => {
       console.error(e);
       isLoadingData.value = false;
+      toast.error("Une erreur est survenue: Liste des enquêtes.");
+    });
+};
+
+const getFeuilleDeRouteData = async () => {
+  isLoading.value = true;
+  await EvaluationService.getFeuilleDeRouteEvaluation(idEvaluation)
+    .then((result) => {
+      feuilleDeRoute.value = result.data.data;
+      isLoading.value = false;
+    })
+    .catch((e) => {
+      console.error(e);
+      isLoading.value = false;
       toast.error("Une erreur est survenue: Liste des enquêtes.");
     });
 };
@@ -391,9 +407,12 @@ onMounted(async () => {
       <div class="flex">
         <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
         <!-- <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button> -->
+        <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation perception</button>       
       </div>
     </div>
   </div>
+
+  
 
   <div class="p-5 mt-0 intro-y">
     <div class="" v-if="!isLoadingData">
@@ -621,13 +640,6 @@ onMounted(async () => {
                   <button v-else class="w-full gap-2 py-[22px]"></button>
                   <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
                 </div>
-                <button
-                  v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)"
-                  @click="goToDetailSoumission(datas?.factuel?.id)"
-                  class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
-                  Details de la soumission
-                  <ExternalLinkIcon class="ml-2 size-5" />
-                </button>
               </div>
 
               <div class="absolute top-0 flex w-full">
@@ -644,7 +656,7 @@ onMounted(async () => {
               <div class="relative m-5 bg-white">
                 <div
                   class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">
-                  Evaluation factuel </div>
+                  Evaluation de Perception </div>
               </div>
 
               <div class="m-5 text-slate-600 dark:text-slate-500">
@@ -720,7 +732,7 @@ onMounted(async () => {
         </div>
 
         <!-- Ranking Section -->
-        <div v-if="data.pourcentage_evolution < 100" class="col-span-4 p-6 bg-white rounded-md shadow-lg">
+        <div v-if="statistiques.pourcentage_evolution == 100" class="col-span-4 p-6 bg-white rounded-md shadow-lg">
           <h2 class="mb-4 text-lg font-bold">Ranking of Submissions</h2>
 
           <div class="">
@@ -741,6 +753,8 @@ onMounted(async () => {
                 <button class="mr-2 shadow-md btn btn-primary" >Consulter la Feuille de route</button>
               </div>
             </div>
+            <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button>
+
             <ActionPlan />
           </div>
       </div>
