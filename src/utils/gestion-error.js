@@ -7,6 +7,13 @@ export const messageError = (error) => {
 };
 
 export function getAllErrorMessages(errorResponse) {
+  if (errorResponse.status == 500 || errorResponse.status == 404 || errorResponse.status == 403) {
+    if (errorResponse.response.data.message) {
+      return errorResponse.response.data.message;
+    } else {
+      return "Une erreur est survenue.";
+    }
+  }
   if (errorResponse.response.data) {
     const message = Object.values(errorResponse.response.data.errors)
       .flatMap((error) => error)

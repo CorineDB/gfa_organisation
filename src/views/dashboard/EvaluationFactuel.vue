@@ -11,6 +11,7 @@ import { useRoute, useRouter } from "vue-router";
 import { computed } from "vue";
 import { getAllErrorMessages } from "@/utils/gestion-error";
 import { generateUniqueId, generatevalidateKey, getvalidateKey } from "../../utils/helpers";
+import { getFieldErrors } from "@/utils/helpers.js";
 
 const TYPE_ORGANISATION = "organisation";
 
@@ -50,26 +51,25 @@ const currentMember = ref({
   contact: null,
 });
 const sources = ref([]);
+const errors = ref({});
 
 const getDataFormFactuel = async () => {
   try {
     const { data } = await EvaluationService.getFactuelFormEvaluation(token);
 
     showAlertValidate.value = data.data.terminer;
-    if(!showAlertValidate.value){
+    if (!showAlertValidate.value) {
       formDataFactuel.value = data.data;
       formulaireFactuel.value = formDataFactuel.value.formulaire_de_gouvernance;
       payload.formulaireDeGouvernanceId = formulaireFactuel.value.id;
       idEvaluation.value = formDataFactuel.value.id;
       initializeFormData();
       getFilesFormData();
-    }
-    else{
-      if(data.statutCode == 206){
+    } else {
+      if (data.statutCode == 206) {
         router.push({ name: "DetailSoumission", params: { e: data.data.idEvaluation, s: data.data.idSoumission } });
       }
     }
-
   } catch (e) {
     console.log(e);
     toast.error("Erreur lors de la récupération des données.");
@@ -155,7 +155,7 @@ const submitData = async () => {
     try {
       const result = await action;
 
-      if(result.statutCode == 206){
+      if (result.statutCode == 206) {
         router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id } });
       }
 
@@ -164,15 +164,22 @@ const submitData = async () => {
         toast.success(`${result.data.message}`);
         generatevalidateKey("factuel");
         showAlertValidate.value = true;
-        showModalPreview.value=false;
+        showModalPreview.value = false;
       }
     } catch (e) {
       console.error(e);
-      if (isValidate.value) toast.error(getAllErrorMessages(e));
+      if (isValidate.value) {
+        if (e.response && e.response.status === 422) {
+          errors.value = e.response.data.errors;
+        } else {
+          toast.error(getAllErrorMessages(e));
+        }
+      }
     } finally {
       isLoading.value = false;
     }
   } else {
+    if (isValidate.value) toast.info("Veuillez remplir le formulaire.");
     return;
   }
 };
@@ -282,6 +289,7 @@ const changeOrganisation = () => {
 const resetValidation = () => {
   showModalPreview.value = false;
   isValidate.value = false;
+  errors.value = {};
 };
 
 const openPreview = () => {
@@ -312,10 +320,10 @@ onMounted(async () => {
   } else {
     authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
     payload.organisationId = authUser.value.profil.id;
-    
+
     await getDataFormFactuel();
-    
-    if(!showAlertValidate.value){
+
+    if (!showAlertValidate.value) {
       await getSource();
       // await getcurrentUserAndFetchOrganization();
       // findFormulaireFactuel();
@@ -338,7 +346,7 @@ onMounted(async () => {
             </ul>
           </div>
         </div>
-<!--         <div class="min-w-[250px] flex items-center gap-3">
+        <!--         <div class="min-w-[250px] flex items-center gap-3">
           <label class="form-label">Organisations</label>
           <TomSelect v-model="payload.organisationId" @change="changeOrganisation" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
             <option value=""></option>
@@ -433,7 +441,6 @@ onMounted(async () => {
             <button v-if="!isPreview" @click="nextPage()" class="px-4 py-3 btn btn-outline-primary" :disabled="currentPage === totalPages - 1">Suivant</button>
 
             <button v-if="isPreview" @click="openPreview" class="px-4 py-3 btn btn-outline-primary">Prévisualiser</button>
-
           </div>
         </div>
       </div>
@@ -484,6 +491,7 @@ onMounted(async () => {
       </ModalHeader>
 
       <ModalBody class="space-y-5">
+        <div v-if="errors.factuel" class="my-2 text-danger">{{ getFieldErrors(errors.factuel) }}</div>
         <p>Organisation: {{ findOrganisation(payload.organisationId) }}</p>
         <div v-if="payload.factuel.comite_members.length > 0" class="mt-3 space-y-1">
           <label class="form-label">Membres</label>
