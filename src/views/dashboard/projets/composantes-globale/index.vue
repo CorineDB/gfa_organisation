@@ -5,7 +5,7 @@ import { getStringValueOfStatutCode } from "@/utils/index";
 import ProjetService from "@/services/modules/projet.service.js";
 import ComposantesService from "@/services/modules/composante.service";
 import InputForm from "@/components/news/InputForm.vue";
-import { getFieldErrors } from "../../utils/helpers";
+import { getFieldErrors } from "@/utils/helpers.js";
 import VButton from "@/components/news/VButton.vue";
 import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
 import { toast } from "vue3-toastify";
@@ -130,6 +130,7 @@ export default {
               this.showModal = false;
               toast.success("Modification éffectuée");
               this.formData.projetId = this.projetId;
+              this.errors = {};
 
               this.clearObjectValues(this.formData);
               this.getProjetById();
@@ -140,7 +141,7 @@ export default {
             console.log(error);
             this.isLoading = false;
             if (error.response && error.response.status === 422) {
-              this.errors.value = error.response.data.errors;
+              this.errors = error.response.data.errors;
             } else {
               toast.error(error.message);
             }
@@ -156,14 +157,14 @@ export default {
               toast.success("Ajout éffectué");
               this.showModal = false;
               this.clearObjectValues(this.formData);
-
+              this.errors = {};
               this.getProjetById();
             }
           })
           .catch((error) => {
             this.isLoading = false;
             if (error.response && error.response.status === 422) {
-              this.errors.value = error.response.data.errors;
+              this.errors = error.response.data.errors;
             } else {
               toast.error(error.message);
             }
@@ -199,6 +200,11 @@ export default {
       this.composants = data.composantes;
     },
     filter() {},
+    resetForm() {
+      this.showModal = false;
+      this.errors = {};
+    },
+    getFieldErrors,
   },
 
   created() {},
@@ -317,8 +323,8 @@ export default {
       <h2 v-else class="mr-auto text-base font-medium">Modifier un OutCome</h2>
     </ModalHeader>
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-      <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" :control="getFieldErrors(errors.libelle)" placeHolder="Nom de l'organisation" label="Nom" />
-      <InputForm v-model="formData.poids" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
+      <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" :control="getFieldErrors(errors.nom)" placeHolder="Nom de l'organisation" label="Nom" />
+      <InputForm v-model="formData.poids" class="col-span-12" type="number" :control="getFieldErrors(errors.poids)" required="required" placeHolder="Poids de l'activité " label="Poids" />
       <div v-if="this.currentUser.type == 'unitee-de-gestion'" class="flex col-span-12">
         <v-select class="w-full" :reduce="(projet) => projet.id" v-model="formData.projetId" label="nom" :options="projets">
           <template #search="{ attributes, events }">
@@ -327,13 +333,13 @@ export default {
         </v-select>
         <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
       </div>
-      <InputForm v-model="formData.budgetNational" class="col-span-12" type="number" required="required" placeHolder="Ex : 200000" label="Fond propre" />
+      <InputForm v-model="formData.budgetNational" :control="getFieldErrors(errors.budgetNational)" class="col-span-12" type="number" required="required" placeHolder="Ex : 200000" label="Fond propre" />
 
-      <InputForm v-model="formData.pret" class="col-span-12" type="number" label="Montant financier" />
+      <InputForm v-model="formData.pret" :control="getFieldErrors(errors.pret)" class="col-span-12" type="number" label="Montant financier" />
     </ModalBody>
     <ModalFooter>
       <div class="flex items-center justify-center">
-        <button type="button" @click="showModal = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+        <button type="button" @click="resetForm" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
         <VButton class="inline-block" :label="labels" :loading="isLoading" @click="sendForm" />
       </div>
     </ModalFooter>

@@ -5,6 +5,7 @@ import { getStringValueOfStatutCode } from "@/utils/index";
 import ProjetService from "@/services/modules/projet.service.js";
 import ComposantesService from "@/services/modules/composante.service";
 import InputForm from "@/components/news/InputForm.vue";
+import { getFieldErrors } from "@/utils/helpers.js";
 import VButton from "@/components/news/VButton.vue";
 import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
 import { toast } from "vue3-toastify";
@@ -12,7 +13,7 @@ export default {
   components: {
     InputForm,
     VButton,
-    NoRecordsMessage
+    NoRecordsMessage,
   },
   data() {
     return {
@@ -36,6 +37,7 @@ export default {
       labels: "Ajouter",
       showDeleteModal: false,
       deleteLoader: false,
+      errors: {},
     };
   },
   computed: {
@@ -57,8 +59,12 @@ export default {
   },
 
   methods: {
-
-    text() { },
+    getFieldErrors,
+    resetForm() {
+      this.showModal = false;
+      this.errors = {};
+    },
+    text() {},
 
     clearObjectValues(obj) {
       for (let key in obj) {
@@ -121,7 +127,7 @@ export default {
     sendForm() {
       if (this.update) {
         // this.formData.projetId = this.projetId
-         this.isLoading = true;
+        this.isLoading = true;
         ComposantesService.update(this.sousComposantId, this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
@@ -129,10 +135,10 @@ export default {
               this.isLoading = false;
               this.showModal = false;
               toast.success("Modification éffectuée");
-              this.composantsId = this.formData.composanteId
+              this.composantsId = this.formData.composanteId;
               this.clearObjectValues(this.formData);
               // delete this.formData.projetId;
-              
+              this.errors = {};
               //this.getProjetById();
               this.getComposantById(this.composantsId);
               //this.sendRequest = false;
@@ -141,7 +147,11 @@ export default {
           .catch((error) => {
             // delete this.formData.projetId;
             this.isLoading = false;
-            toast.error(error.message);
+            if (error.response && error.response.status === 422) {
+              this.errors = error.response.data.errors;
+            } else {
+              toast.error(error.message);
+            }
           });
       } else {
         this.isLoading = true;
@@ -154,22 +164,27 @@ export default {
               toast.success("Ajout éffectué");
               this.showModal = false;
               this.clearObjectValues(this.formData);
-
+              this.errors = {};
               //this.getProjetById();
               this.getComposantById(this.composantsId);
             }
           })
           .catch((error) => {
             this.isLoading = false;
-            toast.error("Erreur lors de la modification");
+            if (error.response && error.response.status === 422) {
+              this.errors = error.response.data.errors;
+            } else {
+              toast.error(error.message);
+              toast.error("Erreur lors de la modification");
+            }
           });
       }
     },
     getListeProjet() {
-      this.isLoadingData = true
+      this.isLoadingData = true;
       ProjetService.get()
         .then((data) => {
-          this.isLoadingData = false
+          this.isLoadingData = false;
           this.projets = data.data.data;
           if (this.projetId == "") {
             this.projetId = this.currentUser.projet.id;
@@ -193,13 +208,12 @@ export default {
         .then((datas) => {
           this.composants = datas.data.data.composantes;
 
-          if ((this.composantsId == "") && (this.composants.length > 0) ) {
+          if (this.composantsId == "" && this.composants.length > 0) {
             this.composantsId = this.composants[0].id;
           }
-          if(this.composantsId != "" && this.composantsId != null && this.composantsId != undefined){
+          if (this.composantsId != "" && this.composantsId != null && this.composantsId != undefined) {
             this.getComposantById(this.composantsId);
           }
-
         })
         .catch((error) => {
           console.log(error);
@@ -208,7 +222,7 @@ export default {
     getComposantById(data) {
       ComposantesService.detailComposant(data)
         .then((data) => {
-          this.sousComposants = data.data.data.souscomposantes
+          this.sousComposants = data.data.data.souscomposantes;
           console.log(this.sousComposants);
         })
         .catch((error) => {
@@ -250,18 +264,19 @@ export default {
         </div>
 
         <div class="flex w-full">
-          <label for="_input-wizard-10"
-              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
-          <TomSelect v-model="composantsId" :options="{
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
+          <TomSelect
+            v-model="composantsId"
+            :options="{
               placeholder: 'Choisir un OutCome',
               create: false,
               onOptionAdd: text(),
-            }" class="w-full">
-              <option v-for="(composant, index) in composants" :key="index" :value="composant.id">{{ composant.codePta }} - {{ composant.nom }}
-              </option>
+            }"
+            class="w-full"
+          >
+            <option v-for="(composant, index) in composants" :key="index" :value="composant.id">{{ composant.codePta }} - {{ composant.nom }}</option>
           </TomSelect>
         </div>
-
       </div>
 
       <!-- <button class="absolute px-4 py-2 text-white transform -translate-x-1/2 bg-blue-500 rounded -bottom-3 left-1/2" @click="filter()">Filtrer</button> -->
@@ -290,7 +305,7 @@ export default {
 
   <div v-if="!isLoadingData" class="grid grid-cols-12 gap-6 mt-5">
     <!-- BEGIN: Users Layout -->
-     <!-- <pre>{{sousComposants}}</pre>   -->
+    <!-- <pre>{{sousComposants}}</pre>   -->
     <div v-if="sousComposants.length > 0" v-for="(item, index) in sousComposants" :key="index" class="col-span-12 intro-y md:col-span-6 lg:col-span-4">
       <div class="p-5 box">
         <div class="flex items-start pt-5 _px-5">
@@ -348,10 +363,7 @@ export default {
     </div>
   </div>
 
-  <NoRecordsMessage v-if="!sousComposants.length"
-      title="No outputs Found"
-      description="It seems there are no outputs to display. Please check back later."
-    />
+  <NoRecordsMessage v-if="!sousComposants.length" title="No outputs Found" description="It seems there are no outputs to display. Please check back later." />
   <!-- END: Users Layout -->
   <LoaderSnipper v-if="isLoadingData" />
 
@@ -361,29 +373,33 @@ export default {
       <h2 v-else class="mr-auto text-base font-medium">Modifier un Output</h2>
     </ModalHeader>
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-      <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
-      <InputForm v-model="formData.poids" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
+      <InputForm v-model="formData.nom" :control="getFieldErrors(errors.nom)" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
+      <InputForm v-model="formData.poids" :control="getFieldErrors(errors.poids)" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
 
       <div class="flex col-span-12 mt-3">
-          <label for="_input-wizard-10"
-              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
-          <TomSelect v-model="formData.composanteId" :options="{
-              placeholder: 'Choisir un OutCome',
-              create: false,
-              onOptionAdd: text(),
-            }" class="w-full">
-              <option v-for="(composant, index) in composants" :key="index" :value="composant.id">{{ composant.codePta }} - {{ composant.nom }}
-              </option>
-          </TomSelect>
-        </div>
+        <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
+        <TomSelect
+          v-model="formData.composanteId"
+          :options="{
+            placeholder: 'Choisir un OutCome',
+            create: false,
+            onOptionAdd: text(),
+          }"
+          class="w-full"
+        >
+          <option v-for="(composant, index) in composants" :key="index" :value="composant.id">{{ composant.codePta }} - {{ composant.nom }}</option>
+        </TomSelect>
+        <br />
+        <div v-if="errors.composanteId" class="mt-2 text-danger">{{ getFieldErrors(errors.composanteId) }}</div>
+      </div>
 
-      <InputForm v-model="formData.budgetNational" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
+      <InputForm v-model="formData.budgetNational" :control="getFieldErrors(errors.budgetNational)" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
 
-      <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Montant financier" />
+      <InputForm v-model="formData.pret" :control="getFieldErrors(errors.pret)" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Montant financier" />
     </ModalBody>
     <ModalFooter>
       <div class="flex items-center justify-center">
-        <button type="button" @click="showModal = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+        <button type="button" @click="resetForm" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
         <VButton class="inline-block" :label="labels" :loading="isLoading" @click="sendForm" />
       </div>
     </ModalFooter>
