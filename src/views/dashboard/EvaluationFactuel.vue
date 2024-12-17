@@ -154,17 +154,23 @@ const submitData = async () => {
 
     try {
       const result = await action;
+<<<<<<< HEAD
 
       if(result.statutCode == 206){
         router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id } });
       }
 
       payload.soumissionId = result.data.data.id;
+=======
+>>>>>>> ca23a3cf7c4ad5a221e17a2b1ef54efefa3257cc
       if (isValidate.value) {
         toast.success(`${result.data.message}`);
         generatevalidateKey("factuel");
         showAlertValidate.value = true;
+<<<<<<< HEAD
         showModalPreview.value=false;
+=======
+>>>>>>> ca23a3cf7c4ad5a221e17a2b1ef54efefa3257cc
       }
     } catch (e) {
       console.error(e);
