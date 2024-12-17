@@ -80,8 +80,12 @@ const EvaluationService = {
     return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/recommandations`);
   },
   
-  getFeuilleDeRouteEvaluation(idEvaluation) {
+  getActionsAMenerEvaluation(idEvaluation) {
     return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/actions-a-mener`);
+  },
+  
+  getFeuilleDeRouteEvaluation(idEvaluation) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/feuille-de-route`);
   },
 };
 

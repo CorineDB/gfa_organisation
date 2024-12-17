@@ -186,7 +186,7 @@ const modifierMotPasse = () => {
     if (!chargement.value) {
       chargement.value = true
 
-      let newPassword = { new_password: formData.newPassword }
+      let newPassword = { current_password: formData.oldPassword, new_password: formData.newPassword, new_password_confirmation: formData.confirmPassword }
 
       AuthentificationService.changePassword(newPassword).then(response => {
 

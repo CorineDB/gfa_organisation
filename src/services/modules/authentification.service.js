@@ -10,7 +10,7 @@ const AuthentificationService = {
     return ApiService.post("authentificate/logout");
   },
   changePassword(params){
-    return ApiService.post("users/updatePassword",params)
+    return ApiService.post("gfa/utilisateurs/updatePassword",params)
   },
   changeProfil(params){
       return ApiService.post("users/photo",params)  
