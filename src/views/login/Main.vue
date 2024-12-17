@@ -30,7 +30,7 @@
             <div class="mt-2 text-center intro-x text-slate-400 xl:hidden">Responsabilité partagée, Qualité améliorée : Unis pour un meilleur service social.</div>
             <div class="mt-8 intro-x">
               <div>
-                <input type="text" v-model.trim="login" class="block px-4 py-3 intro-x login__input form-control" autocomplete  placeholder="Email" />
+                <input type="text" v-model.trim="login" class="block px-4 py-3 intro-x login__input form-control" autocomplete placeholder="Email" />
                 <!-- <div class="py-2 text-sm font-semibold text-red-500" v-if='!$v.login.required && soumettre'>
                   Ce champ est obligatoire
                       </div> -->
@@ -105,6 +105,7 @@ import { mapState, mapActions, mapMutations, mapGetters } from "vuex";
 import axios from "axios";
 import VButton from "@/components/news/VButton.vue";
 import { API_BASE_URL } from "@/services/configs/environment.js";
+import { toast } from "vue3-toastify";
 
 export default {
   name: "IndexPage",
@@ -143,7 +144,7 @@ export default {
     ...mapActions({
       authentification: "auths/LOGIN",
     }),
-
+    toast,
     gotoValidate() {
       this.showSend = true;
     },
@@ -182,6 +183,12 @@ export default {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response.status == 422) {
+                toast.error("Email ou mot de passe incorrect  reesayer !!!");
+              } else {
+                toast.error("Une erreur s'est produite   reesayer !!!");
+              }
+
               this.chargement = false;
             });
         } else {
@@ -217,10 +224,9 @@ export default {
     },
 
     gotoOrganisationAppropriateDashboard(projet = null) {
-      if(projet != null){
+      if (projet != null) {
         this.$router.push({ name: "projets_id_details", params: { id: projet.id, projet: projet } });
-      }
-      else{
+      } else {
         this.$router.push({ name: "Programmation_enquete" });
       }
     },
