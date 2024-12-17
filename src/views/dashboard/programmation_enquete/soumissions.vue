@@ -707,7 +707,6 @@ onMounted(async () => {
               <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Emettre une mesure a prendre</button>
               <button class="mr-2 shadow-md btn btn-primary">Consulter la Feuille de route</button>
             </div>
-            <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Emettre une mesure a prendre</button>
           </div>
           <!-- <ActionPlan /> -->
         </div>
