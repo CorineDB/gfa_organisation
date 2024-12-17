@@ -936,6 +936,7 @@ import ReportBarChart1 from "@/components/report-bar-chart-1/Main.vue";
 import SimpleLineChart1 from "@/components/simple-line-chart-1/Main.vue";
 import { useRouter, useRoute } from "vue-router";
 import BsdService from "@/services/modules/bsd.service";
+import ProgrammeService from "@/services/modules/programme.service";
 import CampagneService from "@/services/modules/campagne.service";
 import XLSX from "xlsx";
 import { PUSHER_BASE_URL, PUSHER_APP_CLUSTER } from "@/services/configs/environment";
@@ -950,6 +951,7 @@ const salesReportFilter = ref(""); // la variable pour la selection de 2 date
 const isDisabled = ref(true);
 const importantNotesRef = ref();
 const statistique = ref({});
+const dashboard = ref({});
 const campagnes = ref({});
 const firstCampagnId = ref("");
 const chartData = ref([]);
@@ -1049,6 +1051,7 @@ const allStats = ref({});
 onBeforeMount(function () {
   getCampagne();
   getstatGeneral();
+  getStatsGeneral();
 
   selectedYear.value = new Date().getFullYear();
 });
@@ -1349,6 +1352,18 @@ const subscribe = function () {
     toutCampagneJMedQrN.value = statistique.value.toutCampagneJMediocreQr[0];
     toutCampagneJMedTabN.value = statistique.value.toutCampagneJMediocreTablette[0];
   });
+};
+
+const getStatsGeneral = function () {
+  ProgrammeService.dashboard()
+    .then((data) => {
+      console.log(data);
+      dashboard.value = data.data.data;
+    })
+    .catch((e) => {
+      // disabled()
+      // alert(e)
+    });
 };
 
 const getstatGeneral = function () {

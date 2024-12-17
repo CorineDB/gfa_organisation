@@ -18,10 +18,6 @@ export default {
   },
   props: {
 
-    getProjetById: {
-      type: Function,
-      required: false,
-    },
     sousComposantsId: {
       type: String,
       required: true,
@@ -29,10 +25,6 @@ export default {
     composantId: {
       type: String,
       required: true,
-    },
-    projetId: {
-      required: true,
-      type: String
     }
   },
   data() {
@@ -75,11 +67,6 @@ export default {
     ...mapGetters("auths", { currentUser: "GET_AUTHENTICATE_USER" }),
   },
   watch: {
-    projetId(newValue, oldValue) {
-      if (this.projets.length > 0) {
-        //this.getProjetById(newValue);
-      }
-    },
     composantId(newValue, oldValue) {
       this.composantsId = newValue;
     },
@@ -90,17 +77,15 @@ export default {
     },
     sousComposantId(newValue, oldValue) {
       //if (this.sousComposants.length > 0) {
+      if (newValue!=null) {
         this.getComposantById(newValue);
+        //this.getComposantById(newValue);
+      }
       //}
     },
     sousComposantsId(newValue, oldValue) {
       this.sousComposantId = newValue;
-    },/* 
-    composantId(newValue, oldValue) {
-      if (this.sousComposants.length > 0) {
-        this.getComposantById(newValue);
-      }
-    }, */
+    }
   },
 
   methods: {
@@ -147,7 +132,7 @@ export default {
     },
 
     addActivite() {
-      this.getProjetById();
+      this.triggerGetProjetDetailsById();
       this.showModal = true;
       this.isUpdate = false;
       this.formData.type = "pta";
@@ -179,7 +164,6 @@ export default {
         this.formData.budgetNational = parseInt(this.formData.budgetNational);
         this.formData.pret = parseInt(this.formData.pret);
         this.formData.type = "pta";
-        // this.formData.projetId = this.projetId
         this.isLoading = true;
         ActiviteService.update(this.activiteId, this.formData)
           .then((response) => {
@@ -195,7 +179,6 @@ export default {
             }
           })
           .catch((error) => {
-            // delete this.formData.projetId;
             this.isLoading = false;
             toast.error(error.message);
           });
@@ -222,37 +205,31 @@ export default {
           });
       }
     },
-    getProjetById(data = null) {
-      console.log(data);
-      if (data == null) {
-        data = this.projetId ?? this.currentUser.projet.id;
-        //this.projetId = this.projets[0].id;
-      }
 
-      ProjetService.getDetailProjet(data)
-        .then((datas) => {
-          this.composants = datas.data.data.composantes;
-          if ((this.composantsId == "") && (this.composants.length > 0) ) {
-            this.composantsId = this.composants[0].id;
-          }
-          if(this.composantsId != "" && this.composantsId != null && this.composantsId != undefined){
-            this.getComposantById(this.composantsId);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    triggerGetProjetDetailsById() {
+      // Emit the event with the projetId as payload
+      console.log("Emit");
+      this.$emit('getProjetById');
     },
     getComposantById(data) {
       ComposantesService.detailComposant(data)
         .then((data) => {
 
-          this.activites = data.data.data.activites;
-          console.log(this.activites);
+          /* this.activites = data.data.data.activites;
+          console.log(this.activites); */
 
           if (data.data.data.souscomposantes.length > 0) {
             this.sousComposants = data.data.data.souscomposantes;
+
+            if ((this.sousComposantsId == "") && (this.sousComposants.length > 0) ) {
+              this.sousComposantId = this.sousComposants[0].id;
+            }
             this.haveSousComposantes = true;
+          }
+          else{
+            console.log("Fetch sous composantes");
+            console.log(data.data.data.activites);
+            this.activites = data.data.data.activites;
           }
         })
         .catch((error) => {
