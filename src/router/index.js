@@ -452,7 +452,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   // Permettre l'accès à la route "toolsPerception" quel que soit l'état d'authentification
-  if (["ToolsPerception", "activation", "reset_Password", "view_survey", "request_password"].includes(to.name)) {
+  if (["ToolsPerception", "activation", "reset_Password", "view_survey", "request_password", "request_Password"].includes(to.name)) {
     next();
   }
   // Rediriger vers "/" si non authentifié et que la route n'est pas la page d'accueil
