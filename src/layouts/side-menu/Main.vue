@@ -116,7 +116,8 @@ const sideMenu = computed(() => nestedMenu(sideMenuStore.menu, route));
 const updateMenu = reactive([]);
 
 const lastMenu = computed(() => nestedMenu(updateMenu, route));
-const isToolsPerception = computed(() => route.path.includes("tools-perception") && !localStorage.getItem("authenticateUser"));
+const isToolsPerception = computed(() => ["tools-perception", "form-individuel", "request-password"].some((path) => route.path.includes(path)) && !localStorage.getItem("authenticateUser"));
+
 provide("forceActiveMenu", (pageName) => {
   route.forceActiveMenu = pageName;
   formattedMenu.value = $h.toRaw(lastMenu.value);
