@@ -222,6 +222,7 @@ export default {
     },
     getProjetById(data = null) {
       
+      console.log("Emit");
       if (data == null) {
         data = this.projetId = this.projetId ?? this.currentUser.projet.id;
         //this.projetId = this.projets[0].id;
@@ -246,15 +247,17 @@ export default {
       ComposantesService.detailComposant(data)
         .then((data) => {
 
-          this.activites = data.data.data.activites;
+          console.log(data.data.data.souscomposantes);
+          //this.activites = data.data.data.activites;
 
           if (data.data.data.souscomposantes.length > 0) {
             this.sousComposants = data.data.data.souscomposantes;
             this.haveSousComposantes = true;
+            this.sousComposantsId = this.sousComposants[0].id;
 
-            if ((this.sousComposantsId == "") && (this.sousComposants.length > 0) ) {
+            /* if ((this.sousComposantsId == "") && (this.sousComposants.length > 0) ) {
               this.sousComposantsId = this.sousComposants[0].id;
-            }
+            } */
 
           }
         })
@@ -427,7 +430,7 @@ export default {
       </div>
     </div>
 
-    <ActivitiesComponent v-if="seeActivite" :projetId="projetId" :composantId="composantsId" :sousComposantsId="sousComposantsId" @getProjetById="getProjetById"/>
+    <ActivitiesComponent v-if="seeActivite" :composantId="composantsId" :sousComposantsId="sousComposantsId" @getProjetById="getProjetById"/>
     <PlanDecaissementComponent v-if="seePlan" :projetId="projetId" :composantsId="sousComposantsId ?? composantsId" />
 
   <div v-if="false == true">

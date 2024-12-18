@@ -64,6 +64,9 @@ const ProgrammeService = {
     scopes(slug) {
         return ApiService.get(`programmes/${slug}/scopes`);
     },
+    dashboard() {
+        return ApiService.get(`programme/dashboard`);
+    },
     kobo() {
         return ApiService.get(`programme/kobo`);
     },

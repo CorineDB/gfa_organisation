@@ -16,7 +16,7 @@ const AuthService = {
     },
 
     login(params) {
-      return ApiService.post("authentification", params);
+      return ApiService.post("organisation-authentification", params);
     },
 
     changeProfil(slug, params) {
