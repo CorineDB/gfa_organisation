@@ -14,6 +14,7 @@ import Critere from "../views/dashboard/critere.vue";
 import Utilisateur from "../views/dashboard/utilisateur.vue";
 import Login from "../views/login/Main.vue";
 import RequestPassword from "../views/reset_password/Main.vue";
+import Activation from "../views/activation/Main.vue";
 import ResetPasswordConnect from "../views/reset_password/Main.vue";
 import ResetPassword from "../views/reset-password/Main.vue";
 import NewPassword from "../views/reset-password/_mails/newPassword.vue";
@@ -351,16 +352,6 @@ const routes = [
         component: Critere,
       },
       {
-        path: "/request-password",
-        name: "request_password",
-        component: RequestPassword,
-      },
-      {
-        path: "/reset_password/:t",
-        name: "reset_Password",
-        component: ResetPasswordConnect,
-      },
-      {
         path: "enquete-individuel",
         name: "EnqueteIndividuel",
         component: EnqueteIndividuel,
@@ -421,6 +412,21 @@ const routes = [
     component: ResetPassword,
   },
   {
+    path: "/activation/:t",
+    name: "activation",
+    component: Activation,
+  },
+  {
+    path: "/request-password",
+    name: "request_password",
+    component: RequestPassword,
+  },
+  {
+    path: "/reset_password/:t",
+    name: "reset_Password",
+    component: ResetPasswordConnect,
+  },
+  {
     path: "/password_update",
     name: "NewPassword",
     component: NewPassword,
@@ -446,7 +452,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   // Permettre l'accès à la route "toolsPerception" quel que soit l'état d'authentification
-  if (to.name === "ToolsPerception") {
+  if (["ToolsPerception", "activation", "reset_Password", "view_survey", "request_password"].includes(to.name)) {
     next();
   }
   // Rediriger vers "/" si non authentifié et que la route n'est pas la page d'accueil
