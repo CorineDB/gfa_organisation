@@ -12,6 +12,7 @@ import { getAllErrorMessages } from "@/utils/gestion-error";
 import { computed } from "vue";
 import { ages, categorieDeParticipant, sexes } from "../../utils/constants";
 import { generateUniqueId, generatevalidateKey, getvalidateKey } from "../../utils/helpers";
+import { getFieldErrors } from "@/utils/helpers.js";
 
 const TYPE_ORGANISATION = "organisation";
 
@@ -44,6 +45,7 @@ const organisationSelected = ref(false);
 const isValidate = ref(false);
 const isLoadingDataPerception = ref(true);
 const sources = ref([]);
+const errors = ref({});
 
 // Etat de la page et items par page
 const currentPage = ref(1);
@@ -53,7 +55,7 @@ const getDataFormPerception = async () => {
   try {
     const { data } = await EvaluationService.getPerceptionFormEvaluation(payload.identifier_of_participant, token);
     //showAlertValidate.value = data.data.terminer;
-    if(!showAlertValidate.value){
+    if (!showAlertValidate.value) {
       formDataPerception.value = data.data;
       formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance;
       idEvaluation.value = formDataPerception.value.id;
@@ -95,24 +97,31 @@ const submitData = async () => {
     try {
       const result = await action;
 
-      if(result.statutCode == 206){
+      if (result.statutCode == 206) {
         showAlertValidate.value = result.data.terminer;
       }
-      
+
       if (isValidate.value) {
         toast.success(`${result.data.message}`);
         generatevalidateKey("perception");
         showAlertValidate.value = true;
-        showModalPreview.value=false;
+        showModalPreview.value = false;
       }
-      
+      errors.value = {};
     } catch (e) {
       console.error(e);
-      if (isValidate.value) toast.error(getAllErrorMessages(e));
+      if (isValidate.value) {
+        if (e.response && e.response.status === 422) {
+          errors.value = e.response.data.errors;
+        } else {
+          toast.error(getAllErrorMessages(e));
+        }
+      }
     } finally {
       isLoading.value = false;
     }
   } else {
+    if (isValidate.value) toast.info("Veuillez remplir le formulaire.");
     return;
   }
 };
@@ -188,6 +197,7 @@ const findResponse = (id) => {
 const resetValidation = () => {
   showModalPreview.value = false;
   isValidate.value = false;
+  errors.value = {};
 };
 
 const openPreview = () => {
@@ -259,8 +269,8 @@ onMounted(async () => {
   } else {
     payload.identifier_of_participant = generateUniqueId();
     await getDataFormPerception();
-    
-    if(!showAlertValidate.value){
+
+    if (!showAlertValidate.value) {
       // await getcurrentUserAndFetchOrganization();
       // findFormulairePerception();
       initializeFormData();
@@ -350,6 +360,7 @@ onMounted(async () => {
       </ModalHeader>
 
       <ModalBody class="space-y-5">
+        <div v-if="errors.perception" class="my-2 text-danger">{{ getFieldErrors(errors.perception) }}</div>
         <p v-if="payload.organisationId">
           Patenaire: <span class="text-primary">{{ findOrganisation(payload.organisationId) }}</span>
         </p>

@@ -13,6 +13,9 @@ import Principe from "../views/dashboard/principe.vue";
 import Critere from "../views/dashboard/critere.vue";
 import Utilisateur from "../views/dashboard/utilisateur.vue";
 import Login from "../views/login/Main.vue";
+import RequestPassword from "../views/reset_password/Main.vue";
+import Activation from "../views/activation/Main.vue";
+import ResetPasswordConnect from "../views/reset_password/Main.vue";
 import ResetPassword from "../views/reset-password/Main.vue";
 import NewPassword from "../views/reset-password/_mails/newPassword.vue";
 import ResetPasswordFromDashboard from "../views/dashboard/resetPasswordFromDashboard.vue";
@@ -138,12 +141,12 @@ const routes = [
         path: "indicateur/:id",
         name: "detail_indicateur",
         component: DetailSuivi,
-      },/*
+      } /*
       {
         path: "actions",
         name: "action_a_mener",
         component: ActionsMener,
-      },*/
+      },*/,
       {
         path: "suivi-indicateur",
         name: "suivi_indicateur",
@@ -174,7 +177,7 @@ const routes = [
         name: "MesuresAPrendre",
         component: MesuresAPrendre,
       },
-      
+
       {
         path: "audit",
         name: "audit",
@@ -387,7 +390,7 @@ const routes = [
         path: "enquetes/:id/recommandations",
         name: "Recommandation",
         component: Recommandation,
-      }
+      },
     ],
   },
 
@@ -407,6 +410,21 @@ const routes = [
     path: "/reset-password",
     name: "resetPassword",
     component: ResetPassword,
+  },
+  {
+    path: "/activation/:t",
+    name: "activation",
+    component: Activation,
+  },
+  {
+    path: "/request-password",
+    name: "request_password",
+    component: RequestPassword,
+  },
+  {
+    path: "/reset_password/:t",
+    name: "reset_Password",
+    component: ResetPasswordConnect,
   },
   {
     path: "/password_update",
@@ -434,7 +452,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   // Permettre l'accès à la route "toolsPerception" quel que soit l'état d'authentification
-  if (to.name === "ToolsPerception") {
+  if (["ToolsPerception", "activation", "reset_Password", "view_survey", "request_password", "request_Password"].includes(to.name)) {
     next();
   }
   // Rediriger vers "/" si non authentifié et que la route n'est pas la page d'accueil

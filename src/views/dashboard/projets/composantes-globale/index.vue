@@ -5,6 +5,7 @@ import { getStringValueOfStatutCode } from "@/utils/index";
 import ProjetService from "@/services/modules/projet.service.js";
 import ComposantesService from "@/services/modules/composante.service";
 import InputForm from "@/components/news/InputForm.vue";
+import { getFieldErrors } from "@/utils/helpers.js";
 import VButton from "@/components/news/VButton.vue";
 import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
 import { toast } from "vue3-toastify";
@@ -12,7 +13,7 @@ export default {
   components: {
     InputForm,
     VButton,
-    NoRecordsMessage
+    NoRecordsMessage,
   },
   data() {
     return {
@@ -34,6 +35,7 @@ export default {
       labels: "Ajouter",
       showDeleteModal: false,
       deleteLoader: false,
+      errors: {},
     };
   },
   computed: {
@@ -117,10 +119,9 @@ export default {
     },
 
     sendForm() {
-      console.log(this.formData)
-      
+      console.log(this.formData);
+
       if (this.update) {
-        
         ComposantesService.update(this.composantsId, this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
@@ -129,6 +130,7 @@ export default {
               this.showModal = false;
               toast.success("Modification éffectuée");
               this.formData.projetId = this.projetId;
+              this.errors = {};
 
               this.clearObjectValues(this.formData);
               this.getProjetById();
@@ -138,7 +140,11 @@ export default {
           .catch((error) => {
             console.log(error);
             this.isLoading = false;
-            toast.error(error.message);
+            if (error.response && error.response.status === 422) {
+              this.errors = error.response.data.errors;
+            } else {
+              toast.error(error.message);
+            }
           });
       } else {
         this.isLoading = true;
@@ -151,13 +157,17 @@ export default {
               toast.success("Ajout éffectué");
               this.showModal = false;
               this.clearObjectValues(this.formData);
-
+              this.errors = {};
               this.getProjetById();
             }
           })
           .catch((error) => {
             this.isLoading = false;
-            toast.error("Erreur lors de la modification");
+            if (error.response && error.response.status === 422) {
+              this.errors = error.response.data.errors;
+            } else {
+              toast.error(error.message);
+            }
           });
       }
     },
@@ -190,6 +200,11 @@ export default {
       this.composants = data.composantes;
     },
     filter() {},
+    resetForm() {
+      this.showModal = false;
+      this.errors = {};
+    },
+    getFieldErrors,
   },
 
   created() {},
@@ -204,8 +219,7 @@ export default {
 </script>
 
 <template>
-
-<h2 class="mt-10 text-lg font-medium intro-y">OutComes</h2>
+  <h2 class="mt-10 text-lg font-medium intro-y">OutComes</h2>
 
   <!-- Titre de la page -->
   <div class="grid grid-cols-12 gap-6 mt-5">
@@ -223,34 +237,26 @@ export default {
   </div>
 
   <div v-if="!isLoadingData" class="grid grid-cols-12 gap-6 mt-5">
-    <div v-if="composants.length" v-for="(item, index) in composants" :key="index" class="col-span-12 md:col-span-6 lg:col-span-4 p-4">
-      <div class="p-5 box shadow-lg rounded-lg border-l-4 border-primary transition-transform transform hover:scale-105 bg-white hover:bg-gray-50">
+    <div v-if="composants.length" v-for="(item, index) in composants" :key="index" class="col-span-12 p-4 md:col-span-6 lg:col-span-4">
+      <div class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
         <!-- En-tête avec sigle et titre -->
-        <div class="flex items-start pt-5 relative">
+        <div class="relative flex items-start pt-5">
           <div class="flex flex-col items-center w-full lg:flex-row">
             <!-- Circle with initial or image -->
-            <div class="flex items-center justify-center w-16 h-16 text-white rounded-full bg-primary shadow-md">
+            <div class="flex items-center justify-center w-16 h-16 text-white rounded-full shadow-md bg-primary">
               {{ item.sigle }}
             </div>
             <!-- Item details -->
             <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0">
-              <a href="" class="font-semibold text-lg text-gray-800 hover:text-primary transition-colors">
+              <a href="" class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary">
                 {{ item.nom }}
               </a>
               <div class="mt-2 text-xs text-gray-500">
                 <!-- Status badges -->
-                <span v-if="item.statut == -2" class="px-2 py-1 text-xs font-medium text-white bg-primary rounded-md">
-                  Non validé
-                </span>
-                <span v-else-if="item.statut == -1" class="px-2 py-1 text-xs font-medium text-white bg-green-500 rounded-md">
-                  Validé
-                </span>
-                <span v-else-if="item.statut == 0" class="px-2 py-1 text-xs font-medium text-white bg-yellow-500 rounded-md">
-                  En cours
-                </span>
-                <span v-else-if="item.statut == 1" class="px-2 py-1 text-xs font-medium text-white bg-red-500 rounded-md">
-                  En retard
-                </span>
+                <span v-if="item.statut == -2" class="px-2 py-1 text-xs font-medium text-white rounded-md bg-primary"> Non validé </span>
+                <span v-else-if="item.statut == -1" class="px-2 py-1 text-xs font-medium text-white bg-green-500 rounded-md"> Validé </span>
+                <span v-else-if="item.statut == 0" class="px-2 py-1 text-xs font-medium text-white bg-yellow-500 rounded-md"> En cours </span>
+                <span v-else-if="item.statut == 1" class="px-2 py-1 text-xs font-medium text-white bg-red-500 rounded-md"> En retard </span>
                 <span v-else-if="item.statut == 2" class="pl-2 font-medium">Terminé</span>
               </div>
             </div>
@@ -258,42 +264,38 @@ export default {
           <!-- Dropdown for actions -->
           <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
             <DropdownToggle tag="a" class="block w-5 h-5 cursor-pointer">
-              <MoreVerticalIcon class="w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors" />
+              <MoreVerticalIcon class="w-5 h-5 text-gray-400 transition-colors hover:text-gray-600" />
             </DropdownToggle>
-            <DropdownMenu class="w-40 shadow-lg rounded-md bg-white">
+            <DropdownMenu class="w-40 bg-white rounded-md shadow-lg">
               <DropdownContent>
-                <DropdownItem @click="modifierComposante(item)">
-                  <Edit2Icon class="w-4 h-4 mr-2 text-gray-600" /> Modifier
-                </DropdownItem>
-                <DropdownItem @click="supprimerComposant(item)">
-                  <TrashIcon class="w-4 h-4 mr-2 text-red-500" /> Supprimer
-                </DropdownItem>
+                <DropdownItem @click="modifierComposante(item)"> <Edit2Icon class="w-4 h-4 mr-2 text-gray-600" /> Modifier </DropdownItem>
+                <DropdownItem @click="supprimerComposant(item)"> <TrashIcon class="w-4 h-4 mr-2 text-red-500" /> Supprimer </DropdownItem>
               </DropdownContent>
             </DropdownMenu>
           </Dropdown>
         </div>
 
         <!-- Description section with distinct styling -->
-        <div class="text-center lg:text-left mt-5">
-          <p class="text-lg font-semibold mb-3 text-primary">Description</p>
-          <p class="text-gray-600 bg-gray-50 p-3 rounded-lg shadow-sm">{{ item.description }}</p>
+        <div class="mt-5 text-center lg:text-left">
+          <p class="mb-3 text-lg font-semibold text-primary">Description</p>
+          <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description }}</p>
 
           <!-- Other details with iconized section headers -->
-          <div class="mt-5 text-gray-600 space-y-3">
+          <div class="mt-5 space-y-3 text-gray-600">
             <div class="flex items-center text-sm font-medium text-gray-700">
-              <LinkIcon class="w-4 h-4 mr-2 text-primary" /> Fond Propre: 
-              <span class="ml-2 text-gray-900 font-semibold">{{ item.budgetNational }}</span>
+              <LinkIcon class="w-4 h-4 mr-2 text-primary" /> Fond Propre:
+              <span class="ml-2 font-semibold text-gray-900">{{ item.budgetNational }}</span>
             </div>
             <div class="flex items-center text-sm font-medium text-gray-700">
-              <LinkIcon class="w-4 h-4 mr-2 text-primary" /> Montant financier: 
-              <span class="ml-2 text-gray-900 font-semibold">{{ item.pret }}</span>
+              <LinkIcon class="w-4 h-4 mr-2 text-primary" /> Montant financier:
+              <span class="ml-2 font-semibold text-gray-900">{{ item.pret }}</span>
             </div>
             <div class="flex items-center text-sm font-medium text-gray-700">
-              <GlobeIcon class="w-4 h-4 mr-2 text-primary" /> Taux d'exécution physique: 
-              <span class="ml-2 text-gray-900 font-semibold">{{ item.tep }}</span>
+              <GlobeIcon class="w-4 h-4 mr-2 text-primary" /> Taux d'exécution physique:
+              <span class="ml-2 font-semibold text-gray-900">{{ item.tep }}</span>
             </div>
             <div class="flex items-center text-sm font-medium text-gray-700">
-              <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut: 
+              <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut:
               <span v-if="item.statut == -2" class="ml-2 text-gray-900">Non validé</span>
               <span v-else-if="item.statut == -1" class="ml-2 text-gray-900">Validé</span>
               <span v-else-if="item.statut == 0" class="ml-2 text-gray-900">En cours</span>
@@ -301,8 +303,8 @@ export default {
               <span v-else-if="item.statut == 2" class="ml-2 text-gray-900">Terminé</span>
             </div>
             <div class="flex items-center text-sm font-medium text-gray-700">
-              <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Poids: 
-              <span class="ml-2 text-gray-900 font-semibold">{{ item.poids }}</span>
+              <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Poids:
+              <span class="ml-2 font-semibold text-gray-900">{{ item.poids }}</span>
             </div>
           </div>
         </div>
@@ -310,10 +312,7 @@ export default {
     </div>
   </div>
 
-  <NoRecordsMessage v-if="!composants.length"
-      title="No outcomes Found"
-      description="It seems there are no outcomes to display. Please check back later."
-    />
+  <NoRecordsMessage v-if="!composants.length" title="No outcomes Found" description="It seems there are no outcomes to display. Please check back later." />
 
   <!-- END: Users Layout -->
   <LoaderSnipper v-if="isLoadingData" />
@@ -324,8 +323,8 @@ export default {
       <h2 v-else class="mr-auto text-base font-medium">Modifier un OutCome</h2>
     </ModalHeader>
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-      <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
-      <InputForm v-model="formData.poids" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
+      <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" :control="getFieldErrors(errors.nom)" placeHolder="Nom de l'organisation" label="Nom" />
+      <InputForm v-model="formData.poids" class="col-span-12" type="number" :control="getFieldErrors(errors.poids)" required="required" placeHolder="Poids de l'activité " label="Poids" />
       <div v-if="this.currentUser.type == 'unitee-de-gestion'" class="flex col-span-12">
         <v-select class="w-full" :reduce="(projet) => projet.id" v-model="formData.projetId" label="nom" :options="projets">
           <template #search="{ attributes, events }">
@@ -334,13 +333,13 @@ export default {
         </v-select>
         <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
       </div>
-      <InputForm v-model="formData.budgetNational" class="col-span-12" type="number" required="required" placeHolder="Ex : 200000" label="Fond propre" />
+      <InputForm v-model="formData.budgetNational" :control="getFieldErrors(errors.budgetNational)" class="col-span-12" type="number" required="required" placeHolder="Ex : 200000" label="Fond propre" />
 
-      <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 20000" label="Montant financier" />
+      <InputForm v-model="formData.pret" :control="getFieldErrors(errors.pret)" class="col-span-12" type="number" label="Montant financier" />
     </ModalBody>
     <ModalFooter>
       <div class="flex items-center justify-center">
-        <button type="button" @click="showModal = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+        <button type="button" @click="resetForm" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
         <VButton class="inline-block" :label="labels" :loading="isLoading" @click="sendForm" />
       </div>
     </ModalFooter>

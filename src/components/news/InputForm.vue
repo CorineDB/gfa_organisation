@@ -1,4 +1,6 @@
 <script setup>
+import { error } from "jquery";
+
 const props = defineProps({
   modelValue: {
     type: [String, Number],
@@ -16,6 +18,10 @@ const props = defineProps({
     type: String,
     default: "text",
   },
+  control: {
+    type: String,
+    required: false,
+  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -30,5 +36,6 @@ function updateValue(event) {
   <div>
     <label :for="label" class="form-label">{{ label }}</label>
     <input :id="label" :type="type" :required="required" :value="modelValue" @input="updateValue" class="form-control" :placeholder="label" />
+    <div v-if="control" class="mt-2 text-danger">{{ control }}</div>
   </div>
 </template>

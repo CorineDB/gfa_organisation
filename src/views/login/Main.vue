@@ -24,13 +24,14 @@
         </div>
         <!-- END: Login Info -->
         <!-- BEGIN: Login Form -->
-        <form @submit.prevent="save" class="flex items-center h-screen py-5 m-10 _bg-white xl:h-auto xl:py-0 sm:mx-auto xl:my-0">
+        <form @submit.prevent="save" autocomplete="on" class="flex items-center h-screen py-5 m-10 _bg-white xl:h-auto xl:py-0 sm:mx-auto xl:my-0">
           <div class="w-full px-5 py-8 mx-auto my-auto bg-white rounded-md shadow-md dark:bg-darkmode-600 xl:bg-transparent sm:px-8 xl:p-0 xl:shadow-none sm:w-3/4 lg:w-2/4 xl:w-auto">
+            <Alert v-if="showAlert" class="flex items-center mb-2 alert-danger"> <AlertCircleIcon class="w-6 h-6 mr-2" /> Email ou mot de passe incorrect. </Alert>
             <h2 class="text-2xl font-bold text-center intro-x xl:text-3xl xl:text-left">Se connecter</h2>
             <div class="mt-2 text-center intro-x text-slate-400 xl:hidden">Responsabilité partagée, Qualité améliorée : Unis pour un meilleur service social.</div>
             <div class="mt-8 intro-x">
               <div>
-                <input type="text" v-model.trim="login" class="block px-4 py-3 intro-x login__input form-control" autocomplete  placeholder="Email" />
+                <input type="text" autocomplete="on" v-model.trim="login" class="block px-4 py-3 intro-x login__input form-control" placeholder="Email" />
                 <!-- <div class="py-2 text-sm font-semibold text-red-500" v-if='!$v.login.required && soumettre'>
                   Ce champ est obligatoire
                       </div> -->
@@ -72,7 +73,7 @@
                 <input id="remember-me" type="checkbox" class="mr-2 border form-check-input" />
                 <label class="mr-3 cursor-pointer select-none" for="remember-me">Se souvenir de moi</label>
               </div>
-              <router-link to="/change-password">Mots de passe oublié?</router-link>
+              <span class="cursor-pointer" @click="goPageRequest()">Mots de passe oublié?</span>
             </div>
             <div class="mt-5 text-center intro-x xl:mt-8 xl:text-left">
               <!-- <button class="w-full px-4 py-3 align-top btn btn-primary bg-primary xl:mr-3">
@@ -105,6 +106,7 @@ import { mapState, mapActions, mapMutations, mapGetters } from "vuex";
 import axios from "axios";
 import VButton from "@/components/news/VButton.vue";
 import { API_BASE_URL } from "@/services/configs/environment.js";
+import { toast } from "vue3-toastify";
 
 export default {
   name: "IndexPage",
@@ -114,6 +116,7 @@ export default {
       base_url: API_BASE_URL,
       statePassword: "password",
       show: false,
+      showAlert: false,
       state: {
         email: "",
         password: "",
@@ -143,9 +146,12 @@ export default {
     ...mapActions({
       authentification: "auths/LOGIN",
     }),
-
+    toast,
     gotoValidate() {
       this.showSend = true;
+    },
+    goPageRequest() {
+      this.$router.push({ name: "request_password" });
     },
     resentLink() {
       this.soumettre = true;
@@ -170,18 +176,20 @@ export default {
                 if (response.data.utilisateur.type == "administrateur") {
                   // this.$toast.success("Connexion réussie")
                   this.$router.push("/dashboard/programme");
-                } /*
-                else if (response.data.utilisateur.type == "organisation") {
+                } else {
                   // this.$toast.success("Connexion réussie")
-                  this.gotoOrganisationAppropriateDashboard(response.data.utilisateur.projet);
-                }*/ else {
-                  // this.$toast.success("Connexion réussie")
-                  this.$router.push("/dashboard/projets/");
+                  this.$router.push("/dashboard/projets");
                 }
               }
             })
             .catch((error) => {
               console.log(error);
+              if (error.response.status == 422) {
+                this.showAlert = true;
+                toast.error("Email ou mot de passe incorrect reesayer !!!");
+              } else {
+                toast.error("Une erreur s'est produite reesayer !!!");
+              }
               this.chargement = false;
             });
         } else {
@@ -214,15 +222,6 @@ export default {
       this.statePassword = !this.show ? "text" : "password";
       this.show = !this.show;
       //this.$toast.success('Profile saved',)
-    },
-
-    gotoOrganisationAppropriateDashboard(projet = null) {
-      if(projet != null){
-        this.$router.push({ name: "projets_id_details", params: { id: projet.id, projet: projet } });
-      }
-      else{
-        this.$router.push({ name: "Programmation_enquete" });
-      }
     },
   },
   mounted() {

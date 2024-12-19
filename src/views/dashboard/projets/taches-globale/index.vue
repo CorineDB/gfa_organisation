@@ -4,8 +4,9 @@ import { mapGetters, mapActions } from "vuex";
 import { getStringValueOfStatutCode } from "@/utils/index";
 import ProjetService from "@/services/modules/projet.service.js";
 import ComposantesService from "@/services/modules/composante.service";
+import { getFieldErrors } from "@/utils/helpers.js";
 import ActiviteService from "@/services/modules/activite.service";
-import TachesService from '@/services/modules/tache.service';
+import TachesService from "@/services/modules/tache.service";
 import InputForm from "@/components/news/InputForm.vue";
 import VButton from "@/components/news/VButton.vue";
 import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
@@ -14,7 +15,7 @@ export default {
   components: {
     InputForm,
     VButton,
-    NoRecordsMessage
+    NoRecordsMessage,
   },
   data() {
     return {
@@ -33,7 +34,7 @@ export default {
         poids: "",
         debut: "",
         fin: "",
-        activiteId: ""
+        activiteId: "",
       },
       composantsId: "",
       sousComposantId: "",
@@ -42,7 +43,8 @@ export default {
       showDeleteModal: false,
       deleteLoader: false,
       taches: [],
-      tacheId: ''
+      tacheId: "",
+      errors: {},
     };
   },
   computed: {
@@ -74,6 +76,11 @@ export default {
   },
 
   methods: {
+    getFieldErrors,
+    resetForm() {
+      this.showModal = false;
+      this.errors = {};
+    },
     text() {},
     clearObjectValues(obj) {
       for (let key in obj) {
@@ -131,7 +138,7 @@ export default {
     addTache() {
       this.showModal = true;
       this.isUpdate = false;
-      
+
       this.formData.activiteId = this.activitesId;
 
       this.labels = "Ajouter";
@@ -152,6 +159,7 @@ export default {
               this.clearObjectValues(this.formData);
               // delete this.formData.projetId;
               //this.getProjetById();
+              this.errors = {};
               this.getActiviteById(this.activitesId);
               //this.sendRequest = false;
             }
@@ -159,7 +167,11 @@ export default {
           .catch((error) => {
             // delete this.formData.projetId;
             this.isLoading = false;
-            toast.error(error.message);
+            if (error.response && error.response.status === 422) {
+              this.errors = error.response.data.errors;
+            } else {
+              toast.error(error.message);
+            }
           });
       } else {
         this.isLoading = true;
@@ -171,13 +183,19 @@ export default {
               toast.success("Ajout éffectué");
               this.showModal = false;
               this.clearObjectValues(this.formData);
-
+              this.errors = {};
               //this.getProjetById();
               this.getActiviteById(this.activitesId);
             }
           })
           .catch((error) => {
             this.isLoading = false;
+            if (error.response && error.response.status === 422) {
+              this.errors = error.response.data.errors;
+            } else {
+              // toast.error(error.message);
+            }
+
             toast.error("Erreur lors de la modification");
           });
       }
@@ -189,13 +207,12 @@ export default {
           this.isLoadingData = false;
           this.projets = data.data.data;
 
-          if ((this.projetId == "") && (this.projets.length > 0) ) {
+          if (this.projetId == "" && this.projets.length > 0) {
             this.projetId = this.projets[0].id;
           }
-          if(this.projetId != "" && this.projetId != null && this.projetId != undefined){
+          if (this.projetId != "" && this.projetId != null && this.projetId != undefined) {
             this.getProjetById(this.projetId);
           }
-
         })
         .catch((error) => {
           console.log(error);
@@ -212,10 +229,10 @@ export default {
         .then((datas) => {
           this.composants = datas.data.data.composantes;
 
-          if ((this.composantsId == "") && (this.composants.length > 0) ) {
+          if (this.composantsId == "" && this.composants.length > 0) {
             this.composantsId = this.composants[0].id;
           }
-          if(this.composantsId != "" && this.composantsId != null && this.composantsId != undefined){
+          if (this.composantsId != "" && this.composantsId != null && this.composantsId != undefined) {
             this.getComposantById(this.composantsId);
           }
         })
@@ -225,8 +242,7 @@ export default {
     },
     getComposantById(data) {
       ComposantesService.detailComposant(data)
-        .then((data) => {        
-         
+        .then((data) => {
           this.activites = data.data.data.activites;
 
           if (data.data.data.souscomposantes.length > 0) {
@@ -234,10 +250,10 @@ export default {
             this.haveSousComposantes = true;
           }
 
-          if ((this.activitesId == "") && this.activites.length > 0) {
+          if (this.activitesId == "" && this.activites.length > 0) {
             this.activitesId = this.activites[0].id;
           }
-          if(this.activitesId != "" && this.activitesId != null && this.activitesId != undefined){
+          if (this.activitesId != "" && this.activitesId != null && this.activitesId != undefined) {
             this.getActiviteById(this.activitesId);
           }
         })
@@ -328,7 +344,6 @@ export default {
           </v-select>
           <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activites</label>
         </div>
-
       </div>
 
       <!-- <button class="absolute px-4 py-2 text-white transform -translate-x-1/2 bg-blue-500 rounded -bottom-3 left-1/2" @click="filter()">Filtrer</button> -->
@@ -414,11 +429,7 @@ export default {
     </div>
   </div>
 
-
-  <NoRecordsMessage v-if="!sousComposants.length"
-      title="No outputs Found"
-      description="It seems there are no outputs to display. Please check back later."
-    />
+  <NoRecordsMessage v-if="!sousComposants.length" title="No outputs Found" description="It seems there are no outputs to display. Please check back later." />
 
   <!-- END: Users Layout -->
   <LoaderSnipper v-if="isLoadingData" />
@@ -429,24 +440,25 @@ export default {
       <h2 v-else class="mr-auto text-base font-medium">Modifier une tache</h2>
     </ModalHeader>
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-      <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de la tache" label="Nom" />
-      <InputForm v-model="formData.poids" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
-      <InputForm v-model="formData.debut" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de début" label="Début du projet" />
-      <InputForm v-model="formData.fin" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de fin" label="Fin du projet " />
+      <InputForm v-model="formData.nom" :control="getFieldErrors(errors?.nom)" class="col-span-12" type="text" required="required" placeHolder="Nom de la tache" label="Nom" />
+      <InputForm v-model="formData.poids" :control="getFieldErrors(errors?.poids)" class="col-span-12" type="number" required="required" placeHolder="Poids de l'activité " label="Poids" />
+      <InputForm v-model="formData.debut" :control="getFieldErrors(errors.debut)" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de début" label="Début du projet" />
+      <InputForm v-model="formData.fin" :control="getFieldErrors(errors.fin)" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de fin" label="Fin du projet " />
 
-       <div class="flex col-span-12">
+      <div class="flex col-span-12">
         <v-select class="w-full" :reduce="(activite) => activite.id" v-model="formData.activiteId" label="nom" :options="activites">
           <template #search="{ attributes, events }">
             <input class="vs__search form-input" :required="!formData.activiteId" v-bind="attributes" v-on="events" />
           </template>
         </v-select>
         <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activites</label>
+        <br />
+        <div v-if="errors.activiteId" class="mt-2 text-danger">{{ getFieldErrors(errors.activiteId) }}</div>
       </div>
-
     </ModalBody>
     <ModalFooter>
       <div class="flex items-center justify-center">
-        <button type="button" @click="showModal = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+        <button type="button" @click="resetForm" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
         <VButton class="inline-block" :label="labels" :loading="isLoading" @click="sendForm" />
       </div>
     </ModalFooter>
