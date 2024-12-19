@@ -327,10 +327,10 @@ onMounted(async () => {
                       <CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Période:
                       <span class="ml-2 font-semibold text-gray-900">{{ item.debut }} <span class="font-normal">au</span> {{ item.fin }}</span>
                     </div>
-                    <div class="flex items-center text-sm font-medium text-gray-700">
+                    <!-- <div class="flex items-center text-sm font-medium text-gray-700">
                       <TargetIcon class="w-4 h-4 mr-2 text-primary" /> Objectif attendu:
                       <span class="ml-2 font-semibold text-gray-900">{{ item.objectif_attendu }}</span>
-                    </div>
+                    </div> -->
                     <div class="flex items-center text-sm font-medium text-gray-700">
                       <BarChart2Icon class="w-4 h-4 mr-2 text-primary" /> Total soumissions:
                       <span class="ml-2 font-semibold text-gray-900">{{ item.total_soumissions_de_perception + item.total_soumissions_factuel }}</span>
