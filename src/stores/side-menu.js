@@ -47,7 +47,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
       },
       {
         icon: "FolderIcon",
-        title: "Gestion Financier",
+        title: "Gestion Financière",
         subMenu: [
           {
             icon: "BarChart2Icon",

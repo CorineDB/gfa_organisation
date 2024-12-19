@@ -8,13 +8,10 @@ import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
 import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
 import { getFieldErrors } from "@/utils/helpers.js";
-import ActionAMenerService from "@/services/modules/action_a_mener.service";
 import { useRouter, useRoute } from "vue-router";
-import ProgressBar from "../../../components/news/ProgressBar.vue"; /* 
-import ChartPerceptionOption from "../../../components/news/ChartPerceptionOption.vue"; */
+import ProgressBar from "../../../components/news/ProgressBar.vue";
 import RankingChart from "./RankingChart.vue";
 import ActionPlan from "./ActionPlan.vue";
-import { data } from "jquery";
 
 const router = useRouter();
 
@@ -44,11 +41,7 @@ const idCurrentOng = ref({});
 const errors = ref({});
 const currentOptionsPerception = ref({});
 const currentOrganisationsOptions = ref("");
-<<<<<<< HEAD
-const invitationPayload = reactive({ "participants": [], "nbreParticipants": 0 });
-=======
 const invitationPayload = reactive({ participants: [], nbreParticipants: 0 });
->>>>>>> 51cbd3f9411119271e0af76b0c39bce6a3af97eb
 const showInvitationModal = ref(false);
 
 const options = [
@@ -289,20 +282,6 @@ function gotoAppreciations(enquete) {
   router.push({ name: "EnqueteAppreciations", query: { enqueteId: enquete.id } });
 }
 
-const handleEdit = (params) => {
-  /*console.log(params);
-
-  isCreate.value = false;
-  idSelect.value = params.id;
-  payload.nom = params.nom;
-  payload.description = params.description;
-  payload.objectif = params.objectif;
-  payload.debut = params.debut;
-  payload.fin = params.fin;
-  showModalCreate.value = true;*/
-  router.push({ name: "ToolsFactuel", query: { enqueteId: route.params.id } });
-};
-
 const viewResultats = (organisationId) => {
   router.push({ name: "resultat_collecte", query: { enqueteId: route.params.id, organisationId: organisationId } });
 };
@@ -416,8 +395,7 @@ onMounted(async () => {
       <div class="flex">
         <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
         <!-- <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button> -->
-        <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation
-          perception</button>
+        <!-- <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation perception</button>        -->
       </div>
     </div>
   </div>
@@ -710,7 +688,6 @@ onMounted(async () => {
 
 
         <div v-else class="col-span-4 p-6 overflow-x-auto flex flex-col justify-start p-4 bg-white shadow rounded-md">
-
           <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
             <div class="flex">
               <h2 class="mr-5 text-lg font-medium truncate">Actions correctionnelle en cours</h2>
