@@ -13,7 +13,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="(pta,indice) in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <tr v-for="(pta, indice) in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <!-- <th scope="row" class=" p-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 {{ pta.owner_nom }}
                  <pre>{{ pta.nom }}</pre>
@@ -27,8 +27,7 @@
                 <span v-if="pta.isTache" class="text-sm text-red-600"> {{ pta.code }}</span>
               </td>
               <td>
-
-            <!-- <TomSelect v-if="pta.isTache"
+                <!-- <TomSelect v-if="pta.isTache"
               :options="{
                 placeholder: 'Choisir le poidActuel',
               }"
@@ -42,18 +41,9 @@
               <option value="100">100%</option>
             </TomSelect> -->
 
-              <TomSelect v-if="pta.isTache"
-                :options="{ placeholder: 'Choisir le poidActuel' }"
-                class="w-full"
-                :id="'select-' + pta.id"
-                v-model="pta.poidsActuel"
-                @change="togglesuivie(pta, indice, $event)"
-              >
-                <option v-for="option in poidsOptions" :key="option" :value="option">
-                  {{ option }} %
-                </option>
-              </TomSelect>
-
+                <TomSelect v-if="pta.isTache" :options="{ placeholder: 'Choisir le poidActuel' }" class="w-full" :id="'select-' + pta.id" v-model="pta.poidsActuel" @change="togglesuivie(pta, indice, $event)">
+                  <option v-for="option in poidsOptions" :key="option" :value="option">{{ option }} %</option>
+                </TomSelect>
 
                 <!-- <button
                   v-if="pta.isTache"
@@ -139,9 +129,9 @@
           <tbody>
             <tr v-for="pta in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span v-if="pta.isProjet" class="text-lg font-bold">projet: {{ pta.nom }} {{pta.poidsActuel}}</span>
-                <span v-if="pta.isComposante" class="text-sm text-blue-500">Composante: {{ pta.nom }}</span>
-                <span v-if="pta.isSC" class="text-sm text-yellow-600"> <span class="text-sm text-yellow-600" v-if="pta.code != 0">Sous composante:</span> {{ pta.nom }}</span>
+                <span v-if="pta.isProjet" class="text-lg font-bold">projet: {{ pta.nom }} {{ pta.poidsActuel }}</span>
+                <span v-if="pta.isComposante" class="text-sm text-blue-500">OUtCome: {{ pta.nom }}</span>
+                <span v-if="pta.isSC" class="text-sm text-yellow-600"> <span class="text-sm text-yellow-600" v-if="pta.code != 0">OUtPut:</span> {{ pta.nom }}</span>
                 <span v-if="pta.isActivite" class="text-sm text-green-600 shadow bg-gradient-to-br from-yellow-400 to-yellow-600">Activite: {{ pta.nom }}</span>
                 <span v-if="pta.isTache" class="text-sm text-red-600"> {{ pta.nom }}</span>
               </td>
@@ -175,7 +165,6 @@
 
               <!-- total budgetaire-->
 
-            
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
@@ -337,7 +326,6 @@ import BailleursService from "@/services/modules/bailleur.service.js";
 import TacheService from "@/services/modules/tache.service.js";
 import PtaService from "@/services/modules/pta.service.js";
 
-
 import { mapGetters, mapMutations, mapActions, mapState } from "vuex";
 export default {
   props: ["ppm"],
@@ -362,7 +350,7 @@ export default {
       statutActuel: false,
       annee: null,
       poidsActuel: 0,
-      poidsOptions: [0,50,100],
+      poidsOptions: [0, 50, 100],
       bailleur: "",
       bailleurs: [],
       version: "current",
@@ -383,7 +371,6 @@ export default {
       exporterSuiviPta: false,
       exporterSuiviRePpm: false,
       exporterSuiviRePta: false,
-
     };
   },
   computed: {
@@ -1465,7 +1452,7 @@ export default {
       // Perform your logic with the selected value
       pta.poidsActuel = selectedValue; // Example: Update the item's property
     },
-    
+
     // exportToExcel() {
     //   //  console.log('gghghghgh');
     //   //  console.log(this.dataNew);
@@ -1576,7 +1563,7 @@ export default {
 
       // }
       this.active();
-      PtabService.getPta({annee: 2024})
+      PtabService.getPta({ annee: 2024 })
         .then((data) => {
           this.ptab = data.data.data;
           this.disabled();

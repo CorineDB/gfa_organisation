@@ -407,7 +407,7 @@ onMounted(async () => {
       <div class="flex">
         <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
         <!-- <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button> -->
-        <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation perception</button>       
+        <!-- <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation perception</button>        -->
       </div>
     </div>
   </div>
