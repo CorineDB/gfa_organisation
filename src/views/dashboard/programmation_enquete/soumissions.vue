@@ -12,6 +12,7 @@ import { useRouter, useRoute } from "vue-router";
 import ProgressBar from "../../../components/news/ProgressBar.vue";/* 
 import ChartPerceptionOption from "../../../components/news/ChartPerceptionOption.vue"; */
 import RankingChart from "./RankingChart.vue";
+import ActionPlan from "./ActionPlan.vue";
 import { data } from "jquery";
 
 const router = useRouter();
@@ -41,18 +42,18 @@ const statistiques = ref({});
 const idCurrentOng = ref({});
 const currentOptionsPerception = ref({});
 const currentOrganisationsOptions = ref("");
-const invitationPayload = reactive({"participants": [], "nbreParticipants": 0});
+const invitationPayload = reactive({ "participants": [], "nbreParticipants": 0 });
 const showInvitationModal = ref(false);
 
 const options = [
-{ label: "Adresse Email", id: "email" },
-{ label: "Numéro de téléphone", id: "contact" },
+  { label: "Adresse Email", id: "email" },
+  { label: "Numéro de téléphone", id: "contact" },
 ];
 const participant = reactive({
-    type_de_contact: options[0].id,
-    email: "",
-    phone: "",
-  });
+  type_de_contact: options[0].id,
+  email: "",
+  phone: "",
+});
 const createData = async () => {
   isLoading.value = true;
   await EnqueteDeColleteService.create(payload)
@@ -83,9 +84,9 @@ const getDatas = async () => {
     });
 };
 
-const getFeuilleDeRouteData = async () => {
+const getActionsAMenerData = async () => {
   isLoading.value = true;
-  await EvaluationService.getFeuilleDeRouteEvaluation(idEvaluation)
+  await EvaluationService.getActionsAMenerEvaluation(idEvaluation)
     .then((result) => {
       feuilleDeRoute.value = result.data.data;
       isLoading.value = false;
@@ -385,8 +386,9 @@ onMounted(async () => {
 
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
   getDatas();
-  getFormulaireFactuel();
   getEvaluation();
+  getFormulaireFactuel();
+  getActionsAMenerData();
 });
 </script>
 
@@ -407,12 +409,13 @@ onMounted(async () => {
       <div class="flex">
         <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
         <!-- <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button> -->
-        <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation perception</button>       
+        <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation
+          perception</button>
       </div>
     </div>
   </div>
 
-  
+
 
   <div class="p-5 mt-0 intro-y">
     <div class="" v-if="!isLoadingData">
@@ -513,13 +516,13 @@ onMounted(async () => {
                     <div class="mt-1 text-primary">
                       Factuel:
                       <span class="font-semibold"> {{
-      Math.round(statistiques?.pourcentage_evolution_des_soumissions_factuel) }}% </span>
+          Math.round(statistiques?.pourcentage_evolution_des_soumissions_factuel) }}% </span>
                     </div>
                     <div class="w-px h-8 bg-slate-400"></div>
                     <div class="mt-1 text-primary">
                       Perception:
                       <span class="font-semibold"> {{
-      Math.round(statistiques?.pourcentage_evolution_des_soumissions_de_perception) }}% </span>
+          Math.round(statistiques?.pourcentage_evolution_des_soumissions_de_perception) }}% </span>
                     </div>
                   </div>
                 </div>
@@ -581,7 +584,7 @@ onMounted(async () => {
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Submitted_at At:
                   <div class="ml-2 font-bold">{{ datas?.factuel ? (datas.factuel.submitted_at != null ?
-      datas.factuel.submitted_at : "Not Defined") : "Not Defined" }}</div>
+          datas.factuel.submitted_at : "Not Defined") : "Not Defined" }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
@@ -673,11 +676,11 @@ onMounted(async () => {
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
                   <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.reponses_de_la_collecte?.length :
-      0 }}</div>
+          0 }}</div>
                 </div>
                 <div class="flex items-center">
                   <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.reponses_de_la_collecte?.length :
-      0 }}</div>
+          0 }}</div>
                 </div>
 
                 <div class="mt-4">
@@ -701,7 +704,8 @@ onMounted(async () => {
                 v-else-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)"
                 class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)"
+                  <button
+                    v-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)"
                     @click.self="sendInvitationLink"
                     class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">Envoyer
                     une invitation
@@ -727,7 +731,7 @@ onMounted(async () => {
                 </div>
               </div>
             </div>
-            
+
           </div>
         </div>
 
@@ -743,20 +747,20 @@ onMounted(async () => {
 
 
         <div v-else class="col-span-4 p-6 overflow-x-auto flex flex-col justify-start p-4 bg-white shadow rounded-md">
-            
-            <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
-              <div class="flex">
-                <h2 class="mr-5 text-lg font-medium truncate">Actions correctionnelle en cours</h2>
-              </div>
-              <div class="flex">
-                <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button>
-                <button class="mr-2 shadow-md btn btn-primary" >Consulter la Feuille de route</button>
-              </div>
-            </div>
-            <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button>
 
-            <ActionPlan />
+          <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
+            <div class="flex">
+              <h2 class="mr-5 text-lg font-medium truncate">Actions correctionnelle en cours</h2>
+            </div>
+            <div class="flex">
+              <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
+              <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Voir Feuille de route</button>
+            </div>
           </div>
+          <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
+
+          <ActionPlan :actions="feuilleDeRoute"/>
+        </div>
       </div>
 
       <!-- <ActionsMener v-if="idEvaluation && statistiques.statut == 1" :evaluation="idEvaluation" /> -->
@@ -812,9 +816,10 @@ onMounted(async () => {
     </ModalHeader>
     <form @submit.prevent="sendInvitation">
       <ModalBody>
-        
+
         <div class="max-w-screen-lg p-4 mx-auto mt-4 box">
-          <InputForm class="" label="Nombre de participants" pattern="\d{1,8}" maxlength="8" v-model.number="invitationPayload.nbreParticipants" type="number" />
+          <InputForm class="" label="Nombre de participants" pattern="\d{1,8}" maxlength="8"
+            v-model.number="invitationPayload.nbreParticipants" type="number" />
         </div>
         <hr class="my-5" />
         <div class="max-w-screen-lg p-4 mx-auto mt-6 box">
@@ -826,7 +831,8 @@ onMounted(async () => {
                 <label class="form-label">Type de données</label>
                 <div class="flex gap-2">
                   <div v-for="(option, index) in options" :key="index" class="form-check">
-                    <input v-model="participant.type_de_contact" :id="option.id" class="form-check-input" type="radio" name="option" :value="option.id" />
+                    <input v-model="participant.type_de_contact" :id="option.id" class="form-check-input" type="radio"
+                      name="option" :value="option.id" />
                     <label class="form-check-label" :for="option.id">{{ option.label }}</label>
                   </div>
                 </div>
@@ -834,24 +840,33 @@ onMounted(async () => {
               <form v-show="participant.type_de_contact === options[0].id" @submit.prevent="addEmail">
                 <div class="flex items-end gap-4">
                   <InputForm class="" label="Adresse email" v-model="participant.email" type="email" />
-                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                  <button class="btn btn-primary">
+                    <PlusIcon class="w-4 h-4 mr-3" />Ajouter
+                  </button>
                 </div>
               </form>
               <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="8" v-model.number="participant.phone" type="number" />
+                  <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="8"
+                    v-model.number="participant.phone" type="number" />
                   <!-- <div class="">
                     <label for="Numéro de téléphone" class="form-label">Numéro de téléphone</label>
                     <input id="Numéro de téléphone" type="number" pattern="\d{1,8}" maxlength="8" required v-model.number="currentPhone" class="form-control" placeholder="Numéro de téléphone" />
                   </div> -->
-                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                  <button class="btn btn-primary">
+                    <PlusIcon class="w-4 h-4 mr-3" />Ajouter
+                  </button>
                 </div>
               </form>
 
               <div class="flex flex-wrap items-center w-full max-w-full gap-3">
-                <div class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium bg-blue rounded-sm shadow cursor-pointer text-primary" v-for="(participant, index) in invitationPayload.participants" :key="index">
+                <div
+                  class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium bg-blue rounded-sm shadow cursor-pointer text-primary"
+                  v-for="(participant, index) in invitationPayload.participants" :key="index">
                   <span>{{ participant.type_de_contact === 'email' ? participant?.email : participant?.phone }}</span>
-                  <button @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
+                  <button @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100">
+                    <XIcon class="w-4 h-4 text-danger" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -860,7 +875,8 @@ onMounted(async () => {
       </ModalBody>
       <ModalFooter>
         <div class="flex gap-2">
-          <button type="button" @click="resetInvitationForm" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
+          <button type="button" @click="resetInvitationForm"
+            class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
           <VButton :loading="isLoading" label="Envoyer l'invitation" />
         </div>
       </ModalFooter>

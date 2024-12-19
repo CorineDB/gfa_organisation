@@ -1,6 +1,6 @@
 <template>
   <div class="action-plan">
-    <!-- Progress Summary -->
+    <!-- Progress Summary
     <div class="progress-summary">
       <div
         class="summary-item"
@@ -17,6 +17,24 @@
           <p>{{ item.progressCurrent }} / {{ item.progressTotal }}</p>
         </div>
       </div>
+    </div> -->
+
+    <!-- Dropdown Filter -->
+    <div class="filter-dropdown">
+      <TomSelect
+        v-model="selectedFilter"
+        :options="{ placeholder: 'Sélectionnez une catégorie' }"
+        class="w-full"
+      >
+        <option value="all">Toutes ({{ countActions("all") }})</option>
+        <option
+          v-for="filter in filters"
+          :key="filter.label"
+          :value="filter.value"
+        >  {{ getCategoryIcon(filter.label) }}  
+          {{ filter.label }} ({{ countActions(filter.value) }})
+        </option>
+      </TomSelect>
     </div>
 
     <!-- Actions Table -->
@@ -24,21 +42,26 @@
       <thead>
         <tr>
           <th>Action</th>
-          <th>Statut</th>
+          <th>Statut</th><!-- 
           <th>Priorité</th>
-          <th>Responsable</th>
+          <th>Responsable</th> -->
           <th>Deadline</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="(action, index) in actions" :key="index">
-          <td>{{ action.actionDescription }}</td>
-          <td :class="`status ${action.status.toLowerCase().replace(' ', '-')}`">
-            {{ action.status }}
-          </td>
+      <tbody v-if="filteredActions.length > 0">
+        <tr v-for="(action, index) in filteredActions" :key="index">
+          <td>{{ action.action }}</td>
+          <td :class="`status ${String(getStatusLabel(action.statut)).toLowerCase().replace(' ', '-')}`">
+            {{ getStatusLabel(action.statut) }}
+          </td><!-- 
           <td>{{ action.priority }}</td>
-          <td>{{ action.responsible }}</td>
-          <td>{{ formatDate(action.deadline) }}</td>
+          <td>{{ action.responsible }}</td> -->
+          <td>{{ formatDate(action.end_at) }}</td>
+        </tr>
+      </tbody>
+      <tbody v-else>
+        <tr>
+          <td colspan="3" class="no-actions">Aucune action disponible pour le moment.</td>
         </tr>
       </tbody>
     </table>
@@ -49,47 +72,61 @@
 export default {
   name: "ActionPlan",
   data() {
-    return {
+    return {/* 
       progressSummary: [
-        { progressCategory: "Terminer", progressCurrent: 0, progressTotal: 160 },
-        { progressCategory: "En cours", progressCurrent: 139, progressTotal: 160 },
-        { progressCategory: "En retard", progressCurrent: 0, progressTotal: 160 },
-      ],
-      actions: [
-        {
-          actionId: 1,
-          actionDescription:
-            "Recruter la mission de surveillance et contrôle général pour le suivi du PGES.",
-          tepActuel: 8.75,
-          status: "En cours",
-          priority: "Haute",
-          responsible: "Équipe Technique",
-          deadline: "2024-12-15",
-        },
-        {
-          actionId: 2,
-          actionDescription:
-            "Construire les collecteurs d'assainissement pluvial dans les bassins Pa3 et Y.",
-          tepActuel: 21.0,
-          status: "En cours",
-          priority: "Moyenne",
-          responsible: "Département Infrastructure",
-          deadline: "2025-03-01",
-        },
-        {
-          actionId: 3,
-          actionDescription:
-            "Aménager les voies connexes dans les bassins Pa3 et Y.",
-          tepActuel: 19.0,
-          status: "En cours",
-          priority: "Basse",
-          responsible: "Département Logistique",
-          deadline: "2025-06-30",
-        },
+        { progressCategory: "Terminer", progressCurrent: countCompleted, progressTotal: actions.length },
+        { progressCategory: "En cours", progressCurrent: countInProgress, progressTotal: actions.length },
+        { progressCategory: "En retard", progressCurrent: countOverdue, progressTotal: actions.length },
+      ] */
+      selectedFilter: "in_progress",
+      filters: [
+        { label: "Toutes", value: "all" },
+        { label: "Terminer", value: "completed" },
+        { label: "En cours", value: "in_progress" },
+        { label: "En retard", value: "overdue" },
       ],
     };
   },
+  props:{
+    actions: {
+      type: Array,
+      required: true,
+    },
+  },
+  computed: {
+    countCompleted() {
+      return this.actions.filter(action => action.statut === 2).length;
+    },
+    countInProgress() {
+      return this.actions.filter(action => action.statut === 0).length;
+    },
+    countOverdue() {
+      return this.actions.filter(action => action.statut === 1).length;
+    },
+    progressSummary() {
+      return [
+        { progressCategory: "Terminer", progressCurrent: this.countCompleted, progressTotal: this.actions.length },
+        { progressCategory: "En cours", progressCurrent: this.countInProgress, progressTotal: this.actions.length },
+        { progressCategory: "En retard", progressCurrent: this.countOverdue, progressTotal: this.actions.length },
+      ];
+    },
+    filteredActions() {
+      if (this.selectedFilter === "all") {
+        return this.actions;
+      }
+      return this.actions.filter((action) => action.statut === this.selectedFilter);
+    },
+  },
   methods: {
+    filterActions(filter) {
+      this.selectedFilter = filter.value;
+    },
+    countActions(status) {
+      if (status === "all") {
+        return this.actions.length;
+      }
+      return this.actions.filter((action) => action.statut === status).length;
+    },
     getCategoryIcon(category) {
       switch (category) {
         case "Terminer":
@@ -106,15 +143,29 @@ export default {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(dateString).toLocaleDateString("fr-FR", options);
     },
+    getStatusLabel(status) {
+      const statusMap = {
+        2: "Terminer",
+        0: "En cours",
+        1: "En retard",
+      };
+      return statusMap[status] || "Inconnu";
+    },
   },
 };
 </script>
 
 <style scoped>
 /* Layout and Fonts */
+.no-actions {
+  text-align: center;
+  font-style: italic;
+  color: gray;
+}
+
 .action-plan {
   font-family: Arial, sans-serif;
-  margin: 20px;
+  margin: 0px;
 }
 
 .progress-summary {

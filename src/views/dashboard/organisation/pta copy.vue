@@ -1,18 +1,4 @@
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Plan d'Action</h2>
-  <div class="grid grid-cols-12 gap-6 my-5">
-    <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="relative w-56 text-slate-500">
-          <input type="text" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
-          <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
-        </div>
-      </div>
-      <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="showModalFiltre = true"><FilterIcon class="w-4 h-4 mr-3" />Filtrer le PA</button>
-      </div>
-    </div>
-  </div>
   <div v-if="currentPage && ptaVisible" class="current">
     <div style="height: 80vh" class="relative flex overflow-y-auto">
       <div style="width: 33.33%; position: sticky; left: 0; background: transparent; z-index: 1; margin-right: 1%">
@@ -27,11 +13,11 @@
           </thead>
 
           <tbody>
-            <tr v-for="pta in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <tr v-for="(pta,indice) in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <!-- <th scope="row" class=" p-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  {{ pta.owner_nom }}
-                   <pre>{{ pta.nom }}</pre>
-                </th> -->
+                {{ pta.owner_nom }}
+                 <pre>{{ pta.nom }}</pre>
+              </th> -->
 
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span v-if="pta.isProjet" class="text-lg font-bold"> {{ pta.code }}</span>
@@ -41,28 +27,51 @@
                 <span v-if="pta.isTache" class="text-sm text-red-600"> {{ pta.code }}</span>
               </td>
               <td>
-                <select v-if="pta.isTache" class="form-select form-select-sm mt-2" aria-label=".form-select-sm example" @change="togglesuivie(pta)">
-                  <option value="0">0%</option>
-                  <option value="50">50%</option>
-                  <option value="100">100%</option>
-                </select>
+
+            <!-- <TomSelect v-if="pta.isTache"
+              :options="{
+                placeholder: 'Choisir le poidActuel',
+              }"
+              class="w-full" :id="'select-' + pta.id" 
+              @change="togglesuivie(pta, indice, $event)"
+
+            >
+              <option>Choisir un type d'activité</option>
+              <option value="0">0%</option>
+              <option value="50">50%</option>
+              <option value="100">100%</option>
+            </TomSelect> -->
+
+              <TomSelect v-if="pta.isTache"
+                :options="{ placeholder: 'Choisir le poidActuel' }"
+                class="w-full"
+                :id="'select-' + pta.id"
+                v-model="pta.poidsActuel"
+                @change="togglesuivie(pta, indice, $event)"
+              >
+                <option v-for="option in poidsOptions" :key="option" :value="option">
+                  {{ option }} %
+                </option>
+              </TomSelect>
+
+
                 <!-- <button
-                    v-if="pta.isTache"
-                    @click="togglesuivie(pta)"
-                    class="flex items-center justify-between px-1 text-white transition-all rounded-full shadow w-14 h-7"
+                  v-if="pta.isTache"
+                  @click="togglesuivie(pta)"
+                  class="flex items-center justify-between px-1 text-white transition-all rounded-full shadow w-14 h-7"
+                  :class="{
+                    'bg-gray-400': false,
+                    'bg-red-400': pta.poidsActuel == 0 || tabletoggle[pta.id] == 0,
+                    'bg-green-400 ': greentoggle && (pta.poidsActuel > 0 || tabletoggle[pta.id] == 1),
+                  }"
+                >
+                  <div
+                    class="w-5 h-5 transform translate-x-0 bg-white rounded-full"
                     :class="{
-                      'bg-gray-400': false,
-                      'bg-red-400': pta.poidsActuel == 0 || tabletoggle[pta.id] == 0,
-                      'bg-green-400 ': greentoggle && (pta.poidsActuel > 0 || tabletoggle[pta.id] == 1),
+                      'translate-x-full': pta.poidsActuel > 0 || translatetoggle || tabletoggle[pta.id] == 1,
                     }"
-                  >
-                    <div
-                      class="w-5 h-5 transform translate-x-0 bg-white rounded-full"
-                      :class="{
-                        'translate-x-full': pta.poidsActuel > 0 || translatetoggle || tabletoggle[pta.id] == 1,
-                      }"
-                    ></div>
-                  </button> -->
+                  ></div>
+                </button> -->
               </td>
             </tr>
           </tbody>
@@ -98,8 +107,8 @@
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Taux d'exécution financière</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th>
               <!-- <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">BN</th>
-                <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP</th>
-                <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th> -->
+              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">EMP</th>
+              <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th> -->
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">JAV</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">FEV</th>
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">MARS</th>
@@ -130,9 +139,9 @@
           <tbody>
             <tr v-for="pta in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span v-if="pta.isProjet" class="text-lg font-bold">projet: {{ pta.nom }}</span>
-                <span v-if="pta.isComposante" class="text-sm text-blue-500">OutComes: {{ pta.nom }}</span>
-                <span v-if="pta.isSC" class="text-sm text-yellow-600"> <span class="text-sm text-yellow-600" v-if="pta.code != 0">OutPut:</span> {{ pta.nom }}</span>
+                <span v-if="pta.isProjet" class="text-lg font-bold">projet: {{ pta.nom }} {{pta.poidsActuel}}</span>
+                <span v-if="pta.isComposante" class="text-sm text-blue-500">Composante: {{ pta.nom }}</span>
+                <span v-if="pta.isSC" class="text-sm text-yellow-600"> <span class="text-sm text-yellow-600" v-if="pta.code != 0">Sous composante:</span> {{ pta.nom }}</span>
                 <span v-if="pta.isActivite" class="text-sm text-green-600 shadow bg-gradient-to-br from-yellow-400 to-yellow-600">Activite: {{ pta.nom }}</span>
                 <span v-if="pta.isTache" class="text-sm text-red-600"> {{ pta.nom }}</span>
               </td>
@@ -143,9 +152,9 @@
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <!-- <td v-if="pta.pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                  <span class="font-bold text-green-500"> {{ pta.pret | formatNumber }} </span>
-                   <span v-else class="font-bold" >0 FCFA </span>
-                </td> -->
+                <span class="font-bold text-green-500"> {{ pta.pret | formatNumber }} </span>
+                 <span v-else class="font-bold" >0 FCFA </span>
+              </td> -->
               <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold text-yellow-500"> 222</span>
@@ -166,6 +175,7 @@
 
               <!-- total budgetaire-->
 
+            
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
@@ -178,9 +188,9 @@
               </td>
 
               <!-- <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                  <span v-if="pta.structureAssocie != undefined" class="font-bold"> {{ pta.structureAssocie }} </span>
-                   <span v-else class="font-bold" >0 FCFA</span>
-                </td> -->
+                <span v-if="pta.structureAssocie != undefined" class="font-bold"> {{ pta.structureAssocie }} </span>
+                 <span v-else class="font-bold" >0 FCFA</span>
+              </td> -->
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span v-if="pta.structureResponsable != undefined" class="font-bold"> {{ pta.structureResponsable }} </span>
                 <!--  <span v-else class="font-bold" >0 FCFA</span> -->
@@ -247,10 +257,10 @@
 
               <!--  planing semestre -->
               <!-- <td v-if="pta.t1Pret != undefined && pta.t1Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                  <span class="font-bold"> {{ pta.t1Pret | formatNumber }} </span>
-                   <span v-else class="font-bold" >0 FCFA </span>
-                </td>
-                <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
+                <span class="font-bold"> {{ pta.t1Pret | formatNumber }} </span>
+                 <span v-else class="font-bold" >0 FCFA </span>
+              </td>
+              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
 
               <td v-if="pta.t1Pret != '' || pta.t1Bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold"> {{ (pta.t1Pret + pta.t1Bn) | formatNumber }} </span>
@@ -283,10 +293,10 @@
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <!-- <td v-if="pta.t3Pret != undefined && pta.t3Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                  <span class="font-bold"> {{ pta.t3Pret | formatNumber }} </span>
-                   <span v-else class="font-bold" >0 FCFA </span>
-                </td>
-                <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
+                <span class="font-bold"> {{ pta.t3Pret | formatNumber }} </span>
+                 <span v-else class="font-bold" >0 FCFA </span>
+              </td>
+              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
 
               <td v-if="pta.t3Pret != '' || pta.t3Bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span class="font-bold"> {{ (pta.t3Pret + pta.t3Bn) | formatNumber }} </span>
@@ -302,10 +312,10 @@
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <!-- <td v-if="pta.t4Pret != undefined && pta.t4Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                  <span class="font-bold"> {{ pta.t4Pret | formatNumber }} </span>
-                   <span v-else class="font-bold" >0 FCFA </span>
-                </td>
-                <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
+                <span class="font-bold"> {{ pta.t4Pret | formatNumber }} </span>
+                 <span v-else class="font-bold" >0 FCFA </span>
+              </td>
+              <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td> -->
 
               <td v-if="pta.t4Pret != '' || pta.t4Bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span v-if="pta.t4Pret != undefined && pta.t4Bn != undefined" class="font-bold"> {{ (pta.t4Pret + pta.t4Bn) | formatNumber }} </span>
@@ -318,41 +328,6 @@
       </div>
     </div>
   </div>
-  <!-- Modal Register & Update -->
-  <Modal backdrop="static" :show="showModalFiltre" @hidden="showModalFiltre = false">
-    <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">Filtrer le pta</h2>
-    </ModalHeader>
-    <form @submit.prevent="filtreParAnnee(annees)">
-      <ModalBody>
-        <div class="grid grid-cols-1 gap-4">
-          <!-- <pre>{{years}}</pre> -->
-          <div class="">
-            <label class="form-label">Année</label>
-            <TomSelect v-model="annees" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
-              <option v-for="(year, index) in years" :key="index" :value="year.nom">{{ year.nom }}</option>
-            </TomSelect>
-          </div>
-        </div>
-      </ModalBody>
-      <ModalFooter>
-        <div class="flex gap-2">
-          <button
-            type="button"
-            @click="
-              showModalFiltre = false;
-              annees = '';
-            "
-            class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary"
-          >
-            Annuler
-          </button>
-          <VButton :loading="isLoading" label="Filtrer" />
-        </div>
-      </ModalFooter>
-    </form>
-  </Modal>
-  <!-- End Modal -->
 </template>
 
 <script>
@@ -360,23 +335,22 @@
 import PtabService from "@/services/modules/pta.service.js";
 import BailleursService from "@/services/modules/bailleur.service.js";
 import TacheService from "@/services/modules/tache.service.js";
-import VButton from "@/components/news/VButton.vue";
-import { toast } from "vue3-toastify";
+import PtaService from "@/services/modules/pta.service.js";
+
+
 import { mapGetters, mapMutations, mapActions, mapState } from "vuex";
 export default {
   props: ["ppm"],
-  components: { VButton },
+  components: {},
   data() {
     return {
-      years: [],
-      annees: "",
       tabletoggle: [],
       etattoggle: true,
       graytoggle: true,
       redtoggle: false,
       translatetoggle: false,
       chargement: false,
-      showModalFiltre: false,
+
       greentoggle: true,
       ptab: [],
       items: ["Item 1", "Item 2", "Item 3"],
@@ -387,6 +361,8 @@ export default {
       openFiltre: false,
       statutActuel: false,
       annee: null,
+      poidsActuel: 0,
+      poidsOptions: [0,50,100],
       bailleur: "",
       bailleurs: [],
       version: "current",
@@ -407,6 +383,7 @@ export default {
       exporterSuiviPta: false,
       exporterSuiviRePpm: false,
       exporterSuiviRePta: false,
+
     };
   },
   computed: {
@@ -1365,16 +1342,6 @@ export default {
     },
   },
   methods: {
-    filtreParAnnee(datas) {
-      let data = {};
-
-      data = {
-        organisationId: this.$route.params.ongId,
-        annee: datas,
-      };
-      this.getPta(data);
-    },
-    handleInput(event) {},
     saveSuiviOld(id, data) {
       this.chargement = true;
       var form = {
@@ -1415,7 +1382,15 @@ export default {
         this.activeItems.push(index);
       }
     },
-    togglesuivie(pta) {
+
+    /* togglesuivie(pta, index, event) {
+      console.log("changeTEP");
+      // Access the selected value
+      const selectedValue = event.target.value;
+
+      // Update the specific item's selected option
+      pta.poidsActuel = selectedValue;
+
       //this.dataNew;
 
       this.redtoggle = false;
@@ -1426,9 +1401,7 @@ export default {
       //console.log(this.tabletoggle[id]);
 
       this.chargement = true;
-      var form = {
-        tacheId: pta.id,
-      };
+
       //  console.log(id)
       if (pta.poidsActuel > 0) {
         this.tabletoggle[pta.id] = 0;
@@ -1438,6 +1411,7 @@ export default {
             // this.dataNew;
             this.$toast.success("suivie supprimé avec succès");
             // window.location.reload();
+            this.getPta();
           })
           .catch((error) => {
             if (error.response) {
@@ -1453,6 +1427,10 @@ export default {
             }
           });
       } else {
+        var form = {
+          poidsActuel: pta.poidsActuel,
+          tacheId: pta.id,
+        };
         this.tabletoggle[pta.id] = 1;
 
         TacheService.suiviTache(form)
@@ -1461,6 +1439,7 @@ export default {
             // this.dataNew;
             this.$toast.success("suivie éffectué avec succès");
             // window.location.reload();
+            this.getPta();
           })
           .catch((error) => {
             if (error.response) {
@@ -1478,6 +1457,15 @@ export default {
       }
       this.chargement = false;
     },
+    */
+
+    togglesuivie(pta, indice, event) {
+      const selectedValue = event.target.value; // Get the selected value
+      console.log(`Selected value for ${pta.code} (Index ${indice}):`, selectedValue);
+      // Perform your logic with the selected value
+      pta.poidsActuel = selectedValue; // Example: Update the item's property
+    },
+    
     // exportToExcel() {
     //   //  console.log('gghghghgh');
     //   //  console.log(this.dataNew);
@@ -1568,7 +1556,12 @@ export default {
         this.currentPage = true;
       }
     },
-    getPta(data) {
+    getPta() {
+      let data = {};
+
+      data = {
+        organisationId: this.$route.params.ongId ?? this.currentUser?.profil?.id,
+      };
       // if (this.annee == null) {
       //   const year = new Date().getFullYear();
       //   data = {
@@ -1583,14 +1576,13 @@ export default {
 
       // }
       this.active();
-      PtabService.getOrganisationPta(data)
+      PtabService.getPta({annee: 2024})
         .then((data) => {
           this.ptab = data.data.data;
           this.disabled();
-          toast.success("Filtre éffectuer avec succès");
         })
         .catch((e) => {
-          toast.error("Erreur lors du filtrage des informations");
+          this.$toast.error(e);
           this.disabled();
         });
     },
@@ -1698,28 +1690,16 @@ export default {
     },
   },
   mounted() {
+    console.log(this.currentUser);
     this.getPermission();
 
     if (this.revisionVisible || this.ppmVisible || this.ptaVisible) {
-      console.log(this.$route.params.ongId);
-      let data = {};
-      data = {
-        organisationId: this.$route.params.ongId,
-      };
-      this.getPta(data);
+      this.getPta();
       this.getBailleur();
       this.fetchProgrammeScopes(this.currentUser.programme.id).then((response) => {
         this.scopes = response.data.data;
       });
     }
-
-    var anneeActuelle = new Date().getFullYear() + 5;
-    let i = 0;
-    for (var annee = 2016; annee <= anneeActuelle; annee++) {
-      i++;
-      this.years.push({ nom: `${annee}` });
-    }
-    console.log(this.years);
   },
 };
 </script>

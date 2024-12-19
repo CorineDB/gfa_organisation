@@ -16,96 +16,20 @@ const idEvaluation = route.params.e;
 const organizationId = ref(route.params.s);
 const authUser = ref("");
 const idSelectStructure = ref("");
+const idSelect = ref("");
 
-const feuilleDeRoute = ref([]); /*reactive([
-        {
-          id: 1,
-          action: "Évaluer les risques",
-          start_at: "2024-12-01",
-          end_at: "2025-01-26",
-          statut: -1,
-        },
-        {
-          id: 2,
-          action: "Définir les objectifs",
-          start_at: "2024-12-01",
-          end_at: "2024-12-01",
-          statut: 0,
-        },
-        {
-          id: 3,
-          action: "Mettre en place les outils",
-          start_at: "2024-12-01",
-          end_at: "2024-12-01",
-          statut: 0,
-        },
-]);*/
-const mesuresAPrendre = ref([]);  /*reactive( [
-        {
-          id: 1,
-          recommandation: "Évaluer les risques",
-        },
-        {
-          id: 2,
-          recommandation: "Définir les objectifs",
-        },
-        {
-          id: 3,
-          recommandation: "Mettre en place les outils",
-          description: "Installer les outils nécessaires pour le suivi des mesures."
-        }
-      ]
-); */
-
-const plan = reactive([
-      {
-        recommandation: { id: "$2fgdfsdf", recommandation: "Recommandation 1",
-        actionsAMener: [
-          { 
-            id: "1", 
-            action: "Action 1", 
-            start_at: "2024-11-01", 
-            end_at: "2024-12-01", 
-            validated_at: null, 
-            statut: 1, 
-            est_valider: true 
-          },
-          { 
-            id: "2", 
-            action: "Action 2", 
-            start_at: "2024-11-05", 
-            end_at: "2024-12-05", 
-            validated_at: "2024-11-10", 
-            statut: 0, 
-            est_valider: false 
-          },
-        ],
-         },
-        
-      },
-      {
-        recommandation: { id: "$3dsdfsdf", recommandation: "Recommandation 2",actionsAMener: [
-          { 
-            id: "3", 
-            action: "Action 3", 
-            start_at: "2024-12-01", 
-            end_at: "2025-01-01", 
-            validated_at: null, 
-            statut: -1, 
-            est_valider: false 
-          },
-        ] },
-        
-      }
-    ]);
+const feuilleDeRoute = ref([]);
+const mesuresAPrendre = ref([]);
 
 const isLoading = ref(false);
 const collapsedIndex = ref(null);
 
 const showMesureModal = ref(false);
+const showDeleteMesureModal = ref(false);
 const showActionModal = ref(false);
+const showDeleteActionModal = ref(false);
 
-const isCreate = ref(true);
+let isCreate = ref(true);
 const currentFactuel = ref("");
 const currentPerception = ref("");
 const currentProfileGouvernance = ref("");
@@ -117,8 +41,25 @@ const openMesureModal = () => {
   showMesureModal.value = true
 };
 
+const editMesureModal = (mesure) => {
+  isCreate = false
+  recommandationPayload.recommandation = mesure.recommandation;
+  showMesureModal.value = true
+  idSelect.value = mesure.id;
+};
+
 const openActionModal = () => {
   showActionModal.value = true
+};
+
+const editActionModal = (action) => {
+  isCreate = false
+  actionPayload.action = action.action;
+  actionPayload.start_at = action.start_at;
+  actionPayload.end_at = action.end_at;
+  actionPayload.recommandationId = action.recommandationId;
+  showActionModal.value = true
+  idSelect.value = action.id;
 };
 
 const submitMesureData = () => (isCreate.value ? createMesureData() : updateMesureData());
@@ -138,6 +79,7 @@ const formatDate = (date) => {
 const resetMesureForm = () => {
   recommandationPayload.recommandation = "";
   showMesureModal.value = false
+  isCreate = true
 };
 
 const resetActionForm = () => {
@@ -147,6 +89,7 @@ const resetActionForm = () => {
   actionPayload.recommandationId = "";
   actionPayload.indicateurs = [];
   showActionModal.value = false
+  isCreate = true
 };
 
 const createMesureData = async () => {
@@ -167,7 +110,7 @@ const createMesureData = async () => {
 
 const updateMesureData = async (id) => {
   isLoading.value = true;
-  await RecommandationService.update(id, recommandationPayload)
+  await RecommandationService.update(idSelect.value, recommandationPayload)
     .then(() => {
       isLoading.value = false;
       getMesuresData();
@@ -178,6 +121,27 @@ const updateMesureData = async (id) => {
       isLoading.value = false;
       console.error(e);
       toast.error("Vérifier les informations et ressayer.");
+    });
+};
+
+const handleDeleteMesure = (params) => {
+  idSelect.value = params.id;
+  showDeleteMesureModal.value = true;
+};
+
+const deleteMesureData = async () => {
+  isLoading.value = true;
+  await RecommandationService.destroy(idSelect.value)
+    .then(() => {
+      showDeleteMesureModal.value = false;
+      isLoading.value = false;
+      toast.success("Recommandation supprimée");
+      getMesuresData();
+    })
+    .catch((e) => {
+      isLoading.value = false;
+      console.error(e);
+      toast.error("Une erreur est survenue, ressayer");
     });
 };
 
@@ -199,7 +163,7 @@ const createActionData = async () => {
 
 const updateActionData = async (id) => {
   isLoading.value = true;
-  await ActionAMenerService.update(id, actionPayload)
+  await ActionAMenerService.update(idSelect.value, actionPayload)
     .then(() => {
       isLoading.value = false;
       getFeuilleDeRouteData();
@@ -210,6 +174,27 @@ const updateActionData = async (id) => {
       isLoading.value = false;
       console.error(e);
       toast.error("Vérifier les informations et ressayer.");
+    });
+};
+
+const handleDeleteAction = (params) => {
+  idSelect.value = params.id;
+  showDeleteActionModal.value = true;
+};
+
+const deleteActionData = async () => {
+  isLoading.value = true;
+  await ActionAMenerService.destroy(idSelect.value)
+    .then(() => {
+      showDeleteActionModal.value = false;
+      isLoading.value = false;
+      toast.success("Action correctionnelle supprimée");
+      getFeuilleDeRouteData()
+    })
+    .catch((e) => {
+      isLoading.value = false;
+      console.error(e);
+      toast.error("Une erreur est survenue, ressayer");
     });
 };
 
@@ -293,25 +278,32 @@ onMounted(async () => {
                   <table cellspacing="0" cellpadding="10">
                     <thead>
                       <tr>
-                        <th>Recommendation</th>
                         <th>Action</th>
                         <th>Status</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Validated At</th>
+                        <th>Actions</th> <!-- New Actions column -->
                       </tr>
                     </thead>
                     <tbody>
                       <!-- Loop through recommendations -->
                       <template v-for="recommendation in feuilleDeRoute.recommandations" :key="recommendation.id">
                         <!-- Recommendation row -->
-                        <tr>
+                        <!-- <tr>
                           <td :rowspan="recommendation.actions_a_mener.length + 1">{{ recommendation.recommandation }}</td>
                           <td colspan="5" class="actions-header">
-                            <!-- Placeholder for the first action row -->
+                            
+                          </td>
+                        </tr> -->
+
+                        <tr class="highlight-row">
+                          <td colspan="5">{{ recommendation.recommandation }}</td>
+                          <td class="actions-cell">
+                            <!-- Actions buttons for the recommendation -->
+                            <button class="action-button" @click="editMesureModal(recommendation)">Edit</button>
                           </td>
                         </tr>
-
                         <!-- Loop through actions of the current recommendation -->
                         <tr v-for="action in recommendation.actions_a_mener" :key="action.id">
                           <td>{{ action.action }}</td>
@@ -319,6 +311,11 @@ onMounted(async () => {
                           <td>{{ action.start_at }}</td>
                           <td>{{ action.end_at }}</td>
                           <td>{{ action.validated_at }}</td>
+                          <td class="actions-cell">
+                            <!-- Action buttons for each individual action -->
+                            <button class="action-button" @click="editActionModal(action)">Edit</button>
+                            <button class="action-button" @click="handleDeleteAction(action)">Delete</button>
+                          </td>
                         </tr>
                       </template>
                     </tbody>
@@ -454,6 +451,38 @@ onMounted(async () => {
     </form>
   </Modal>
   <!-- End Modal -->
+
+  <!-- Modal Delete -->
+  <Modal :show="showDeleteActionModal" @hidden="showDeleteActionModal = false">
+    <ModalBody class="p-0">
+      <div class="p-5 text-center">
+        <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">Suppression</div>
+        <div class="mt-2 text-slate-500">Supprimer cette action correctionnelle?</div>
+      </div>
+      <div class="flex justify-center w-full gap-3 py-4 text-center">
+        <button type="button" @click="cancelSelect" class="mr-1 btn btn-outline-secondary">Annuler</button>
+        <DeleteButton :loading="isLoading" @click="deleteActionData" />
+      </div>
+    </ModalBody>
+  </Modal>
+  <!-- End Modal -->
+
+  <!-- Modal Delete -->
+  <Modal :show="showDeleteMesureModal" @hidden="showDeleteMesureModal = false">
+    <ModalBody class="p-0">
+      <div class="p-5 text-center">
+        <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">Suppression</div>
+        <div class="mt-2 text-slate-500">Supprimer cette recommandation?</div>
+      </div>
+      <div class="flex justify-center w-full gap-3 py-4 text-center">
+        <button type="button" @click="cancelSelect" class="mr-1 btn btn-outline-secondary">Annuler</button>
+        <DeleteButton :loading="isLoading" @click="deleteMesuseData" />
+      </div>
+    </ModalBody>
+  </Modal>
+  <!-- End Modal -->
 </template>
 
 <style scoped>
@@ -567,6 +596,12 @@ th, td {
 }
 .actions-header {
   text-align: center;
+  font-weight: bold;
+}
+.highlight-row {
+  background-color: #f0f8ff; /* Light blue for highlighting */
+  background-color: rgb(15, 52, 96); /* Darker blue accent color */
+  color: #f0f8ff; /* Light blue for highlighting */
   font-weight: bold;
 }
 </style>
