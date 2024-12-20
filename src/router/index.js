@@ -13,7 +13,7 @@ import Principe from "../views/dashboard/principe.vue";
 import Critere from "../views/dashboard/critere.vue";
 import Utilisateur from "../views/dashboard/utilisateur.vue";
 import Login from "../views/login/Main.vue";
-import RequestPassword from "../views/reset_password/Main.vue";
+import RequestPassword from "../views/request-password/Main.vue";
 import Activation from "../views/activation/Main.vue";
 import ResetPasswordConnect from "../views/reset_password/Main.vue";
 import ResetPassword from "../views/reset-password/Main.vue";
