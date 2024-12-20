@@ -493,7 +493,7 @@ onMounted(async () => {
       <ModalBody class="space-y-5">
         <div v-if="errors.factuel" class="my-2 text-danger">{{ getFieldErrors(errors.factuel) }}</div>
         <div v-if="errors['factuel.comite_members']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.comite_members"]) }}</div>
-        <div v-if="errors['actuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["actuel.response_data"]) }}</div>
+        <div v-if="errors['factuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.response_data"]) }}</div>
         <p>Organisation: {{ findOrganisation(payload.organisationId) }}</p>
         <div v-if="payload.factuel.comite_members.length > 0" class="mt-3 space-y-1">
           <label class="form-label">Membres</label>

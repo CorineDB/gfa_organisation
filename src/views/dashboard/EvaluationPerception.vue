@@ -360,7 +360,11 @@ onMounted(async () => {
       </ModalHeader>
 
       <ModalBody class="space-y-5">
-        <div v-if="errors.perception" class="my-2 text-danger">{{ getFieldErrors(errors.perception) }}</div>
+        <!-- <div v-if="errors.perception" class="my-2 text-danger">{{ getFieldErrors(errors.perception) }}</div> -->
+        <div v-if="errors['perception.age']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.age"]) }}</div>
+        <div v-if="errors['perception.categorieDeParticipant']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.categorieDeParticipant"]) }}</div>
+        <div v-if="errors['perception.sexe']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.sexe"]) }}</div>
+        <div v-if="errors['perception.commentaire']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.commentaire"]) }}</div>
         <p v-if="payload.organisationId">
           Patenaire: <span class="text-primary">{{ findOrganisation(payload.organisationId) }}</span>
         </p>
