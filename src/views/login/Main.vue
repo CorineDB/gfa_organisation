@@ -225,6 +225,9 @@ export default {
     },
   },
   mounted() {
+    if (localStorage.getItem("authenticateUser") && localStorage.getItem("access_token")) {
+      window.location.href = "/dashboard/projets";
+    }
     this.isValidate = localStorage.getItem("activeCompte");
   },
 
