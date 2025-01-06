@@ -122,7 +122,7 @@ const initTabulator = () => {
             return button;
           };
 
-          const viewPta = createButton("voir pta", "btn btn-pending", () => {
+          const viewPta = createButton("Plan d'action", "btn btn-pending", () => {
             goToPta(cell.getData());
           });
 
@@ -350,8 +350,8 @@ onMounted(() => {
                 <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export JSON </DropdownItem>
                 <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export XLSX </DropdownItem>
                 <DropdownItem> <FileTextIcon class="w-4 h-4 mr-2" /> Export HTML </DropdownItem>
-              </DropdownContent> </DropdownMenu
-            >secteurActivite
+              </DropdownContent>
+            </DropdownMenu>
           </Dropdown>
         </div>
       </div>

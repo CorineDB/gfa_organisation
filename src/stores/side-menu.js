@@ -58,8 +58,8 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "BarChart2Icon",
             pageName: "finances_suivi",
             title: "Suivi financier",
-          }
-        ]
+          },
+        ],
       },
       {
         icon: "FolderIcon",
@@ -74,7 +74,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "BarChart2Icon",
             pageName: "suivi_indicateur",
             title: "Suivis Indicateur",
-          },/* 
+          } /* 
           {
             icon: "BarChart2Icon",
             pageName: "UniteDeMesure",
@@ -99,7 +99,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "BarChart2Icon",
             pageName: "TypeResultat",
             title: "Résultats Cadre de rendement",
-          }, */
+          }, */,
         ],
       },
       {
@@ -111,7 +111,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
       {
         icon: "BarChart2Icon",
         pageName: "EnqueteIndividuel",
-        title: "Enquête individuelle",
+        title: "Enquête personnalisé",
       },
       {
         icon: "UsersIcon",
@@ -130,43 +130,43 @@ export const useSideMenuStore = defineStore("sideMenu", {
           },
         ],
       },
-      {
-        icon: "SettingsIcon",
-        pageName: "setting",
-        title: "Paramètres",
-        subMenu: [
-          {
-            icon: "BarChart2Icon",
-            pageName: "sources_verification",
-            title: "Sources de vérification",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "UniteDeMesure",
-            title: "Unité de Mesure",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "KeyValue",
-            title: "Clé Valeur Indicateur",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "CategoriesIndicateurs",
-            title: "Catégories d'indicateurs",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "Sites",
-            title: "Sites",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "TypeResultat",
-            title: "Résultats Cadre de rendement",
-          },
-        ],
-      },
+      // {
+      //   icon: "SettingsIcon",
+      //   pageName: "setting",
+      //   title: "Paramètres",
+      //   subMenu: [
+      //     {
+      //       icon: "BarChart2Icon",
+      //       pageName: "sources_verification",
+      //       title: "Sources de vérification",
+      //     },
+      //     {
+      //       icon: "BarChart2Icon",
+      //       pageName: "UniteDeMesure",
+      //       title: "Unité de Mesure",
+      //     },
+      //     {
+      //       icon: "BarChart2Icon",
+      //       pageName: "KeyValue",
+      //       title: "Clé Valeur Indicateur",
+      //     },
+      //     {
+      //       icon: "BarChart2Icon",
+      //       pageName: "CategoriesIndicateurs",
+      //       title: "Catégories d'indicateurs",
+      //     },
+      //     {
+      //       icon: "BarChart2Icon",
+      //       pageName: "Sites",
+      //       title: "Sites",
+      //     },
+      //     {
+      //       icon: "BarChart2Icon",
+      //       pageName: "TypeResultat",
+      //       title: "Résultats Cadre de rendement",
+      //     },
+      //   ],
+      // },
     ],
   }),
 });
