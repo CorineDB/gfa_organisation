@@ -188,7 +188,7 @@ export default {
                 this.showAlert = true;
                 toast.error("Email ou mot de passe incorrect reesayer !!!");
               } else {
-                toast.error("Une erreur s'est produite reesayer !!!");
+                toast.error("Identifiants incorrect !!!");
               }
               this.chargement = false;
             });
