@@ -38,11 +38,11 @@
               <input id="regular-form-1" type="text" required v-model="formData.entrepriseNom" class="form-control" placeholder="Nom de l'entreprise" />
             </div> -->
             <div>
-              <label for="regular-form-1" class="form-label">Nom</label>
+              <label for="regular-form-1" class="form-label">Nom<span class="text-danger">*</span> </label>
               <input id="regular-form-1" type="text" required v-model="formData.nom" class="form-control" placeholder="Nom" />
             </div>
             <div>
-              <label for="regular-form-1" class="form-label">Prenoms</label>
+              <label for="regular-form-1" class="form-label">Prenoms<span class="text-danger">*</span> </label>
               <input id="regular-form-1" type="text" required v-model="formData.prenom" class="form-control" placeholder="Prenoms" />
             </div>
             <!-- <div>
@@ -50,22 +50,22 @@
               <input id="regular-form-1" type="number" required v-model="formData.entrepriseContact" class="form-control" placeholder="Contact" />
             </div> -->
             <div>
-              <label for="regular-form-1" class="form-label">Email</label>
+              <label for="regular-form-1" class="form-label">Email<span class="text-danger">*</span> </label>
               <input id="regular-form-1" type="email" required v-model="formData.email" class="form-control" placeholder="Email" />
             </div>
 
             <div>
-              <label for="regular-form-1" class="form-label">Contact</label>
+              <label for="regular-form-1" class="form-label">Contact<span class="text-danger">*</span> </label>
               <input id="regular-form-1" type="number" v-model="formData.contact" class="form-control" placeholder="Contact" />
             </div>
 
             <div>
-              <label for="regular-form-1" class="form-label">Poste</label>
+              <label for="regular-form-1" class="form-label">Poste<span class="text-danger">*</span> </label>
               <input id="regular-form-1" type="text" v-model="formData.poste" class="form-control" placeholder="Poste" />
             </div>
 
             <div class="">
-              <label class="form-label">Roles</label>
+              <label class="form-label">Roles<span class="text-danger">*</span> </label>
               <TomSelect v-model="formData.roles" multiple :options="{ placeholder: 'Selectionez les roles' }" class="w-full">
                 <option v-for="(role, index) in roles" :key="index" :value="role.id">{{ role.nom }}</option>
               </TomSelect>

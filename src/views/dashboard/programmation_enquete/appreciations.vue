@@ -256,7 +256,7 @@ onMounted(async () => {
         <div class="grid grid-cols-1 gap-4">
           <textarea name="contenu" v-model="payload.contenu" cols="30" rows="10"></textarea>
           <div>
-            <label>Type</label>
+            <label>Type<span class="text-danger">*</span> </label>
             <div class="flex flex-col mt-2 sm:flex-row">
               <div class="mr-2 form-check">
                 <input v-model="payload.type" id="faiblesse" class="form-check-input" type="radio" name="type" value="faiblesse" />
@@ -269,7 +269,7 @@ onMounted(async () => {
             </div>
           </div>
           <div class="">
-            <label class="form-label">Organisation </label>
+            <label class="form-label">Organisation<span class="text-danger">*</span> </label>
             <TomSelect v-model="payload.organisationId" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
               <option v-for="(organisation, index) in organisations" :key="index" :value="organisation.id">{{ organisation.nom }}</option>
             </TomSelect>

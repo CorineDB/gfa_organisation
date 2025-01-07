@@ -76,7 +76,7 @@
           </div>
           <div class="flex w-full gap-4">
             <div class="flex-1">
-              <label class="form-label">Formulaires</label>
+              <label class="form-label">Formulaires <span class="text-danger">*</span> </label>
               <TomSelect v-model="payload.surveyFormId" name="trimestre_suivi" :options="{ placeholder: 'Selectionez un formulaire' }" class="w-full">
                 <option value=""></option>
                 <option v-for="form in formulaires" :key="form.id" :value="form.id">{{ form.libelle }}</option>

@@ -64,7 +64,7 @@
             </div>
           </div>
           <div class="flex-1">
-            <label class="form-label" for="description">Strucutre Formulaire</label>
+            <label class="form-label" for="description">Strucutre Formulaire <span class="text-danger">*</span> </label>
             <div class="">
               <textarea name="form_data" class="form-control" id="form_data" v-model="payload.form_data" cols="30" rows="3"></textarea>
               <div v-if="errors.form_data" class="mt-2 text-danger">{{ getFieldErrors(errors.form_data) }}</div>
