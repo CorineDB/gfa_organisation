@@ -470,7 +470,7 @@ onMounted(async () => {
         </div>
         <div class="w-full">
           <label for="contact" class="form-label">Contact <span class="text-danger">*</span> </label>
-          <input id="contact" type="number" required v-model.number="currentMember.contact" class="form-control" placeholder="Contact" />
+          <input id="contact" type="text" required v-model.number="currentMember.contact" class="form-control" placeholder="Contact" />
         </div>
       </ModalBody>
     </div>

@@ -221,9 +221,9 @@ onMounted(() => {
           <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
         </div>
       </div>
-      <div class="flex">
+      <!-- <div class="flex">
         <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal"><PlusIcon class="w-4 h-4 mr-3" />Ajouter un Suivi Financier</button>
-      </div>
+      </div> -->
     </div>
   </div>
 
