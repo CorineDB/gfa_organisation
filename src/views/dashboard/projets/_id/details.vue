@@ -190,7 +190,6 @@
           <!-- <div  style="height: 40vh"></div> -->
           <div>
             <div id="map" class="h-48 mb-4 bg-gray-200 rounded-md"></div>
-            <p class="text-sm text-gray-500">Total Number of Sessions within Date Range Users</p>
           </div>
           <!-- Data Table -->
           <div>
@@ -245,13 +244,13 @@
     </section>
 
     <!-- Performance Metrics Section -->
-    <section class="p-6 bg-white rounded-md shadow-md">
+    <!-- <section class="p-6 bg-white rounded-md shadow-md">
       <h2 class="text-lg font-semibold text-gray-700">Suivi Indicateurs</h2>
       <div class="mt-4 overflow-x-auto">
         <TabulatorSuiviIndicateurDetail v-if="suivis.length > 0" :data="suivis" :years="annees" />
         <p v-else>Pas de suivi disponible pour l'instant</p>
       </div>
-    </section>
+    </section> -->
   </div>
   <!-- fin new sample -->
 </template>
@@ -263,7 +262,7 @@ import ReportDonutChart2 from "@/components/report-donut-chart-2/Main.vue";
 import { toast } from "vue3-toastify";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
-import TabulatorSuiviIndicateurDetail from "@/components/TabulatorSuiviIndicateurDetail.vue";
+// import TabulatorSuiviIndicateurDetail from "@/components/TabulatorSuiviIndicateurDetail.vue";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
@@ -498,47 +497,6 @@ const getStat = function () {
     .then((data) => {
       graphiqueData.value = data.data.data;
       initTabulator();
-      if (graphiqueData.value?.sites?.length > 0) {
-        // alert("ok");
-        myIcon.value = L.icon({
-          iconUrl: icon,
-          iconSize: [30, 30],
-          iconAnchor: [22, 94],
-          popupAnchor: [-3, -76],
-          shadowUrl: markerShadow,
-          shadowSize: [60, 30],
-          shadowAnchor: [22, 94],
-        });
-
-        // Initialiser la carte
-        initialMap.value = L.map("map", {
-          zoomControl: true,
-          zoom: 1,
-          zoomAnimation: false,
-          fadeAnimation: true,
-          markerZoomAnimation: true,
-        }).setView([6.8041, 2.4152], 6);
-
-        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        }).addTo(initialMap.value);
-
-        // Ajouter des marqueurs individuels
-        L.marker([6.3746, 2.6004], { icon: myIcon.value }).addTo(initialMap.value);
-        L.marker([6.3752, 2.8349], { icon: myIcon.value }).addTo(initialMap.value);
-
-        // Créer un groupe de marqueurs
-        const markers = L.markerClusterGroup();
-
-        // Ajouter des marqueurs à partir de `addressPoints`
-        addressPoints.forEach((element, index) => {
-          const each_marker = new L.marker([element.latitude, element.longitude], { icon: myIcon.value }).bindPopup(`<strong> Hello Bangladesh! </strong> <br> I am a popup number ${index}`);
-          markers.addLayer(each_marker);
-        });
-
-        initialMap.value.addLayer(markers);
-      }
     })
     .catch((error) => {
       console.log(error);
