@@ -296,8 +296,12 @@ const handleEdit = (data) => {
 const handlePreview = (data) => {};
 
 const handleCopy = (data) => {
-  navigator.clipboard.writeText(data.survey_form_link);
-  toast.success("URL copié");
+  if (!data?.survey_form_link) {
+    toast.error("URL inexistant");
+  } else {
+    navigator.clipboard.writeText(data.survey_form_link);
+    toast.success("URL copié");
+  }
 };
 
 // Handle delete action
