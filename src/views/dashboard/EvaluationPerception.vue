@@ -360,12 +360,16 @@ onMounted(async () => {
       </ModalHeader>
 
       <ModalBody class="space-y-5">
-        <div v-if="errors.perception" class="my-2 text-danger">{{ getFieldErrors(errors.perception) }}</div>
+        <!-- <div v-if="errors.perception" class="my-2 text-danger">{{ getFieldErrors(errors.perception) }}</div> -->
+        <div v-if="errors['perception.age']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.age"]) }}</div>
+        <div v-if="errors['perception.categorieDeParticipant']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.categorieDeParticipant"]) }}</div>
+        <div v-if="errors['perception.sexe']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.sexe"]) }}</div>
+        <div v-if="errors['perception.commentaire']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.commentaire"]) }}</div>
         <p v-if="payload.organisationId">
           Patenaire: <span class="text-primary">{{ findOrganisation(payload.organisationId) }}</span>
         </p>
         <div class="">
-          <label class="form-label">Catégorie participant </label>
+          <label class="form-label">Catégorie participant <span class="text-danger">*</span> </label>
           <TomSelect v-model="payload.perception.categorieDeParticipant" :options="{ placeholder: 'Selectionez un categorie' }" class="w-full">
             <option value=""></option>
             <option v-for="(categorie, index) in categorieDeParticipant" :key="index" :value="categorie.id">{{ categorie.label }}</option>
@@ -373,7 +377,7 @@ onMounted(async () => {
         </div>
         <div class="flex flex-wrap items-center justify-around gap-2">
           <div>
-            <label class="form-label">Sexe</label>
+            <label class="form-label">Sexe<span class="text-danger">*</span> </label>
             <div class="flex gap-2">
               <div v-for="(sexe, index) in sexes" :key="index" class="form-check">
                 <input v-model="payload.perception.sexe" :id="`sex-${sexe.id}${index}`" class="form-check-input" type="radio" name="sexe" :value="sexe.id" />
@@ -382,7 +386,7 @@ onMounted(async () => {
             </div>
           </div>
           <div>
-            <label class="form-label">Âge</label>
+            <label class="form-label">Âge<span class="text-danger">*</span> </label>
             <div class="flex gap-2">
               <div v-for="(age, index) in ages" :key="index" class="form-check">
                 <input v-model="payload.perception.age" :id="`age-${age.id}${index}`" class="form-check-input" type="radio" name="age" :value="age.id" />

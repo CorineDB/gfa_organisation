@@ -34,7 +34,7 @@ function updateValue(event) {
 
 <template>
   <div>
-    <label :for="label" class="form-label">{{ label }}</label>
+    <label :for="label" class="form-label">{{ label }} <span class="text-danger" v-if="required">*</span> </label>
     <input :id="label" :type="type" :required="required" :value="modelValue" @input="updateValue" class="form-control" :placeholder="label" />
     <div v-if="control" class="mt-2 text-danger">{{ control }}</div>
   </div>

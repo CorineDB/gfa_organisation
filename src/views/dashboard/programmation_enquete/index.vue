@@ -287,8 +287,7 @@ onMounted(async () => {
             <div v-for="(item, index) in datas" :key="index" class="col-span-12 p-4 md:col-span-12 lg:col-span-4">
               <div class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
                 <!-- En-tête avec sigle et titre -->
-                <div class="relative flex items-start pt-2">
-                  <!-- Dropdown for actions -->
+                <!-- <div class="relative flex items-start pt-2">
                   <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
                     <DropdownToggle tag="a" class="block w-5 h-5 cursor-pointer">
                       <MoreVerticalIcon class="w-5 h-5 text-gray-400 transition-colors hover:text-gray-600" />
@@ -300,7 +299,7 @@ onMounted(async () => {
                       </DropdownContent>
                     </DropdownMenu>
                   </Dropdown>
-                </div>
+                </div> -->
 
                 <div @click="gotoSoumissions(item)" class="flex flex-col items-start w-full gap-2 mt-2 cursor-pointer">
                   <!-- Item details -->

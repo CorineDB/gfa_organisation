@@ -649,11 +649,8 @@ onMounted(async () => {
 
               <div v-else-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button
-                    v-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)"
-                    @click.self="sendInvitationLink"
-                    class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">Envoyer
-                    une invitation
+                  <button v-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                    Envoyer une invitation
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
 
@@ -686,8 +683,7 @@ onMounted(async () => {
           </div>
         </div>
 
-
-        <div v-else class="col-span-4 p-6 overflow-x-auto flex flex-col justify-start p-4 bg-white shadow rounded-md">
+        <div v-else class="flex flex-col justify-start col-span-4 p-4 p-6 overflow-x-auto bg-white rounded-md shadow">
           <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
             <div class="flex">
               <h2 class="mr-5 text-lg font-medium truncate">Actions correctionnelle en cours</h2>
@@ -698,7 +694,7 @@ onMounted(async () => {
             </div>
           </div>
           <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
-          <ActionPlan :actions="feuilleDeRoute"/>
+          <ActionPlan :actions="feuilleDeRoute" />
         </div>
       </div>
 
@@ -765,8 +761,7 @@ onMounted(async () => {
                 <label class="form-label">Type de données</label>
                 <div class="flex gap-2">
                   <div v-for="(option, index) in options" :key="index" class="form-check">
-                    <input v-model="participant.type_de_contact" :id="option.id" class="form-check-input" type="radio"
-                      name="option" :value="option.id" />
+                    <input v-model="participant.type_de_contact" :id="option.id" class="form-check-input" type="radio" name="option" :value="option.id" />
                     <label class="form-check-label" :for="option.id">{{ option.label }}</label>
                   </div>
                 </div>
@@ -774,22 +769,17 @@ onMounted(async () => {
               <form v-show="participant.type_de_contact === options[0].id" @submit.prevent="addEmail">
                 <div class="flex items-end gap-4">
                   <InputForm class="" label="Adresse email" v-model="participant.email" type="email" />
-                  <button class="btn btn-primary">
-                    <PlusIcon class="w-4 h-4 mr-3" />Ajouter
-                  </button>
+                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
                 </div>
               </form>
               <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="8"
-                    v-model.number="participant.phone" type="number" />
+                  <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="10" v-model.number="participant.phone" />
                   <!-- <div class="">
                     <label for="Numéro de téléphone" class="form-label">Numéro de téléphone</label>
                     <input id="Numéro de téléphone" type="number" pattern="\d{1,8}" maxlength="8" required v-model.number="currentPhone" class="form-control" placeholder="Numéro de téléphone" />
                   </div> -->
-                  <button class="btn btn-primary">
-                    <PlusIcon class="w-4 h-4 mr-3" />Ajouter
-                  </button>
+                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
                 </div>
               </form>
               <div v-if="errors.participants" class="mt-2 text-danger">{{ getFieldErrors(errors.participants) }}</div>
@@ -805,8 +795,7 @@ onMounted(async () => {
       </ModalBody>
       <ModalFooter>
         <div class="flex gap-2">
-          <button type="button" @click="resetInvitationForm"
-            class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
+          <button type="button" @click="resetInvitationForm" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
           <VButton :loading="isLoading" label="Envoyer l'invitation" />
         </div>
       </ModalFooter>

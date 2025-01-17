@@ -13,7 +13,7 @@ import Principe from "../views/dashboard/principe.vue";
 import Critere from "../views/dashboard/critere.vue";
 import Utilisateur from "../views/dashboard/utilisateur.vue";
 import Login from "../views/login/Main.vue";
-import RequestPassword from "../views/reset_password/Main.vue";
+import RequestPassword from "../views/request-password/Main.vue";
 import Activation from "../views/activation/Main.vue";
 import ResetPasswordConnect from "../views/reset_password/Main.vue";
 import ResetPassword from "../views/reset-password/Main.vue";
@@ -82,6 +82,8 @@ import CreateIndicateur from "../views/dashboard/indicateurs/CreateIndicateur.vu
 import ActionsMener from "../views/dashboard/actionsMener.vue";*/
 import SuiviIndicateur from "../views/dashboard/indicateurs/SuiviIndicateur.vue";
 import DetailSuivi from "../views/dashboard/indicateurs/DetailSuivi.vue";
+import SurveyFormView from "../views/dashboard/SurveyFormView.vue";
+import DetailEvaluationIndividuel from "../views/dashboard/DetailEvaluationIndividuel.vue";
 
 const routes = [
   {
@@ -390,6 +392,16 @@ const routes = [
         path: "enquetes/:id/recommandations",
         name: "Recommandation",
         component: Recommandation,
+      },
+      {
+        path: "form-individuel/:id",
+        name: "view_survey",
+        component: SurveyFormView,
+      },
+      {
+        path: "evaluation-individuel/:id",
+        name: "detail_evaluation_individuel",
+        component: DetailEvaluationIndividuel,
       },
     ],
   },
