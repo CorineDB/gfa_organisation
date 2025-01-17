@@ -25,7 +25,7 @@
 
 
     <!-- BEGIN: Notifications -->
-    <Dropdown class="mr-auto intro-x sm:mr-6">
+    <!-- <Dropdown class="mr-auto intro-x sm:mr-6">
       <DropdownToggle tag="div" role="button" class="cursor-pointer notification notification--bullet">
         <BellIcon class="notification__icon dark:text-slate-500" />
       </DropdownToggle>
@@ -56,7 +56,7 @@
           </div>
         </DropdownContent>
       </DropdownMenu>
-    </Dropdown>
+    </Dropdown> -->
     <!-- END: Notifications -->
 
 
