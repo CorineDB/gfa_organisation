@@ -272,6 +272,8 @@ import IndicateursService from "@/services/modules/indicateur.service";
 import AuthService from "@/services/modules/auth.service";
 import ChartJauge from "../../components/news/ChartJauge.vue";
 import Tabulator from "tabulator-tables";
+import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
+
 
 const tabulator = ref();
 const filterStatut = ref(0);

@@ -493,6 +493,7 @@ const markerLatLng = ref([47.31322, -1.319482]);
 const loadingOption = ref(true);
 const graphiqueData = ref([]);
 const getStat = function () {
+
   ProjetService.statistiques(route.params.id)
     .then((data) => {
       graphiqueData.value = data.data.data;
