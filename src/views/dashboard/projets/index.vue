@@ -29,7 +29,7 @@
 </l-map> -->
   <div>
     
-   <h3>An interactive leaflet map</h3>
+   <!-- <h3>An interactive leaflet map</h3> -->
    <div id="map" style="height:40vh;"></div>
 </div>
   <Modal backdrop="static" :show="showModal" @hidden="showModal = false">

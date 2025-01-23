@@ -469,8 +469,8 @@ onMounted(async () => {
           <InputForm label="Prénom" v-model="currentMember.prenom" />
         </div>
         <div class="w-full">
-          <label for="contact" class="form-label">Contact</label>
-          <input id="contact" type="number" required v-model.number="currentMember.contact" class="form-control" placeholder="Contact" />
+          <label for="contact" class="form-label">Contact <span class="text-danger">*</span> </label>
+          <input id="contact" type="text" required v-model.number="currentMember.contact" class="form-control" placeholder="Contact" />
         </div>
       </ModalBody>
     </div>

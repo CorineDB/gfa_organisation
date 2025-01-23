@@ -16,14 +16,14 @@ const options = [
   { label: "Numéro de téléphone", id: "contact" },
 ];
 const participant = reactive({
-    type_de_contact: options[0].id,
-    email: "",
-    phone: "",
-  });
+  type_de_contact: options[0].id,
+  email: "",
+  phone: "",
+});
 const idEvaluation = route.query.e;
 const currentOption = ref(options[0].id);
 const currentPhone = ref("");
-const payload = reactive({"participants": []});
+const payload = reactive({ participants: [] });
 const isLoading = ref(false);
 
 const addEmail = () => {
@@ -77,7 +77,7 @@ const submitData = async () => {
 };
 
 const deleteItem = (item) => {
-    payload.participants.splice(item, 1);
+  payload.participants.splice(item, 1);
 };
 
 onMounted(() => {
@@ -116,7 +116,7 @@ onMounted(() => {
           </form>
           <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
             <div class="flex items-end gap-4">
-              <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="8" v-model.number="participant.phone" type="number" />
+              <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="10" v-model.number="participant.phone" />
               <!-- <div class="">
                 <label for="Numéro de téléphone" class="form-label">Numéro de téléphone</label>
                 <input id="Numéro de téléphone" type="number" pattern="\d{1,8}" maxlength="8" required v-model.number="currentPhone" class="form-control" placeholder="Numéro de téléphone" />
@@ -127,7 +127,7 @@ onMounted(() => {
 
           <div class="flex flex-wrap items-center w-full max-w-full gap-3">
             <div class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium bg-blue rounded-sm shadow cursor-pointer text-primary" v-for="(participant, index) in payload.participants" :key="index">
-              <span>{{ participant.type_de_contact === 'email' ? participant?.email : participant?.phone }}</span>
+              <span>{{ participant.type_de_contact === "email" ? participant?.email : participant?.phone }}</span>
               <button @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
             </div>
           </div>

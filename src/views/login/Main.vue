@@ -188,7 +188,7 @@ export default {
                 this.showAlert = true;
                 toast.error("Email ou mot de passe incorrect reesayer !!!");
               } else {
-                toast.error("Une erreur s'est produite reesayer !!!");
+                toast.error("Identifiants incorrect !!!");
               }
               this.chargement = false;
             });
@@ -225,6 +225,9 @@ export default {
     },
   },
   mounted() {
+    if (localStorage.getItem("authenticateUser") && localStorage.getItem("access_token")) {
+      window.location.href = "/dashboard/projets";
+    }
     this.isValidate = localStorage.getItem("activeCompte");
   },
 

@@ -8,6 +8,7 @@
       <nav v-if="!isToolsPerception" class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
         <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-wrap items-center justify-center mt-3 intro-x">
           <h1 class="font-semibold text-white">Programme de redevabilité</h1>
+           <p>{{ currentUsers.role }}</p>
           <!-- <img alt="Programme de redevabilité" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" /> -->
         </router-link>
         <div class="my-6 side-nav__devider"></div>
@@ -398,11 +399,15 @@ const updatedMenu = () => {
 };
 const usersProfileImage = ref("");
 
+const currentUsers = reactive({});
+
 onMounted(() => {
   const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
   //console.log(usersInfo);
 
   if (usersInfo) {
+    currentUsers.nom = "test";
+    currentUsers.role = usersInfo.role[0].nom;
     // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
   }
 
@@ -410,6 +415,8 @@ onMounted(() => {
   updatedMenu();
   formattedMenu.value = $h.toRaw(lastMenu.value);
 });
+
+
 </script>
 <style scoped>
 .navColor {
