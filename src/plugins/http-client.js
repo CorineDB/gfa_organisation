@@ -111,4 +111,19 @@ httpClient.interceptors.response.use(
   // responseErrorInterceptor
 );
 
-export { httpClient , determineContentType };
+httpClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Supprimez "authenticated" && access_token de localStorage
+      localStorage.removeItem("authenticateUser");
+      localStorage.removeItem("access_token");
+      // // Redirigez vers "/"
+      window.location.href = "/";
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export { httpClient, determineContentType };
