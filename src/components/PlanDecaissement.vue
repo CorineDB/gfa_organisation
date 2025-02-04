@@ -1,1345 +1,502 @@
-<template>
-  
-
-   
-</template>
-
 <script>
-var XLSX = require("xlsx");
+import { mapGetters, mapActions } from "vuex";
 
-import PtabService from "@/services/modules/pta.service.js";
-import BailleursService from "@/services/modules/bailleur.service.js";
-import JsonExcel from "vue-json-excel";
-import VueHtml2pdf from 'vue-html2pdf';
-import TacheService from "@/services/modules/tache.service.js";
+import { getStringValueOfStatutCode } from "@/utils/index";
+import ProjetService from "@/services/modules/projet.service.js";
+import PlanDeCaissement from "@/services/modules/plan.decaissement.service";
+import InputForm from "@/components/news/InputForm.vue";
+import verifyPermission from "@/utils/verifyPermission";
+import VButton from "@/components/news/VButton.vue";
+import pagination from "@/components/news/pagination.vue";
+import ActiviteService from "@/services/modules/activite.service";
+import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
 
-import { mapGetters, mapMutations, mapActions, mapState } from "vuex";
+import { helper as $h } from "@/utils/helper";
+
+import { toast } from "vue3-toastify";
 export default {
-  props: ['ppm'],
-  components: { Multiselect, Vmodal, VueHtml2pdf, JsonExcel },
+  emits: ["send-activiteId"],
+  props: {
+    activiteId: {
+      type: String, // Type attendu (String, Number, Boolean, Array, Object, etc.)
+      required: false, // Indique si la prop est obligatoire
+      default: "", // Définit une valeur par défaut
+    },
+    activites: {
+      type: Array, // Type attendu (String, Number, Boolean, Array, Object, etc.)
+      required: false, // Indique si la prop est obligatoire
+      default: [], // Définit une valeur par défaut
+    },
+  },
+  components: {
+    InputForm,
+    VButton,
+    pagination,
+    NoRecordsMessage,
+  },
   data() {
     return {
-      etattoggle: true,
-      graytoggle: true,
-      redtoggle: false,
-      translatetoggle: false,
-      chargement: false,
+      activiteIdLocal: this.activiteId,
 
+      search: "",
+      isLoading: false,
+      itemsPerPage: 3, // Nombre d'éléments par page
+      totalItems: null,
+      currentPage: 1, // Page courante
+      messageErreur: {},
 
-      greentoggle: false,
-      ptab: [],
-      items: ['Item 1', 'Item 2', 'Item 3'],
-      activeItems: [],
-      fich: [],
+      planDeDecaissement: [],
+      isLoadingData: false,
+      showModal: false,
+      isUpdate: false,
+      isLoading: false,
+      formData: {
+        annee: "",
+        trimestre: "",
+        pret: "0",
+        budgetNational: "0",
+        activiteId: "",
+      },
 
-      ptabR: [],
-      openFiltre: false,
-      statutActuel: false,
-      annee: null,
-      bailleur: '',
-      bailleurs: [],
-      version: 'current',
-      version: "",
-      versionSlug: "",
-      scopes: [],
-      currentPage: true,
-      revisionAdd: false,
-      revisionVisible: false,
-      ptaVisible: false,
-      filtrePta: false,
-      filtrePpm: false,
-      filtreRePta: false,
-      filtreRePpm: false,
-      planDecaissementPtaVisible: false,
-      ppmVisible: false,
-      exporterSuiviPpm: false,
-      exporterSuiviPta: false,
-      exporterSuiviRePpm: false,
-      exporterSuiviRePta: false,
-    }
+      planDeDecaissementId: "",
+      labels: "Ajouter",
+      showDeleteModal: false,
+      deleteLoader: false,
+    };
   },
   computed: {
-    ...mapGetters('auths', { currentUser: 'GET_AUTHENTICATE_USER' }),
-    ...mapState({
-      loading: state => state.loading
-    }),
+    ...mapGetters("auths", { currentUser: "GET_AUTHENTICATE_USER" }),
+    paginatedAndFilteredDataPlan() {
+      const { paginatedData, totalFilteredItems } = $h.filterData({
+        itemsPerPage: this.itemsPerPage,
+        search: this.search,
+        data: this.planDeDecaissement,
+        currentPage: this.currentPage,
+        keys: ["activite.nom"],
+      });
 
-    
-    dataNew() {
-      const programme = []
-      if (this.ptab != undefined && this.ptab != null) {
-        this.ptab.forEach(element => {
-          const bailleur = element.bailleur
-          const bn = element.budgetNational
-          const pret = element.pret
+      // Mettre à jour le total pour recalculer la pagination
+      this.totalItems = totalFilteredItems;
 
-          programme.push({ bailleur, nom: element.nom, code: element.code, isProjet: true, bn, pret })
-          element.composantes.forEach(composante => {
-            const bn = composante.budgetNational
-            const pret = composante.pret
-            let poids = composante.poids
-            let poidsActuel = composante.poidsActuel
-            let t1Bn = ''
-            let t1Pret = ''
-            let t2Bn = ''
-            let t2Pret = ''
-            let t3Bn = ''
-            let t3Pret = ''
-            let t4Bn = ''
-            let t4Pret = ''
-            let tBn = ''
-            let tPret = ''
-            let total = ''
-            if (composante.trimestre1 != undefined) {
-              t1Pret = composante.trimestre1.pret
-              t1Bn = composante.trimestre1.budgetNational
-            }
-            if (composante.trimestre2 != undefined) {
-              t2Pret = composante.trimestre2.pret
-              t2Bn = composante.trimestre2.budgetNational
-            }
-            if (composante.trimestre3 != undefined) {
-              t3Pret = composante.trimestre3.pret
-              t3Bn = composante.trimestre3.budgetNational
-            }
-            if (composante.trimestre4 != undefined) {
-              t4Pret = composante.trimestre4.pret
-              t4Bn = composante.trimestre4.budgetNational
-            }
-            tBn = t1Bn + t2Bn + t3Bn + t4Bn
-            tPret = t1Pret + t2Pret + t3Pret + t4Pret
-            total = tBn + tPret
-
-            programme.push({ bailleur, nom: composante.nom, code: composante.code, poids, poidsActuel, isComposante: true, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total })
-            composante.sousComposantes.forEach(sousComposante => {
-              const bn = sousComposante.budgetNational
-              const pret = sousComposante.pret
-              let poids = sousComposante.poids
-              let poidsActuel = sousComposante.poidsActuel
-              let t1Bn = ''
-              let t1Pret = ''
-              let t2Bn = ''
-              let t2Pret = ''
-              let t3Bn = ''
-              let t3Pret = ''
-              let t4Bn = ''
-              let t4Pret = ''
-              let tBn = ''
-              let tPret = ''
-              let total = ''
-              let nom = "PAS DE SOUS COMPOSANTE"
-              if (sousComposante.nom != 0) {
-                nom = sousComposante.nom
-              }
-              if (sousComposante.trimestre1 != undefined && sousComposante.trimestre1 != 0) {
-                t1Pret = sousComposante.trimestre1.pret * 1
-                t1Bn = sousComposante.trimestre1.budgetNational * 1
-
-              }
-              if (sousComposante.trimestre2 != undefined && sousComposante.trimestre2 != 0) {
-                t2Pret = sousComposante.trimestre2.pret * 1
-                t2Bn = sousComposante.trimestre2.budgetNational * 1
-              }
-              if (sousComposante.trimestre3 != undefined && sousComposante.trimestre3 != 0) {
-                t3Pret = sousComposante.trimestre3.pret * 1
-                t3Bn = sousComposante.trimestre3.budgetNational * 1
-              }
-              if (sousComposante.trimestre4 != undefined && sousComposante.trimestre4 != 0) {
-                t4Pret = sousComposante.trimestre4.pret * 1
-                t4Bn = sousComposante.trimestre4.budgetNational * 1
-              }
-
-              tBn = t1Bn + t2Bn + t3Bn + t4Bn
-              tPret = t1Pret + t2Pret + t3Pret + t4Pret
-              total = tBn + tPret
-              if (nom !== 'PAS DE SOUS COMPOSANTE') {
-                programme.push({ bailleur, nom, code: sousComposante.code, poids, poidsActuel, isSC: true, bn, pret, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total })
-              }
-              sousComposante.activites.forEach(activite => {
-                const bn = activite.budgetNational
-                const pret = activite.pret
-                let poids = activite.poids
-                let poidsActuel = activite.poidsActuel
-                let structureResponsable = activite.structureResponsable
-                let structureAssocie = activite.structureAssocie
-                let t1Bn = ''
-                let t1Pret = ''
-                let t2Bn = ''
-                let t2Pret = ''
-                let t3Bn = ''
-                let t3Pret = ''
-                let t4Bn = ''
-                let t4Pret = ''
-                let tBn = ''
-                let tPret = ''
-                let total = ''
-                const planing = {
-                  janvier: '',
-                  fevrier: '',
-                  mars: '',
-                  avril: '',
-                  mai: '',
-                  juin: '',
-                  juillet: '',
-                  aout: '',
-                  septembre: '',
-                  octobre: '',
-                  novembre: '',
-                  decembre: ''
-                }
-                const planingt = {
-                  janvier: '',
-                  fevrier: '',
-                  mars: '',
-                  avril: '',
-                  mai: '',
-                  juin: '',
-                  juillet: '',
-                  aout: '',
-                  septembre: '',
-                  octobre: '',
-                  novembre: '',
-                  decembre: ''
-                }
-                if (activite.trimestre1 != undefined) {
-                  t1Pret = activite.trimestre1.pret
-                  t1Bn = activite.trimestre1.budgetNational
-                }
-                if (activite.trimestre2 != undefined) {
-                  t2Pret = activite.trimestre2.pret
-                  t2Bn = activite.trimestre2.budgetNational
-                }
-                if (activite.trimestre3 != undefined) {
-                  t3Pret = activite.trimestre3.pret
-                  t3Bn = activite.trimestre3.budgetNational
-                }
-                if (activite.trimestre4 != undefined) {
-                  t4Pret = activite.trimestre4.pret
-                  t4Bn = activite.trimestre4.budgetNational
-                }
-                tBn = t1Bn + t2Bn + t3Bn + t4Bn
-                tPret = t1Pret + t2Pret + t3Pret + t4Pret
-                total = tBn + tPret
-
-                //extraire les activiteDuree[] des dates et le mettre dans un tableau
-                const activiteDuree = activite.durees
-                if (activiteDuree != undefined || activiteDuree != null) {
-                  if (activiteDuree[0] == 1) {
-                    planing.janvier = "ok"
-                  }
-                  if (activiteDuree[1] == 1) {
-                    planing.fevrier = "ok"
-                  }
-                  if (activiteDuree[2] == 1) {
-                    planing.mars = "ok"
-                  }
-                  if (activiteDuree[3] == 1) {
-                    planing.avril = "ok"
-                  }
-                  if (activiteDuree[4] == 1) {
-                    planing.mai = "ok"
-                  }
-                  if (activiteDuree[5] == 1) {
-                    planing.juin = "ok"
-                  }
-                  if (activiteDuree[6] == 1) {
-                    planing.juillet = "ok"
-                  }
-                  if (activiteDuree[7] == 1) {
-                    planing.aout = "ok"
-                  }
-                  if (activiteDuree[8] == 1) {
-                    planing.septembre = "ok"
-                  }
-                  if (activiteDuree[9] == 1) {
-                    planing.octobre = "ok"
-                  }
-                  if (activiteDuree[10] == 1) {
-                    planing.novembre = "ok"
-                  }
-                  if (activiteDuree[11] == 1) {
-                    planing.decembre = "ok"
-                  }
-                }
-
-
-
-
-
-                programme.push({ bailleur, nom: activite.nom, code: activite.code, poids, poidsActuel, isActivite: true, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, planing })
-                activite.taches.forEach(tache => {
-                  const planingt = {
-                    janvier: '',
-                    fevrier: '',
-                    mars: '',
-                    avril: '',
-                    mai: '',
-                    juin: '',
-                    juillet: '',
-                    aout: '',
-                    septembre: '',
-                    octobre: '',
-                    novembre: '',
-                    decembre: ''
-                  }
-                  let poids = tache.poids
-                  let poidsActuel = tache.poidsActuel
-                  const tacheDuree = tache.durees
-                  const pret = ''
-                  const bn = ''
-                  let t1Bn = ''
-                  let t1Pret = ''
-                  let t2Bn = ''
-                  let t2Pret = ''
-                  let t3Bn = ''
-                  let t3Pret = ''
-                  let t4Bn = ''
-                  let t4Pret = ''
-                  let tBn = ''
-                  let tPret = ''
-                  // let total = ''
-
-                  if (tacheDuree != undefined || activiteDuree != null) {
-                    if (tacheDuree[0] == 1) {
-                      planingt.janvier = "ok"
-                    }
-                    if (tacheDuree[1] == 1) {
-                      planingt.fevrier = "ok"
-                    }
-                    if (tacheDuree[2] == 1) {
-                      planingt.mars = "ok"
-                    }
-                    if (tacheDuree[3] == 1) {
-                      planingt.avril = "ok"
-                    }
-                    if (tacheDuree[4] == 1) {
-                      planingt.mai = "ok"
-                    }
-                    if (tacheDuree[5] == 1) {
-                      planingt.juin = "ok"
-                    }
-                    if (tacheDuree[6] == 1) {
-                      planingt.juillet = "ok"
-                    }
-                    if (tacheDuree[7] == 1) {
-                      planingt.aout = "ok"
-                    }
-                    if (tacheDuree[8] == 1) {
-                      planingt.septembre = "ok"
-                    }
-                    if (tacheDuree[9] == 1) {
-                      planingt.octobre = "ok"
-                    }
-                    if (tacheDuree[10] == 1) {
-                      planingt.novembre = "ok"
-                    }
-                    if (tacheDuree[11] == 1) {
-                      planingt.decembre = "ok"
-                    }
-                  }
-
-                  // programme.push({ bailleur, id: tache.id, nom: tache.nom, code: tache.code, poids, poidsActuel, isTache: true, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, planingt })
-                })
-              })
-            })
-          })
-
-        })
-      }
-      this.fich.push(programme)
-      return programme
-
-      console.log(programme)
-    },
-
-
-    json_data() {
-      const programme = []
-      if (this.ptab != undefined && this.ptab != null) {
-        this.ptab.forEach(element => {
-          const bailleur = element.bailleur
-          const bn = element.budgetNational
-          const pret = element.pret
-
-          let poids = ""
-          let poidsActuel = ''
-
-          let t1Pret = ''
-          let t1Bn = ''
-          let t2Pret = ''
-          let t2Bn = ''
-          let t3Pret = ''
-          let t3Bn = ''
-          let t4Bn = ''
-          let t4Pret = ''
-          let tBn = ''
-          let tPret = ''
-          let total = ''
-          let structureResponsable = ''
-          let structureAssocie = ''
-
-          programme.push({ bailleur, nom: element.nom, code: element.code, poids, poidsActuel, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, })
-          element.composantes.forEach(composante => {
-            const bn = composante.budgetNational
-            const pret = composante.pret
-            let poids = composante.poids
-            let poidsActuel = composante.poidsActuel
-            let t1Bn = ''
-            let t1Pret = ''
-            let t2Bn = ''
-            let t2Pret = ''
-            let t3Bn = ''
-            let t3Pret = ''
-            let t4Bn = ''
-            let t4Pret = ''
-            let tBn = ''
-            let tPret = ''
-            let total = ''
-            if (composante.trimestre1 != undefined) {
-              t1Pret = composante.trimestre1.pret
-              t1Bn = composante.trimestre1.budgetNational
-            }
-            if (composante.trimestre2 != undefined) {
-              t2Pret = composante.trimestre2.pret
-              t2Bn = composante.trimestre2.budgetNational
-            }
-            if (composante.trimestre3 != undefined) {
-              t3Pret = composante.trimestre3.pret
-              t3Bn = composante.trimestre3.budgetNational
-            }
-            if (composante.trimestre4 != undefined) {
-              t4Pret = composante.trimestre4.pret
-              t4Bn = composante.trimestre4.budgetNational
-            }
-            tBn = t1Bn + t2Bn + t3Bn + t4Bn
-            tPret = t1Pret + t2Pret + t3Pret + t4Pret
-            total = tBn + tPret
-            let structureResponsable = ''
-            let structureAssocie = ''
-            programme.push({ bailleur, nom: composante.nom, code: composante.code, poids, poidsActuel, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, })
-            composante.sousComposantes.forEach(sousComposante => {
-              const bn = sousComposante.budgetNational
-              const pret = sousComposante.pret
-              let poids = sousComposante.poids
-              let poidsActuel = sousComposante.poidsActuel
-              let t1Bn = ''
-              let t1Pret = ''
-              let t2Bn = ''
-              let t2Pret = ''
-              let t3Bn = ''
-              let t3Pret = ''
-              let t4Bn = ''
-              let t4Pret = ''
-              let tBn = ''
-              let tPret = ''
-              let total = ''
-              let nom = "PAS DE SOUS COMPOSANTE"
-              if (sousComposante.nom != 0) {
-                nom = sousComposante.nom
-              }
-              if (sousComposante.trimestre1 != undefined && sousComposante.trimestre1 != 0) {
-                t1Pret = sousComposante.trimestre1.pret * 1
-                t1Bn = sousComposante.trimestre1.budgetNational * 1
-
-              }
-              if (sousComposante.trimestre2 != undefined && sousComposante.trimestre2 != 0) {
-                t2Pret = sousComposante.trimestre2.pret * 1
-                t2Bn = sousComposante.trimestre2.budgetNational * 1
-              }
-              if (sousComposante.trimestre3 != undefined && sousComposante.trimestre3 != 0) {
-                t3Pret = sousComposante.trimestre3.pret * 1
-                t3Bn = sousComposante.trimestre3.budgetNational * 1
-              }
-              if (sousComposante.trimestre4 != undefined && sousComposante.trimestre4 != 0) {
-                t4Pret = sousComposante.trimestre4.pret * 1
-                t4Bn = sousComposante.trimestre4.budgetNational * 1
-              }
-
-              tBn = t1Bn + t2Bn + t3Bn + t4Bn
-              tPret = t1Pret + t2Pret + t3Pret + t4Pret
-              total = tBn + tPret
-              let structureResponsable = ''
-              let structureAssocie = ''
-              if (nom !== 'PAS DE SOUS COMPOSANTE') {
-                programme.push({ bailleur, nom, code: sousComposante.code, poids, poidsActuel, bn, pret, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, })
-              }
-              sousComposante.activites.forEach(activite => {
-                const bn = activite.budgetNational
-                const pret = activite.pret
-                let poids = activite.poids
-                let poidsActuel = activite.poidsActuel
-                let structureResponsable = activite.structureResponsable
-                let structureAssocie = activite.structureAssocie
-                let t1Bn = ''
-                let t1Pret = ''
-                let t2Bn = ''
-                let t2Pret = ''
-                let t3Bn = ''
-                let t3Pret = ''
-                let t4Bn = ''
-                let t4Pret = ''
-                let tBn = ''
-                let tPret = ''
-                let total = ''
-                const planing = {
-                  janvier: '',
-                  fevrier: '',
-                  mars: '',
-                  avril: '',
-                  mai: '',
-                  juin: '',
-                  juillet: '',
-                  aout: '',
-                  septembre: '',
-                  octobre: '',
-                  novembre: '',
-                  decembre: ''
-                }
-                if (activite.trimestre1 != undefined) {
-                  t1Pret = activite.trimestre1.pret
-                  t1Bn = activite.trimestre1.budgetNational
-                }
-                if (activite.trimestre2 != undefined) {
-                  t2Pret = activite.trimestre2.pret
-                  t2Bn = activite.trimestre2.budgetNational
-                }
-                if (activite.trimestre3 != undefined) {
-                  t3Pret = activite.trimestre3.pret
-                  t3Bn = activite.trimestre3.budgetNational
-                }
-                if (activite.trimestre4 != undefined) {
-                  t4Pret = activite.trimestre4.pret
-                  t4Bn = activite.trimestre4.budgetNational
-                }
-                tBn = t1Bn + t2Bn + t3Bn + t4Bn
-                tPret = t1Pret + t2Pret + t3Pret + t4Pret
-                total = tBn + tPret
-
-                //extraire les activiteDuree[] des dates et le mettre dans un tableau
-                const activiteDuree = activite.durees
-                if (activiteDuree != undefined || activiteDuree != null) {
-                  if (activiteDuree[0] == 1) {
-                    planing.janvier = "ok"
-                  }
-                  if (activiteDuree[1] == 1) {
-                    planing.fevrier = "ok"
-                  }
-                  if (activiteDuree[2] == 1) {
-                    planing.mars = "ok"
-                  }
-                  if (activiteDuree[3] == 1) {
-                    planing.avril = "ok"
-                  }
-                  if (activiteDuree[4] == 1) {
-                    planing.mai = "ok"
-                  }
-                  if (activiteDuree[5] == 1) {
-                    planing.juin = "ok"
-                  }
-                  if (activiteDuree[6] == 1) {
-                    planing.juillet = "ok"
-                  }
-                  if (activiteDuree[7] == 6) {
-                    planing.aout = "ok"
-                  }
-                  if (activiteDuree[8] == 1) {
-                    planing.septembre = "ok"
-                  }
-                  if (activiteDuree[9] == 1) {
-                    planing.octobre = "ok"
-                  }
-                  if (activiteDuree[10] == 1) {
-                    planing.novembre = "ok"
-                  }
-                  if (activiteDuree[11] == 1) {
-                    planing.decembre = "ok"
-                  }
-                }
-
-                programme.push({ bailleur, nom: activite.nom, code: activite.code, poids, poidsActuel, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, })
-                activite.taches.forEach(tache => {
-                  let poids = tache.poids
-                  let poidsActuel = tache.poidsActuel
-                  let tBn = ''
-                  let tPret = ''
-                  let total = ''
-                  let structureResponsable = ''
-                  let structureAssocie = ''
-
-                  programme.push({ bailleur, nom: tache.nom, code: tache.code, poids, poidsActuel, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, planing })
-                })
-              })
-            })
-          })
-
-        })
-      }
-      return programme
-    },
-    json_dataR() {
-      const programme = []
-      if (this.ptabR != undefined && this.ptabR != null) {
-        this.ptabR.forEach(element => {
-          const bailleur = element.bailleur
-          const bn = element.budgetNational
-          const pret = element.pret
-          let poids = ""
-          let poidsActuel = ''
-
-          let t1Pret = ''
-          let t1Bn = ''
-          let t2Pret = ''
-          let t2Bn = ''
-          let t3Pret = ''
-          let t3Bn = ''
-          let t4Bn = ''
-          let t4Pret = ''
-          let tBn = ''
-          let tPret = ''
-          let total = ''
-          let structureResponsable = ''
-          let structureAssocie = ''
-
-          programme.push({ bailleur, nom: element.nom, code: element.code, poids, poidsActuel, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, })
-          element.composantes.forEach(composante => {
-            const bn = composante.budgetNational
-            const pret = composante.pret
-            let poids = composante.poids
-            let poidsActuel = composante.poidsActuel
-            let t1Bn = 0
-            let t1Pret = 0
-            let t2Bn = 0
-            let t2Pret = 0
-            let t3Bn = 0
-            let t3Pret = 0
-            let t4Bn = 0
-            let t4Pret = 0
-            let tBn = 0
-            let tPret = 0
-            let total = 0
-            if (composante.trimestre1 != undefined) {
-              t1Pret = composante.trimestre1.pret
-              t1Bn = composante.trimestre1.budgetNational
-            }
-            if (composante.trimestre2 != undefined) {
-              t2Pret = composante.trimestre2.pret
-              t2Bn = composante.trimestre2.budgetNational
-            }
-            if (composante.trimestre3 != undefined) {
-              t3Pret = composante.trimestre3.pret
-              t3Bn = composante.trimestre3.budgetNational
-            }
-            if (composante.trimestre4 != undefined) {
-              t4Pret = composante.trimestre4.pret
-              t4Bn = composante.trimestre4.budgetNational
-            }
-            tBn = t1Bn + t2Bn + t3Bn + t4Bn
-            tPret = t1Pret + t2Pret + t3Pret + t4Pret
-            total = tBn + tPret
-            let structureResponsable = ''
-            let structureAssocie = ''
-            programme.push({ bailleur, nom: composante.nom, code: composante.code, poids, poidsActuel, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, })
-            composante.sousComposantes.forEach(sousComposante => {
-              const bn = sousComposante.budgetNational
-              const pret = sousComposante.pret
-              let poids = sousComposante.poids
-              let poidsActuel = sousComposante.poidsActuel
-              let t1Bn = 0
-              let t1Pret = 0
-              let t2Bn = 0
-              let t2Pret = 0
-              let t3Bn = 0
-              let t3Pret = 0
-              let t4Bn = 0
-              let t4Pret = 0
-              let tBn = 0
-              let tPret = 0
-              let total = 0
-              let nom = "PAS DE SOUS COMPOSANTE"
-              if (sousComposante.nom != 0) {
-                nom = sousComposante.nom
-              }
-              if (sousComposante.trimestre1 != undefined && sousComposante.trimestre1 != 0) {
-                t1Pret = sousComposante.trimestre1.pret * 1
-                t1Bn = sousComposante.trimestre1.budgetNational * 1
-
-              }
-              if (sousComposante.trimestre2 != undefined && sousComposante.trimestre2 != 0) {
-                t2Pret = sousComposante.trimestre2.pret * 1
-                t2Bn = sousComposante.trimestre2.budgetNational * 1
-              }
-              if (sousComposante.trimestre3 != undefined && sousComposante.trimestre3 != 0) {
-                t3Pret = sousComposante.trimestre3.pret * 1
-                t3Bn = sousComposante.trimestre3.budgetNational * 1
-              }
-              if (sousComposante.trimestre4 != undefined && sousComposante.trimestre4 != 0) {
-                t4Pret = sousComposante.trimestre4.pret * 1
-                t4Bn = sousComposante.trimestre4.budgetNational * 1
-              }
-
-              tBn = t1Bn + t2Bn + t3Bn + t4Bn
-              tPret = t1Pret + t2Pret + t3Pret + t4Pret
-              total = tBn + tPret
-              let structureResponsable = ''
-              let structureAssocie = ''
-              if (nom !== 'PAS DE SOUS COMPOSANTE') {
-                programme.push({ bailleur, nom, code: sousComposante.code, poids, poidsActuel, bn, pret, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, })
-              }
-              sousComposante.activites.forEach(activite => {
-                const bn = activite.budgetNational
-                const pret = activite.pret
-                let poids = activite.poids
-                let poidsActuel = activite.poidsActuel
-                let structureResponsable = activite.structureResponsable
-                let structureAssocie = activite.structureAssocie
-                let t1Bn = 0
-                let t1Pret = 0
-                let t2Bn = 0
-                let t2Pret = 0
-                let t3Bn = 0
-                let t3Pret = 0
-                let t4Bn = 0
-                let t4Pret = 0
-                let tBn = 0
-                let tPret = 0
-                let total = 0
-                const planing = {
-                  janvier: '',
-                  fevrier: '',
-                  mars: '',
-                  avril: '',
-                  mai: '',
-                  juin: '',
-                  juillet: '',
-                  aout: '',
-                  septembre: '',
-                  octobre: '',
-                  novembre: '',
-                  decembre: ''
-                }
-                if (activite.trimestre1 != undefined) {
-                  t1Pret = activite.trimestre1.pret
-                  t1Bn = activite.trimestre1.budgetNational
-                }
-                if (activite.trimestre2 != undefined) {
-                  t2Pret = activite.trimestre2.pret
-                  t2Bn = activite.trimestre2.budgetNational
-                }
-                if (activite.trimestre3 != undefined) {
-                  t3Pret = activite.trimestre3.pret
-                  t3Bn = activite.trimestre3.budgetNational
-                }
-                if (activite.trimestre4 != undefined) {
-                  t4Pret = activite.trimestre4.pret
-                  t4Bn = activite.trimestre4.budgetNational
-                }
-                tBn = t1Bn + t2Bn + t3Bn + t4Bn
-                tPret = t1Pret + t2Pret + t3Pret + t4Pret
-                total = tBn + tPret
-
-                //extraire les activiteDuree[] des dates et le mettre dans un tableau
-                const activiteDuree = activite.durees
-                if (activiteDuree != undefined || activiteDuree != null) {
-                  if (activiteDuree[0] == 1) {
-                    planing.janvier = "ok"
-                  }
-                  if (activiteDuree[1] == 1) {
-                    planing.fevrier = "ok"
-                  }
-                  if (activiteDuree[2] == 1) {
-                    planing.mars = "ok"
-                  }
-                  if (activiteDuree[3] == 1) {
-                    planing.avril = "ok"
-                  }
-                  if (activiteDuree[4] == 1) {
-                    planing.mai = "ok"
-                  }
-                  if (activiteDuree[5] == 1) {
-                    planing.juin = "ok"
-                  }
-                  if (activiteDuree[6] == 1) {
-                    planing.juillet = "ok"
-                  }
-                  if (activiteDuree[7] == 1) {
-                    planing.aout = "ok"
-                  }
-                  if (activiteDuree[8] == 1) {
-                    planing.septembre = "ok"
-                  }
-                  if (activiteDuree[9] == 1) {
-                    planing.octobre = "ok"
-                  }
-                  if (activiteDuree[10] == 1) {
-                    planing.novembre = "ok"
-                  }
-                  if (activiteDuree[11] == 1) {
-                    planing.decembre = "ok"
-                  }
-                }
-
-                programme.push({ bailleur, nom: activite.nom, code: activite.code, poids, poidsActuel, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, })
-                activite.taches.forEach(tache => {
-                  let poids = tache.poids
-                  let poidsActuel = tache.poidsActuel
-                  let tBn = ''
-                  let tPret = ''
-                  let total = ''
-                  let structureResponsable = ''
-                  let structureAssocie = ''
-
-                  programme.push({ bailleur, nom: tache.nom, code: tache.code, poids, poidsActuel, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, planing })
-                })
-              })
-            })
-          })
-
-        })
-      }
-      return programme
-    },
-
-    dataNewR() {
-      const programme = []
-      if (this.ptabR != undefined && this.ptabR != null) {
-        this.ptabR.forEach(element => {
-          const bailleur = element.bailleur
-          const bn = element.budgetNational
-          const pret = element.pret
-
-          programme.push({ bailleur, nom: element.nom, code: element.code, isProjet: true, bn, pret })
-          element.composantes.forEach(composante => {
-            const bn = composante.budgetNational
-            const pret = composante.pret
-            let poids = composante.poids
-            let poidsActuel = composante.poidsActuel
-            let t1Bn = 0
-            let t1Pret = 0
-            let t2Bn = 0
-            let t2Pret = 0
-            let t3Bn = 0
-            let t3Pret = 0
-            let t4Bn = 0
-            let t4Pret = 0
-            let tBn = 0
-            let tPret = 0
-            let total = 0
-            if (composante.trimestre1 != undefined) {
-              t1Pret = composante.trimestre1.pret
-              t1Bn = composante.trimestre1.budgetNational
-            }
-            if (composante.trimestre2 != undefined) {
-              t2Pret = composante.trimestre2.pret
-              t2Bn = composante.trimestre2.budgetNational
-            }
-            if (composante.trimestre3 != undefined) {
-              t3Pret = composante.trimestre3.pret
-              t3Bn = composante.trimestre3.budgetNational
-            }
-            if (composante.trimestre4 != undefined) {
-              t4Pret = composante.trimestre4.pret
-              t4Bn = composante.trimestre4.budgetNational
-            }
-            tBn = t1Bn + t2Bn + t3Bn + t4Bn
-            tPret = t1Pret + t2Pret + t3Pret + t4Pret
-            total = tBn + tPret
-
-            programme.push({ bailleur, nom: composante.nom, code: composante.code, poids, poidsActuel, isComposante: true, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total })
-            composante.sousComposantes.forEach(sousComposante => {
-              const bn = sousComposante.budgetNational
-              const pret = sousComposante.pret
-              let poids = sousComposante.poids
-              let poidsActuel = sousComposante.poidsActuel
-              let t1Bn = 0
-              let t1Pret = 0
-              let t2Bn = 0
-              let t2Pret = 0
-              let t3Bn = 0
-              let t3Pret = 0
-              let t4Bn = 0
-              let t4Pret = 0
-              let tBn = 0
-              let tPret = 0
-              let total = 0
-              let nom = "PAS DE SOUS COMPOSANTE"
-              if (sousComposante.nom != 0) {
-                nom = sousComposante.nom
-              }
-              if (sousComposante.trimestre1 != undefined && sousComposante.trimestre1 != 0) {
-                t1Pret = sousComposante.trimestre1.pret * 1
-                t1Bn = sousComposante.trimestre1.budgetNational * 1
-
-              }
-              if (sousComposante.trimestre2 != undefined && sousComposante.trimestre2 != 0) {
-                t2Pret = sousComposante.trimestre2.pret * 1
-                t2Bn = sousComposante.trimestre2.budgetNational * 1
-              }
-              if (sousComposante.trimestre3 != undefined && sousComposante.trimestre3 != 0) {
-                t3Pret = sousComposante.trimestre3.pret * 1
-                t3Bn = sousComposante.trimestre3.budgetNational * 1
-              }
-              if (sousComposante.trimestre4 != undefined && sousComposante.trimestre4 != 0) {
-                t4Pret = sousComposante.trimestre4.pret * 1
-                t4Bn = sousComposante.trimestre4.budgetNational * 1
-              }
-
-              tBn = t1Bn + t2Bn + t3Bn + t4Bn
-              tPret = t1Pret + t2Pret + t3Pret + t4Pret
-              total = tBn + tPret
-              if (nom !== 'PAS DE SOUS COMPOSANTE') {
-                programme.push({ bailleur, nom, code: sousComposante.code, poids, poidsActuel, isSC: true, bn, pret, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total })
-              }
-
-              sousComposante.activites.forEach(activite => {
-                const bn = activite.budgetNational
-                const pret = activite.pret
-                let poids = activite.poids
-                let poidsActuel = activite.poidsActuel
-                let structureResponsable = activite.structureResponsable
-                let structureAssocie = activite.structureAssocie
-                let t1Bn = 0
-                let t1Pret = 0
-                let t2Bn = 0
-                let t2Pret = 0
-                let t3Bn = 0
-                let t3Pret = 0
-                let t4Bn = 0
-                let t4Pret = 0
-                let tBn = 0
-                let tPret = 0
-                let total = 0
-                const planing = {
-                  janvier: '',
-                  fevrier: '',
-                  mars: '',
-                  avril: '',
-                  mai: '',
-                  juin: '',
-                  juillet: '',
-                  aout: '',
-                  septembre: '',
-                  octobre: '',
-                  novembre: '',
-                  decembre: ''
-                }
-                if (activite.trimestre1 != undefined) {
-                  t1Pret = activite.trimestre1.pret
-                  t1Bn = activite.trimestre1.budgetNational
-                }
-                if (activite.trimestre2 != undefined) {
-                  t2Pret = activite.trimestre2.pret
-                  t2Bn = activite.trimestre2.budgetNational
-                }
-                if (activite.trimestre3 != undefined) {
-                  t3Pret = activite.trimestre3.pret
-                  t3Bn = activite.trimestre3.budgetNational
-                }
-                if (activite.trimestre4 != undefined) {
-                  t4Pret = activite.trimestre4.pret
-                  t4Bn = activite.trimestre4.budgetNational
-                }
-                tBn = t1Bn + t2Bn + t3Bn + t4Bn
-                tPret = t1Pret + t2Pret + t3Pret + t4Pret
-                total = tBn + tPret
-
-                //extraire les activiteDuree[] des dates et le mettre dans un tableau
-                const activiteDuree = activite.durees
-                if (activiteDuree != undefined || activiteDuree != null) {
-                  if (activiteDuree[0] == 1) {
-                    planing.janvier = "ok"
-                  }
-                  if (activiteDuree[1] == 1) {
-                    planing.fevrier = "ok"
-                  }
-                  if (activiteDuree[2] == 1) {
-                    planing.mars = "ok"
-                  }
-                  if (activiteDuree[3] == 1) {
-                    planing.avril = "ok"
-                  }
-                  if (activiteDuree[4] == 1) {
-                    planing.mai = "ok"
-                  }
-                  if (activiteDuree[5] == 1) {
-                    planing.juin = "ok"
-                  }
-                  if (activiteDuree[6] == 1) {
-                    planing.juillet = "ok"
-                  }
-                  if (activiteDuree[7] == 1) {
-                    planing.aout = "ok"
-                  }
-                  if (activiteDuree[8] == 1) {
-                    planing.septembre = "ok"
-                  }
-                  if (activiteDuree[9] == 1) {
-                    planing.octobre = "ok"
-                  }
-                  if (activiteDuree[10] == 1) {
-                    planing.novembre = "ok"
-                  }
-                  if (activiteDuree[11] == 1) {
-                    planing.decembre = "ok"
-                  }
-                }
-
-                programme.push({ bailleur, nom: activite.nom, code: activite.code, poids, poidsActuel, isActivite: true, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret, tBn, tPret, total, structureResponsable, structureAssocie, planing })
-                activite.taches.forEach(tache => {
-                  let poids = tache.poids
-                  let poidsActuel = tache.poidsActuel
-                  programme.push({ bailleur, nom: tache.nom, code: tache.code, poids, poidsActuel, isTache: true, bn, pret, t1Pret, t1Bn, t2Pret, t2Bn, t3Pret, t3Bn, t4Bn, t4Pret })
-                })
-              })
-            })
-          })
-
-        })
-      }
-      return programme
-    },
-    title_pdf() {
-      if (this.annee == null) {
-        const year = new Date().getFullYear()
-        return "pta reviser -" + year
-      } else {
-        return "pta reviser -" + this.annee
-      }
-    },
-    title_excel() {
-      if (this.annee == null) {
-        const year = new Date().getFullYear()
-        return "pta reviser -" + year
-      } else {
-        return "pta reviser -" + this.annee
-      }
-    },
-
-    title_pdfReviser() {
-      if (this.annee == null) {
-        const year = new Date().getFullYear()
-        return "pta " + this.version.nom + "-" + year
-      } else {
-        return "pta " + + this.version.nom + "-" + this.annee
-      }
-    },
-    title_Reviser_excel() {
-      if (this.annee == null) {
-        const year = new Date().getFullYear()
-        return "pta " + this.version.nom + "-" + year
-      } else {
-        return "pta " + + this.version.nom + "-" + this.annee
-      }
+      return paginatedData;
     },
   },
+
   methods: {
-    saveSuiviOld(id, data) {
-      this.chargement = true
-      var form = {
-        tacheId: id
-      }
-      TacheService.suiviTache(form).then((data) => {
-        // this.doSuiviOld = false
-        //this.$toast.success('Operation éffectué avec succès')
-      }).catch((error) => {
-        if (error.response) {
-          // Requête effectuée mais le serveur a répondu par une erreur.
-          const message = error.response.data.message
-          this.$toast.error(message)
-        } else if (error.request) {
-          // Demande effectuée mais aucune réponse n'est reçue du serveur.
-          //console.log(error.request);
-        } else {
-          // Une erreur s'est produite lors de la configuration de la demande
-          //console.log('dernier message', error.message);
-        }
-      })
-      this.chargement = false
+    obtenirDate(annee) {
+      // Convertir l'année en chaîne et concaténer avec "-01-01"
+      let myDate = `${annee}-01-01`;
+      console.log("myDate", myDate);
+
+      const date = new Date(myDate); // Exemple de date
+      const dateISO = date.toISOString().split("T")[0];
+      return dateISO;
     },
-
-
-
-    isgray() {
-      return true;
+    updateActiviteId(id) {
+      const details = { id: 1, nom: "Exemple" };
+      this.$emit("send-activiteId", id);
     },
-    isActive(index) {
-      return this.activeItems.includes(index);
+    text() {},
+    onPageChanged(newPage) {
+      this.currentPage = newPage;
+      console.log("Page actuelle :", this.currentPage);
+      // Charger les données pour la page actuelle
+      // this.loadDataForPage(newPage);
     },
-    toggle(index) {
-      const isActive = this.activeItems.includes(index);
-      if (isActive) {
-        this.activeItems.splice(this.activeItems.indexOf(index), 1);
-      } else {
-        this.activeItems.push(index);
-      }
-    }
-    ,
-    togglesuivie(id) {
-
-      // this.redtoggle = true;
-      //  this.graytoggle =false;
-      //  this.translatetoggle =true;
-
-
-      this.chargement = true
-      var form = {
-        tacheId: id
-      }
-      console.log(id)
-      TacheService.suiviTache(form).then((data) => {
-
-        // this.doSuiviOld = false
-        // this.dataNew;
-        this.$toast.success('Operation éffectué avec succès')
-        // window.location.reload();
-      }).catch((error) => {
-        if (error.response) {
-          // Requête effectuée mais le serveur a répondu par une erreur.
-          const message = error.response.data.message
-          this.$toast.error(message)
-        } else if (error.request) {
-          // Demande effectuée mais aucune réponse n'est reçue du serveur.
-          //console.log(error.request);
-        } else {
-          // Une erreur s'est produite lors de la configuration de la demande
-          //console.log('dernier message', error.message);
-        }
-      })
-      this.chargement = false
-
-
+    onItemsPerPageChanged(itemsPerPage) {
+      this.itemsPerPage = itemsPerPage;
     },
-    exportToExcel() {
-      console.log('gghghghgh');
-      console.log(this.dataNew);
+    clearObjectValues(obj) {
+      for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          let value = obj[key];
 
-
-      const tableDataWithColors = this.dataNew.map(row => {
-        return {
-          ...row,
-          bailleur: 'bg-red-500'
-        };
-      });
-
-      const worksheet = XLSX.utils.json_to_sheet(tableDataWithColors);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Tableau de données');
-      XLSX.writeFile(workbook, 'tableau.xlsx');
-
-    },
-    generateReport() {
-      this.$refs.html2Pdf.generatePdf()
-    },
-    ...mapActions("revisionPtab", {
-      fetchProgrammeScopes: "FETCH_PROGRAMME_SCOPES"
-    }),
-    chargement(bool) {
-      this.$store.dispatch('SET_LOADER', bool)
-    },
-    active() {
-      this.$store.dispatch('active')
-    },
-    disabled() {
-      this.$store.dispatch('disabled')
-    },
-    getPermission() {
-      this.currentUser.role[0].permissions.forEach(element => {
-        if (element.slug === 'exporter-un-suivi-ppm') {
-          this.exporterSuiviPpm = true
-        }
-        if (element.slug === 'exporter-un-suivi-ptab') {
-          this.exporterSuiviPta = true
-        }
-        if (element.slug === 'exporter-un-suivi-ppm') {
-          this.exporterSuiviRePpm = true
-        }
-        if (element.slug === 'exporter-un-suivi-pta') {
-          this.exporterSuiviRePta = true
-        }
-        if (element.slug === 'voir-le-plan-de-decaissement-du-ptab') {
-          this.planDecaissementPtaVisible = true
-        }
-        if (element.slug === 'exporter-un-suivi-financier') {
-          this.exporterSuiviFinance = true
-        }
-        if (element.slug === 'voir-ptab') {
-          this.ptaVisible = true
-        }
-        if (element.slug === 'voir-ppm') {
-          this.ppmVisible = true
-        }
-        if (element.slug === 'voir-revision-ptab') {
-          this.revisionVisible = true
-        }
-        if (element.slug === 'voir-ptab') {
-          this.filtrePta = true
-        }
-        if (element.slug === 'voir-ppm') {
-          this.filtrePpm = true
-        }
-        if (element.slug === 'voir-ptab') {
-          this.filtreRePta = true
-        }
-        if (element.slug === 'voir-ppm') {
-          this.filtreRePpm = true
-        }
-
-
-      });
-
-    },
-
-    customLabel({ sigle }) {
-      return ` ${sigle}`
-    },
-    choiceVersion(version) {
-      if (this.scopes.length > 0) {
-        if ("actuelle" === version) {
-          this.currentPage = true;
-        } else {
-          this.currentPage = false;
-          this.getPtaRevise()
-        }
-      } else {
-        this.currentPage = true;
-      }
-    },
-    getPta() {
-      let data = {}
-      if (this.annee == null) {
-        const year = new Date().getFullYear()
-        data = {
-
-          programmeId: this.currentUser.programme.id,
-          annee: year
-        }
-      } else {
-        data = {
-
-          programmeId: this.currentUser.programme.id,
-          annee: Number(annee)
-        }
-      }
-      this.active()
-      PtabService.getPta(data).then((data) => {
-        this.ptab = data.data.data
-        this.disabled()
-      }).catch((e) => {
-        this.$toast.error(e)
-        this.disabled()
-      })
-    },
-    getPtaRevise() {
-      let data = {}
-      if (this.annee == null) {
-        const year = new Date().getFullYear()
-        data = {
-          ptabScopeId: this.version.id,
-          programmeId: this.currentUser.programme.id,
-          annee: year
-        }
-      } else {
-        data = {
-          ptabScopeId: this.version.id,
-          programmeId: this.currentUser.programme.id,
-          annee: Number(annee)
-        }
-      }
-      this.active()
-      PtabService.getReviser(data).then((data) => {
-        this.ptabR = data.data.data
-        this.disabled()
-      }).catch((e) => {
-        this.$toast.error(e)
-        this.disabled()
-      })
-    },
-    getPtaReviseFiltre() {
-      let data = {}
-      if (this.annee == null) {
-        const year = new Date().getFullYear()
-        data = {
-          ptabScopeId: this.version.id,
-          programmeId: this.currentUser.programme.id,
-          annee: year
-        }
-      } else {
-        data = {
-          ptabScopeId: this.version.id,
-          programmeId: this.currentUser.programme.id,
-          annee: Number(this.annee)
-        }
-      }
-      this.active()
-      PtabService.getReviser(data).then((data) => {
-        this.ptabR = data.data.data
-        this.disabled()
-      }).catch((e) => {
-        this.$toast.error(e)
-        this.disabled()
-      })
-    },
-    getPtaFiltre() {
-      let data = {}
-      this.chargement(true)
-      if (this.ppm == null) {
-
-        if (this.bailleur == null) {
-          data = {
-            programmeId: this.currentUser.programme.id,
-            annee: Number(this.annee)
-          }
-        } else {
-          data = {
-            bailleurId: this.bailleur.id,
-            programmeId: this.currentUser.programme.id,
-            annee: Number(this.annee)
+          if (typeof value === "string") {
+            obj[key] = "";
+          } else if (typeof value === "number") {
+            obj[key] = 0;
+          } else if (typeof value === "boolean") {
+            obj[key] = false;
+          } else if (Array.isArray(value)) {
+            obj[key] = [];
+          } else if (typeof value === "object" && value !== null) {
+            obj[key] = {}; // ou appliquer récursion pour vider les objets imbriqués
+            clearObjectValues(obj[key]); // récursion pour les objets imbriqués
+          } else {
+            obj[key] = null; // pour les autres types (null, undefined, etc.)
           }
         }
-
-      } else {
-        data = {
-          bailleurId: this.bailleur.id,
-          programmeId: this.currentUser.programme.id,
-          annee: Number(this.annee),
-          ppm: this.ppm
-        }
       }
-      this.active()
-      PtabService.getFiltre(data).then((data) => {
-        this.ptab = data.data.data
-        this.openFiltre = false
-        this.chargement(false)
-        this.disabled()
-      }).catch((e) => {
-        this.chargement(false)
-        this.$toast.error(e)
-        this.disabled()
+    },
+    verifyPermission,
+    supprimerPlanDeDecaissement(data) {
+      this.showDeleteModal = true;
+      console.log("this.planDeDecaissementId", this.planDeDecaissementId);
+      this.planDeDecaissementId = data.id;
+    },
+    deleteplanDeDecaissement() {
+      this.deleteLoader = true;
+      PlanDeCaissement.destroy(this.planDeDecaissementId)
+        .then((data) => {
+          this.deleteLoader = false;
+          this.showDeleteModal = false;
+          toast.success("Suppression  éffectuée avec succès");
+          this.getListePlanDeDecaissement(this.activiteId);
+          setTimeout(() => {
+            this.planDeDecaissementId = "";
+          }, 100);
+        })
+        .catch((error) => {
+          console.log("error", error);
+          this.deleteLoader = false;
+          toast.error("Erreur lors de la suppression");
+        });
+    },
+    modifierPlanDeDecaissement(data) {
+      this.messageErreur = {};
+      console.log(data);
+      this.labels = "Modifier";
+      this.showModal = true;
+      console.log("showModal", this.showModal);
+      this.update = true;
 
-      })
+      this.formData.pret = data.pret ?? "";
+      this.formData.activiteId = data.activiteId;
+      this.formData.budgetNational = data.budgetNational;
+      this.formData.trimestre = data.trimestre.toString();
+
+      console.log("data.annee", data.annee);
+
+      this.formData.annee = this.obtenirDate(data.annee);
+      this.planDeDecaissementId = data.id;
+
+      console.log("planDeDecaissementId", this.planDeDecaissementId);
+
+      console.log("this.formData", this.formData);
+    },
+    addPlanDeDecaissement() {
+      this.showModal = true;
+      this.isUpdate = false;
+      this.formData.activiteId = this.activiteId;
+      this.labels = "Ajouter";
+    },
+    sendForm() {
+      let oldDate = this.formData.annee;
+
+      if (this.formData.annee) {
+        const dateObj = new Date(this.formData.annee); // Convertir la chaîne en objet Date
+        this.formData.annee = dateObj.getFullYear(); // Extraire l'année
+      }
+
+      if (this.update) {
+        PlanDeCaissement.update(this.planDeDecaissementId, this.formData)
+          .then((response) => {
+            if (response.status == 200 || response.status == 201) {
+              this.update = false;
+              this.isLoading = false;
+              this.showModal = false;
+              toast.success("Modification éffectuée");
+              this.getListePlanDeDecaissement(this.formData.activiteId);
+              // this.formData.projetId = this.projetId;
+
+              this.clearObjectValues(this.formData);
+              this.getListePlanDeDecaissement();
+              //this.sendRequest = false;
+            }
+          })
+          .catch((error) => {
+            this.formData.annee = new Date(oldDate).toISOString().split("T")[0];
+            console.log(error);
+            this.isLoading = false;
+            if (error.response && error.response.data && error.response.data.errors) {
+              this.messageErreur = error.response.data.errors;
+
+              Object.keys(this.messageErreur).forEach((key) => {
+                this.messageErreur[key] = $h.extractContentFromArray(this.messageErreur[key]);
+              });
+              toast.error("Une erreur s'est produite.Vérifier le formulaire de soumission");
+            } else {
+              toast.error(error.message);
+              //
+            }
+          });
+      } else {
+        this.isLoading = true;
+        this.formData.budgetNational = parseInt(this.formData.budgetNational);
+        this.formData.pret = parseInt(this.formData.pret);
+
+        if (this.formData.annee) {
+          const dateObj = new Date(this.formData.annee); // Convertir la chaîne en objet Date
+          this.formData.annee = dateObj.getFullYear(); // Extraire l'année
+        }
+
+        console.log("this.activiteId", this.activiteId);
+
+        PlanDeCaissement.create(this.formData)
+          .then((response) => {
+            if (response.status == 200 || response.status == 201) {
+              console.log("this.formData.activiteId", this.formData.activiteId);
+              //this.activiteIdLocal = this.formData.activiteId;
+
+              this.getListePlanDeDecaissement(this.formData.activiteId);
+              this.isLoading = false;
+              toast.success("Ajout éffectué");
+              this.showModal = false;
+
+              setTimeout(() => {
+                this.clearObjectValues(this.formData);
+              }, 100);
+            }
+          })
+          .catch((error) => {
+            console.log("error", error);
+
+            this.formData.annee = new Date(oldDate).toISOString().split("T")[0];
+            this.isLoading = false;
+
+            toast.error(error.message);
+
+            if (error.response && error.response.data && error.response.data.errors) {
+              this.messageErreur = error.response.data.errors;
+
+              Object.keys(this.messageErreur).forEach((key) => {
+                this.messageErreur[key] = $h.extractContentFromArray(this.messageErreur[key]);
+              });
+
+              if (error.response.data.message !== "") toast.error(error.response.data.message);
+            } else {
+              toast.error(error.message);
+            }
+          });
+      }
+    },
+    getListePlanDeDecaissement(id) {
+      ActiviteService.plansDeDecaissement(id)
+        .then((data) => {
+          console.log(data.data.data);
+          this.planDeDecaissement = data.data.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
-    getBailleur() {
-      BailleursService.get().then((data) => {
-        this.bailleurs = data.data.data
-      }).catch((e) => {
-        this.$toast.error(e)
-      })
+    // getListeplanDeDecaissement(data) {
+    //   this.planDeDecaissement = data.composantes;
+    // },
+    filter() {},
+  },
+  watch: {
+    activiteId(newId) {
+      this.activiteIdLocal = newId;
+      if (newId && newId !== "") {
+        this.getListePlanDeDecaissement(newId);
+      }
     },
   },
+
+  created() {},
   mounted() {
-    this.getPermission()
-
-    if (this.revisionVisible || this.ppmVisible || this.ptaVisible) {
-      this.getPta()
-      this.getBailleur()
-      this.fetchProgrammeScopes(this.currentUser.programme.id).then((response) => {
-        this.scopes = response.data.data
-      });
+    if (this.activiteId !== "") {
+      this.getListePlanDeDecaissement(this.activiteId);
     }
-
-
-  }
-}
+  },
+};
 </script>
 
-<style ></style>
+<template>
+  <!-- <h2 class="mt-10 text-lg font-medium intro-y">Plan de décaissements</h2> -->
+
+  <!-- Titre de la page -->
+  <div class="grid grid-cols-12 gap-6 mt-5">
+    <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y">
+      <div class="w-auto">
+        <div class="relative w-56 text-slate-500">
+          <input type="text" v-model="search" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
+          <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
+        </div>
+      </div>
+      <div v-if="verifyPermission('creer-un-plan-de-decaissement')" class="flex mt-4 sm:mt-0">
+        <button class="mr-2 shadow-md btn btn-primary" @click="addPlanDeDecaissement()"><PlusIcon class="w-4 h-4 mr-3" />Ajouter un plan de décaissement</button>
+      </div>
+    </div>
+  </div>
+  <!-- <pre>{{isLoadingData}}</pre>
+v-if="!isLoadingData"
+v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
+  <!-- <pre>{{ planDeDecaissement }}</pre> -->
+  <div class="grid grid-cols-12 gap-6 mt-5">
+    <NoRecordsMessage class="col-span-12" v-if="!planDeDecaissement.length" title="Aucun plan de décaissement disponible" description="Il semble qu'il n'y ait pas de plan de décaissement à afficher. Veuillez sélectionner une activité dans le filtre ci-dessus." />
+
+    <div v-for="(item, index) in paginatedAndFilteredDataPlan" :key="index" class="col-span-12 p-4 md:col-span-6 xl:col-span-4">
+      <div class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
+        <!-- En-tête avec sigle et titre -->
+        <div class="relative flex items-start pt-5">
+          <div class="relative flex flex-col items-center w-full pt-5 lg:flex-row lg:items-start">
+            <!-- Circle with initial or image -->
+            <!-- <div class="flex items-center justify-center w-[90px] h-[90px] text-white rounded-full shadow-md bg-primary flex-shrink-0">
+              {{ item.annee }}
+            </div> -->
+            <!-- Item details -->
+            <div class="w-full">
+              <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0 flex-1">
+                <a href="" class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary _truncate text-center lg:text-left"> {{ item.activite.nom }}</a>
+              </div>
+              <!-- <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0 flex-1">
+                <a href="" class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary _truncate text-center lg:text-left"> {{ item.annee }}</a>
+              </div> -->
+            </div>
+          </div>
+          <!-- Dropdown for actions -->
+          <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
+            <DropdownToggle tag="a" class="block w-5 h-5 cursor-pointer">
+              <MoreVerticalIcon class="w-5 h-5 text-gray-400 transition-colors hover:text-gray-600" />
+            </DropdownToggle>
+            <DropdownMenu class="w-40 bg-white rounded-md shadow-lg">
+              <DropdownContent>
+                <DropdownItem v-if="verifyPermission('modifier-un-plan-de-decaissement')" @click="modifierPlanDeDecaissement(item)"> <Edit2Icon class="w-4 h-4 mr-2 text-gray-600" /> Modifier </DropdownItem>
+                <DropdownItem v-if="verifyPermission('supprimer-un-plan-de-decaissement')" @click="supprimerPlanDeDecaissement(item)"> <TrashIcon class="w-4 h-4 mr-2 text-red-500" /> Supprimer </DropdownItem>
+              </DropdownContent>
+            </DropdownMenu>
+          </Dropdown>
+        </div>
+
+        <!-- Description section with distinct styling -->
+        <div class="mt-5 text-center lg:text-left">
+          <!-- <p class="mb-3 text-lg font-semibold text-primary">Description</p>
+          <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description == null ? "Aucune description" : item.description }}</p> -->
+
+          <!-- Other details with iconized section headers -->
+          <div class="mt-5 space-y-3 text-gray-600">
+            <div class="flex items-center">
+              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ $h.formatCurrency(item.budgetNational) }}
+              <div class="ml-2 italic font-bold">Fcfa</div>
+            </div>
+
+            <div class="flex items-center">
+              <LinkIcon class="w-4 h-4 mr-2" /> Montant financé: {{ $h.formatCurrency(item.pret) }}
+              <div class="ml-2 italic font-bold">Fcfa</div>
+            </div>
+            <div class="flex items-center">
+              <CalendarIcon class="w-4 h-4 mr-2" /> Trimestre: {{ item.trimestre }}
+              <!-- <div class="ml-2 italic font-bold">Fcfa</div> -->
+            </div>
+            <div class="flex items-center">
+              <CalendarIcon class="w-4 h-4 mr-2" /> Annee: {{ item.annee }}
+              <!-- <div class="ml-2 italic font-bold">Fcfa</div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <pagination class="col-span-12" :total-items="totalItems" :items-per-page="itemsPerPage" :is-loading="isLoadingData" @page-changed="onPageChanged" @items-per-page-changed="onItemsPerPageChanged">
+    <!-- Slots personnalisés (facultatif) -->
+    <template #prev-icon>
+      <span>&laquo; Précédent</span>
+    </template>
+    <template #next-icon>
+      <span>Suivant &raquo;</span>
+    </template>
+  </pagination>
+  <!-- END: Users Layout -->
+  <LoaderSnipper v-if="isLoadingData" />
+
+  <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
+    <ModalHeader>
+      <h2 v-if="!update" class="mr-auto text-base font-medium">Ajouter un Plan de décaissement</h2>
+      <h2 v-else class="mr-auto text-base font-medium">Modifier un Plan de décaissement</h2>
+    </ModalHeader>
+    <form @submit.prevent="sendForm">
+      <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
+        <div class="flex col-span-12">
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activités</label>
+          <TomSelect
+            v-model="formData.activiteId"
+            :options="{
+              placeholder: 'Choisir une activité',
+              create: false,
+              onOptionAdd: text(),
+            }"
+            @change="updateActiviteId(formData.activiteId)"
+            class="w-full"
+            title="Veuillez sélectionner une activité pour afficher son plan de décaissement"
+          >
+            <option value="">Choisir une activité</option>
+
+            <option v-for="(element, index) in activites" :key="index" :value="element.id">{{ element.nom }}</option>
+          </TomSelect>
+        </div>
+
+        <div class="flex col-span-12 mt-4">
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Trimestre</label>
+          <TomSelect
+            v-model="formData.trimestre"
+            :options="{
+              placeholder: 'Choisir un trimestre',
+              create: false,
+            }"
+            class="w-full"
+          >
+            <option value="">Choisir un trimestre</option>
+            <option value="1">Trimestre 1</option>
+            <option value="2">Trimestre 2</option>
+            <option value="3">Trimestre 3</option>
+            <option value="4">Trimestre 4</option>
+          </TomSelect>
+        </div>
+        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.trimestre">{{ messageErreur.trimestre }}</p>
+
+        <InputForm v-model="formData.annee" class="col-span-12" type="date" required="required" placeHolder="Annee de base" label="Année de base" />
+        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.annee">{{ messageErreur.annee }}</p>
+
+        <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
+        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
+
+        <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Montant financé" />
+        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
+      </ModalBody>
+      <ModalFooter>
+        <div class="flex items-center justify-center">
+          <button type="button" @click="showModal = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+          <VButton class="inline-block" :label="labels" :loading="isLoading" />
+        </div>
+      </ModalFooter>
+    </form>
+  </Modal>
+
+  <Modal backdrop="static" :show="showDeleteModal" @hidden="showDeleteModal = false">
+    <ModalBody class="p-0">
+      <div class="p-5 text-center">
+        <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">Etes vous sûr?</div>
+        <div class="mt-2 text-slate-500">Voulez vous supprimer l'organisation ? <br />Cette action ne peut être annulé</div>
+      </div>
+      <div class="flex gap-2 px-5 pb-8 text-center">
+        <button type="button" @click="showDeleteModal = false" class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>
+        <VButton :loading="deleteLoader" label="Supprimer" @click="deleteplanDeDecaissement" />
+      </div>
+    </ModalBody>
+  </Modal>
+</template>
+
+<style>
+.no-spin {
+  /* Cacher les icônes pour Chrome, Edge, et Safari */
+  -webkit-appearance: none;
+  margin: 0;
+
+  /* Cacher les icônes pour Firefox */
+  -moz-appearance: textfield;
+
+  /* Compatibilité supplémentaire */
+  appearance: none;
+
+  /* Optionnel : personnaliser les styles du champ */
+  /* border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 14px; */
+}
+</style>

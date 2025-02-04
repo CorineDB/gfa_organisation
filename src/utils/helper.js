@@ -4,6 +4,27 @@ import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 
 const helpers = {
+  filterData({ itemsPerPage, search, data, currentPage, keys }) {
+    const lowercasedSearch = search.toLowerCase();
+
+    // Filtrer les données en fonction des clés et du terme de recherche
+    const filteredData = data.filter((item) =>
+      keys.some((key) => {
+        const value = key.split(".").reduce((obj, keyPart) => obj?.[keyPart], item);
+        return value?.toString().toLowerCase().includes(lowercasedSearch);
+      })
+    );
+
+    // Pagination : Calculer l'index de début et de fin
+    const start = (currentPage - 1) * parseInt(itemsPerPage);
+    const end = start + parseInt(itemsPerPage);
+
+    // Retourner les données paginées
+    return {
+      paginatedData: filteredData.slice(start, end),
+      totalFilteredItems: filteredData.length,
+    };
+  },
   reformatDate(dateStr) {
     // Split the date string by the hyphen
     let parts = dateStr.split("-");
