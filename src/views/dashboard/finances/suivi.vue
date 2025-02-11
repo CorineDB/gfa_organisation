@@ -9,6 +9,47 @@ import Tabulator from "tabulator-tables";
 import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
+import AuthService from "@/services/modules/auth.service";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const showModalFiltre = ref(false);
+const annees = ref("");
+const filterPayload = reactive({
+  trimestre: 1, // Trimestre actuel
+  annee: new Date().getFullYear(), // Set current year as default
+});
+const isLoadingFilter = ref(false);
+
+const suiviFinancier = ref([]);
+const suiviFinancierPayload = reactive({
+  activiteId: null,
+  trimestre: 1, // Trimestre actuel
+  annee: new Date().getFullYear(), // Set current year as default
+  consommer: 0,
+  type: 0,
+});
+
+const resetFilter = function () {
+  filterPayload.trimestre = 1;
+  filterPayload.annee = new Date().getFullYear();
+
+  filterSuiviFinancierActivite();
+};
+
+// const annees = computed(() => {
+//   let anneeDebut = parseInt(debutProgramme.value.split("-")[0], 10);
+//   let anneeFin = parseInt(finProgramme.value.split("-")[0], 10);
+//   let annees = [];
+//   for (let annee = anneeDebut; annee <= anneeFin; annee++) {
+//     annees.push(annee);
+//   }
+//   return annees;
+// });
+
+const showModalSuiviFinancier = ref(false);
+const loadingSuiviFinancier = ref(false);
+const erreurSuiviFinancier = ref(null);
 
 const payload = reactive({
   consommer: "",
@@ -18,7 +59,6 @@ const payload = reactive({
   trimestre: "",
 });
 
-const years = ref([]);
 const tabulator = ref();
 const idSelect = ref("");
 const showModalCreate = ref(false);
@@ -29,7 +69,44 @@ const isCreate = ref(true);
 const activites = ref([]);
 const datas = ref([]);
 
+const debutProgramme = ref("");
+const finProgramme = ref("");
+
+// const years = ref([]);
+
+const years = computed(() => {
+  console.log("debut", `${debutProgramme.value.split("-")}`);
+  console.log("fin", `${finProgramme.value.split("-")}`);
+  let anneeDebut = parseInt(`${debutProgramme.value.split("-")[0]}`);
+  let anneeFin = parseInt(`${finProgramme.value.split("-")[0]}`);
+  let annees = [];
+  for (let annee = anneeDebut; annee <= anneeFin; annee++) {
+    if (annee <= new Date().getFullYear()) {
+      annees.push(annee);
+    }
+  }
+  return annees;
+});
+
+const getcurrentUser = async () => {
+  await AuthService.getCurrentUser()
+    .then((result) => {
+      // responsablesForm.value.ug = result.data.data.profil.id;
+      // ugs.value.push({ id: result.data.data.profil.id, nom: result.data.data.profil.nom });
+      // idProgramme.value = result.data.data.programme.id;
+      console.log("debut", result.data.data.programme.debut);
+      console.log("fin", result.data.data.programme.debut);
+      debutProgramme.value = result.data.data.programme.debut;
+      finProgramme.value = result.data.data.programme.fin;
+    })
+    .catch((e) => {
+      console.error(e);
+      toast.error("Une erreur est survenue: Utilisateur connecté .");
+    });
+};
+
 const createData = async () => {
+  console.log("payload", payload);
   isLoading.value = true;
   await SuiviFinancierService.create(payload)
     .then(() => {
@@ -147,15 +224,16 @@ const initTabulator = () => {
             return button;
           };
 
-          const modifyButton = createButton("Modifier", "btn btn-primary", () => {
-            handleEdit(cell.getData());
+          const voirDetail = createButton("Voir détail", "btn btn-primary", () => {
+            console.log("cell.getData().id", cell.getData().id);
+            handleDetail(cell.getData().id);
           });
 
           const deleteButton = createButton("Supprimer", "btn btn-danger", () => {
             handleDelete(cell.getData());
           });
 
-          container.append(modifyButton, deleteButton);
+          container.append(voirDetail, deleteButton);
 
           return container;
         },
@@ -163,18 +241,14 @@ const initTabulator = () => {
     ],
   });
 };
-const handleEdit = (params) => {
-  console.log(params);
-  showModalCreate.value = true;
-  // isCreate.value = false;
-  // idSelect.value = params.id;
-
-  // payload.libelle = params.libelle;
-  // payload.description = params.description;
-  // payload.key = params.key;
-  // payload.uniteeMesureId = params.uniteeMesureId;
-  // payload.programmeId = params.programmeId;
+const handleDetail = (data) => {
+  // console.log("handleDetail id", id);
+  router.push({
+    name: "detail_suivi",
+    params: { id: data.activite.id },
+  });
 };
+
 const handleDelete = (params) => {
   idSelect.value = params.id;
   deleteModalPreview.value = true;
@@ -192,22 +266,121 @@ const resetForm = () => {
   showModalCreate.value = false;
 };
 const openCreateModal = () => {
-  // payload.programmeId = "";
-  showModalCreate.value = isCreate.value = true;
+  years.value = [];
+  let anneeDebut = parseInt(debutProgramme.value.split("-")[0]);
+  let anneeFin = parseInt(finProgramme.value.split("-")[0]);
+
+  for (let annee = anneeDebut; annee <= anneeFin; annee++) {
+    years.value.push(annee);
+  }
+
+  console.log("years", years.value);
+
+  showModalCreate.value = true;
+  isCreate.value = true;
+};
+
+const getCurrentQuarter = () => {
+  const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
+  return Math.ceil(month / 3); // Calcul du trimestre actuel
+};
+
+const ouvrirModalSuiviFinancierActivite = (item) => {
+  suiviFinancierPayload.activiteId = item.activite.id;
+  suiviFinancierPayload.trimestre = getCurrentQuarter();
+  suiviFinancier.value.push(suiviFinancierPayload);
+  showModalSuiviFinancier.value = true;
+};
+
+const resetModalSuiviFinancierActivite = (item) => {
+  suiviFinancier.value = [];
+  showModalSuiviFinancier.value = false;
+};
+
+const addPlan = () => {
+  suiviFinancier.value.push(suiviFinancierPayload);
+};
+
+const removePlan = (index) => {
+  suiviFinancier.value.splice(index, 1);
+};
+
+const suiviFinancierActivite = () => {
+  loadingSuiviFinancier.value = true;
+
+  for (let index = 0; index < suiviFinancier.value.length; index++) {
+    SuiviFinancierService.create(suiviFinancier.value[index])
+      .then(() => {
+        loadingSuiviFinancier.value = false;
+        toast.success("Suivi Financier créer.");
+        resetModalSuiviFinancierActivite();
+        showModalSuiviFinancier.value = false;
+        getDatas();
+      })
+      .catch((error) => {
+        console.log(error);
+        loadingSuiviFinancier.value = false;
+
+        toast.error("Une erreur s'est produite");
+
+        // Mettre à jour les messages d'erreurs dynamiquement
+        if (error.response && error.response.data && error.response.data.errors) {
+          erreurSuiviFinancier = error.response.data.errors;
+        } else {
+          toast.error(error.response.data.errors.message);
+        }
+      });
+  }
 };
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
+const openFilterModal = () => {
+  console.log(filterPayload.annee);
+  filterPayload.trimestre = 3; //getCurrentQuarter();
+  showModalFiltre.value = true;
+};
+
+const filterSuiviFinancierActivite = async () => {
+  isLoadingFilter.value = true;
+
+  console.log(filterPayload.annee);
+
+  filterPayload.annee = parseInt(filterPayload.annee);
+  filterPayload.trimestre = parseInt(filterPayload.trimestre);
+
+  await SuiviFinancierService.filtre(filterPayload)
+    .then((result) => {
+      datas.value = result.data.data;
+      console.log(datas.value);
+      isLoadingFilter.value = false;
+      resetFilterModal();
+      toast.success("Suivi Financier filtrer.");
+    })
+    .catch((e) => {
+      console.log(e);
+      isLoadingFilter.value = false;
+      toast.error("Vérifier les informations et ressayer.");
+    });
+};
+
+const resetFilterModal = () => {
+  isLoadingFilter.value = false;
+  annees.value = "";
+  showModalFiltre.value = false;
+};
+
 onMounted(() => {
-  var anneeActuelle = new Date().getFullYear() + 5;
-  let i = 0;
-  for (var annee = 2016; annee <= anneeActuelle; annee++) {
-    i++;
-    years.value.push({ nom: `${annee}` });
-  }
+  // var anneeActuelle = new Date().getFullYear() + 5;
+  // let i = 0;
+  // for (var annee = 2016; annee <= anneeActuelle; annee++) {
+  //   i++;
+  //   years.value.push({ nom: `${annee}` });
+  // }
 
   getDatas();
   getactivites(new Date().getFullYear());
+  getcurrentUser();
 });
 </script>
 
@@ -221,8 +394,17 @@ onMounted(() => {
           <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
         </div>
       </div>
+      <div class="flex">
+        <button class="mr-2 shadow-md btn btn-primary" @click="openFilterModal"><FilterIcon class="w-4 h-4 mr-3" />Filtrer le PA</button>
+
+        <button class="btn btn-primary" title="Réinitialiser le filtre" @click="resetFilter()">
+          <RefreshCwIcon class="w-5 h-5" />
+        </button>
+      </div>
       <!-- <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal"><PlusIcon class="w-4 h-4 mr-3" />Ajouter un Suivi Financier</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal">
+          <PlusIcon class="w-4 h-4 mr-3" />Ajouter un Suivi Financier
+        </button>
       </div> -->
     </div>
   </div>
@@ -294,43 +476,46 @@ onMounted(() => {
                     <span class="font-bold">{{ suivi.trimestre }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.periode.budjet | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.periode.budjet) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.periode.consommer | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.periode.consommer) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.periode.disponible | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.periode.disponible) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
                     <span class="font-bold">{{ suivi.periode.pourcentage }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.exercice.budjet | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.exercice.budjet) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.exercice.consommer | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.exercice.consommer) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.exercice.disponible | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.exercice.disponible) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
                     <span class="font-bold">{{ suivi.exercice.pourcentage }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.cumul.budjet | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.cumul.budjet) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.cumul.consommer | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.cumul.consommer) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.cumul.disponible | formatNumber }}</span>
+                    <span class="font-bold">{{ $h.formatCurrency(suivi.cumul.disponible) }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
                     <span class="font-bold">{{ suivi.cumul.pourcentage }}</span>
                   </td>
                   <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700 text-center">
-                    <button @click="handleEdit(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Modifier</button>
+                    <button @click="ouvrirModalSuiviFinancierActivite(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Suivre</button>
+
+                    <button @click="handleDetail(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Voir détail</button>
+
                     <button @click="handleDelete(suivi)" class="text-white bg-red-500 hover:bg-red-600 font-medium rounded-lg text-xs px-4 py-2">Supprimer</button>
                   </td>
                 </tr>
@@ -356,8 +541,8 @@ onMounted(() => {
           <div class="">
             <label class="form-label">Sources</label>
             <TomSelect v-model="payload.type" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
-              <option value="0">Pret</option>
-              <option value="1">Budget National</option>
+              <option value="0">Montant financé</option>
+              <option value="1">Fond Propre</option>
             </TomSelect>
           </div>
           <!-- <pre>{{years}}</pre> -->
@@ -366,6 +551,7 @@ onMounted(() => {
             <TomSelect v-model="payload.annee" @change="handleInput(payload.annee)" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
               <option v-for="(year, index) in years" :key="index" :value="year.nom">{{ year.nom }}</option>
             </TomSelect>
+            <pre></pre>
           </div>
 
           <div class="">
@@ -408,6 +594,93 @@ onMounted(() => {
         <DeleteButton :loading="isLoading" @click="deleteData" />
       </div>
     </ModalBody>
+  </Modal>
+  <!-- End Modal -->
+
+  <Modal backdrop="static" :show="showModalSuiviFinancier" @hidden="showModalSuiviFinancier = false">
+    <ModalHeader>
+      <h2 class="mr-auto text-base font-medium">{{ mode }} un Suivi Financier</h2>
+    </ModalHeader>
+
+    <form @submit.prevent="suiviFinancierActivite">
+      <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
+        <div v-for="(plan, index) in suiviFinancier" :key="index" class="col-span-12 border-b pb-4 mb-4">
+          <h3 class="text-sm font-medium mb-3">Plan {{ index + 1 }}</h3>
+
+          <div class="">
+            <InputForm label="Consommé" v-model="plan.consommer" type="number" />
+
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.consommer">
+              {{ erreurSuiviFinancier[index].consommer }}
+            </p>
+          </div>
+
+          <div class="mt-5">
+            <label class="form-label">Sources</label>
+            <TomSelect v-model="plan.type" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
+              <option value="0">Fond propre</option>
+              <option value="1">Budget Alloue</option>
+            </TomSelect>
+          </div>
+
+          <div class="mt-5">
+            <InputForm v-model="plan.trimestre" :min="1" :max="4" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Sélectionnez le trimestre" label="Sélectionnez le trimestre" />
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+              {{ erreurSuiviFinancier[index].trimestre }}
+            </p>
+          </div>
+
+          <div class="mt-5">
+            <InputForm v-model="plan.annee" :min="2000" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.annee">
+              {{ erreurSuiviFinancier[index].annee }}
+            </p>
+          </div>
+
+          <button type="button" @click="removePlan(index)" class="mt-2 text-red-600 text-sm underline">Supprimer ce suivi</button>
+        </div>
+
+        <button type="button" @click="addPlan" class="col-span-12 btn btn-outline-primary">Ajouter un autre suivi</button>
+      </ModalBody>
+      <ModalFooter>
+        <div class="flex items-center justify-center">
+          <button type="button" @click="resetModalSuiviFinancierActivite" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+          <VButton class="inline-block" label="Enregistrer" :loading="loadingSuiviFinancier" :type="submit" />
+        </div>
+      </ModalFooter>
+    </form>
+  </Modal>
+
+  <!-- Modal Register & Update -->
+  <Modal backdrop="static" :show="showModalFiltre" @hidden="showModalFiltre = false">
+    <ModalHeader>
+      <h2 class="mr-auto text-base font-medium">Filtrer le pta</h2>
+    </ModalHeader>
+    <form @submit.prevent="filterSuiviFinancierActivite">
+      <ModalBody>
+        <div class="grid grid-cols-1 gap-4">
+          <!-- <pre>{{years}}</pre> -->
+          <div class="">
+            <label class="form-label">Année</label>
+            <TomSelect v-model="filterPayload.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
+              <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
+            </TomSelect>
+          </div>
+          <div class="">
+            <label class="form-label">Trimestre</label>
+            <TomSelect v-model="filterPayload.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full">
+              <option v-for="(i, index2) in 4" :key="index2" :value="i">Trimestre {{ i }}</option>
+            </TomSelect>
+          </div>
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <div class="flex gap-2">
+          <button type="button" @click="resetFilterModal" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
+          <VButton :loading="isLoadingFilter" label="Filtrer" />
+        </div>
+      </ModalFooter>
+    </form>
   </Modal>
   <!-- End Modal -->
 </template>

@@ -178,7 +178,7 @@ export default {
                   this.$router.push("/dashboard/programme");
                 } else {
                   // this.$toast.success("Connexion réussie")
-                  this.$router.push("/dashboard/projets");
+                  this.$router.push("/dashboard/gfa");
                 }
               }
             })
