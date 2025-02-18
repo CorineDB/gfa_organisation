@@ -135,6 +135,7 @@ watch(
 const updatedMenu = () => {
   sideMenu.value.forEach((element) => {
     updateMenu.push(element);
+
     // if ($h.getPermission("voir-un-ano") && element.title == "Anos") {
     //   updateMenu.push(element);
     // }
@@ -402,6 +403,7 @@ const usersProfileImage = ref("");
 const currentUsers = reactive({});
 
 onMounted(() => {
+  sideMenuStore.setMenu();
   const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
   //console.log(usersInfo);
 

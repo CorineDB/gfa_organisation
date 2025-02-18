@@ -8,85 +8,36 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
         pageName: "DashboardGfa",
         title: "Dashboard GFA",
       },
+
       {
         icon: "FolderIcon",
-        pageName: "projets",
-        title: "Projets",
+        title: "Gestion Financière",
         subMenu: [
           {
-            icon: "FolderIcon",
-            pageName: "projets",
-            title: "Projets",
+            icon: "BarChart2Icon",
+            pageName: "plan_de_decaissement",
+            title: "Plan De decaissement",
           },
           {
-            icon: "FolderIcon",
-            pageName: "dashboard_projets_composantes_globale",
-            title: "OutComes",
-          },
-          {
-            icon: "FolderIcon",
-            pageName: "dashboard_projets_sous_composantes_globale",
-            title: "OutPut",
-          },
-          {
-            icon: "FolderIcon",
-            pageName: "dashboard_projets_activites_globale",
-            title: "Activités",
-          },
-          {
-            icon: "FolderIcon",
-            pageName: "dashboard_projets_taches_globale",
-            title: "Taches",
+            icon: "BarChart2Icon",
+            pageName: "finances_suivi",
+            title: "Suivi financier",
           },
         ],
       },
       {
         icon: "FolderIcon",
-        pageName: "Indicateurs",
         title: "Cadre Mesure Rendement",
-      },
-
-      {
-        icon: "CpuIcon",
-        pageName: "Ongs",
-        title: "Organisations",
-      },
-
-      {
-        icon: "BarChart2Icon",
-        pageName: "indicateursDeGouvernance",
-        title: "Indicateurs de gouvernance",
-      },
-      {
-        icon: "FolderIcon",
-        pageName: "projets",
-        title: "Outils de collecte",
         subMenu: [
           {
-            icon: "FolderKanbanIcon",
-            pageName: "typeGouvernance",
-            title: "Type de Gouvernance",
+            icon: "BarChart2Icon",
+            pageName: "create_indicateur",
+            title: "Indicateurs",
           },
           {
-            icon: "GlobeIcon",
-            pageName: "PrincipeGouvernance",
-            title: "Principes de Gouvernance",
-          },
-          {
-            icon: "GlobeIcon",
-            pageName: "critereGouvernance",
-            title: "Criteres de Gouvernance",
-          },
-          {
-            icon: "SettingsIcon",
-            pageName: "ToolsFactuel",
-            title: "Formulaire Factuel",
-          },
-
-          {
-            icon: "SettingsIcon",
-            pageName: "ToolsPerception",
-            title: "Formulaire de Perception",
+            icon: "BarChart2Icon",
+            pageName: "suivi_indicateur",
+            title: "Suivis Indicateur",
           },
         ],
       },
@@ -99,51 +50,134 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
       {
         icon: "BarChart2Icon",
         pageName: "EnqueteIndividuel",
-        title: "Enquête individuelle",
+        title: "Enquête personnalisé",
       },
-
       {
         icon: "UsersIcon",
-        pageName: "Utilisateur",
-        title: "Utilisateurs",
-      },
-      {
-        icon: "SettingsIcon",
-        pageName: "setting",
-        title: "Paramètres",
+        pageName: "personnel",
+        title: "Personnel",
         subMenu: [
           {
-            icon: "BarChart2Icon",
-            pageName: "optionReponse",
-            title: "Option de réponse",
+            icon: "UsersIcon",
+            pageName: "Utilisateur",
+            title: "Membres",
           },
           {
-            icon: "BarChart2Icon",
-            pageName: "UniteDeMesure",
-            title: "Unité de Mesure",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "KeyValue",
-            title: "Clé Valeur Indicateur",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "CategoriesIndicateurs",
-            title: "Catégories d'indicateurs",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "Sites",
-            title: "Sites",
-          },
-          {
-            icon: "BarChart2Icon",
-            pageName: "TypeResultat",
-            title: "Résultats cadre de rendement",
+            icon: "KeyIcon",
+            pageName: "Roles",
+            title: "Roles",
           },
         ],
       },
     ],
   }),
+  actions: {
+    setMenu() {
+      const haveProject = JSON.parse(localStorage.getItem("authenticateUser")).projet;
+      // const haveProject = null;
+      this.menu = [
+        {
+          icon: "GridIcon",
+          pageName: "DashboardGfa",
+          title: "Dashboard GFA",
+        },
+
+        {
+          icon: "FolderIcon",
+          title: "Gestion Financière",
+          subMenu: [
+            {
+              icon: "BarChart2Icon",
+              pageName: "plan_de_decaissement",
+              title: "Plan De decaissement",
+            },
+            {
+              icon: "BarChart2Icon",
+              pageName: "finances_suivi",
+              title: "Suivi financier",
+            },
+          ],
+        },
+        {
+          icon: "FolderIcon",
+          title: "Cadre Mesure Rendement",
+          subMenu: [
+            {
+              icon: "BarChart2Icon",
+              pageName: "create_indicateur",
+              title: "Indicateurs",
+            },
+            {
+              icon: "BarChart2Icon",
+              pageName: "suivi_indicateur",
+              title: "Suivis Indicateur",
+            },
+          ],
+        },
+        {
+          icon: "BarChart2Icon",
+          pageName: "Programmation_enquete",
+          title: "Évaluations & Résulats",
+        },
+
+        {
+          icon: "BarChart2Icon",
+          pageName: "EnqueteIndividuel",
+          title: "Enquête personnalisé",
+        },
+        {
+          icon: "UsersIcon",
+          pageName: "personnel",
+          title: "Personnel",
+          subMenu: [
+            {
+              icon: "UsersIcon",
+              pageName: "Utilisateur",
+              title: "Membres",
+            },
+            {
+              icon: "KeyIcon",
+              pageName: "Roles",
+              title: "Roles",
+            },
+          ],
+        },
+      ];
+
+      if (haveProject !== null) {
+        this.menu.splice(1, 0, {
+          icon: "FolderIcon",
+          pageName: "projets",
+          title: "Projets",
+          subMenu: [
+            {
+              icon: "FolderIcon",
+              pageName: "projets",
+              title: "Projets",
+            },
+            {
+              icon: "FolderIcon",
+              pageName: "dashboard_projets_composantes_globale",
+              title: "OutComes",
+            },
+            {
+              icon: "FolderIcon",
+              pageName: "dashboard_projets_sous_composantes_globale",
+              title: "OutPut",
+            },
+            {
+              icon: "FolderIcon",
+              pageName: "dashboard_projets_activites_globale",
+              title: "Activités",
+            },
+            {
+              icon: "FolderIcon",
+              pageName: "dashboard_projets_taches_globale",
+              title: "Taches",
+            },
+          ],
+        });
+      }
+    },
+  },
 });

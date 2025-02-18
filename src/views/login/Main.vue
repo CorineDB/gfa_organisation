@@ -101,6 +101,8 @@
 //import gRecaptcha from '@finpo/vue2-recaptcha-invisible';
 import { required, minLength, numeric, email, sameAs } from "@vuelidate/validators";
 import { mapState, mapActions, mapMutations, mapGetters } from "vuex";
+import { useSimpleMenuStore } from "@/stores/simple-menu";
+import { useSideMenuStore } from "@/stores/side-menu";
 
 //import Vmodal from '@/components/Vmodal'
 import axios from "axios";
@@ -113,6 +115,9 @@ export default {
   components: { VButton },
   data() {
     return {
+      sideMenuStore: useSideMenuStore(),
+      simpleMenuStore: useSimpleMenuStore(),
+
       base_url: API_BASE_URL,
       statePassword: "password",
       show: false,
@@ -171,15 +176,27 @@ export default {
         if (datas.status == 204) {
           await this.authentification(identifiant)
             .then((response, status) => {
+              this.simpleMenuStore.setMenu();
+              this.sideMenuStore.setMenu();
+
               if (response.statut === "success" || response.status === 200) {
                 this.chargement = false;
-                if (response.data.utilisateur.type == "administrateur") {
-                  // this.$toast.success("Connexion réussie")
-                  this.$router.push("/dashboard/programme");
-                } else {
-                  // this.$toast.success("Connexion réussie")
+
+                const haveProject = JSON.parse(localStorage.getItem("authenticateUser")).projet;
+
+                if (haveProject !== null) {
                   this.$router.push("/dashboard/gfa");
+                } else {
+                  this.$router.push("dashboard/enquetes");
                 }
+
+                //  if (response.data.utilisateur.type == "administrateur") {
+                //    // this.$toast.success("Connexion réussie")
+                //    this.$router.push("/dashboard/programme");
+                //  } else {
+                //    // this.$toast.success("Connexion réussie")
+                //    this.$router.push("/dashboard/gfa");
+                //  }
               }
             })
             .catch((error) => {

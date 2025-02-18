@@ -325,7 +325,7 @@ const suiviFinancierActivite = () => {
 
         // Mettre à jour les messages d'erreurs dynamiquement
         if (error.response && error.response.data && error.response.data.errors) {
-          erreurSuiviFinancier = error.response.data.errors;
+          erreurSuiviFinancier.value = error.response.data.errors;
         } else {
           toast.error(error.response.data.errors.message);
         }

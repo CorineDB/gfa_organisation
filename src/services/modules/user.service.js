@@ -23,7 +23,7 @@ const UsersService = {
     
 
     update(slug, params) {
-      return ApiService.update("utilisateurs", slug, params);
+      return ApiService.update("gfa/utilisateurs", slug, params);
     },
 
     destroy(slug) {

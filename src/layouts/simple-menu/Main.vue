@@ -145,6 +145,7 @@ watch(
 );
 
 onMounted(() => {
+  simpleMenuStore.setMenu;
   dom("body").removeClass("error-page").removeClass("login").addClass("main");
   formattedMenu.value = $h.toRaw(simpleMenu.value);
 });
