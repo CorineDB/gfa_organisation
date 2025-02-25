@@ -4,6 +4,13 @@ import duration from "dayjs/plugin/duration";
 dayjs.extend(duration);
 
 const helpers = {
+  extractContentFromArray(arr) {
+    if (Array.isArray(arr) && arr.length === 1 && typeof arr[0] === "string") {
+      return arr[0]; // Retourne la chaîne unique contenue dans le tableau
+    } else {
+      throw new Error("L'entrée doit être un tableau contenant une seule chaîne de caractères.");
+    }
+  },
   filterData({ itemsPerPage, search, data, currentPage, keys }) {
     const lowercasedSearch = search.toLowerCase();
 

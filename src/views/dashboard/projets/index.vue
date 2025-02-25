@@ -147,9 +147,9 @@
       </div>
 
       <div class="flex items-center justify-center p-5 border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
-        <a class="flex items-center mr-auto text-primary" href="javascript:;" @click="goToDetail(projet)"> <EyeIcon class="w-4 h-4 mr-1" /> Détail </a>
-        <a class="flex items-center mr-3" href="javascript:;" @click="modifierProjet(projet)"> <CheckSquareIcon class="w-4 h-4 mr-1" /> Modifier </a>
-        <a class="flex items-center text-danger" href="javascript:;" @click="supprimerProjet(projet)"> <Trash2Icon class="w-4 h-4 mr-1" /> Supprimer </a>
+        <a class="flex items-center mr-auto text-primary" href="javascript:;" v-if="verifyPermission('voir-details-projet')" @click="goToDetail(projet)"> <EyeIcon class="w-4 h-4 mr-1" /> Détail </a>
+        <a class="flex items-center mr-3" href="javascript:;" v-if="verifyPermission('modifier-un-projet')" @click="modifierProjet(projet)"> <CheckSquareIcon class="w-4 h-4 mr-1" /> Modifier </a>
+        <a class="flex items-center text-danger" href="javascript:;" v-if="verifyPermission('supprimer-un-projet')" @click="supprimerProjet(projet)"> <Trash2Icon class="w-4 h-4 mr-1" /> Supprimer </a>
       </div>
 
       <div class="absolute bottom-0 flex w-full">
@@ -242,6 +242,8 @@ import { toast } from "vue3-toastify";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { LMap, LTileLayer, LMarker, LPolygon, LPopup } from "@vue-leaflet/vue-leaflet";
+import verifyPermission from "@/utils/verifyPermission";
+
 
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
@@ -638,6 +640,7 @@ export default {
       this.isUpdate = false;
       this.showCloseModal(true);
     },
+    verifyPermission,
 
     modifierProjet(projet) {
       console.log(projet);

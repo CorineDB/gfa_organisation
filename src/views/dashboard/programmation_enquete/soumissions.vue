@@ -379,7 +379,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Soumissions par organisations</h2>
+  <div class="flex justify-between mt-4 items-center">
+    <h2 class="text-lg font-medium intro-y">Soumissions par organisations</h2>
+    <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
+  </div>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <!-- <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">

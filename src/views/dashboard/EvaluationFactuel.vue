@@ -333,6 +333,7 @@ onMounted(async () => {
 });
 </script>
 <template>
+  <pre>{{ showAlertValidate }}</pre>
   <div v-if="!showAlertValidate" class="">
     <div v-if="!isLoadingDataFactuel" class="">
       <div v-if="formDataFactuel.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataFactuel.intitule }}</div>

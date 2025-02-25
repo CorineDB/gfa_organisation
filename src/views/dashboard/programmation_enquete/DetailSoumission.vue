@@ -30,7 +30,12 @@ const getSoumission = async () => {
 };
 
 const goBack = () => {
-  router.back();
+  router.push({
+    name: "SoumissionsEnqueteDeCollecte",
+    params: {
+      id: route.params.e,
+    },
+  });
 };
 
 const filterOptions = computed(() => soumission.value?.formulaire_de_gouvernance?.options_de_reponse);
@@ -40,12 +45,11 @@ onMounted(() => getSoumission());
 <template>
   <div>
     <div v-if="!isLoading">
-      <h2 class="mt-10 text-lg font-medium intro-y">Détail Soumissions</h2>
-      <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
-        <div class="flex">
-          <button @click="goBack()" class="mr-2 shadow-md btn btn-primary"><ArrowLeftIcon class="w-4 h-4 mr-3" />Retour</button>
-        </div>
+      <div class="flex justify-between mt-4 items-center">
+        <h2 class="text-lg font-medium intro-y">Détail Soumissions</h2>
+        <button class="btn btn-primary" @click="goBack">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
       </div>
+
       <table v-if="soumission?.type == 'factuel'" class="w-full my-10 border-collapse table-auto border-slate-500" cellpadding="10" cellspacing="0">
         <thead class="text-white bg-blue-900">
           <tr>
