@@ -381,7 +381,7 @@ onMounted(async () => {
 <template>
   <div class="flex justify-between mt-4 items-center">
     <h2 class="text-lg font-medium intro-y">Soumissions par organisations</h2>
-    <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
+    <button class="btn btn-primary" @click="router.push({ name: 'Programmation_enquete' })">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
   </div>
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
@@ -698,6 +698,7 @@ onMounted(async () => {
           </div>
           <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
           <ActionPlan :actions="feuilleDeRoute" />
+          <!-- <pre>{{ feuilleDeRoute }}</pre> -->
         </div>
       </div>
 

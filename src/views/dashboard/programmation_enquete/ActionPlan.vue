@@ -1,39 +1,10 @@
 <template>
   <div class="action-plan">
-    <!-- Progress Summary
-    <div class="progress-summary">
-      <div
-        class="summary-item"
-        v-for="(item, index) in progressSummary"
-        :key="index"
-      >
-        <span
-          :class="`status-icon ${item.progressCategory.toLowerCase().replace(' ', '-')}`"
-        >
-          {{ getCategoryIcon(item.progressCategory) }}
-        </span>
-        <div>
-          <p class="category">{{ item.progressCategory }}</p>
-          <p>{{ item.progressCurrent }} / {{ item.progressTotal }}</p>
-        </div>
-      </div>
-    </div> -->
-
     <!-- Dropdown Filter -->
     <div class="filter-dropdown">
-      <TomSelect
-        v-model="selectedFilter"
-        :options="{ placeholder: 'Sélectionnez une catégorie' }"
-        class="w-full"
-      >
+      <TomSelect v-model="selectedFilter" :options="{ placeholder: 'Sélectionnez une catégorie' }" class="w-full">
         <option value="all">Toutes ({{ countActions("all") }})</option>
-        <option
-          v-for="filter in filters"
-          :key="filter.label"
-          :value="filter.value"
-        >  {{ getCategoryIcon(filter.label) }}  
-          {{ filter.label }} ({{ countActions(filter.value) }})
-        </option>
+        <option v-for="filter in filters" :key="filter.label" :value="filter.value">{{ getCategoryIcon(filter.label) }} {{ filter.label }} ({{ countActions(filter.value) }})</option>
       </TomSelect>
     </div>
 
@@ -42,7 +13,8 @@
       <thead>
         <tr>
           <th>Action</th>
-          <th>Statut</th><!-- 
+          <th>Statut</th>
+          <!-- 
           <th>Priorité</th>
           <th>Responsable</th> -->
           <th>Deadline</th>
@@ -53,7 +25,8 @@
           <td>{{ action.action }}</td>
           <td :class="`status ${String(getStatusLabel(action.statut)).toLowerCase().replace(' ', '-')}`">
             {{ getStatusLabel(action.statut) }}
-          </td><!-- 
+          </td>
+          <!-- 
           <td>{{ action.priority }}</td>
           <td>{{ action.responsible }}</td> -->
           <td>{{ formatDate(action.end_at) }}</td>
@@ -72,22 +45,24 @@
 export default {
   name: "ActionPlan",
   data() {
-    return {/* 
+    return {
+      /* 
       progressSummary: [
         { progressCategory: "Terminer", progressCurrent: countCompleted, progressTotal: actions.length },
         { progressCategory: "En cours", progressCurrent: countInProgress, progressTotal: actions.length },
         { progressCategory: "En retard", progressCurrent: countOverdue, progressTotal: actions.length },
       ] */
-      selectedFilter: "in_progress",
+      selectedFilter: "0",
       filters: [
         { label: "Toutes", value: "all" },
-        { label: "Terminer", value: "completed" },
-        { label: "En cours", value: "in_progress" },
-        { label: "En retard", value: "overdue" },
+        { label: "Terminer", value: "2" },
+        { label: "En cours", value: "0" },
+        { label: "En retard", value: "1" },
+        { label: "Non démarrer", value: "-1" },
       ],
     };
   },
-  props:{
+  props: {
     actions: {
       type: Array,
       required: true,
@@ -95,26 +70,30 @@ export default {
   },
   computed: {
     countCompleted() {
-      return this.actions.filter(action => action.statut === 2).length;
+      return this.actions.filter((action) => action.statut === 2).length;
     },
     countInProgress() {
-      return this.actions.filter(action => action.statut === 0).length;
+      return this.actions.filter((action) => action.statut === 0).length;
     },
     countOverdue() {
-      return this.actions.filter(action => action.statut === 1).length;
+      return this.actions.filter((action) => action.statut === 1).length;
+    },
+    countNoStart() {
+      return this.actions.filter((action) => action.statut === -1).length;
     },
     progressSummary() {
       return [
         { progressCategory: "Terminer", progressCurrent: this.countCompleted, progressTotal: this.actions.length },
         { progressCategory: "En cours", progressCurrent: this.countInProgress, progressTotal: this.actions.length },
         { progressCategory: "En retard", progressCurrent: this.countOverdue, progressTotal: this.actions.length },
+        { progressCategory: "Non démarrer", progressCurrent: this.countNoStart, progressTotal: this.actions.length },
       ];
     },
     filteredActions() {
       if (this.selectedFilter === "all") {
         return this.actions;
       }
-      return this.actions.filter((action) => action.statut === this.selectedFilter);
+      return this.actions.filter((action) => action.statut == this.selectedFilter);
     },
   },
   methods: {
@@ -125,7 +104,7 @@ export default {
       if (status === "all") {
         return this.actions.length;
       }
-      return this.actions.filter((action) => action.statut === status).length;
+      return this.actions.filter((action) => action.statut == status).length;
     },
     getCategoryIcon(category) {
       switch (category) {
@@ -135,6 +114,8 @@ export default {
           return "⏳";
         case "En retard":
           return "⏰";
+        case "Non démarrer":
+          return "⏪";
         default:
           return "";
       }
@@ -148,6 +129,7 @@ export default {
         2: "Terminer",
         0: "En cours",
         1: "En retard",
+        "-1": "Non démarrer",
       };
       return statusMap[status] || "Inconnu";
     },

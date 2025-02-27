@@ -213,7 +213,7 @@ export default {
               // this.activitesId = this.formData.activiteId;
               this.clearObjectValues(this.formData);
               // delete this.formData.projetId;
-              alert("ok");
+              //  alert("ok");
               this.getActiviteById(this.activitesId);
               // this.getListeProjet();
               //this.sendRequest = false;
@@ -522,18 +522,21 @@ export default {
               <span class="px-2 py-1 m-5 text-xs text-white rounded bg-danger/80" v-else-if="item.statut == 1"> En retard </span>
               <span class="pl-2" v-else-if="item.statut == 2">Terminé</span>
             </div>
-            <div class="flex items-center mt-2">
-              <ClockIcon class="w-4 h-4 mr-2" />
-              <div>
-                Date : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(item.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(item.fin) }}</span>
+            <div class="h-20 overflow-y-scroll">
+              <div class="flex items-center mt-2">
+                <ClockIcon class="w-4 h-4 mr-2" />
+                <div>
+                  Date : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(item.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(item.fin) }}</span>
+                </div>
+              </div>
+              <div class="flex items-center mt-2" v-for="(plage, t) in item.durees" :key="t">
+                <ClockIcon class="w-4 h-4 mr-2" />
+                <div>
+                  Plage de date {{ t + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(plage.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(plage.fin) }}</span>
+                </div>
               </div>
             </div>
-            <div class="flex items-center mt-2" v-for="(plage, t) in item.durees" :key="t">
-              <ClockIcon class="w-4 h-4 mr-2" />
-              <div>
-                Plage de date {{ t + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(plage.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(plage.fin) }}</span>
-              </div>
-            </div>
+
             <!-- <div class="flex items-center mt-2"><CheckSquareIcon class="w-4 h-4 mr-2" /> Poids : {{ item.poids }}</div> -->
           </div>
         </div>

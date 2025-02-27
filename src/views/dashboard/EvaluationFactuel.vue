@@ -315,25 +315,43 @@ const isPreview = computed(() => currentPage.value === totalPages.value - 1);
 // );
 
 onMounted(async () => {
-  if (getvalidateKey("factuel")) {
-    showAlertValidate.value = true;
-  } else {
-    authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
-    payload.organisationId = authUser.value.profil.id;
+  // if (getvalidateKey("factuel")) {
+  //   alert("ok");
+  //   showAlertValidate.value = true;
+  // } else {
 
-    await getDataFormFactuel();
+  //   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
+  //   payload.organisationId = authUser.value.profil.id;
 
-    if (!showAlertValidate.value) {
-      await getSource();
-      // await getcurrentUserAndFetchOrganization();
-      // findFormulaireFactuel();
-      initializeFormData();
-    }
+  //   await getDataFormFactuel();
+
+  //   if (!showAlertValidate.value) {
+  //     await getSource();
+  //     // await getcurrentUserAndFetchOrganization();
+  //     // findFormulaireFactuel();
+  //     initializeFormData();
+  //   }
+  // }
+
+  authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
+  payload.organisationId = authUser.value.profil.id;
+
+  await getDataFormFactuel();
+
+  if (!showAlertValidate.value) {
+    await getSource();
+    // await getcurrentUserAndFetchOrganization();
+    // findFormulaireFactuel();
+    initializeFormData();
   }
 });
 </script>
 <template>
-  <pre>{{ showAlertValidate }}</pre>
+  <div class="flex justify-between my-4 items-center">
+    <h2 class="text-lg font-medium intro-y">Evaluation factuel</h2>
+    <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
+  </div>
+
   <div v-if="!showAlertValidate" class="">
     <div v-if="!isLoadingDataFactuel" class="">
       <div v-if="formDataFactuel.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataFactuel.intitule }}</div>
