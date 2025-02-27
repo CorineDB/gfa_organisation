@@ -8,7 +8,7 @@
       <nav v-if="!isToolsPerception" class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
         <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-wrap items-center justify-center mt-3 intro-x">
           <h1 class="font-semibold text-white">Programme de redevabilité</h1>
-           <p>{{ currentUsers.role }}</p>
+          <p>{{ currentUsers.role }}</p>
           <!-- <img alt="Programme de redevabilité" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" /> -->
         </router-link>
         <div class="my-6 side-nav__devider"></div>
@@ -403,8 +403,23 @@ const usersProfileImage = ref("");
 const currentUsers = reactive({});
 
 onMounted(() => {
-  sideMenuStore.setMenu();
+  // sideMenuStore.setMenu();
   const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
+
+  console.log("permissions", usersInfo.roles);
+  let permissions = usersInfo.role[0].permissions;
+
+  // let permissions = [
+  //   {
+  //     id: "07BZNxb9Q4mR1Y0AkbE3xvzo2GdDqnjZK1JZ6leKapX95rgMwP78NLBVWQ4LEvAn",
+  //     nom: "Voir un projet",
+  //     slug: "voir-un-projet",
+  //   },
+  // ];
+
+  sideMenuStore.setTabPermission(permissions);
+
+  sideMenuStore.addToMenuIfPermissionGranted();
   //console.log(usersInfo);
 
   if (usersInfo) {
@@ -415,10 +430,8 @@ onMounted(() => {
 
   dom("body").removeClass("error-page").removeClass("login").addClass("main");
   updatedMenu();
-  formattedMenu.value = $h.toRaw(lastMenu.value);
+  formattedMenu.value = $h.toRaw(sideMenu.value);
 });
-
-
 </script>
 <style scoped>
 .navColor {

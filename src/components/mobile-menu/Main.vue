@@ -124,6 +124,22 @@ const usersProfileImage = ref("");
 onMounted(() => {
   const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
 
+  console.log("permissions", usersInfo.roles);
+
+  let permissions = usersInfo.role[0].permissions;
+
+  // let permissions = [
+  //   {
+  //     id: "07BZNxb9Q4mR1Y0AkbE3xvzo2GdDqnjZK1JZ6leKapX95rgMwP78NLBVWQ4LEvAn",
+  //     nom: "Voir un projet",
+  //     slug: "voir-un-projet",
+  //   },
+  // ];
+
+  sideMenuStore.setTabPermission(permissions);
+
+  sideMenuStore.addToMenuIfPermissionGranted();
+
   // if (usersInfo) {
   //   usersProfileImage.value = API_BASE_URL + usersInfo.users.profil}
 
