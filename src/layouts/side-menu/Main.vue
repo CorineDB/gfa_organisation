@@ -7,7 +7,9 @@
       <!-- BEGIN: Side Menu -->
       <nav v-if="!isToolsPerception" class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
         <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-wrap items-center justify-center mt-3 intro-x">
-          <h1 class="font-semibold text-white">Programme de redevabilité</h1>
+          <h1 class="font-semibold text-white">{{ nomProgramme }}</h1>
+
+          <!-- <h1 class="font-semibold text-white">Programme de redevabilité</h1> -->
           <p>{{ currentUsers.role }}</p>
           <!-- <img alt="Programme de redevabilité" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" /> -->
         </router-link>
@@ -401,11 +403,12 @@ const updatedMenu = () => {
 const usersProfileImage = ref("");
 
 const currentUsers = reactive({});
+const nomProgramme = ref("");
 
 onMounted(() => {
   // sideMenuStore.setMenu();
   const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
-
+  nomProgramme.value = usersInfo.programme.nom;
   console.log("permissions", usersInfo.roles);
   let permissions = usersInfo.role[0].permissions;
 

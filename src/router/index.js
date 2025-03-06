@@ -463,12 +463,18 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // Permettre l'accès à la route "toolsPerception" quel que soit l'état d'authentification
-  if (["ToolsPerception", "activation", "reset_Password", "view_survey", "request_password", "request_Password"].includes(to.name)) {
+  const isAuthenticated = localStorage.getItem("authenticateUser");
+
+  // Permettre l'accès à certaines routes spécifiques sans authentification
+  if (["ToolsPerception", "activation", "reset_Password", "view_survey", "request_password", "reset_Password"].includes(to.name)) {
     next();
   }
-  // Rediriger vers "/" si non authentifié et que la route n'est pas la page d'accueil
-  else if (!localStorage.getItem("authenticateUser") && to.path !== "/") {
+  // Si authentifié et qu'on essaie d'aller sur "/", rediriger vers "/projet"
+  else if (isAuthenticated && to.path === "/") {
+    next("/dashboard/projets");
+  }
+  // Si non authentifié et qu'on essaie d'accéder à une autre page que "/", rediriger vers "/"
+  else if (!isAuthenticated && to.path !== "/") {
     next("/");
   } else {
     next();

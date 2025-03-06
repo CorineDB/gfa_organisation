@@ -21,42 +21,7 @@
       </ol>
     </nav>
 
-    <!-- END: Breadcrumb -->
-
-    <!-- BEGIN: Notifications -->
-    <!-- <Dropdown class="mr-auto intro-x sm:mr-6">
-      <DropdownToggle tag="div" role="button" class="cursor-pointer notification notification--bullet">
-        <BellIcon class="notification__icon dark:text-slate-500" />
-      </DropdownToggle>
-      <DropdownMenu class="pt-2 notification-content">
-        <DropdownContent tag="div" class="notification-content__box">
-          <div class="notification-content__title">Notifications</div>
-          <div v-for="(faker, fakerKey) in $_.take($f(), 5)" :key="fakerKey"
-            class="relative flex items-center cursor-pointer" :class="{ 'mt-5': fakerKey }">
-            <div class="flex-none w-12 h-12 mr-1 image-fit">
-              <img alt="Tinker Tailwind HTML Admin Template" class="rounded-full" :src="faker.photos[0]" />
-              <div
-                class="absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full bg-success dark:border-darkmode-600">
-              </div>
-            </div>
-            <div class="ml-2 overflow-hidden">
-              <div class="flex items-center">
-                <a href="javascript:;" class="mr-5 font-medium truncate">{{
-                  faker.users[0].name
-                }}</a>
-                <div class="ml-auto text-xs text-slate-400 whitespace-nowrap">
-                  {{ faker.times[0] }}
-                </div>
-              </div>
-              <div class="w-full truncate text-slate-500 mt-0.5">
-                {{ faker.news[0].shortContent }}
-              </div>
-            </div>
-          </div>
-        </DropdownContent>
-      </DropdownMenu>
-    </Dropdown> -->
-    <!-- END: Notifications -->
+   
 
     <!-- BEGIN: Account Menu -->
 
@@ -134,8 +99,8 @@ onMounted(() => {
 
   if (usersInfo) {
     // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil
-    // currentUsers.nom = usersInfo.profil.nom
-    currentUsers.nom = "test";
+     currentUsers.nom = usersInfo.nom
+    // currentUsers.nom = "test";
     // currentUsers.prenom = usersInfo.users.prenom
     currentUsers.role = usersInfo.role[0].nom;
     //  + currentUsers.prenom[0]
