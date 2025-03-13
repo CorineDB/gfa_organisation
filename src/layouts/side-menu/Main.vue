@@ -406,30 +406,23 @@ const currentUsers = reactive({});
 const nomProgramme = ref("");
 
 onMounted(() => {
-  // sideMenuStore.setMenu();
   const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
-  nomProgramme.value = usersInfo.programme.nom;
-  console.log("permissions", usersInfo.roles);
-  let permissions = usersInfo.role[0].permissions;
-
-  // let permissions = [
-  //   {
-  //     id: "07BZNxb9Q4mR1Y0AkbE3xvzo2GdDqnjZK1JZ6leKapX95rgMwP78NLBVWQ4LEvAn",
-  //     nom: "Voir un projet",
-  //     slug: "voir-un-projet",
-  //   },
-  // ];
-
-  sideMenuStore.setTabPermission(permissions);
-
-  sideMenuStore.addToMenuIfPermissionGranted();
-  //console.log(usersInfo);
 
   if (usersInfo) {
-    currentUsers.nom = "test";
+    nomProgramme.value = usersInfo.programme.nom;
+
+    let permissions = usersInfo.role[0].permissions;
+
+    sideMenuStore.setTabPermission(permissions);
+
+    sideMenuStore.addToMenuIfPermissionGranted();
+
+    currentUsers.nom = usersInfo.nom;
+
     currentUsers.role = usersInfo.role[0].nom;
-    // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
   }
+
+  //console.log(usersInfo);
 
   dom("body").removeClass("error-page").removeClass("login").addClass("main");
   updatedMenu();

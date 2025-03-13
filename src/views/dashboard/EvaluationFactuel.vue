@@ -306,32 +306,9 @@ const totalPages = computed(() => {
 });
 const isPreview = computed(() => currentPage.value === totalPages.value - 1);
 
-// watch(
-//   formData,
-//   (newValue) => {
-//     localStorage.setItem("formData", JSON.stringify(newValue));
-//   },
-//   { deep: true }
-// );
 
 onMounted(async () => {
-  // if (getvalidateKey("factuel")) {
-  //   alert("ok");
-  //   showAlertValidate.value = true;
-  // } else {
-
-  //   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
-  //   payload.organisationId = authUser.value.profil.id;
-
-  //   await getDataFormFactuel();
-
-  //   if (!showAlertValidate.value) {
-  //     await getSource();
-  //     // await getcurrentUserAndFetchOrganization();
-  //     // findFormulaireFactuel();
-  //     initializeFormData();
-  //   }
-  // }
+   
 
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
   payload.organisationId = authUser.value.profil.id;
@@ -340,8 +317,7 @@ onMounted(async () => {
 
   if (!showAlertValidate.value) {
     await getSource();
-    // await getcurrentUserAndFetchOrganization();
-    // findFormulaireFactuel();
+     
     initializeFormData();
   }
 });

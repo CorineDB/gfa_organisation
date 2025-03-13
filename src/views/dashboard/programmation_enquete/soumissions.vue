@@ -44,6 +44,19 @@ const currentOrganisationsOptions = ref("");
 const invitationPayload = reactive({ participants: [], nbreParticipants: 0 });
 const showInvitationModal = ref(false);
 
+const getStatusText2 = (param) => {
+  switch (param) {
+    case 1:
+      return { label: "Terminé", class: "bg-success" };
+    case 0:
+      return { label: "En cours", class: "bg-pending" };
+    case -1:
+      return { label: "Non demarré", class: "bg-primary" };
+    default:
+      return { label: "A déterminer", class: "bg-primary" };
+  }
+};
+
 const options = [
   { label: "Adresse Email", id: "email" },
   { label: "Numéro de téléphone", id: "contact" },
@@ -102,6 +115,7 @@ const getFormulaireFactuel = async () => {
   await EvaluationService.getFormulaireFactuelEvaluation(idEvaluation)
     .then((result) => {
       formulaireFactuel.value = result.data.data;
+      console.log("formulaireFactuel.value", result.data.data);
       isLoadingData.value = false;
     })
     .catch((e) => {
@@ -383,25 +397,6 @@ onMounted(async () => {
     <h2 class="text-lg font-medium intro-y">Soumissions par organisations</h2>
     <button class="btn btn-primary" @click="router.push({ name: 'Programmation_enquete' })">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
   </div>
-  <div class="grid grid-cols-12 gap-6 mt-5">
-    <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <!-- <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="relative w-56 text-slate-500">
-          <input type="text" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
-          <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
-        </div>
-      </div> -->
-      <!-- <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal">Remplir formulaire Factuel</button>
-        <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de perception</button>
-      </div> -->
-      <div class="flex">
-        <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
-        <!-- <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button> -->
-        <!-- <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation perception</button>        -->
-      </div>
-    </div>
-  </div>
 
   <div class="p-5 mt-0 intro-y">
     <div class="" v-if="!isLoadingData">
@@ -592,12 +587,13 @@ onMounted(async () => {
 
               <div v-if="!datas.factuel || (datas.factuel && datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                  <!-- <pre>{{ statistiques.statut }}</pre> -->
                   <button v-if="(datas.factuel && datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Continuer
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
 
-                  <button v-else-if="!datas.factuel" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-else-if="!datas.factuel && statistiques.statut === 0" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Demarrer
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
@@ -652,7 +648,7 @@ onMounted(async () => {
 
               <div v-else-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-if="(!datas.perception && statistiques.statut === 0) || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Envoyer une invitation
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
