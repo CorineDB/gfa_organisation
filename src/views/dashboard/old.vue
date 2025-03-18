@@ -378,20 +378,25 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <!-- <div v-if="findQuestionDetails" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
-    <p class="my-3">Il vous reste {{ invalidResponses.length }} question{{ invalidResponses.length > 1 ? "s" : "" }} à compléter pour terminer le formulaire.</p> 
-
-    <h2 class="text-lg font-semibold text-gray-800">Détail de la question en attente de réponse</h2>
-    <p class="mt-2 text-gray-600"><span class="font-semibold">Type de gouvernance :</span> {{ findQuestionDetails.nom_typeGouvernance }}</p>
-    <p class="mt-1 text-gray-600"><span class="font-semibold">Principe de gouvernance :</span> {{ findQuestionDetails.nom_principe }}</p>
-    <p class="mt-1 text-gray-600"><span class="font-semibold">Critère :</span> {{ findQuestionDetails.nom_critere }}</p>
-
-    <p class="mt-1 text-gray-600"><span class="font-semibold">Question :</span> {{ findQuestionDetails.nom_question }}</p>
-  </div> -->
   <div v-if="!showModalPreview">
     <div class="flex justify-between my-4 items-center">
       <h2 class="text-lg font-medium intro-y">Evaluation factuel</h2>
       <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
+    </div>
+
+    <!-- <pre> {{ invalidResponses }}</pre> -->
+
+    <!-- <pre> {{ findQuestionDetails }}</pre> -->
+
+    <div v-if="findQuestionDetails" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
+      <p class="my-3">Il vous reste {{ invalidResponses.length }} question{{ invalidResponses.length > 1 ? "s" : "" }} à compléter pour terminer le formulaire.</p>
+
+      <h2 class="text-lg font-semibold text-gray-800">Détail de la question en attente de réponse</h2>
+      <p class="mt-2 text-gray-600"><span class="font-semibold">Type de gouvernance :</span> {{ findQuestionDetails.nom_typeGouvernance }}</p>
+      <p class="mt-1 text-gray-600"><span class="font-semibold">Principe de gouvernance :</span> {{ findQuestionDetails.nom_principe }}</p>
+      <p class="mt-1 text-gray-600"><span class="font-semibold">Critère :</span> {{ findQuestionDetails.nom_critere }}</p>
+
+      <p class="mt-1 text-gray-600"><span class="font-semibold">Question :</span> {{ findQuestionDetails.nom_question }}</p>
     </div>
 
     <div v-if="!showAlertValidate" class="">
@@ -415,7 +420,11 @@ onMounted(async () => {
           </TomSelect>
         </div> -->
         </div>
+        <!-- <pre>
+          {{ responses }}
+        </pre> -->
         <div>
+          <!-- <pre>{{ isValidate }}</pre> -->
           <div class="py-5 intro-x" v-if="formDataFactuel.id">
             <div class="space-y-0">
               <!-- v-for type_gouvernance -->
@@ -454,7 +463,7 @@ onMounted(async () => {
                                       </div>
                                     </div>
                                     <div class="flex items-center gap-3">
-                                      <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null'">
+                                      <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === null">
                                         <label class="">Autre source</label>
                                         <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
                                       </div>
@@ -517,7 +526,6 @@ onMounted(async () => {
       </Alert>
     </div>
   </div>
-
   <div v-else>
     <div class="my-5">
       <div>
@@ -618,6 +626,7 @@ onMounted(async () => {
       </div>
     </div>
   </div>
+
   <!-- BEGIN: Modal Content -->
   <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
     <div class="mb-5">
@@ -649,7 +658,7 @@ onMounted(async () => {
   <Modal backdrop="static" size="modal-xl" :show="showModalPreview === !showModalPreview" @hidden="resetValidation">
     <div class="mb-5">
       <ModalHeader>
-        <h2 class="mr-auto text-base font-medium">Validation formulaire</h2>
+        <h2 class="mr-auto text-base font-medium">Validation formulaire test</h2>
       </ModalHeader>
 
       <ModalBody class="space-y-5">
@@ -669,7 +678,7 @@ onMounted(async () => {
             <h1 class="mt-5 mb-3 text-xl font-semibold text-gray-800">{{ typeGouvernance.nom }}</h1>
             <!-- v-for Principe -->
             <div class="space-y-6">
-              <AccordionGroup :selectedIndex="null" v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex" class="border-primary">
+              <AccordionGroup v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex" class="border-primary">
                 <AccordionItem>
                   <Accordion class="text-xl !px-4 font-semibold bg-primary !text-white flex items-center justify-between">
                     <h2>{{ principe.nom }}</h2>
@@ -736,3 +745,71 @@ onMounted(async () => {
   </Modal>
   <!-- END: Modal Content -->
 </template>
+
+<AccordionGroup :selectedIndex="null" class="border-primary" v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex">
+<AccordionItem>
+  <Accordion class="text-xl !px-4 font-semibold bg-primary !text-white flex items-center justify-between">
+    <h2>{{ principe.nom }}</h2>
+    <ChevronDownIcon />
+  </Accordion>
+  <AccordionPanel class="!px-8 !shadow-md !bg-white !py-6">
+    <!-- v-for Critere -->
+    <AccordionGroup :selectedIndex="null" class="space-y-2">
+      <AccordionItem class="!px-0" v-for="(critere, critereIndex) in principe.categories_de_gouvernance" :key="critereIndex">
+        <Accordion class="text-xl !p-4 font-semibold bg-primary/90 !text-white flex items-center justify-between">
+          <h2>{{ critere.nom }}</h2>
+          <ChevronDownIcon />
+        </Accordion>
+        <!-- v-for Indicateur -->
+        <AccordionPanel class="!border-none pt-1">
+          <div v-for="(question, questionIndex) in critere.questions_de_gouvernance" :key="questionIndex" class="relative px-4 pt-2 my-3 transition-all">
+            <div class="p-2 py-3 space-y-2 border-l-8 border-yellow-500 rounded shadow box">
+              <p class="w-full text-lg font-semibold text-center text-primary">{{ questionIndex + 1 }} - {{ question.nom }}</p>
+              <div class="flex flex-col items-center justify-center w-full gap-3">
+                <!-- v-for Option -->
+                <div class="inline-flex flex-wrap items-center gap-3">
+                  <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="form-check-input" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
+                  <div v-for="(option, optionIndex) in formulaireFactuel.options_de_reponse" :key="optionIndex">
+                    <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}${optionIndex}`" class="form-check-input" type="radio" :name="`${question.id}-${question.slug}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" />
+                    <label class="text-base form-check-label" :for="`radio${question.id}${optionIndex}`">
+                      {{ option.libelle }}
+                    </label>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === null">
+                    <label class="">Autre source</label>
+                    <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
+                  </div>
+                  <div v-else class="flex items-center gap-3">
+                    <label class="">Source</label>
+                    <div class="min-w-[230px]">
+                      <TomSelect v-if="responses[question.id]?.sourceDeVerificationId" :options="{ placeholder: 'Sélectionnez une source' }" class="w-full" v-model="responses[question.id].sourceDeVerificationId">
+                        <option v-for="(source, indexSource) in sources" :key="indexSource" :value="source.id">{{ source.intitule }}</option>
+                        <option value="null">Autre Source</option>
+                      </TomSelect>
+                    </div>
+                  </div>
+                  <div>
+                    <input type="file" :id="question.id" multiple :ref="question.id" @change="handleFileUpload($event, question.id)" />
+                  </div>
+                </div>
+              </div>
+              <!-- Display uploaded files -->
+              <div v-if="responsesFiles[question.id]?.preuvesFiles.length" class="flex flex-wrap items-center gap-3 mt-2">
+                <p class="text-sm font-bold">Fichiers:</p>
+
+                <span class="flex items-center px-2 py-1 text-blue-500 truncate bg-white rounded-full shadow-md max-w-[200px]" v-for="(file, index) in responsesFiles[question.id]?.preuvesFiles" :key="index">
+                  <a :href="file.url" target="_blank" rel="noopener noreferrer" class="truncate max-w-[200px]">
+                    {{ file.nom }}
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </AccordionPanel>
+      </AccordionItem>
+    </AccordionGroup>
+  </AccordionPanel>
+</AccordionItem>
+</AccordionGroup>

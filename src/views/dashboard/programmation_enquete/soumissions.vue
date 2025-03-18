@@ -183,7 +183,13 @@ const getStatusText = (param) => {
 };
 
 const openFactuelModal = () => {
-  router.push({ name: "ToolsFactuel", params: { id: formulaireFactuel.value.token } });
+  console.log("formulaireFactuel.value.token", formulaireFactuel.value);
+
+  if (formulaireFactuel.value) {
+    router.push({ name: "ToolsFactuel", params: { id: formulaireFactuel.value.token } });
+  } else {
+    toast.info("Le délail de soumission de l'enquête est passé");
+  }
 };
 
 const goToDetailSoumission = (idSoumission) => {
@@ -564,12 +570,15 @@ onMounted(async () => {
                   <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
                 </div>
                 <div class="mt-4">
+                  <!-- <pre>{{ datas.factuel.pourcentage_evolution }}</pre> -->
                   <p>Évolution soumissions</p>
                   <ProgressBar :percent="datas.factuel ? datas.factuel.pourcentage_evolution : 0" />
                 </div>
               </div>
 
-              <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <!-- <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400"> -->
+
+              <!-- <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                   <button v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" @click.self="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Details de la soumission
@@ -577,18 +586,34 @@ onMounted(async () => {
                   </button>
 
                   <button v-else class="w-full gap-2 py-[22px]"></button>
-                  <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
+                  <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button>
                 </div>
                 <button v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" @click.self="goToPageSynthese" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Fiche de synthèse
                   <ArrowRightIcon class="ml-2 size-5" />
                 </button>
+              </div> -->
+
+              <div v-if="datas.factuel && datas.factuel.pourcentage_evolution > 0" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                  <button @click.self="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                    Details de la soumission
+                    <ExternalLinkIcon class="ml-2 size-5" />
+                  </button>
+
+                  <!-- <button class="w-full gap-2 py-[22px]"></button> -->
+                  <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
+                </div>
+                <button @click.self="goToPageSynthese" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                  Fiche de synthèse
+                  <ArrowRightIcon class="ml-2 size-5" />
+                </button>
               </div>
 
-              <div v-if="!datas.factuel || (datas.factuel && datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-if="!datas.factuel || (datas.factuel && !datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                   <!-- <pre>{{ statistiques.statut }}</pre> -->
-                  <button v-if="(datas.factuel && datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-if="(datas.factuel && !datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Continuer
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>

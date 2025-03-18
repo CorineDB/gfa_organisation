@@ -71,6 +71,8 @@ onMounted(() => getSoumission());
             <template v-for="categorie in gouvernance.categories_de_gouvernance" :key="categorie.id">
               <template v-for="(sousCategorie, scIndex) in categorie.categories_de_gouvernance" :key="sousCategorie.id">
                 <template v-for="(question, qIndex) in sousCategorie.questions_de_gouvernance" :key="question.id">
+                  <!-- <pre>{{ question.reponse_de_la_collecte.preuves }}</pre> -->
+
                   <tr>
                     <!-- Première cellule de catégorie principale avec rowspan -->
                     <td class="font-semibold text-center" v-if="scIndex === 0 && qIndex === 0" :rowspan="categorie.categories_de_gouvernance.reduce((sum, sc) => sum + sc.questions_de_gouvernance.length, 0)">
@@ -83,7 +85,26 @@ onMounted(() => getSoumission());
                     <td>{{ question.nom }}</td>
                     <td class="text-center">{{ question.reponse_de_la_collecte?.nom }}</td>
                     <td class="text-right">{{ question.reponse_de_la_collecte?.point }}</td>
-                    <td class="text-center">{{ question.reponse_de_la_collecte?.sourceDeVerification }}</td>
+                    <td class="text-center">
+                      {{ question.reponse_de_la_collecte?.sourceDeVerification }}
+
+                      <div class="p-4 bg-gray-100 rounded-lg shadow-md w-72">
+                        <h2 class="text-lg font-semibold mb-3">Preuves</h2>
+                        <ul>
+                          <li v-for="(doc, index) in question.reponse_de_la_collecte.preuves" :key="index" class="p-2 bg-white rounded-md shadow-sm mb-2 hover:bg-gray-200 transition">
+                            <a :href="doc.url" download class="text-blue-500 hover:underline">
+                              {{ doc.nom }}
+                            </a>
+                          </li>
+                        </ul>
+                        <!-- <ul>
+                          <li v-for="(doc, index) in question.reponse_de_la_collecte.preuves" :key="index" class="flex justify-between items-center p-2 bg-white rounded-md shadow-sm mb-2">
+                            <span class="text-gray-700">{{ doc.nom }}</span>
+                            <a :href="doc.url" download class="px-3 py-1 bg-blue-500 text-black text-sm rounded hover:bg-blue-600 transition"> Télécharger </a>
+                          </li>
+                        </ul> -->
+                      </div>
+                    </td>
                   </tr>
                 </template>
               </template>
