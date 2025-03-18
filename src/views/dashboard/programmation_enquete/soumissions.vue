@@ -87,6 +87,9 @@ const getDatas = async () => {
   await EvaluationService.getSoumissionsEvaluation(idEvaluation)
     .then((result) => {
       datas.value = result.data.data;
+
+      console.log("membre", datas.value.factuel.comite_members);
+      localStorage.setItem("member", JSON.stringify(datas.value.factuel.comite_members));
       isLoadingData.value = false;
     })
     .catch((e) => {

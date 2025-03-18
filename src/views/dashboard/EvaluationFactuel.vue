@@ -206,6 +206,7 @@ const initializeFormData = () => {
             optionDeReponseId: question.reponse_de_la_collecte?.optionDeReponseId ?? "null",
             sourceDeVerificationId: sources.value.length > 0 ? question.reponse_de_la_collecte?.sourceDeVerificationId ?? sources.value[0]?.id : null,
             sourceDeVerification: question.reponse_de_la_collecte?.sourceDeVerification ?? " ",
+            // description: findResponse2(question.reponse_de_la_collecte?.optionDeReponseId) == "partiellement" ? "" : undefined,
             preuves: [],
           };
         });
@@ -366,6 +367,10 @@ onMounted(async () => {
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
   payload.organisationId = authUser.value.profil.id;
 
+  console.log(JSON.parse(localStorage.getItem("member")));
+
+  payload.factuel.comite_members = JSON.parse(localStorage.getItem("member"));
+
   console.log("authUser.value.profil.user.nom", authUser.value.nom);
 
   await getDataFormFactuel();
@@ -378,16 +383,6 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <!-- <div v-if="findQuestionDetails" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
-    <p class="my-3">Il vous reste {{ invalidResponses.length }} question{{ invalidResponses.length > 1 ? "s" : "" }} à compléter pour terminer le formulaire.</p> 
-
-    <h2 class="text-lg font-semibold text-gray-800">Détail de la question en attente de réponse</h2>
-    <p class="mt-2 text-gray-600"><span class="font-semibold">Type de gouvernance :</span> {{ findQuestionDetails.nom_typeGouvernance }}</p>
-    <p class="mt-1 text-gray-600"><span class="font-semibold">Principe de gouvernance :</span> {{ findQuestionDetails.nom_principe }}</p>
-    <p class="mt-1 text-gray-600"><span class="font-semibold">Critère :</span> {{ findQuestionDetails.nom_critere }}</p>
-
-    <p class="mt-1 text-gray-600"><span class="font-semibold">Question :</span> {{ findQuestionDetails.nom_question }}</p>
-  </div> -->
   <div v-if="!showModalPreview">
     <div class="flex justify-between my-4 items-center">
       <h2 class="text-lg font-medium intro-y">Evaluation factuel</h2>
@@ -407,13 +402,6 @@ onMounted(async () => {
               </ul>
             </div>
           </div>
-          <!--         <div class="min-w-[250px] flex items-center gap-3">
-          <label class="form-label">Organisations</label>
-          <TomSelect v-model="payload.organisationId" @change="changeOrganisation" :options="{ placeholder: 'Selectionez une organisation' }" class="w-full">
-            <option value=""></option>
-            <option v-for="(ong, index) in formDataFactuel.organisations" :key="index" :value="ong.id">{{ ong.nom }}</option>
-          </TomSelect>
-        </div> -->
         </div>
         <div>
           <div class="py-5 intro-x" v-if="formDataFactuel.id">
@@ -443,6 +431,7 @@ onMounted(async () => {
                                 <div class="p-2 py-3 space-y-2 border-l-8 border-yellow-500 rounded shadow box">
                                   <p class="w-full text-lg font-semibold text-center text-primary">{{ questionIndex + 1 }} - {{ question.nom }}</p>
                                   <div class="flex flex-col items-center justify-center w-full gap-3">
+                                    <pre>{{ findResponse2(responses[question.id].optionDeReponseId) }}</pre>
                                     <!-- v-for Option -->
                                     <div class="inline-flex flex-wrap items-center gap-3">
                                       <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="form-check-input" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
@@ -454,11 +443,15 @@ onMounted(async () => {
                                       </div>
                                     </div>
                                     <div class="flex items-center gap-3">
-                                      <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null'">
+                                      <!-- <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null' && !findResponse2(responses[question.id].optionDeReponseId) == 'partiellement'">
+                                        <label class="">Autre source</label>
+                                        <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
+                                      </div> -->
+                                      <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === null">
                                         <label class="">Autre source</label>
                                         <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
                                       </div>
-                                      <div v-else class="flex items-center gap-3">
+                                      <div v-else-if="responses[question.id]?.sourceDeVerificationId !== null && findResponse2(responses[question.id].optionDeReponseId) == 'oui'" class="flex items-center gap-3">
                                         <label class="">Source</label>
                                         <div class="min-w-[230px]">
                                           <TomSelect v-if="responses[question.id]?.sourceDeVerificationId" :options="{ placeholder: 'Sélectionnez une source' }" class="w-full" v-model="responses[question.id].sourceDeVerificationId">
@@ -467,8 +460,15 @@ onMounted(async () => {
                                           </TomSelect>
                                         </div>
                                       </div>
-                                      <div>
+                                      <div v-if="findResponse2(responses[question.id].optionDeReponseId) == 'oui'">
                                         <input type="file" :id="question.id" multiple :ref="question.id" @change="handleFileUpload($event, question.id)" />
+                                      </div>
+                                      <div class="flex-1" v-if="findResponse2(responses[question.id].optionDeReponseId) == 'partiellement'">
+                                        <label class="form-label" for="description">Description</label>
+                                        <div class="">
+                                          <textarea name="description" class="form-control" id="description" v-model="payload.description" cols="30" rows="3"></textarea>
+                                          <div v-if="errors.description" class="mt-2 text-danger">{{ getFieldErrors(errors.description) }}</div>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
@@ -632,7 +632,7 @@ onMounted(async () => {
         </div>
         <div class="w-full">
           <label for="contact" class="form-label">Contact <span class="text-danger">*</span> </label>
-          <input id="contact" type="text" required v-model.number="currentMember.contact" class="form-control" placeholder="Contact" />
+          <input id="contact" pattern="\d*" type="text" required v-model.number="currentMember.contact" class="form-control" placeholder="Contact" />
         </div>
       </ModalBody>
     </div>
