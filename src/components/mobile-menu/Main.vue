@@ -8,12 +8,7 @@
   >
     <div class="mobile-menu-bar">
       <a href="" class="flex mr-auto">
-        <!-- <img
-          alt="Tinker Tailwind HTML Admin Template"
-          class="w-16"
-          :src="usersProfileImage"
-        /> -->
-        <span class="ml-3 text-lg text-white"> Programme de redevabilité </span>
+        <img alt="Tinker Tailwind HTML Admin Template" class="w-6" src="@/assets/images/favicon.ico" />
       </a>
       <a href="javascript:;" class="mobile-menu-toggler">
         <BarChart2Icon class="w-8 h-8 text-white transform -rotate-90" @click="toggleMobileMenu" />
@@ -23,10 +18,10 @@
       <a href="javascript:;" class="mobile-menu-toggler">
         <XCircleIcon class="w-8 h-8 text-white transform -rotate-90" @click="toggleMobileMenu" />
       </a>
-      <ul class="py-2 scrollable__content">
+      <ul class="scrollable__content py-2">
         <!-- BEGIN: First Child -->
         <template v-for="(menu, menuKey) in formattedMenu">
-          <li v-if="menu == 'devider'" :key="menu + menuKey" class="my-6 menu__devider"></li>
+          <li v-if="menu == 'devider'" :key="menu + menuKey" class="menu__devider my-6"></li>
           <li v-else :key="menu + menuKey">
             <a
               href="javascript:;"

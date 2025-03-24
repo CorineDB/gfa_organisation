@@ -43,7 +43,7 @@ const isValidate = ref(false);
 const isLoadingDataFactuel = ref(true);
 const organisationSelected = ref(false);
 const currentPage = ref(0);
-const authUser = reactive({});
+const authUser = ref({});
 const idEvaluation = ref("");
 const currentMember = ref({
   nom: "",
@@ -520,8 +520,9 @@ onMounted(async () => {
 
   <div v-else>
     <div class="my-5">
-      <div>
+      <div class="flex justify-between">
         <h2 class="mr-auto text-base font-medium">Validation formulaire</h2>
+        <p > <span class="text-sm font-bold">Organisation:</span> {{ authUser?.nom }}</p>
       </div>
 
       <div v-if="findQuestionDetails" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
@@ -540,7 +541,6 @@ onMounted(async () => {
         <div v-if="errors['factuel.comite_members']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.comite_members"]) }}</div>
         <div v-if="errors['factuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.response_data"]) }}</div>
         <!-- <p>Organisation:  {{ findOrganisation(payload.organisationId) }}</p> -->
-        <!-- <p>Organisation: {{ authUser?.nom }}</p> -->
         <div v-if="payload.factuel.comite_members.length > 0" class="mt-3 space-y-1">
           <label class="form-label">Membres</label>
           <ul class="space-y-2">

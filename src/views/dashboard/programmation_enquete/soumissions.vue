@@ -370,6 +370,10 @@ function getPercentEvolutionOng(id) {
   return ong?.pourcentage_evolution ?? 0;
 }
 
+function deleteItem(index) {
+  invitationPayload.participants.splice(index, 1);
+}
+
 const changeOrganisationOptions = () => {
   loadingOption.value = false;
   setTimeout(() => {
@@ -802,7 +806,7 @@ onMounted(async () => {
               </form>
               <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="10" v-model.number="participant.phone" />
+                  <InputForm class="" type="text" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="10" v-model="participant.phone" />
                   <!-- <div class="">
                     <label for="Numéro de téléphone" class="form-label">Numéro de téléphone</label>
                     <input id="Numéro de téléphone" type="number" pattern="\d{1,8}" maxlength="8" required v-model.number="currentPhone" class="form-control" placeholder="Numéro de téléphone" />
@@ -814,7 +818,7 @@ onMounted(async () => {
               <div class="flex flex-wrap items-center w-full max-w-full gap-3">
                 <div class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium rounded-sm shadow cursor-pointer bg-blue text-primary" v-for="(participant, index) in invitationPayload.participants" :key="index">
                   <span>{{ participant.type_de_contact === "email" ? participant?.email : participant?.phone }}</span>
-                  <button @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
+                  <button type="button" @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
                 </div>
               </div>
             </div>

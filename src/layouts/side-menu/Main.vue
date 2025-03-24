@@ -3,14 +3,14 @@
     <!-- <DarkModeSwitcher /> -->
     <!-- <MainColorSwitcher /> -->
     <MobileMenu v-if="!isToolsPerception" />
-    <div class="flex mt-[4.7rem] md:mt-0 relative overflow-hidden">
+    <div class="flex mt-[4.7rem] md:mt-0 overflow-hidden">
       <!-- BEGIN: Side Menu -->
       <nav v-if="!isToolsPerception" class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
-        <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-wrap items-center justify-center mt-3 intro-x">
-          <h1 class="font-semibold text-white">{{ nomProgramme }}</h1>
+        <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-col items-center justify-center mt-3 intro-x">
+          <h1 class="font-semibold text-white text-center lg:text-left "> test {{ nomProgramme }}</h1>
 
           <!-- <h1 class="font-semibold text-white">Programme de redevabilité</h1> -->
-          <p>{{ currentUsers.role }}</p>
+          <p class="block">{{ currentUsers.role }}</p>
           <!-- <img alt="Programme de redevabilité" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" /> -->
         </router-link>
         <div class="my-6 side-nav__devider"></div>

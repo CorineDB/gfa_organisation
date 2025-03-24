@@ -11,13 +11,156 @@ import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import AuthService from "@/services/modules/auth.service";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { helper as $h } from "@/utils/helper";
+import SuiviFinancier from "@/services/modules/suiviFinancier.service";
+import ActiviteService from "@/services/modules/activite.service";
+import PlanDeCaissement from "@/services/modules/plan.decaissement.service";
+import PlanDeDecaissementService from "@/services/modules/plan.decaissement.service";
+
+// import SuiviFinancierService from "@/services/modules/suiviFinancier.service";
+// import SuiviFinancierService from "@/services/modules/suiviFinancier.service";
+
+// Ajout de plan de décaissement
+
+const store = useStore();
+
+// Définition des actions
+const prolongerDureeActivite = async (payload) => {
+  await store.dispatch("activites/PROLONGER_DATE", payload);
+};
+
+const storePlanDecaissement = async (payload) => {
+  await store.dispatch("planDeDecaissements/STORE_PLAN_DE_DECAISSEMENT", payload);
+};
+
+// ...mapActions({
+//       // Mapping des actions pour le module activites
+//       prolongerDureeActivite: "activites/PROLONGER_DATE",
+//       // Mapping des actions pour le module planDeDecaissements
+//       storePlanDecaissement: "planDeDecaissements/STORE_PLAN_DE_DECAISSEMENT",
+//     }),
+
+const erreurPlanDeDecaissement = ref(null);
+const planDeDecaissement = ref([]);
+const loadingPlanDeDecaissement = ref(false);
+const showModalPlanDeDecaissement = ref(false);
+
+const getCurrentQuarter = function () {
+  const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
+  return Math.ceil(month / 3); // Calcul du trimestre actuel
+};
+
+const planDeDecaissementPayload = ref({
+  activiteId: null,
+  trimestre: getCurrentQuarter(), // Trimestre actuel
+  annee: new Date().getFullYear(), // Set current year as default
+  budgetNational: 0,
+  pret: 0,
+});
+
+const removePlanDeDecaissement = function (index) {
+  planDeDecaissement.value.splice(index, 1);
+};
+
+const planDeDecaissementActivite = async function () {
+  loadingPlanDeDecaissement.value = true;
+
+  let errorIndex = [];
+
+  for (let index = 0; index < planDeDecaissement.value.length; index++) {
+    let plan = listePlanDeDecaissement.value.filter((plan) => plan.annee == planDeDecaissement.value[index].annee && plan.trimestre == planDeDecaissement.value[index].trimestre);
+
+    const action = plan.length > 0 ? PlanDeCaissement.update(plan[0].id, planDeDecaissement.value[index]) : PlanDeDecaissementService.create(planDeDecaissement.value[index]);
+
+    try {
+      await action;
+
+      toast.success(`Plan  de decaissement n° ${index + 1} enrégistré avec succès`);
+
+      errorIndex.push(index);
+
+      if (index === planDeDecaissement.value.length - 1) {
+        showModalPlanDeDecaissement.value = false;
+
+        setTimeout(() => {
+          this.planDeDecaissement = [];
+        }, 500);
+      }
+    } catch (error) {
+      loadingPlanDeDecaissement.value = false;
+
+      // Mettre à jour les messages d'erreurs dynamiquement
+      if (error.response && error.response.data && error.response.data.errors.length > 0) {
+        erreurPlanDeDecaissement.value = error.response.data.errors;
+        toast.error("Une erreur s'est produite dans votre formualaire");
+      } else {
+        toast.error(`Plan ${index + 1} : ${error.response.data.message}`);
+      }
+    } finally {
+      loadingPlanDeDecaissement.value = false;
+      getListePlanDeDecaissement(planDeDecaissement.value[0].activiteId);
+    }
+
+    if (planDeDecaissement.value.length > 0) {
+      if (errorIndex.length > 0) {
+        errorIndex.forEach((item) => {
+          removePlan(item);
+        });
+      }
+    }
+  }
+};
+
+const loaderListePlan = ref(false);
+
+const listePlanDeDecaissement = ref([]);
+
+const getListePlanDeDecaissement = (id) => {
+  loaderListePlan.value = true;
+
+  ActiviteService.plansDeDecaissement(id)
+    .then((data) => {
+      loaderListePlan.value = false;
+      //console.log(data.data.data);
+      listePlanDeDecaissement.value = data.data.data;
+
+      // console.log("listePlanDeDecaissement.value", listePlanDeDecaissement);
+    })
+    .catch((error) => {
+      loaderListePlan.value = false;
+      //console.log(error);
+    });
+};
+
+const ouvrirModalPlanDeDecaissementActivite = function (data) {
+  console.log(data);
+
+  planDeDecaissement.value = [];
+
+  const newItem = {
+    activiteId: data.activite.id,
+    trimestre: this.getCurrentQuarter(),
+    annee: new Date().getFullYear(),
+    budgetNational: 0,
+    pret: 0,
+    id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+  };
+
+  getListePlanDeDecaissement(data.activite.id);
+
+  showModalPlanDeDecaissement.value = true;
+  planDeDecaissementPayload.value.activiteId = data.activite.id;
+  planDeDecaissement.value.push(planDeDecaissementPayload.value);
+  showModalPlanDeDecaissement.value = true;
+};
 
 const router = useRouter();
 const showModalFiltre = ref(false);
 const annees = ref("");
 const filterPayload = reactive({
-  trimestre: 1, // Trimestre actuel
-  annee: new Date().getFullYear(), // Set current year as default
+  trimestre: getCurrentQuarter(),
+  annee: new Date().getFullYear(),
 });
 const isLoadingFilter = ref(false);
 
@@ -27,7 +170,7 @@ const suiviFinancierPayload = reactive({
   trimestre: 1, // Trimestre actuel
   annee: new Date().getFullYear(), // Set current year as default
   consommer: 0,
-  type: 0,
+  // type: 0,
 });
 
 const resetFilter = function () {
@@ -37,15 +180,35 @@ const resetFilter = function () {
   filterSuiviFinancierActivite();
 };
 
-// const annees = computed(() => {
-//   let anneeDebut = parseInt(debutProgramme.value.split("-")[0], 10);
-//   let anneeFin = parseInt(finProgramme.value.split("-")[0], 10);
-//   let annees = [];
-//   for (let annee = anneeDebut; annee <= anneeFin; annee++) {
-//     annees.push(annee);
-//   }
-//   return annees;
-// });
+const getPlageActivitePlan = computed(() => {
+  let obj = null;
+
+  if (planDeDecaissementPayload.value.activiteId !== "") {
+    obj = datas.value.suiviFinanciers?.find((item) => item.activite.id === planDeDecaissementPayload.value.activiteId);
+  }
+
+  console.log("obj", obj);
+
+  return obj ? obj : null;
+  // Retourne le nom ou `null` si non trouvé
+});
+
+const getPlageActivite = computed(() => {
+  let obj = null;
+
+  console.log("payload.activiteId", payload.activiteId);
+
+  console.log("datas.value.suiviFinanciers", datas.value.suiviFinanciers);
+
+  if (suiviFinancierPayload.activiteId !== "") {
+    obj = datas.value.suiviFinanciers?.find((item) => item.activite.id === suiviFinancierPayload.activiteId);
+  }
+
+  console.log("obj", obj);
+
+  return obj ? obj : null;
+  // Retourne le nom ou `null` si non trouvé
+});
 
 const showModalSuiviFinancier = ref(false);
 const loadingSuiviFinancier = ref(false);
@@ -244,7 +407,7 @@ const initTabulator = () => {
 const handleDetail = (data) => {
   // console.log("handleDetail id", id);
   router.push({
-    name: "detail_suivi",
+    name: "Détail du suivi financier",
     params: { id: data.activite.id },
   });
 };
@@ -280,15 +443,77 @@ const openCreateModal = () => {
   isCreate.value = true;
 };
 
-const getCurrentQuarter = () => {
-  const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
-  return Math.ceil(month / 3); // Calcul du trimestre actuel
+// const getCurrentQuarter = () => {
+//   const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
+//   return Math.ceil(month / 3); // Calcul du trimestre actuel
+// };
+
+const loaderListeSuivi = ref(false);
+const listeSuivi = ref([]);
+const tableauListeSuivi = ref([]);
+
+const filterSuiviFinancierActiviteParAnnee = async function (id, payload, index) {
+  loaderListeSuivi.value = true;
+
+  await SuiviFinancier.getSuiviByActivite(id, payload)
+    .then((data) => {
+      loaderListeSuivi.value = false;
+
+      console.log(data.data.data);
+
+      listeSuivi.value = data.data.data;
+
+      tableauListeSuivi.value[index] = listeSuivi.value;
+
+      console.log("tableauListeSuivi.value", tableauListeSuivi.value);
+    })
+    .catch((error) => {
+      loaderListeSuivi.value = false;
+      //console.log(error);
+    });
+};
+
+const miseAjourTabSuivi = function (id, payLoad, index) {
+  console.log("payLoad.length", payLoad.length);
+  console.log("index", index);
+
+  let taille = payLoad.length;
+
+  console.log("tableauListeSuivi[index]", tableauListeSuivi.value[index]);
+
+  let form = {
+    trimestre: taille < 2 ? payLoad : suiviFinancier.value[index].trimestre,
+    annee: taille > 1 ? payLoad : suiviFinancier.value[index].annee,
+  };
+
+  console.log("form", form);
+
+  filterSuiviFinancierActiviteParAnnee(id, form, index);
 };
 
 const ouvrirModalSuiviFinancierActivite = (item) => {
+  suiviFinancier.value = [];
+  console.log(item);
+  const newItem = {
+    activiteId: item.activite.id,
+    trimestre: getCurrentQuarter(),
+    annee: new Date().getFullYear(),
+    consommer: 0,
+    id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+  };
+
+  let payLoad = {
+    trimestre: getCurrentQuarter(),
+    annee: new Date().getFullYear(),
+  };
+
+  console.log("item.id", item.activiteId);
+
+  filterSuiviFinancierActiviteParAnnee(item.activite.id, payLoad, 0);
+
   suiviFinancierPayload.activiteId = item.activite.id;
   suiviFinancierPayload.trimestre = getCurrentQuarter();
-  suiviFinancier.value.push(suiviFinancierPayload);
+  suiviFinancier.value.push(newItem);
   showModalSuiviFinancier.value = true;
 };
 
@@ -296,40 +521,118 @@ const resetModalSuiviFinancierActivite = (item) => {
   suiviFinancier.value = [];
   showModalSuiviFinancier.value = false;
 };
-
 const addPlan = () => {
-  suiviFinancier.value.push(suiviFinancierPayload);
+  const newItem = {
+    activiteId: planDeDecaissementPayload.value.activiteId,
+    trimestre: 1, // Trimestre actuel
+    annee: new Date().getFullYear(), // Set current year as default
+    budgetNational: 0,
+    pret: 0,
+    id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+  };
+  planDeDecaissement.value.push(newItem);
+};
+
+const addSuivi = function () {
+  const newItem = {
+    activiteId: suiviFinancier.value[0].activiteId,
+    trimestre: getCurrentQuarter(),
+    annee: new Date().getFullYear(),
+    consommer: 0,
+
+    id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+  };
+  suiviFinancier.value.push(newItem);
+
+  let payLoad = {
+    trimestre: getCurrentQuarter(),
+    annee: new Date().getFullYear(),
+  };
+
+  console.log("suiviFinancierPayload.id", suiviFinancierPayload.id);
+
+  console.log("suiviFinancier.value.length - 1", suiviFinancier.value.length - 1);
+
+  filterSuiviFinancierActiviteParAnnee(suiviFinancier.value[0].activiteId, payLoad, suiviFinancier.value.length - 1);
 };
 
 const removePlan = (index) => {
   suiviFinancier.value.splice(index, 1);
 };
 
-const suiviFinancierActivite = () => {
+const removeSuivi = (index) => {
+  suiviFinancier.value.splice(index, 1);
+};
+
+const suiviFinancierActivite = async () => {
   loadingSuiviFinancier.value = true;
 
+  let errorIndex = [];
+
+  console.log("suiviFinancier.value.length", suiviFinancier.value.length);
+
   for (let index = 0; index < suiviFinancier.value.length; index++) {
-    SuiviFinancierService.create(suiviFinancier.value[index])
-      .then(() => {
-        loadingSuiviFinancier.value = false;
-        toast.success("Suivi Financier créer.");
-        resetModalSuiviFinancierActivite();
-        showModalSuiviFinancier.value = false;
-        getDatas();
-      })
-      .catch((error) => {
-        console.log(error);
-        loadingSuiviFinancier.value = false;
+    console.log("tableauListeSuivi.value", tableauListeSuivi.value);
 
-        toast.error("Une erreur s'est produite");
+    console.log("suiviFinancier.value[index]", suiviFinancier.value[index]);
 
-        // Mettre à jour les messages d'erreurs dynamiquement
-        if (error.response && error.response.data && error.response.data.errors) {
-          erreurSuiviFinancier.value = error.response.data.errors;
-        } else {
-          toast.error(error.response.data.errors.message);
-        }
-      });
+    let suivi = tableauListeSuivi.value.filter((suivi) => suivi.annee == suiviFinancier.value[index].annee && suivi.trimestre == suiviFinancier.value[index].trimestre);
+
+    console.log("suivi", suivi);
+
+    console.log("suivi.length", suivi.length);
+
+    // console.log("suivi[0]?.id", suivi[0]?.id);
+
+    const action = suivi.length > 0 ? SuiviFinancier.update(suivi[0]?.id, suiviFinancier.value[index]) : SuiviFinancierService.create(suiviFinancier.value[index]);
+
+    try {
+      await action;
+
+      toast.success(`Suivi financier n° ${index + 1} enrégistré avec succès`);
+
+      errorIndex.push(index);
+
+      console.log("index === suiviFinancier.value.length - 1", index === suiviFinancier.value.length - 1);
+
+      if (index === suiviFinancier.value.length - 1) {
+        showModalSuiviFinancier = false;
+
+        setTimeout(() => {
+          planDeDecaissement = [];
+        }, 500);
+      }
+
+      // getDatas();
+      // getDatasCadre();
+      // resetForm();
+    } catch (error) {
+      console.log("error", error);
+
+      loadingSuiviFinancier.value = false;
+
+      // Mettre à jour les messages d'erreurs dynamiquement
+      if (error.response && error.response.data && error.response.data.errors.length > 0) {
+        erreurSuiviFinancier = error.response.data.errors;
+        toast.error("Une erreur s'est produite dans votre formualaire");
+      } else {
+        toast.error(`Suivi ${index + 1} : ${error.response.data.message}`);
+      }
+    } finally {
+      loadingSuiviFinancier.value = false;
+      // getListePlanDeDecaissement(suiviFinancier.value[0].activiteId);
+    }
+
+    if (suiviFinancier.value.length > 0) {
+      console.log("suiviFinancier.value", suiviFinancier.value);
+
+      if (errorIndex.length > 0) {
+        console.log("errorIndex", errorIndex);
+        errorIndex.forEach((item) => {
+          removeSuivi(item);
+        });
+      }
+    }
   }
 };
 
@@ -352,8 +655,6 @@ const filterSuiviFinancierActivite = async () => {
   await SuiviFinancierService.filtre(filterPayload)
     .then((result) => {
       datas.value = result.data.data;
-      console.log(datas.value);
-      isLoadingFilter.value = false;
       resetFilterModal();
       toast.success("Suivi Financier filtrer.");
     })
@@ -366,20 +667,14 @@ const filterSuiviFinancierActivite = async () => {
 
 const resetFilterModal = () => {
   isLoadingFilter.value = false;
-  annees.value = "";
   showModalFiltre.value = false;
+  filterPayload.trimestre = getCurrentQuarter();
+  filterPayload.annee = new Date().getFullYear();
 };
 
 onMounted(() => {
-  // var anneeActuelle = new Date().getFullYear() + 5;
-  // let i = 0;
-  // for (var annee = 2016; annee <= anneeActuelle; annee++) {
-  //   i++;
-  //   years.value.push({ nom: `${annee}` });
-  // }
-
   getDatas();
-  getactivites(new Date().getFullYear());
+
   getcurrentUser();
 });
 </script>
@@ -395,17 +690,12 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openFilterModal"><FilterIcon class="w-4 h-4 mr-3" />Filtrer le PA</button>
+        <button class="mr-2 shadow-md btn btn-primary" @click="openFilterModal"><FilterIcon class="w-4 h-4 mr-3" />Filtrer le suivi financier</button>
 
         <button class="btn btn-primary" title="Réinitialiser le filtre" @click="resetFilter()">
           <RefreshCwIcon class="w-5 h-5" />
         </button>
       </div>
-      <!-- <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openCreateModal">
-          <PlusIcon class="w-4 h-4 mr-3" />Ajouter un Suivi Financier
-        </button>
-      </div> -->
     </div>
   </div>
 
@@ -430,97 +720,112 @@ onMounted(() => {
         </Dropdown>
       </div>
     </div>
-    <!-- <div class="overflow-x-auto scrollbar-hidden" v-if="!isLoadingData">
-      <div id="tabulator" class="mt-5 table-report table-report--tabulator"></div>
-    </div> -->
+
     <div>
       <div class="border my-4 rounded-lg border-gray-300 shadow-md" v-if="!isLoadingData">
         <!-- suivi budgetaire  current -->
         <div class="current">
-          <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead class="text-xs text-gray-700 uppercase bg-blue-100 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Activités</th>
-                  <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Année</th>
-                  <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Trimestre</th>
-                  <th scope="col" colspan="4" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Période</th>
-                  <th scope="col" colspan="4" class="py-3 px-6 text-center border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Exercice</th>
-                  <th scope="col" colspan="4" class="py-3 px-6 text-center border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Cumul</th>
-                  <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap text-center">Actions</th>
-                </tr>
-                <tr>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
-                  <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(suivi, index) in datas.suiviFinanciers" :key="index" class="bg-white border-b hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi?.activite?.codePta }}-{{ suivi?.activite?.nom }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.annee }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.trimestre }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.periode.budjet) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.periode.consommer) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.periode.disponible) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.periode.pourcentage }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.exercice.budjet) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.exercice.consommer) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.exercice.disponible) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.exercice.pourcentage }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.cumul.budjet) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.cumul.consommer) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ $h.formatCurrency(suivi.cumul.disponible) }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                    <span class="font-bold">{{ suivi.cumul.pourcentage }}</span>
-                  </td>
-                  <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700 text-center">
-                    <button @click="ouvrirModalSuiviFinancierActivite(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Suivre</button>
+          <div class="overflow-y-auto overflow-x-auto flex relative shadow-md sm:rounded-lg">
+            <div style="width: 20%; position: sticky; left: 0; background: transparent; z-index: 1; margin-right: 1%">
+              <table class="top-0 left-0 block w-full text-sm text-left table-fixed border-collaspe table1">
+                <thead class="sticky top-0 z-20 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr style="height: 82px">
+                    <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Activités</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="height: 49px" v-for="(suivi, index) in datas.suiviFinanciers" :key="index" class="bg-white border-b hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi?.activite?.codePta }}-{{ suivi?.activite?.nom }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-                    <button @click="handleDetail(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Voir détail</button>
+            <div class="absolute shadow-md perso left-[150px] sm:rounded-lg">
+              <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="sticky top-0 text-xs text-gray-700 uppercase _z-20 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Année</th>
+                    <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Trimestre</th>
+                    <th scope="col" colspan="4" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Période</th>
+                    <th scope="col" colspan="4" class="py-3 px-6 text-center border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Exercice</th>
+                    <th scope="col" colspan="4" class="py-3 px-6 text-center border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Cumul</th>
+                    <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap text-center">Actions</th>
+                  </tr>
+                  <tr>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
+                    <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(suivi, index) in datas.suiviFinanciers" :key="index" class="bg-white border-b hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.annee }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.trimestre }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.periode.budget == null || suivi.periode.budget == 0 ? 0 : $h.formatCurrency(suivi.periode.budget) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.periode.consommer == null || suivi.periode.consommer == 0 ? 0 : $h.formatCurrency(suivi.periode.consommer) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.periode.disponible == null || suivi.periode.disponible == 0 ? 0 : $h.formatCurrency(suivi.periode.disponible) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.periode.pourcentage }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.exercice.budget == null || suivi.exercice.budget == 0 ? 0 : $h.formatCurrency(suivi.exercice.budget) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.exercice.consommer == null || suivi.exercice.consommer == 0 ? 0 : $h.formatCurrency(suivi.exercice.consommer) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.exercice.disponible == null || suivi.exercice.disponible == 0 ? 0 : $h.formatCurrency(suivi.exercice.disponible) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.exercice.pourcentage }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.cumul.budget == null || suivi.cumul.budget == 0 ? 0 : $h.formatCurrency(suivi.cumul.budget) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.cumul.consommer == null || suivi.cumul.consommer == 0 ? 0 : $h.formatCurrency(suivi.cumul.consommer) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.cumul.disponible == null || suivi.cumul.disponible == 0 ? 0 : $h.formatCurrency(suivi.cumul.disponible) }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                      <span class="font-bold">{{ suivi.cumul.pourcentage }}</span>
+                    </td>
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700 text-center">
+                      <button @click="ouvrirModalSuiviFinancierActivite(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Suivre</button>
 
-                    <button @click="handleDelete(suivi)" class="text-white bg-red-500 hover:bg-red-600 font-medium rounded-lg text-xs px-4 py-2">Supprimer</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                      <button @click="handleDetail(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Voir détail</button>
+
+                      <button @click="ouvrirModalPlanDeDecaissementActivite(suivi)" title="Ajouter un plan de décaissement" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Ajouter un Plan de décaissement</button>
+
+                      <!-- <button @click="handleDelete(suivi)" class="text-white bg-red-500 hover:bg-red-600 font-medium rounded-lg text-xs px-4 py-2">Supprimer</button> -->
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -529,57 +834,88 @@ onMounted(() => {
     <LoaderSnipper v-if="isLoadingData" />
   </div>
 
-  <!-- Modal Register & Update -->
-  <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
+  <Modal backdrop="static" :show="showModalPlanDeDecaissement" @hidden="showModalPlanDeDecaissement = false">
     <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">{{ mode }} un Suivi Financier</h2>
+      <h2 class="mr-auto text-base font-medium">Plan de décaissement</h2>
     </ModalHeader>
-    <form @submit.prevent="submitData">
-      <ModalBody>
-        <div class="grid grid-cols-1 gap-4">
-          <InputForm label="Consommé" v-model="payload.consommer" />
-          <div class="">
-            <label class="form-label">Sources</label>
-            <TomSelect v-model="payload.type" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
-              <option value="0">Montant financé</option>
-              <option value="1">Fond Propre</option>
-            </TomSelect>
-          </div>
-          <!-- <pre>{{years}}</pre> -->
-          <div class="">
+
+    <form @submit.prevent="planDeDecaissementActivite">
+      <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
+        <div v-for="(plan, index) in planDeDecaissement" :key="plan.id" class="col-span-12 border-b pb-4 mb-4">
+          <h3 class="text-sm font-medium mb-2">Plan {{ index + 1 }}</h3>
+
+          <div class="col-span-12 mt-3">
             <label class="form-label">Année</label>
-            <TomSelect v-model="payload.annee" @change="handleInput(payload.annee)" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
-              <option v-for="(year, index) in years" :key="index" :value="year.nom">{{ year.nom }}</option>
+            <TomSelect v-model="plan.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
+              <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
-            <pre></pre>
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+              {{ erreurPlanDeDecaissement[index].trimestre }}
+            </p>
           </div>
 
-          <div class="">
-            <label class="form-label">Activités</label>
-            <TomSelect v-model="payload.activiteId" :options="{ placeholder: 'Selectionez une unité de mesure' }" class="w-full">
-              <option v-for="(unite, index) in activites" :key="index" :value="unite.id">{{ unite.nom }}</option>
-            </TomSelect>
-          </div>
-          <div class="">
-            <label class="form-label">Trimestre</label>
-            <TomSelect v-model="payload.trimestre" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
+          <!-- <InputForm v-model="plan.annee" :min="2000" class="col-span-12" type="number" :required="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
+          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.annee">
+            {{ erreurPlanDeDecaissement[index].annee }}
+          </p> -->
+
+          <div class="w-full mt-3">
+            <label class="form-label">Sélectionnez le trimestre</label>
+            <TomSelect v-model="plan.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full">
               <option value="1">Trimestre 1</option>
               <option value="2">Trimestre 2</option>
               <option value="3">Trimestre 3</option>
               <option value="4">Trimestre 4</option>
             </TomSelect>
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+              {{ erreurPlanDeDecaissement[index].trimestre }}
+            </p>
+          </div>
+
+          <!-- <InputForm v-model="plan.trimestre" :min="1" :max="4" class="col-span-12" type="number" :required="true" placeHolder="Sélectionnez le trimestre" label="Sélectionnez le trimestre" />
+          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
+            {{ erreurPlanDeDecaissement[index].trimestre }}
+          </p> -->
+
+          <InputForm v-model="plan.budgetNational" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Saisissez le fond propre" />
+          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.budgetNational">
+            {{ erreurPlanDeDecaissement[index].budgetNational }}
+          </p>
+
+          <InputForm v-model="plan.pret" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez le montant financé" label="Saisissez le montant financé" />
+          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.pret">
+            {{ erreurPlanDeDecaissement[index].pret }}
+          </p>
+
+          <button type="button" @click="removePlan(index)" class="mt-2 text-red-600 text-sm underline">Supprimer ce plan</button>
+
+          <div class="col-span-12" v-if="getPlageActivite">
+            <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivite.durees" :key="t">
+              <ClockIcon class="w-4 h-4 mr-2" />
+              <div>
+                Plage de date {{ getPlageActivite.durees.length + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].fin) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="getPlageProjet" class="flex items-center mt-2 col-span-12">
+            <ClockIcon class="w-4 h-4 mr-2" />
+            <div>
+              Durée du projet : Du <span class="px-1 font-bold"> {{ $h.reformatDate(getPlageProjet.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageProjet.fin) }}</span>
+            </div>
           </div>
         </div>
+
+        <button type="button" @click="addPlan" class="col-span-12 btn btn-outline-primary">Ajouter un autre plan</button>
       </ModalBody>
       <ModalFooter>
-        <div class="flex gap-2">
-          <button type="button" @click="resetForm" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
-          <VButton :loading="isLoading" :label="mode" />
+        <div class="flex items-center justify-center">
+          <button type="button" @click="showModalPlanDeDecaissement = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+          <VButton class="inline-block" label="Enregistrer" :loading="loadingPlanDeDecaissement" :type="submit" :disabled="loaderListePlan" />
         </div>
       </ModalFooter>
     </form>
   </Modal>
-  <!-- End Modal -->
 
   <!-- Modal Delete -->
   <Modal :show="deleteModalPreview" @hidden="deleteModalPreview = false">
@@ -604,43 +940,70 @@ onMounted(() => {
 
     <form @submit.prevent="suiviFinancierActivite">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-        <div v-for="(plan, index) in suiviFinancier" :key="index" class="col-span-12 border-b pb-4 mb-4">
+        <pre>{{ suiviFinancier }}</pre>
+        <div v-for="(suivi, index) in suiviFinancier" :key="index" class="col-span-12 border-b pb-4 mb-4">
           <h3 class="text-sm font-medium mb-3">Plan {{ index + 1 }}</h3>
 
           <div class="">
-            <InputForm label="Consommé" v-model="plan.consommer" type="number" />
+            <InputForm label="Consommé" v-model="suivi.consommer" type="number" />
 
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.consommer">
               {{ erreurSuiviFinancier[index].consommer }}
             </p>
           </div>
 
-          <div class="mt-5">
-            <label class="form-label">Sources</label>
-            <TomSelect v-model="plan.type" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
-              <option value="0">Fond propre</option>
-              <option value="1">Budget Alloue</option>
-            </TomSelect>
-          </div>
+          <!-- <div class="mt-5">
+            <InputForm v-model="suivi.trimestre" :min="1" :max="4" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Sélectionnez le trimestre" label="Sélectionnez le trimestre" />
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+              {{ erreurSuiviFinancier[index].trimestre }}
+            </p>
+          </div> -->
 
-          <div class="mt-5">
-            <InputForm v-model="plan.trimestre" :min="1" :max="4" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Sélectionnez le trimestre" label="Sélectionnez le trimestre" />
+          <div class="w-full mt-3">
+            <label class="form-label">Sélectionnez le trimestre</label>
+            <TomSelect v-model="suivi.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full" @change="miseAjourTabSuivi(suivi.activiteId, suivi.trimestre, index)">
+              <option value="1">Trimestre 1</option>
+              <option value="2">Trimestre 2</option>
+              <option value="3">Trimestre 3</option>
+              <option value="4">Trimestre 4</option>
+            </TomSelect>
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
               {{ erreurSuiviFinancier[index].trimestre }}
             </p>
           </div>
 
-          <div class="mt-5">
-            <InputForm v-model="plan.annee" :min="2000" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
+          <!-- <div class="mt-5">
+            <InputForm v-model="suivi.annee" :min="2000" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.annee">
               {{ erreurSuiviFinancier[index].annee }}
             </p>
+          </div> -->
+
+          <div class="col-span-12 mt-3">
+            <label class="form-label">Année</label>
+            <TomSelect v-model="suivi.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full" @change="miseAjourTabSuivi(suivi.activiteId, suivi.annee, index)">
+              <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
+            </TomSelect>
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+              {{ erreurSuiviFinancier[index].trimestre }}
+            </p>
           </div>
 
-          <button type="button" @click="removePlan(index)" class="mt-2 text-red-600 text-sm underline">Supprimer ce suivi</button>
+          <!-- <pre>getPlageActivite :{{ getPlageActivite.activite }}</pre> -->
+
+          <button type="button" @click="removeSuivi(index)" class="mt-2 text-red-600 text-sm underline">Supprimer ce suivi</button>
         </div>
 
-        <button type="button" @click="addPlan" class="col-span-12 btn btn-outline-primary">Ajouter un autre suivi</button>
+        <button type="button" @click="addSuivi" class="col-span-12 btn btn-outline-primary">Ajouter un autre suivi</button>
+
+        <div class="col-span-12" v-if="getPlageActivite">
+          <div class="flex items-center mt-2">
+            <ClockIcon class="w-4 h-4 mr-2" />
+            <div>
+              Durée de l'activité : Du <span class="px-1 font-bold"> {{ $h.reformatDate(getPlageActivite.activite.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageActivite.activite.fin) }}</span>
+            </div>
+          </div>
+        </div>
       </ModalBody>
       <ModalFooter>
         <div class="flex items-center justify-center">
