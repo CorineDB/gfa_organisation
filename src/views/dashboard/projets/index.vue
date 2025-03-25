@@ -527,7 +527,7 @@ export default {
       };
 
       localStorage.setItem("profondeurProjet", JSON.stringify(profondeurProjet));
-      this.$router.push({ name: "dashboard_projets_composantes_globale" });
+      this.$router.push({ name: "composantes_globale" });
     },
 
     active() {

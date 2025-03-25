@@ -116,27 +116,27 @@ const routes = [
       {
         path: "projets/composantes-globale",
         component: dashboard_projets_composantes_globale,
-        name: "dashboard_projets_composantes_globale",
+        name: "composantes_globale",
       },
       {
         path: "/dashboard/projets/sous-composantes-globale",
         component: dashboard_projets_sous_composantes_globale,
-        name: "dashboard_projets_sous_composantes_globale",
+        name: "sous_composantes_globale",
       },
       {
         path: "projets/activites-globale",
         component: dashboard_projets_activites_globale,
 
-        name: "dashboard_projets_activites_globale",
+        name: "activites_globale",
       },
       {
         path: "projets/taches-globale",
         component: dashboard_projets_taches_globale,
-        name: "dashboard_projets_taches_globale",
+        name: "taches_globale",
       },
       {
         path: "indicateurs",
-        name: "create_indicateur",
+        name: "indicateur",
         component: CreateIndicateur,
       },
       {

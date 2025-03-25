@@ -14,12 +14,15 @@
     <!-- toast notification -->
     <!-- BEGIN: Breadcrumb -->
 
-    <nav aria-label="breadcrumb" class="hidden mr-auto -intro-x sm:flex">
+    <!-- <nav aria-label="breadcrumb" class="hidden mr-auto -intro-x sm:flex">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">Application</a></li>
         <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
       </ol>
-    </nav>
+    </nav> -->
+
+    <Breadcrumb />
+
 
    
 
@@ -69,6 +72,7 @@ import { ref, reactive, onMounted, provide } from "vue";
 import { useAuthStore } from "@/stores/modules/authentification";
 import AuthentificationService from "@/services/modules/auth.service";
 import { useRouter, useRoute } from "vue-router";
+import Breadcrumb from "../Breadcrumb.vue";
 import { API_BASE_URL } from "@/services/configs/environment";
 const router = useRouter();
 const route = useRoute();

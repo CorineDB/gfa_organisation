@@ -6,7 +6,7 @@ export const useTopMenuStore = defineStore("topMenu", {
       // {
       //   icon: "HomeIcon",
       //   pageName: "top-menu-dashboard",
-      //   title: "Dashboard",
+      //   title:"DashboardGfa",
       //   subMenu: [
       //     {
       //       icon: "",
@@ -35,7 +35,7 @@ export const useTopMenuStore = defineStore("topMenu", {
       //   pageName: "top-menu-menu-layout",
       //   title: "Menu Layout",
       //   subMenu: [
-      //    
+      //
       //     {
       //       icon: "",
       //       pageName: "simple-menu-dashboard-overview-1",
@@ -493,7 +493,7 @@ export const useTopMenuStore = defineStore("topMenu", {
         pageName: "DashboardGfa",
         title: "Dashboard GFA",
       },
-     
+
       {
         icon: "CpuIcon",
         pageName: "Anos",
@@ -570,7 +570,7 @@ export const useTopMenuStore = defineStore("topMenu", {
         icon: "UsersIcon",
         pageName: "Utilisateur",
         title: "Utilisateurs",
-      }
+      },
     ],
   }),
 });

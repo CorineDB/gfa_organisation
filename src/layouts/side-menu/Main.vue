@@ -7,7 +7,7 @@
       <!-- BEGIN: Side Menu -->
       <nav v-if="!isToolsPerception" class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
         <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-col items-center justify-center mt-3 intro-x">
-          <h1 class="font-semibold text-white text-center lg:text-left "> test {{ nomProgramme }}</h1>
+          <h1 class="font-semibold text-white text-center lg:text-left">test {{ nomProgramme }}</h1>
 
           <!-- <h1 class="font-semibold text-white">Programme de redevabilité</h1> -->
           <p class="block">{{ currentUsers.role }}</p>
@@ -162,7 +162,7 @@ const updatedMenu = () => {
     //   updateMenu.push(element);
     // }
 
-    // if (element.title == "Dashboard") {
+    // if (element.title =="DashboardGfa") {
     //   updateMenu.push(element);
     // }
 
@@ -342,7 +342,7 @@ const updatedMenu = () => {
     //   // this.maitriseOeuvreVisible = true;
     // }
 
-    // if (element.title == "Dashboard") {
+    // if (element.title =="DashboardGfa") {
     //   if ($h.getPermission("read.statistique")) {
     //     updateMenu.push(element);
     //   }
