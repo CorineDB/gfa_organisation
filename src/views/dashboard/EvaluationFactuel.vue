@@ -53,6 +53,7 @@ const currentMember = ref({
 const sources = ref([]);
 const errors = ref({});
 
+
 const getDataFormFactuel = async () => {
   try {
     const { data } = await EvaluationService.getFactuelFormEvaluation(token);
@@ -278,6 +279,39 @@ const findOrganisation = (id) => {
 
   return "";
 };
+
+const getRemainingQuestions = () => {
+  return Object.entries(responses).filter(([index, data]) => {
+    console.log(data.optionDeReponseId)
+    return data.optionDeReponseId === null || (findResponse2(data.optionDeReponseId) === "oui" && data.preuves.length === 0);
+  });
+};
+
+const getFirstRemainingQuestionDetails = () => {
+  const remainingQuestions = getRemainingQuestions();
+  if (remainingQuestions.length === 0) return null;
+
+  const [index, data] = remainingQuestions[0];
+
+  for (const type_gouvernance of formulaireFactuel.value.categories_de_gouvernance) {
+    for (const principe of type_gouvernance.categories_de_gouvernance) {
+      for (const critere of principe.categories_de_gouvernance) {
+        for (const question of critere.questions_de_gouvernance) {
+          if (question.id === data.questionId) {
+            return {
+              nom_typeGouvernance: type_gouvernance.nom,
+              nom_principe: principe.nom,
+              nom_critere: critere.nom,
+              nom_question: question.nom,
+            };
+          }
+        }
+      }
+    }
+  }
+  return null;
+};
+
 const findResponse = (id) => {
   if (formulaireFactuel.value.options_de_reponse) {
     const response = formulaireFactuel.value.options_de_reponse.find((response) => response.id === id);
@@ -369,7 +403,13 @@ onMounted(async () => {
 
   console.log(JSON.parse(localStorage.getItem("member")));
 
-  payload.factuel.comite_members = JSON.parse(localStorage.getItem("member"));
+  if (localStorage.getItem("member")) {
+    payload.factuel.comite_members = JSON.parse(localStorage.getItem("member"));
+  } else {
+    payload.factuel.comite_members = [];
+  }
+
+  // payload.factuel.comite_members = JSON.parse(localStorage.getItem("member"));
 
   console.log("authUser.value.profil.user.nom", authUser.value.nom);
 
@@ -384,6 +424,18 @@ onMounted(async () => {
 </script>
 <template>
   <div v-if="!showModalPreview">
+    <pre>{{  getRemainingQuestions }}</pre>
+    <div v-if="getRemainingQuestions().length > 0" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
+      <p class="my-3">Il vous reste {{ getRemainingQuestions().length }} question{{ getRemainingQuestions().length > 1 ? "s" : "" }} à compléter pour terminer le formulaire.</p>
+
+      <!-- <h2 class="text-lg font-semibold text-gray-800">Détail de la question en attente de réponse</h2>
+      <div v-if="getFirstRemainingQuestionDetails()">
+        <p class="mt-2 text-gray-600"><span class="font-semibold">Type de gouvernance :</span> {{ getFirstRemainingQuestionDetails().nom_typeGouvernance }}</p>
+        <p class="mt-1 text-gray-600"><span class="font-semibold">Principe de gouvernance :</span> {{ getFirstRemainingQuestionDetails().nom_principe }}</p>
+        <p class="mt-1 text-gray-600"><span class="font-semibold">Critère :</span> {{ getFirstRemainingQuestionDetails().nom_critere }}</p>
+        <p class="mt-1 text-gray-600"><span class="font-semibold">Question :</span> {{ getFirstRemainingQuestionDetails().nom_question }}</p>
+      </div> -->
+    </div>
     <div class="flex justify-between my-4 items-center">
       <h2 class="text-lg font-medium intro-y">Evaluation factuel</h2>
       <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
@@ -431,7 +483,7 @@ onMounted(async () => {
                                 <div class="p-2 py-3 space-y-2 border-l-8 border-yellow-500 rounded shadow box">
                                   <p class="w-full text-lg font-semibold text-center text-primary">{{ questionIndex + 1 }} - {{ question.nom }}</p>
                                   <div class="flex flex-col items-center justify-center w-full gap-3">
-                                    <pre>{{ findResponse2(responses[question.id].optionDeReponseId) }}</pre>
+                                    <!-- <pre>{{ findResponse2(responses[question.id].optionDeReponseId) }}</pre> -->
                                     <!-- v-for Option -->
                                     <div class="inline-flex flex-wrap items-center gap-3">
                                       <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="form-check-input" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
@@ -443,14 +495,14 @@ onMounted(async () => {
                                       </div>
                                     </div>
                                     <div class="flex items-center gap-3">
-                                      <!-- <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null' && !findResponse2(responses[question.id].optionDeReponseId) == 'partiellement'">
-                                        <label class="">Autre source</label>
-                                        <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
-                                      </div> -->
-                                      <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === null">
+                                      <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'null' && !findResponse2(responses[question.id].optionDeReponseId) == 'partiellement'">
                                         <label class="">Autre source</label>
                                         <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
                                       </div>
+                                      <!-- <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === null">
+                                        <label class="">Autre source</label>
+                                        <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
+                                      </div> -->
                                       <div v-else-if="responses[question.id]?.sourceDeVerificationId !== null && findResponse2(responses[question.id].optionDeReponseId) == 'oui'" class="flex items-center gap-3">
                                         <label class="">Source</label>
                                         <div class="min-w-[230px]">
@@ -522,7 +574,7 @@ onMounted(async () => {
     <div class="my-5">
       <div class="flex justify-between">
         <h2 class="mr-auto text-base font-medium">Validation formulaire</h2>
-        <p > <span class="text-sm font-bold">Organisation:</span> {{ authUser?.nom }}</p>
+        <p><span class="text-sm font-bold">Organisation:</span> {{ authUser?.nom }}</p>
       </div>
 
       <div v-if="findQuestionDetails" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
@@ -580,7 +632,7 @@ onMounted(async () => {
                                   </p>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                  <div class="flex items-center gap-3" v-if="responses[question.id]?.sourceDeVerificationId === 'others'">
+                                  <div class="flex items-center gap-3" v-if="!responses[question.id]?.sourceDeVerificationId === 'oui'">
                                     <p class="text-base font-medium">
                                       Autre source: <span class="text-primary">{{ responses[question.id].sourceDeVerification }}</span>
                                     </p>
@@ -592,7 +644,7 @@ onMounted(async () => {
                                   </div>
                                 </div>
                               </div>
-                              <div class="">
+                              <div v-if="responses[question.id]?.sourceDeVerificationId === 'oui'" class="">
                                 <ul class="flex justify-center">
                                   Fichiers:
                                   <li class="text-base font-medium text-primary" v-for="(file, index) in responses[question.id]?.preuves" :key="index">{{ file.name }}</li>
@@ -657,7 +709,7 @@ onMounted(async () => {
         <div v-if="errors['factuel.comite_members']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.comite_members"]) }}</div>
         <div v-if="errors['factuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.response_data"]) }}</div>
         <p>Organisation: {{ findOrganisation(payload.organisationId) }}</p>
-        <div v-if="payload.factuel?.comite_members.length > 0" class="mt-3 space-y-1">
+        <div v-if="payload.factuel.comite_members?.length > 0" class="mt-3 space-y-1">
           <label class="form-label">Membres</label>
           <ul class="space-y-2">
             <li class="text-base text-primary" v-for="(member, index) in payload.factuel.comite_members" :key="index">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</li>

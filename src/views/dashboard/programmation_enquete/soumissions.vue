@@ -88,8 +88,10 @@ const getDatas = async () => {
     .then((result) => {
       datas.value = result.data.data;
 
-      console.log("membre", datas.value.factuel.comite_members);
-      localStorage.setItem("member", JSON.stringify(datas.value.factuel.comite_members));
+      if (datas.value.factuel?.comite_members) {
+        localStorage.setItem("member", JSON.stringify(datas.value.factuel.comite_members));
+      }
+
       isLoadingData.value = false;
     })
     .catch((e) => {
