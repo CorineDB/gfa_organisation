@@ -395,10 +395,10 @@ onMounted(async () => {
         <div class="flex items-center justify-between mt-5">
           <div class="min-w-[250px]">
             <button class="btn btn-primary" @click="showModal = true">Ajouter membres</button>
-            <div v-if="payload.factuel.comite_members.length > 0" class="mt-3 space-y-1">
+            <div v-if="payload.factuel.comite_members?.length > 0" class="mt-3 space-y-1">
               <label class="text-lg form-label">Membres</label>
               <ul class="space-y-2">
-                <li class="text-base text-primary" v-for="(member, index) in payload.factuel.comite_members" :key="index">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</li>
+                <li class="text-base text-primary" v-for="(member, index) in payload.factuel?.comite_members" :key="index">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</li>
               </ul>
             </div>
           </div>
@@ -657,7 +657,7 @@ onMounted(async () => {
         <div v-if="errors['factuel.comite_members']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.comite_members"]) }}</div>
         <div v-if="errors['factuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.response_data"]) }}</div>
         <p>Organisation: {{ findOrganisation(payload.organisationId) }}</p>
-        <div v-if="payload.factuel.comite_members.length > 0" class="mt-3 space-y-1">
+        <div v-if="payload.factuel?.comite_members.length > 0" class="mt-3 space-y-1">
           <label class="form-label">Membres</label>
           <ul class="space-y-2">
             <li class="text-base text-primary" v-for="(member, index) in payload.factuel.comite_members" :key="index">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</li>

@@ -30,10 +30,10 @@ const getDataCollection = async () => {
   isLoadingData.value = true;
   await SyntheseService.getForEvaluation(idEvaluation)
     .then((result) => {
-      currentProfileGouvernance.value =result.data.data.profile_de_gouvernance;
-      currentFactuel.value=result.data.data.factuel;
-      currentPerception.value=result.data.data.perception;
-      isLoadingData.value = false;/* 
+      currentProfileGouvernance.value = result.data.data.profile_de_gouvernance;
+      currentFactuel.value = result.data.data.factuel;
+      currentPerception.value = result.data.data.perception;
+      isLoadingData.value = false; /* 
       dataForAllOrganisation.value = result.data.data;
       datasFactuel.value = dataForAllOrganisation.value.analyse_factuel;
       datasPerception.value = dataForAllOrganisation.value.analyse_perception; */
@@ -65,7 +65,6 @@ const changeStructure = () => {
 };
 
 onMounted(async () => {
-
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
   await getDataCollection();
   //idSelectStructure.value = dataForAllOrganisation.value[0].id; */
@@ -528,6 +527,10 @@ onMounted(async () => {
 </script>
 
 <template>
+  <div class="flex justify-between my-4 items-center">
+    <h2 class="text-lg font-medium intro-y">Marqueur de gouvernance</h2>
+    <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
+  </div>
   <PreviewComponent class="mt-5 intro-y _box">
     <Preview>
       <TabGroup>
@@ -538,15 +541,12 @@ onMounted(async () => {
         </TabList>
 
         <TabPanels v-show="!isLoadingData" class="mt-5">
-
           <!-- Synthétique -->
           <TabPanel class="leading-relaxed">
             <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">RÉSULTATS SYNTHÉTIQUE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
-                <ExportationResultatSynthese v-if="!isLoadingData && currentProfileGouvernance" :org="authUser?.nom"
-                  :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`"
-                  :dateevaluation="currentFactuel?.evaluatedAt" :datas="currentProfileGouvernance" />
+                <ExportationResultatSynthese v-if="!isLoadingData && currentProfileGouvernance" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentFactuel?.evaluatedAt" :datas="currentProfileGouvernance" />
               </div>
             </div>
             <table class="w-full my-12 text-sm border-collapse table-fixed">
@@ -578,18 +578,11 @@ onMounted(async () => {
               </thead>
 
               <tbody class="bg-white">
-                <tr v-for="(synthese, index) in currentProfileGouvernance" :key="index"
-                  class="pb-2 border border-slate-900">
+                <tr v-for="(synthese, index) in currentProfileGouvernance" :key="index" class="pb-2 border border-slate-900">
                   <td class="py-1 font-">{{ synthese.nom }}</td>
-                  <td class="py-1 text-right"
-                    :style="{ 'background-color': getColorForValue(synthese.indice_factuel) }">{{
-          synthese.indice_factuel }}</td>
-                  <td class="py-1 text-right"
-                    :style="{ 'background-color': getColorForValue(synthese.indice_de_perception) }">{{
-          synthese.indice_de_perception }}</td>
-                  <td class="py-1 text-right"
-                    :style="{ 'background-color': getColorForValue(synthese.indice_synthetique) }">{{
-          synthese.indice_synthetique }}</td>
+                  <td class="py-1 text-right" :style="{ 'background-color': getColorForValue(synthese.indice_factuel) }">{{ synthese.indice_factuel }}</td>
+                  <td class="py-1 text-right" :style="{ 'background-color': getColorForValue(synthese.indice_de_perception) }">{{ synthese.indice_de_perception }}</td>
+                  <td class="py-1 text-right" :style="{ 'background-color': getColorForValue(synthese.indice_synthetique) }">{{ synthese.indice_synthetique }}</td>
                 </tr>
               </tbody>
             </table>
@@ -626,19 +619,14 @@ onMounted(async () => {
               </tbody>
             </table>
             <!-- Tableau de marqueur Factuel -->
-            <TabulatorMarqueurFactuel v-if="!isLoadingData" :data="currentFactuel?.synthese"
-              :indicegouvernace="currentFactuel?.indice_de_gouvernance" />
+            <TabulatorMarqueurFactuel v-if="!isLoadingData" :data="currentFactuel?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" />
           </TabPanel>
           <!-- Perception-->
           <TabPanel class="leading-relaxed">
             <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">MARQUEUR PERCEPTION GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
-                <ExportationMarqueurPerception v-if="!isLoadingData && currentPerception"
-                  :org="authUser?.nom"
-                  :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`"
-                  :dateevaluation="currentPerception?.evaluatedAt" :datas="currentPerception"
-                  />
+                <ExportationMarqueurPerception v-if="!isLoadingData && currentPerception" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentPerception?.evaluatedAt" :datas="currentPerception" />
               </div>
             </div>
 
@@ -661,8 +649,7 @@ onMounted(async () => {
               </tbody>
             </table>
             <!-- Tableau de synthese Perception -->
-            <TabulatorMarqueurPerception :data="currentPerception?.synthese"
-              :indicegouvernace="currentPerception?.indice_de_gouvernance" v-if="!isLoadingData" />
+            <TabulatorMarqueurPerception :data="currentPerception?.synthese" :indicegouvernace="currentPerception?.indice_de_gouvernance" v-if="!isLoadingData" />
           </TabPanel>
         </TabPanels>
         <LoaderSnipper v-if="isLoadingData" />
