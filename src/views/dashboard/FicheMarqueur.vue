@@ -10,6 +10,7 @@ import TabulatorMarqueurFactuel from "../../components/news/TabulatorMarqueurFac
 import { computed } from "vue";
 import ExportationMarqueurPerception from "../../components/news/ExportationMarqueurPerception.vue";
 import TabulatorMarqueurPerception from "../../components/news/TabulatorMarqueurPerception.vue";
+import DownloadPDFButton from "../../components/DownloadPDFButton.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -547,9 +548,10 @@ onMounted(async () => {
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
                 <ExportationResultatSynthese v-if="!isLoadingData && currentProfileGouvernance" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentFactuel?.evaluatedAt" :datas="currentProfileGouvernance" />
+                <DownloadPDFButton :tableIds="['table2AZA', 'tableKJIT']" pageName="RÉSULTATS SYNTHÉTIQUE" format="a4" />
               </div>
             </div>
-            <table class="w-full my-12 text-sm border-collapse table-fixed">
+            <table id="table2AZA" class="w-full my-12 text-sm border-collapse table-fixed">
               <tbody>
                 <tr class="border-b rounded-sm border-slate-300 bg-slate-300">
                   <td class="p-2 font-medium">Structure :</td>
@@ -567,7 +569,7 @@ onMounted(async () => {
                 </tr>
               </tbody>
             </table>
-            <table class="w-full mb-12 border-collapse table-auto" cellpadding="4" cellspacing="0">
+            <table id="tableKJIT" class="w-full mb-12 border-collapse table-auto" cellpadding="4" cellspacing="0">
               <thead class="text-left bg-blue-900">
                 <tr class="text-slate-800 bg-slate-300">
                   <th class="py-2 text-left border border-slate-900">Principes</th>
@@ -596,11 +598,12 @@ onMounted(async () => {
             <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">MARQUEUR FACTUEL GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
+                <DownloadPDFButton :tableIds="['table2AZA98', 'tableKJITNB']" pageName="MARQUEUR FACTUEL GOUVERNANCE" format="a4" />
                 <!-- <ExportationSyntheseFactuel v-if="!isLoadingData" :datas="currentFactuel" /> -->
               </div>
             </div>
 
-            <table class="w-full my-12 text-sm border-collapse table-fixed">
+            <table id="table2AZA98" class="w-full my-12 text-sm border-collapse table-fixed">
               <tbody>
                 <tr class="border-b rounded-sm border-slate-300 bg-slate-300">
                   <td class="p-2 font-medium">Structure :</td>
@@ -627,10 +630,11 @@ onMounted(async () => {
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
                 <ExportationMarqueurPerception v-if="!isLoadingData && currentPerception" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentPerception?.evaluatedAt" :datas="currentPerception" />
+                <DownloadPDFButton :tableIds="['tableA98R', 'tableKNOB']" pageName="MARQUEUR PERCEPTION GOUVERNANCE" format="a4" />
               </div>
             </div>
 
-            <table class="w-full my-12 text-sm border-collapse table-fixed">
+            <table id="tableA98R" class="w-full my-12 text-sm border-collapse table-fixed">
               <tbody>
                 <tr class="border-b rounded-sm border-slate-300 bg-slate-300">
                   <td class="p-2 font-medium">Structure :</td>

@@ -1424,7 +1424,7 @@ export default {
 
             // Mettre à jour les messages d'erreurs dynamiquement
             if (error.response && error.response.data && error.response.data.errors) {
-              erreurSuiviFinancier = error.response.data.errors;
+              this.erreurSuiviFinancier = error.response.data.errors;
             } else {
               toast.error(error.response.data.errors.message);
             }

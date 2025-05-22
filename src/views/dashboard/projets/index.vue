@@ -936,7 +936,7 @@ export default {
 
     if (this.currentUser) {
       this.programmeId = this.currentUser.programme.id;
-      this.projetId = this.currentUser.projet.id;
+      this.projetId = this.currentUser.projet?.id;
     }
 
     if (this.programmeId) {

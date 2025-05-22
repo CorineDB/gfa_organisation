@@ -596,10 +596,10 @@ const suiviFinancierActivite = async () => {
       console.log("index === suiviFinancier.value.length - 1", index === suiviFinancier.value.length - 1);
 
       if (index === suiviFinancier.value.length - 1) {
-        showModalSuiviFinancier = false;
+        this.showModalSuiviFinancier = false;
 
         setTimeout(() => {
-          planDeDecaissement = [];
+          this.planDeDecaissement = [];
         }, 500);
       }
 
@@ -613,7 +613,7 @@ const suiviFinancierActivite = async () => {
 
       // Mettre à jour les messages d'erreurs dynamiquement
       if (error.response && error.response.data && error.response.data.errors.length > 0) {
-        erreurSuiviFinancier = error.response.data.errors;
+        this.erreurSuiviFinancier = error.response.data.errors;
         toast.error("Une erreur s'est produite dans votre formualaire");
       } else {
         toast.error(`Suivi ${index + 1} : ${error.response.data.message}`);

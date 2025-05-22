@@ -1,9 +1,42 @@
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 dayjs.extend(duration);
 
 const helpers = {
+  generatePDF(tableIds, pageName, format = "a4") {
+    const doc = new jsPDF({ orientation: "landscape", format });
+
+    doc.setFontSize(24);
+    const title = pageName;
+    const pageWidth = doc.internal.pageSize.width;
+    const textWidth = doc.getTextWidth(title);
+    const xOffset = (pageWidth - textWidth) / 2;
+    doc.text(title, xOffset, 20);
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString();
+    const timeStr = now.toLocaleTimeString();
+    const dateTimeStr = `Générer le: ${dateStr} à ${timeStr}`;
+    doc.setFontSize(12);
+    const textXOffset = pageWidth - doc.getTextWidth(dateTimeStr) - 10;
+    doc.text(dateTimeStr, textXOffset, 10);
+
+    let currentY = 30; // Initial Y position for the first table
+    tableIds.forEach((tableId) => {
+      autoTable(doc, {
+        html: `#${tableId}`,
+        startY: currentY,
+        didDrawPage: (data) => {
+          currentY = data.cursor.y + 10; // Update Y position for the next table
+        },
+      });
+    });
+
+    doc.save(`${pageName}.pdf`);
+  },
   extractContentFromArray(arr) {
     if (Array.isArray(arr) && arr.length === 1 && typeof arr[0] === "string") {
       return arr[0]; // Retourne la chaîne unique contenue dans le tableau

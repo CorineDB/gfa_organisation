@@ -97,15 +97,18 @@
         <input type="text" class="search__input form-control border-transparent" v-model="searchs" placeholder="Recherche..." />
         <SearchIcon class="search__icon dark:text-slate-500" />
       </div>
-      <button @click="addUsers" class="btn btn-primary flex space-x-2 items-center">
-        <PlusSquareIcon />
-        <span class="uppercase font-semibold"> ajouter</span>
-      </button>
+      <div class="flex items-center space-x-2">
+        <button @click="addUsers" class="btn btn-primary flex space-x-2 items-center">
+          <PlusSquareIcon />
+          <span class="uppercase font-semibold"> ajouter</span>
+        </button>
+        <DownloadPDFButton :tableIds="['userOIN']" pageName="Utilisateurs" format="a4" />
+      </div>
     </div>
     <!-- END: Modal Toggle -->
 
     <div class="overflow-x-auto mt-5">
-      <table class="table mt-5">
+      <table id="userOIN" class="table mt-5">
         <thead class="table-light">
           <tr>
             <th class="whitespace-nowrap">#</th>
@@ -301,6 +304,7 @@ import { helper as $h } from "@/utils/helper";
 import { toast } from "vue3-toastify";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
+import DownloadPDFButton from "@/components/DownloadPDFButton.vue";
 
 // Modfier un utilisateur
 const updateModal = ref(false);
