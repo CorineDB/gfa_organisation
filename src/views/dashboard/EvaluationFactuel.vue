@@ -53,7 +53,6 @@ const currentMember = ref({
 const sources = ref([]);
 const errors = ref({});
 
-
 const getDataFormFactuel = async () => {
   try {
     const { data } = await EvaluationService.getFactuelFormEvaluation(token);
@@ -265,6 +264,7 @@ function findFormulaireFactuel() {
   const idFactuel = formDataFactuel.value.formulaire_factuel_de_gouvernance;
   formulaireFactuel.value = formDataFactuel.value.formulaires_de_gouvernance.find((formulaire) => formulaire.id === idFactuel);
 }
+
 function addMembers() {
   payload.factuel.comite_members.push({ ...currentMember.value });
   showModal.value = false;
@@ -279,39 +279,6 @@ const findOrganisation = (id) => {
 
   return "";
 };
-
-const getRemainingQuestions = () => {
-  return Object.entries(responses).filter(([index, data]) => {
-    console.log(data.optionDeReponseId)
-    return data.optionDeReponseId === null || (findResponse2(data.optionDeReponseId) === "oui" && data.preuves.length === 0);
-  });
-};
-
-const getFirstRemainingQuestionDetails = () => {
-  const remainingQuestions = getRemainingQuestions();
-  if (remainingQuestions.length === 0) return null;
-
-  const [index, data] = remainingQuestions[0];
-
-  for (const type_gouvernance of formulaireFactuel.value.categories_de_gouvernance) {
-    for (const principe of type_gouvernance.categories_de_gouvernance) {
-      for (const critere of principe.categories_de_gouvernance) {
-        for (const question of critere.questions_de_gouvernance) {
-          if (question.id === data.questionId) {
-            return {
-              nom_typeGouvernance: type_gouvernance.nom,
-              nom_principe: principe.nom,
-              nom_critere: critere.nom,
-              nom_question: question.nom,
-            };
-          }
-        }
-      }
-    }
-  }
-  return null;
-};
-
 const findResponse = (id) => {
   if (formulaireFactuel.value.options_de_reponse) {
     const response = formulaireFactuel.value.options_de_reponse.find((response) => response.id === id);
@@ -421,21 +388,33 @@ onMounted(async () => {
     initializeFormData();
   }
 });
+
+const hasInvalidResponses = (principe) => {
+  return principe.categories_de_gouvernance.some((critere) =>
+    critere.questions_de_gouvernance.some((question) =>
+      invalidResponses.value.some((response) => response.questionId === question.id)
+    )
+  );
+};
+
+const hasInvalidResponsesForCritere = (critere) => {
+  return critere.questions_de_gouvernance.some((question) =>
+    invalidResponses.value.some((response) => response.questionId === question.id)
+  );
+};
 </script>
 <template>
-  <div v-if="!showModalPreview">
-    <pre>{{  getRemainingQuestions }}</pre>
-    <div v-if="getRemainingQuestions().length > 0" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
-      <p class="my-3">Il vous reste {{ getRemainingQuestions().length }} question{{ getRemainingQuestions().length > 1 ? "s" : "" }} à compléter pour terminer le formulaire.</p>
+  <!-- <div v-if="findQuestionDetails" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
+      <p class="my-3">Il vous reste {{ invalidResponses.length }} question{{ invalidResponses.length > 1 ? "s" : "" }} à compléter pour terminer le formulaire.</p>
 
-      <!-- <h2 class="text-lg font-semibold text-gray-800">Détail de la question en attente de réponse</h2>
-      <div v-if="getFirstRemainingQuestionDetails()">
-        <p class="mt-2 text-gray-600"><span class="font-semibold">Type de gouvernance :</span> {{ getFirstRemainingQuestionDetails().nom_typeGouvernance }}</p>
-        <p class="mt-1 text-gray-600"><span class="font-semibold">Principe de gouvernance :</span> {{ getFirstRemainingQuestionDetails().nom_principe }}</p>
-        <p class="mt-1 text-gray-600"><span class="font-semibold">Critère :</span> {{ getFirstRemainingQuestionDetails().nom_critere }}</p>
-        <p class="mt-1 text-gray-600"><span class="font-semibold">Question :</span> {{ getFirstRemainingQuestionDetails().nom_question }}</p>
-      </div> -->
-    </div>
+      <h2 class="text-lg font-semibold text-gray-800">Détail de la question en attente de réponse</h2>
+      <p class="mt-2 text-gray-600"><span class="font-semibold">Type de gouvernance :</span> {{ findQuestionDetails.nom_typeGouvernance }}</p>
+      <p class="mt-1 text-gray-600"><span class="font-semibold">Principe de gouvernance :</span> {{ findQuestionDetails.nom_principe }}</p>
+      <p class="mt-1 text-gray-600"><span class="font-semibold">Critère :</span> {{ findQuestionDetails.nom_critere }}</p>
+
+      <p class="mt-1 text-gray-600"><span class="font-semibold">Question :</span> {{ findQuestionDetails.nom_question }}</p>
+    </div> -->
+  <div v-if="!showModalPreview">
     <div class="flex justify-between my-4 items-center">
       <h2 class="text-lg font-medium intro-y">Evaluation factuel</h2>
       <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
@@ -462,10 +441,11 @@ onMounted(async () => {
               <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="transition-all">
                 <h1 class="mb-5 text-2xl font-semibold text-gray-800">{{ typeGouvernance.nom }}</h1>
                 <!-- v-for Principe -->
+
                 <div class="space-y-6">
                   <AccordionGroup class="border-primary">
                     <AccordionItem v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex">
-                      <Accordion class="text-xl !px-4 font-semibold bg-primary !text-white flex items-center justify-between">
+                      <Accordion :class="hasInvalidResponses(principe) ? 'bg-danger' : 'bg-primary'" class="text-xl !px-4 font-semibold !text-white flex items-center justify-between">
                         <h2>{{ principe.nom }}</h2>
                         <ChevronDownIcon />
                       </Accordion>
@@ -473,7 +453,7 @@ onMounted(async () => {
                         <!-- v-for Critere -->
                         <AccordionGroup class="space-y-2">
                           <AccordionItem v-for="(critere, critereIndex) in principe.categories_de_gouvernance" :key="critereIndex" class="!px-0">
-                            <Accordion class="text-xl !p-4 font-semibold bg-primary/90 !text-white flex items-center justify-between">
+                            <Accordion class="text-xl !p-4 font-semibold !text-white flex items-center justify-between" :class="hasInvalidResponsesForCritere(critere) ? 'bg-danger' : 'bg-primary/90'" >
                               <h2>{{ critere.nom }}</h2>
                               <ChevronDownIcon />
                             </Accordion>
@@ -483,7 +463,6 @@ onMounted(async () => {
                                 <div class="p-2 py-3 space-y-2 border-l-8 border-yellow-500 rounded shadow box">
                                   <p class="w-full text-lg font-semibold text-center text-primary">{{ questionIndex + 1 }} - {{ question.nom }}</p>
                                   <div class="flex flex-col items-center justify-center w-full gap-3">
-                                    <!-- <pre>{{ findResponse2(responses[question.id].optionDeReponseId) }}</pre> -->
                                     <!-- v-for Option -->
                                     <div class="inline-flex flex-wrap items-center gap-3">
                                       <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="form-check-input" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
@@ -505,6 +484,7 @@ onMounted(async () => {
                                       </div> -->
                                       <div v-else-if="responses[question.id]?.sourceDeVerificationId !== null && findResponse2(responses[question.id].optionDeReponseId) == 'oui'" class="flex items-center gap-3">
                                         <label class="">Source</label>
+                                        <!-- <pre>{{ responses[question.id] }}</pre> -->
                                         <div class="min-w-[230px]">
                                           <TomSelect v-if="responses[question.id]?.sourceDeVerificationId" :options="{ placeholder: 'Sélectionnez une source' }" class="w-full" v-model="responses[question.id].sourceDeVerificationId">
                                             <option v-for="(source, indexSource) in sources" :key="indexSource" :value="source.id">{{ source.intitule }}</option>
@@ -545,9 +525,9 @@ onMounted(async () => {
                 </div>
               </div>
             </div>
-            <div class="flex justify-center w-full mt-5">
+            <!-- <div class="flex justify-center w-full mt-5">
               <VButton v-if="isPreview" label="Prévisualiser" class="px-8 py-3 w-max" @click="openPreview" />
-            </div>
+            </div> -->
             <div class="flex justify-center gap-3 my-8">
               <button @click="prevPage()" :disabled="currentPage === 0" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
               <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
