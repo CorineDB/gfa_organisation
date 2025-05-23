@@ -135,6 +135,7 @@ const getEvaluation = async () => {
   await EvaluationService.findEvaluation(idEvaluation)
     .then((result) => {
       statistiques.value = result.data.data;
+      console.log(statistiques.value);
       isLoadingStats.value = false;
     })
     .catch((e) => {
