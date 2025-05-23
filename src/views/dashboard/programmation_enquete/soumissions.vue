@@ -527,7 +527,7 @@ onMounted(async () => {
       </div>
       <LoaderSnipper v-else />
 
-      <div v-if="statistiques.statut == 1" class="col-span-12 mt-8">
+      <div v-if="statistiques.statut == 1 && statistiques?.formulaire_perception_de_gouvernance " class="col-span-12 mt-8">
         <div class="flex items-center h-10 intro-y">
           <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
         </div>
@@ -645,7 +645,7 @@ onMounted(async () => {
               </div>
             </div>
 
-            <div class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques?.formulaire_perception_de_gouvernance " class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation de Perception</div>
               </div>

@@ -91,7 +91,7 @@ onMounted(() => getSoumission());
                       <div class="p-4 bg-gray-100 rounded-lg shadow-md w-72">
                         <h2 class="text-lg font-semibold mb-3">Preuves</h2>
                         <ul>
-                          <li v-for="(doc, index) in question.reponse_de_la_collecte.preuves" :key="index" class="p-2 bg-white rounded-md shadow-sm mb-2 hover:bg-gray-200 transition">
+                          <li v-for="(doc, index) in question.reponse_de_la_collecte?.preuves" :key="index" class="p-2 bg-white rounded-md shadow-sm mb-2 hover:bg-gray-200 transition">
                             <a :href="doc.url" download class="text-blue-500 hover:underline">
                               {{ doc.nom }}
                             </a>
