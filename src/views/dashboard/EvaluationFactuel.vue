@@ -482,8 +482,7 @@ const hasInvalidResponsesForCritere = (critere) => {
                                         <label class="">Autre source</label>
                                         <input type="text" required class="form-control" v-model="responses[question.id].sourceDeVerification" placeholder="Autre source" />
                                       </div> -->
-                                      <!-- responses[question.id]?.sourceDeVerificationId !== null &&  -->
-                                      <div v-if="findResponse2(responses[question.id].optionDeReponseId) == 'oui'" class="flex items-center gap-3">
+                                      <div v-else-if="responses[question.id]?.sourceDeVerificationId !== null && findResponse2(responses[question.id].optionDeReponseId) == 'oui'" class="flex items-center gap-3">
                                         <label class="">Source</label>
                                         <!-- <pre>{{ responses[question.id] }}</pre> -->
                                         <div class="min-w-[230px]">
