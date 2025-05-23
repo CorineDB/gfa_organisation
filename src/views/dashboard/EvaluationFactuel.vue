@@ -37,6 +37,9 @@ const formulaireFactuel = ref({});
 const isOrganisation = ref(false);
 const isLoading = ref(false);
 const showAlertValidate = ref(false);
+const isEdit = ref(false);
+const currentIndex = ref(null);
+
 const showModal = ref(false);
 const showModalPreview = ref(false);
 const isValidate = ref(false);
@@ -271,6 +274,35 @@ function addMembers() {
   currentMember.value = { nom: "", prenom: "", contact: "" };
 }
 
+function saveMembers() {
+  if(isEdit.value){
+    updateMember()
+  }
+  else{
+    console.log("Members");
+    addMembers()
+  }
+}
+
+function editMember(member, index) {
+  isEdit.value = true;
+  currentIndex.value = index;
+  showModal.value = true;
+  currentMember.value = {
+    nom: member.nom,
+    prenom: member.prenom,
+    contact: member.contact
+  };
+}
+
+function updateMember() {
+  payload.factuel.comite_members[currentIndex.value] = { ...currentMember.value };
+  showModal.value = false;
+  isEdit.value = false;
+  currentIndex.value = null;
+  currentMember.value = { nom: "", prenom: "", contact: "" };
+}
+
 const findOrganisation = (id) => {
   if (formDataFactuel.value.organisations) {
     const organisation = formDataFactuel.value.organisations.find((organisation) => organisation.id === id);
@@ -429,7 +461,12 @@ const hasInvalidResponsesForCritere = (critere) => {
             <div v-if="payload.factuel.comite_members?.length > 0" class="mt-3 space-y-1">
               <label class="text-lg form-label">Membres</label>
               <ul class="space-y-2">
-                <li class="text-base text-primary" v-for="(member, index) in payload.factuel?.comite_members" :key="index">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</li>
+                <li class="text-base text-primary" v-for="(member, index) in payload.factuel?.comite_members" :key="index">
+                  <span class="mr-2">
+                    {{ member.nom }} {{ member.prenom }} - {{ member.contact }}
+                  </span> 
+                  <button class="btn btn-primary btn-sm" @click="editMember(member, index)">Modifier</button>
+                </li>
               </ul>
             </div>
           </div>
@@ -671,7 +708,7 @@ const hasInvalidResponsesForCritere = (critere) => {
     <ModalFooter>
       <div class="flex gap-2">
         <button type="button" @click="showModal = false" class="w-full px-2 py-2 my-3 btn btn-outline-secondary">Annuler</button>
-        <button type="button" @click="addMembers()" class="w-full px-2 py-2 my-3 btn btn-primary">Ajouter</button>
+        <button type="button" @click="saveMembers" class="w-full px-2 py-2 my-3 btn btn-primary">Ajouter</button>
       </div>
     </ModalFooter>
   </Modal>
