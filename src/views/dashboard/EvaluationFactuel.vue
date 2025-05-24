@@ -341,11 +341,14 @@ const findResponse2 = (id) => {
 const invalidResponses = computed(() => {
   return Object.entries(responses).reduce((acc, [index, data]) => {
     const responseLabel = findResponse2(data.optionDeReponseId);
-    const isNullOption = data.optionDeReponseId === "null";
-    const isOuiWithoutProof = responseLabel === "oui" && data.preuves.length === 0 && !data.sourceDeVerificationId;
-    const isPartiellementWithoutDescription = responseLabel === "partiellement" && (!data.description || data.description.trim() === "");
 
-    if (isNullOption || isOuiWithoutProof || isPartiellementWithoutDescription) {
+    const isNullResponse = data.optionDeReponseId === "null";
+
+    const isOuiAndMissingProofOrSource = responseLabel === "oui" && (!data.sourceDeVerificationId || !Array.isArray(data.preuves) || data.preuves.length === 0);
+
+    const isPartiellementAndNoDescription = responseLabel === "partiellement" && (!data.description || data.description.trim() === "");
+
+    if (isNullResponse || isOuiAndMissingProofOrSource || isPartiellementAndNoDescription) {
       acc.push({ index, questionId: data.questionId });
     }
 
@@ -503,9 +506,10 @@ const toggle = (id) => {
                                     </div>
                                   </div>
 
+                                  <!-- <pre>{{ responses[question.id] }}</pre> -->
+
                                   <!-- Contenu principal -->
                                   <div v-show="openAccordions[question.id]" class="p-6 space-y-6">
-                                    
                                     <!-- <div class="space-y-4">
                                       <h4 class="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2">
                                         <i class="fas fa-question-circle text-blue-500"></i>
@@ -556,8 +560,6 @@ const toggle = (id) => {
                                             </span>
                                           </label>
                                         </div>
-
-                                        
                                       </div>
                                     </div>
 
