@@ -340,9 +340,15 @@ const findResponse2 = (id) => {
 
 const invalidResponses = computed(() => {
   return Object.entries(responses).reduce((acc, [index, data]) => {
-    if (data.optionDeReponseId === "null" || (findResponse2(data.optionDeReponseId) === "oui" && data.preuves.length === 0 && !data.sourceDeVerificationId) || (findResponse2(data.optionDeReponseId) === "partiellement" && (data?.description == "" || !data?.description))) {
+    const responseLabel = findResponse2(data.optionDeReponseId);
+    const isNullOption = data.optionDeReponseId === "null";
+    const isOuiWithoutProof = responseLabel === "oui" && data.preuves.length === 0 && !data.sourceDeVerificationId;
+    const isPartiellementWithoutDescription = responseLabel === "partiellement" && (!data.description || data.description.trim() === "");
+
+    if (isNullOption || isOuiWithoutProof || isPartiellementWithoutDescription) {
       acc.push({ index, questionId: data.questionId });
     }
+
     return acc;
   }, []);
 });
@@ -499,15 +505,14 @@ const toggle = (id) => {
 
                                   <!-- Contenu principal -->
                                   <div v-show="openAccordions[question.id]" class="p-6 space-y-6">
-                                    <!-- Section des options radio -->
-                                    <div class="space-y-4">
+                                    
+                                    <!-- <div class="space-y-4">
                                       <h4 class="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2">
                                         <i class="fas fa-question-circle text-blue-500"></i>
                                         Sélectionnez votre réponse :
                                       </h4>
 
-                                      <!-- Debug info (vous pouvez la retirer) -->
-                                      <!-- <pre class="bg-gray-100 p-3 rounded text-xs overflow-auto">{{ responses[question.id] }}</pre> -->
+                                     
 
                                       <div class="space-y-3">
                                         <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="hidden" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
@@ -520,6 +525,39 @@ const toggle = (id) => {
                                             </span>
                                           </label>
                                         </div>
+                                      </div>
+                                    </div> -->
+
+                                    <div class="space-y-4">
+                                      <h4 class="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2 justify-center">
+                                        <i class="fas fa-question-circle text-blue-500"></i>
+                                        Sélectionnez votre réponse :
+                                      </h4>
+
+                                      <div class="space-y-3 text-center">
+                                        <div v-for="(option, optionIndex) in formulaireFactuel.options_de_reponse" :key="optionIndex" class="inline-block ml-3">
+                                          <label
+                                            class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 group"
+                                            :for="`radio${question.id}${optionIndex}`"
+                                            :class="{
+                                              'border-blue-600 bg-blue-50': responses[question.id]?.optionDeReponseId === option.id,
+                                              'border-gray-200 hover:border-blue-300 hover:bg-blue-50': responses[question.id]?.optionDeReponseId !== option.id,
+                                            }"
+                                          >
+                                            <input :id="`radio${question.id}${optionIndex}`" class="w-5 h-5 text-blue-600 accent-blue-900 mr-4" type="radio" :name="`${question.id}-${question.slug}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" />
+                                            <span
+                                              class="text-gray-700 font-medium"
+                                              :class="{
+                                                'text-blue-700': responses[question.id]?.optionDeReponseId === option.id,
+                                                'group-hover:text-blue-700': responses[question.id]?.optionDeReponseId !== option.id,
+                                              }"
+                                            >
+                                              {{ option.libelle }}
+                                            </span>
+                                          </label>
+                                        </div>
+
+                                        
                                       </div>
                                     </div>
 
@@ -561,6 +599,31 @@ const toggle = (id) => {
                                           <p class="text-xs text-gray-500 mt-2">PDF, DOC, JPG, PNG - Max 10MB par fichier</p>
                                         </div>
                                       </div>
+
+                                      <!-- Section des fichiers uploadés -->
+                                      <div v-if="responses[question.id]?.preuves.length" class="bg-gray-50 rounded-lg p-4">
+                                        <h6 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                                          <i class="fas fa-file-alt text-blue-500"></i>
+                                          Fichiers joints ({{ responses[question.id]?.preuves.length }})
+                                        </h6>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                          <div v-for="(file, index) in responses[question.id]?.preuves" :key="index" class="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow duration-200">
+                                            <div class="flex items-center gap-3">
+                                              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-file text-blue-600"></i>
+                                              </div>
+                                              <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 truncate">{{ file.nom }}</p>
+                                                <p class="text-xs text-gray-500">{{ file.size ? formatFileSize(file.size) : "Taille inconnue" }}</p>
+                                              </div>
+                                              <a :href="file.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                                                <i class="fas fa-external-link-alt"></i>
+                                              </a>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
 
                                     <!-- Section conditionnelle pour "Partiellement" -->
@@ -572,62 +635,13 @@ const toggle = (id) => {
 
                                       <div class="space-y-3">
                                         <label class="block text-sm font-semibold text-gray-700" for="description"> <i class="fas fa-comment-alt mr-2 text-blue-500"></i>Description détaillée </label>
-                                        <textarea name="description" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 resize-none" id="description" v-model="payload.description" cols="30" rows="4" placeholder="Veuillez préciser les détails de votre réponse..."></textarea>
+                                        <textarea name="description" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 resize-none" id="description" v-model="responses[question.id].description" cols="30" rows="4" placeholder="Veuillez préciser les détails de votre réponse..."></textarea>
                                         <div v-if="errors.description" class="flex items-center gap-2 mt-2 text-red-600">
                                           <i class="fas fa-exclamation-circle"></i>
                                           <span class="text-sm">{{ getFieldErrors(errors.description) }}</span>
                                         </div>
                                       </div>
                                     </div>
-                                    <!-- Section des fichiers uploadés -->
-                                    <div v-if="responses[question.id]?.preuves.length" class="bg-gray-50 rounded-lg p-4">
-                                      <h6 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                        <i class="fas fa-file-alt text-blue-500"></i>
-                                        Fichiers joints ({{ responses[question.id]?.preuves.length }})
-                                      </h6>
-
-                                      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                        <div v-for="(file, index) in responses[question.id]?.preuves" :key="index" class="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow duration-200">
-                                          <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                              <i class="fas fa-file text-blue-600"></i>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                              <p class="text-sm font-medium text-gray-900 truncate">{{ file.nom }}</p>
-                                              <p class="text-xs text-gray-500">{{ file.size ? formatFileSize(file.size) : "Taille inconnue" }}</p>
-                                            </div>
-                                            <a :href="file.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
-                                              <i class="fas fa-external-link-alt"></i>
-                                            </a>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <!-- Section des fichiers uploadés -->
-                                    <!-- <div v-if="responsesFiles[question.id]?.preuvesFiles.length" class="bg-gray-50 rounded-lg p-4">
-                                      <h6 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                        <i class="fas fa-file-alt text-blue-500"></i>
-                                        Fichiers joints ({{ responsesFiles[question.id]?.preuvesFiles.length }})
-                                      </h6>
-
-                                      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                        <div v-for="(file, index) in responsesFiles[question.id]?.preuves" :key="index" class="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow duration-200">
-                                          <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                              <i class="fas fa-file text-blue-600"></i>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                              <p class="text-sm font-medium text-gray-900 truncate">{{ file.nom }}</p>
-                                              <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
-                                            </div>
-                                            <a :href="file.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
-                                              <i class="fas fa-external-link-alt"></i>
-                                            </a>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div> -->
                                   </div>
                                 </div>
                               </div>
