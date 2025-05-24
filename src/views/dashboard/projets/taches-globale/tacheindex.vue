@@ -125,7 +125,7 @@
           </div>
           <div class="m-5 text-slate-600 dark:text-slate-500">
             <div class="flex items-center"><LinkIcon class="w-4 h-4 mr-2" /> Budget: {{ item.budgetNational }}</div>
-            <div class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Taux d'exécution physique: {{ item.tep }}</div>
+            <!-- <div class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Taux d'exécution physique: {{ item.tep }}</div> -->
 
             <div class="flex items-center mt-2">
               <CheckSquareIcon class="w-4 h-4 mr-2" /> Statut :

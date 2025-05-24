@@ -750,14 +750,14 @@ export default {
                 </div>
 
                 <div class="flex items-center">
-                  <LinkIcon class="w-4 h-4 mr-2" /> Montant financé: {{ item.pret == null ? 0 : $h.formatCurrency(item.pret) }}
+                  <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret == null ? 0 : $h.formatCurrency(item.pret) }}
                   <div class="ml-2 italic font-bold">Fcfa</div>
                 </div>
 
-                <div class="flex items-center text-sm font-medium text-gray-700">
+                <!-- <div class="flex items-center text-sm font-medium text-gray-700">
                   <GlobeIcon class="w-4 h-4 mr-2 text-primary" /> Taux d'exécution physique:
                   <span class="ml-2 font-semibold text-gray-900">{{ item.tep }}</span>
-                </div>
+                </div> -->
 
                 <div class="flex items-center text-sm font-medium text-gray-700">
                   <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut:
@@ -827,7 +827,7 @@ export default {
           <textarea v-model="formData.description" class="form-control w-full" name="comment" placeholder="Ajouter une description"></textarea>
         </div>
 
-        <InputForm v-model="formData.pret" class="col-span-12 mt-4" type="number" required="required" placeHolder="Montant financé*" label="Montant financé" />
+        <InputForm v-model="formData.pret" class="col-span-12 mt-4" type="number" required="required" placeHolder="Subvention*" label="Subvention" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
 
         <InputForm v-model="formData.budgetNational" class="col-span-12 mt-4" type="number" required="required" placeHolder="Ex : 2" label="Fond Propre" />
@@ -969,7 +969,7 @@ export default {
             {{ erreurPlanDeDecaissement[index].budgetNational }}
           </p>
 
-          <InputForm v-model="plan.pret" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez le montant financé" label="Saisissez le montant financé" />
+          <InputForm v-model="plan.pret" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez la subvention" label="Saisissez la subvention" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.pret">
             {{ erreurPlanDeDecaissement[index].pret }}
           </p>
