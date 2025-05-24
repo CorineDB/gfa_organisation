@@ -206,7 +206,7 @@ const initializeFormData = () => {
             optionDeReponseId: question.reponse_de_la_collecte?.optionDeReponseId ?? "null",
             sourceDeVerificationId: "",
             sourceDeVerification: question.reponse_de_la_collecte?.sourceDeVerification ?? " ",
-            // description: findResponse2(question.reponse_de_la_collecte?.optionDeReponseId) == "partiellement" ? "" : undefined,
+            description: findResponse2(question.reponse_de_la_collecte?.optionDeReponseId) == "partiellement" ? "" : undefined,
             preuves: [],
           };
         });
@@ -411,6 +411,9 @@ onMounted(async () => {
       openAccordions[p.id] = true;
       p.categories_de_gouvernance.forEach((c) => {
         openAccordions[c.id] = true;
+        c.questions_de_gouvernance.forEach((q) => {
+          openAccordions[q.id] = true;
+        });
       });
     });
   });
@@ -487,7 +490,7 @@ const toggle = (id) => {
                               <div v-for="(question, questionIndex) in critere.questions_de_gouvernance" :key="questionIndex" class="bg-white p-4 rounded shadow border-l-4 border-yellow-500">
                                 <div class="bg-white rounded-xl shadow-lg border-l-6 border-blue-600 overflow-hidden mb-6">
                                   <!-- En-tête de la question -->
-                                  <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100">
+                                  <div @click="toggle(question.id)" class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100 cursor-pointer hover:bg-blue-100 transition-colors duration-200">
                                     <div class="flex items-center gap-3">
                                       <span class="bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full">{{ questionIndex + 1 }}</span>
                                       <h3 class="text-xl font-semibold text-gray-800">{{ question.nom }}</h3>
@@ -495,7 +498,7 @@ const toggle = (id) => {
                                   </div>
 
                                   <!-- Contenu principal -->
-                                  <div class="p-6 space-y-6">
+                                  <div v-show="openAccordions[question.id]" class="p-6 space-y-6">
                                     <!-- Section des options radio -->
                                     <div class="space-y-4">
                                       <h4 class="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2">
@@ -716,131 +719,98 @@ const toggle = (id) => {
                         <!-- v-for Indicateur -->
                         <div class="!border-none pt-1">
                           <div v-for="(question, questionIndex) in critere.questions_de_gouvernance" :key="questionIndex" class="relative px-4 pt-2 my-3 transition-all">
-                              
- 
                             <div class="bg-white rounded-xl shadow-lg border-l-6 border-amber-500 overflow-hidden mb-6">
-  <!-- En-tête de la question -->
-  <div class="bg-gradient-to-r from-amber-50 to-yellow-50 px-6 py-4 border-b border-amber-100">
-    <div class="flex items-center gap-3">
-      <span class="_bg-amber-600 _text-white text-sm font-bold px-3 py-1 rounded-full">{{ questionIndex + 1 }}</span>
-      <h3 class="text-xl font-semibold text-gray-800">{{ question.nom }}</h3>
-    </div>
-  </div>
+                              <!-- En-tête de la question -->
+                              <div class="bg-gradient-to-r from-amber-50 to-yellow-50 px-6 py-4 border-b border-amber-100">
+                                <div class="flex items-center gap-3">
+                                  <span class="bg-primary text-white text-sm font-bold px-3 py-1 rounded-full">{{ questionIndex + 1 }}</span>
+                                  <h3 class="text-xl font-semibold text-gray-800">{{ question.nom }}</h3>
+                                </div>
+                              </div>
 
-  <!-- Contenu principal -->
-  <div class="p-6 space-y-6">
-    
-    <!-- Section Réponse -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-          <i class="fas fa-check text-white text-sm"></i>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600">Réponse sélectionnée</p>
-          <p class="text-lg font-semibold text-blue-700">
-            {{ findResponse(responses[question.id]?.optionDeReponseId) }}
-          </p>
-        </div>
-      </div>
-    </div>
+                              <!-- Contenu principal -->
+                              <div class="p-6 space-y-6">
+                                <!-- Section Réponse -->
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                  <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                                      <i class="fas fa-check text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                      <p class="text-sm font-medium text-gray-600">Réponse sélectionnée</p>
+                                      <p class="text-lg font-semibold text-blue-700">
+                                        {{ findResponse(responses[question.id]?.optionDeReponseId) }}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
 
-    <!-- Section pour réponse "Oui" -->
-    <div v-if="findResponse(responses[question.id]?.optionDeReponseId) == 'oui'" 
-         class="space-y-4">
-      
-      <!-- Section Source -->
-      <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-            <i class="fas fa-link text-white text-sm"></i>
-          </div>
-          <h4 class="text-lg font-semibold text-green-800">Source de vérification</h4>
-        </div>
-        
-        <div class="ml-11">
-          <p v-if="responses[question.id].sourceDeVerificationId == 'autre'" 
-             class="text-base text-gray-700">
-            <span class="font-medium">Source personnalisée :</span>
-            <span class="text-green-700 font-semibold ml-2">{{ responses[question.id].sourceDeVerification }}</span>
-          </p>
-          
-          <p v-else class="text-base text-gray-700">
-            <span class="font-medium">Source officielle :</span>
-            <span class="text-green-700 font-semibold ml-2">{{ findSource(responses[question.id]?.sourceDeVerificationId) }}</span>
-          </p>
-        </div>
-      </div>
+                                <!-- Section pour réponse "Oui" -->
+                                <div v-if="findResponse(responses[question.id]?.optionDeReponseId) == 'oui'" class="space-y-4">
+                                  <!-- Section Source -->
+                                  <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <div class="flex items-center gap-3 mb-3">
+                                      <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-link text-white text-sm"></i>
+                                      </div>
+                                      <h4 class="text-lg font-semibold text-green-800">Source de vérification</h4>
+                                    </div>
 
-      <!-- Section Fichiers -->
-      <div v-if="responses[question.id]?.preuves?.length" 
-           class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
-            <i class="fas fa-paperclip text-white text-sm"></i>
-          </div>
-          <h4 class="text-lg font-semibold text-purple-800">
-            Pièces justificatives ({{ responses[question.id]?.preuves?.length }})
-          </h4>
-        </div>
-        
-        <div class="ml-11 space-y-2">
-          <div v-for="(file, index) in responses[question.id]?.preuves" 
-               :key="index"
-               class="flex items-center gap-3 p-3 bg-white border border-purple-100 rounded-lg hover:shadow-sm transition-shadow duration-200">
-            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-              <i class="fas fa-file text-purple-600 text-sm"></i>
-            </div>
-            <div class="flex-1">
-              <p class="text-sm font-medium text-gray-900">{{ file.name }}</p>
-              <p class="text-xs text-gray-500">{{ file.size ? formatFileSize(file.size) : 'Taille inconnue' }}</p>
-            </div>
-            <a v-if="file.url" 
-               :href="file.url" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               class="text-purple-600 hover:text-purple-800 transition-colors duration-200">
-              <i class="fas fa-external-link-alt"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
+                                    <div class="ml-11">
+                                      <p v-if="responses[question.id].sourceDeVerificationId == 'autre'" class="text-base text-gray-700">
+                                        <span class="font-medium">Source personnalisée :</span>
+                                        <span class="text-green-700 font-semibold ml-2">{{ responses[question.id].sourceDeVerification }}</span>
+                                      </p>
 
-    <!-- Section pour réponse "Partiellement" -->
-    <div v-else-if="findResponse(responses[question.id]?.optionDeReponseId) == 'partiellement'" 
-         class="bg-orange-50 border border-orange-200 rounded-lg p-4">
-      <div class="flex items-start gap-3">
-        <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center mt-1">
-          <i class="fas fa-comment-alt text-white text-sm"></i>
-        </div>
-        <div class="flex-1">
-          <h4 class="text-lg font-semibold text-orange-800 mb-2">Description détaillée</h4>
-          <div class="bg-white border border-orange-100 rounded-lg p-4">
-            <p class="text-gray-700 leading-relaxed">
-              {{ responses[question.id].sourceDeVerification || 'Aucune description fournie' }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+                                      <p v-else class="text-base text-gray-700">
+                                        <span class="font-medium">Source officielle :</span>
+                                        <span class="text-green-700 font-semibold ml-2">{{ findSource(responses[question.id]?.sourceDeVerificationId) }}</span>
+                                      </p>
+                                    </div>
+                                  </div>
 
-    <!-- Section pour réponse "Non" -->
-    <div v-else-if="findResponse(responses[question.id]?.optionDeReponseId) == 'non'" 
-         class="bg-red-50 border border-red-200 rounded-lg p-4">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-          <i class="fas fa-times text-white text-sm"></i>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-600">Statut</p>
-          <p class="text-lg font-semibold text-red-700">Réponse négative</p>
-        </div>
-      </div>
-    </div>
+                                  <!-- Section Fichiers -->
+                                  <div v-if="responses[question.id]?.preuves?.length" class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                    <div class="flex items-center gap-3 mb-3">
+                                      <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-paperclip text-white text-sm"></i>
+                                      </div>
+                                      <h4 class="text-lg font-semibold text-purple-800">Pièces justificatives ({{ responses[question.id]?.preuves?.length }})</h4>
+                                    </div>
 
-  </div>
-</div>
+                                    <div v-for="(file, index) in responses[question.id]?.preuves" :key="index" class="flex items-center gap-3 p-3 bg-white border border-purple-100 rounded-lg hover:shadow-sm transition-shadow duration-200">
+                                      <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-file text-purple-600 text-sm"></i>
+                                      </div>
+                                      <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-900">{{ file.name }}</p>
+                                        <p class="text-xs text-gray-500">{{ file.size ? formatFileSize(file.size) : "Taille inconnue" }}</p>
+                                      </div>
+                                      <a v-if="file.url" :href="file.url" target="_blank" rel="noopener noreferrer" class="text-purple-600 hover:text-purple-800 transition-colors duration-200">
+                                        <i class="fas fa-external-link-alt"></i>
+                                      </a>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <!-- Section pour réponse "Partiellement" -->
+                                <div v-else-if="findResponse(responses[question.id]?.optionDeReponseId) == 'partiellement'" class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                  <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center mt-1">
+                                      <i class="fas fa-comment-alt text-white text-sm"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                      <h4 class="text-lg font-semibold text-orange-800 mb-2">Description détaillée</h4>
+                                      <div class="bg-white border border-orange-100 rounded-lg p-4">
+                                        <p class="text-gray-700 leading-relaxed">
+                                          {{ responses[question.id].description || "Aucune description fournie" }}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
