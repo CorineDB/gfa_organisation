@@ -5,8 +5,9 @@ import InputForm from "@/components/news/InputForm.vue";
 import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
-import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
+//import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
 import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+import EvaluationGouvernance from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
 import { getFieldErrors } from "@/utils/helpers.js";
 import { useRouter, useRoute } from "vue-router";
 import ProgressBar from "../../../components/news/ProgressBar.vue";
@@ -68,7 +69,7 @@ const participant = reactive({
 });
 const createData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.create(payload)
+  await EvaluationGouvernance.create(payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
@@ -147,7 +148,7 @@ const getEvaluation = async () => {
 
 const updateData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.update(idSelect.value, payload)
+  await EvaluationGouvernance.update(idSelect.value, payload)
     .then(() => {
       isLoading.value = false;
       getDatas();

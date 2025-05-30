@@ -7,7 +7,9 @@ import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
-import FormulaireFactuel from "@/services/modules/formFactuel.service";
+//import FormulaireFactuel from "@/services/modules/formFactuel.service";
+import EvaluationGouvernance from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
+import FormulaireFactuel from "@/services/modules/enquetes_de_gouvernance/formFactuel.service";
 import { useRouter } from "vue-router";
 import OngService from "@/services/modules/ong.service";
 import { getAllErrorMessages } from "@/utils/gestion-error";
@@ -80,7 +82,7 @@ const createData = async () => {
 };
 const getDatas = async () => {
   isLoadingData.value = true;
-  await EnqueteDeColleteService.get()
+  await EvaluationGouvernance.get()
     .then((result) => {
       datas.value = result.data.data;
       isLoadingData.value = false;
