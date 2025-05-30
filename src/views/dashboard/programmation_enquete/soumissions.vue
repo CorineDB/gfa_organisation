@@ -6,8 +6,11 @@ import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 //import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
-import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
-import EvaluationGouvernance from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
+//import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+
+import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
+import ResultatSyntheseService from "@/services/modules/enquetes_de_gouvernance/synthese.service";
+
 import { getFieldErrors } from "@/utils/helpers.js";
 import { useRouter, useRoute } from "vue-router";
 import ProgressBar from "../../../components/news/ProgressBar.vue";
@@ -89,6 +92,8 @@ const getDatas = async () => {
     .then((result) => {
       datas.value = result.data.data;
 
+      console.log("getDatas", datas);
+
       if (datas.value.factuel?.comite_members) {
         localStorage.setItem("member", JSON.stringify(datas.value.factuel.comite_members));
       }
@@ -136,7 +141,7 @@ const getEvaluation = async () => {
   await EvaluationService.findEvaluation(idEvaluation)
     .then((result) => {
       statistiques.value = result.data.data;
-      console.log(statistiques.value);
+      console.log("statistiques : ", statistiques.value);
       isLoadingStats.value = false;
     })
     .catch((e) => {
@@ -199,8 +204,8 @@ const openFactuelModal = () => {
   }
 };
 
-const goToDetailSoumission = (idSoumission) => {
-  router.push({ name: "DetailSoumission", params: { e: idEvaluation, s: idSoumission } });
+const goToDetailSoumission = (idSoumission, type= 'factuel') => {
+  router.push({ name: "DetailSoumission", params: { e: idEvaluation, s: idSoumission }, query: { type: type } });
 };
 
 const goToPageSynthese = () => {
@@ -215,10 +220,13 @@ const goToMesuresAPrendre = (org = null) => {
   router.push({ name: "MesuresAPrendre", params: { e: idEvaluation, s: org ?? authUser.value?.profil?.id } });
 };
 
-const goToFactuelSoumissionPage = (Idsoumission, status = false) => {
-  if (status == true) {
+const goToFactuelSoumissionPage = (Idsoumission, type = 'factuel', status = false) => {
+  /* if (status == true) {
     router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
-  }
+  } */
+
+  showModalOrganisation.value = false;
+  router.push({ name: "soumission", params: { e: idEvaluation, s: Idsoumission }, query: { type: type } });
 };
 
 const sendReminder = async () => {
@@ -558,7 +566,7 @@ onMounted(async () => {
           </div>
 
           <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-2">
-            <div @click="goToFactuelSoumissionPage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques?.formulaire_factuel_de_gouvernance" @click="goToFactuelSoumissionPage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation factuel</div>
               </div>
@@ -566,19 +574,19 @@ onMounted(async () => {
               <div class="m-5 text-slate-600 dark:text-slate-500">
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Start At:
-                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.created_at : "Not Defined" }}</div>
+                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel.created_at : "Not Defined" }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Submitted_at At:
-                  <div class="ml-2 font-bold">{{ datas?.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Not Defined") : "Not Defined" }}</div>
+                  <div class="ml-2 font-bold">{{ datas.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Not Defined") : "Not Defined" }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
-                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.reponses_de_la_collecte.length : 0 }}</div>
+                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.reponses_de_la_collecte?.length : 0 }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total Membres du comite:
-                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
+                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
                 </div>
                 <div class="mt-4">
                   <!-- <pre>{{ datas.factuel.pourcentage_evolution }}</pre> -->
@@ -607,7 +615,7 @@ onMounted(async () => {
 
               <div v-if="datas.factuel && datas.factuel.pourcentage_evolution > 0" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button @click.self="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button @click.self="goToDetailSoumission(datas.factuel.id, 'factuel')" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Details de la soumission
                     <ExternalLinkIcon class="ml-2 size-5" />
                   </button>
@@ -647,7 +655,7 @@ onMounted(async () => {
               </div>
             </div>
 
-            <div v-if="statistiques?.formulaire_perception_de_gouvernance " class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques.formulaire_de_perception_de_gouvernance " class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation de Perception</div>
               </div>
@@ -655,43 +663,40 @@ onMounted(async () => {
               <div class="m-5 text-slate-600 dark:text-slate-500">
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Start At
-                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception.created_at : "Not Defined" }}</div>
+                  <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception.created_at : "Pas demarre" }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total participants:
-                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.length : 0 }}</div>
+                  <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.length : 0 }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
-                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
-                </div>
-                <div class="flex items-center">
-                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
+                  <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
                 </div>
 
                 <div class="mt-4">
                   <p>Évolution soumissions</p>
-                  <ProgressBar :percent="datas.perception ? datas.pourcentage_evolution_des_soumissions_de_perception : 0" />
+                  <ProgressBar :percent="datas.perception.length ? datas.pourcentage_evolution_des_soumissions_de_perception : 0" />
                 </div>
               </div>
 
-              <div v-if="datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception >= 100" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-if="datas.perception.length && datas.pourcentage_evolution_des_soumissions_de_perception >= 100" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <button @click.self="goToPageMarqueur" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Voir Fiche de synthese
                   <ArrowRightIcon class="ml-2 size-5" />
                 </button>
               </div>
 
-              <div v-else-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-else-if="!datas.perception.length || (datas.perception.length && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="(!datas.perception && statistiques.statut === 0) || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-if="(!datas.perception.length && statistiques.statut === 0) || (datas.perception.length && datas.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Envoyer une invitation
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
 
                   <button v-else class="w-full gap-2 py-[22px]"></button>
                 </div>
-                <button v-if="datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100" @click="sendReminder" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                <button v-if="datas.perception.length && datas.pourcentage_evolution_des_soumissions_de_perception < 100" @click="sendReminder" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Envoyer un rappel
                   <ExternalLinkIcon class="ml-2 size-5" />
                 </button>

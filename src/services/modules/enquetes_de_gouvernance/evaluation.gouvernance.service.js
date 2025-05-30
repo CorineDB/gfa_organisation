@@ -18,9 +18,9 @@ const EvaluationService = {
 
   getFormEvaluation(idEvaluation) {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${idEvaluation}/organisations`);
-  },
+  }, 
   
-  getFactuelFormEvaluation(idEvaluation) {
+  getFormulaireFactuelEvaluation(idEvaluation) {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${idEvaluation}/formulaire-factuel`);
   },
   
@@ -32,14 +32,14 @@ const EvaluationService = {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${idEvaluation}/voir-resultats-avec-classement-organisations`);
   },
   
-  getFactuelFormEvaluation(token) {
+ getFactuelFormEvaluation(token) {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance-factuel/${token}`);
   },
   findEvaluation(id) {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}`);
   },
   getSource() {
-    return ApiService.get(`gfa/enquete-de-gouvernance/sources-de-verification`);
+    return ApiService.get(`gfa/sources-de-verification`);
   },
   getSoumissionsEvaluation(id) {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/soumissions`);
@@ -104,6 +104,18 @@ const EvaluationService = {
 
   prolonger(slug, params) {
     return ApiService.post(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${slug}/ajouterDuree`, params);
+  },
+
+  getRecommandationsEvaluation(idEvaluation) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/recommandations`);
+  },
+  
+  getActionsAMenerEvaluation(idEvaluation) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/actions-a-mener`);
+  },
+  
+  getFeuilleDeRouteEvaluation(idEvaluation) {
+    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/feuille-de-route`);
   },
 };
 

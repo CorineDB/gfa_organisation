@@ -1,7 +1,8 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import { reactive } from "vue";
-import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+//import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { toast } from "vue3-toastify";
 import VButton from "@/components/news/VButton.vue";
