@@ -1,5 +1,5 @@
 <template>
-  <table class="w-full my-10 border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
+  <table id="rpiper" class="w-full my-10 border-collapse table-auto border-slate-500" cellpadding="0" cellspacing="0">
     <thead class="text-white bg-blue-900">
       <tr>
         <th class="py-3 border border-slate-900">Principes</th>

@@ -1,6 +1,7 @@
 <template>
   <div class="h-4 mt-1 progress">
-    <div :style="`width:${prop.percent >= 100 ? 100 : prop.percent}%`" :class="color" class="rounded-full progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">{{ Math.round(prop.percent) }} %</div>
+    <!-- <pre>{{ prop.percent }}</pre> -->
+    <div :style="`width:${prop.percent >= 100 ? 100 : prop.percent}%`" :class="color" class="rounded-full progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">{{ prop.percent }} %</div>
   </div>
 </template>
 

@@ -260,7 +260,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <h2 class="my-10 text-lg font-medium intro-y">Évaluation de gouvernace</h2>
+  <h2 class="my-10 text-lg font-medium intro-y">Évaluation de gouvernance</h2>
   <div class="grid grid-cols-12 gap-6 mb-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
       <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
@@ -301,12 +301,10 @@ onMounted(async () => {
                   </Dropdown>
                 </div> -->
 
-                <div @click="gotoSoumissions(item)" class="flex flex-col items-start w-full gap-2 mt-2 cursor-pointer">
+                <div @click="gotoSoumissions(item)" class="_flex _flex-col _items-start w-full gap-2 mt-2 cursor-pointer">
                   <!-- Item details -->
                   <div class="text-center lg:text-left lg:mt-0">
-                    <span class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary">
-                      {{ item.intitule }}
-                    </span>
+                    <span class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary line-clamp-1 hover:line-clamp-none transition-all break-words"> {{ item.intitule }} terztrrt'é'é'fdsfdsdfs </span>
                   </div>
                 </div>
 
@@ -322,8 +320,8 @@ onMounted(async () => {
                     <div class="flex items-center text-sm font-medium text-gray-700">
                       <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut: <span :class="getStatusText(item.statut).class" class="px-3 py-2 ml-3 text-xs text-white rounded-full">{{ getStatusText(item.statut).label }}</span>
                     </div>
-                    <div class="flex items-center text-sm font-medium text-gray-700">
-                      <CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Période:
+                    <div class="flex items-start text-sm font-medium text-gray-700 flex-wrap">
+                      <div class="mb-2 flex items-center"><CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Période:</div>
                       <span class="ml-2 font-semibold text-gray-900">{{ item.debut }} <span class="font-normal">au</span> {{ item.fin }}</span>
                     </div>
                     <!-- <div class="flex items-center text-sm font-medium text-gray-700">

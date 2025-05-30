@@ -44,6 +44,19 @@ const currentOrganisationsOptions = ref("");
 const invitationPayload = reactive({ participants: [], nbreParticipants: 0 });
 const showInvitationModal = ref(false);
 
+const getStatusText2 = (param) => {
+  switch (param) {
+    case 1:
+      return { label: "Terminé", class: "bg-success" };
+    case 0:
+      return { label: "En cours", class: "bg-pending" };
+    case -1:
+      return { label: "Non demarré", class: "bg-primary" };
+    default:
+      return { label: "A déterminer", class: "bg-primary" };
+  }
+};
+
 const options = [
   { label: "Adresse Email", id: "email" },
   { label: "Numéro de téléphone", id: "contact" },
@@ -74,6 +87,11 @@ const getDatas = async () => {
   await EvaluationService.getSoumissionsEvaluation(idEvaluation)
     .then((result) => {
       datas.value = result.data.data;
+
+      if (datas.value.factuel?.comite_members) {
+        localStorage.setItem("member", JSON.stringify(datas.value.factuel.comite_members));
+      }
+
       isLoadingData.value = false;
     })
     .catch((e) => {
@@ -102,6 +120,7 @@ const getFormulaireFactuel = async () => {
   await EvaluationService.getFormulaireFactuelEvaluation(idEvaluation)
     .then((result) => {
       formulaireFactuel.value = result.data.data;
+      console.log("formulaireFactuel.value", result.data.data);
       isLoadingData.value = false;
     })
     .catch((e) => {
@@ -116,6 +135,7 @@ const getEvaluation = async () => {
   await EvaluationService.findEvaluation(idEvaluation)
     .then((result) => {
       statistiques.value = result.data.data;
+      console.log(statistiques.value);
       isLoadingStats.value = false;
     })
     .catch((e) => {
@@ -169,7 +189,13 @@ const getStatusText = (param) => {
 };
 
 const openFactuelModal = () => {
-  router.push({ name: "ToolsFactuel", params: { id: formulaireFactuel.value.token } });
+  console.log("formulaireFactuel.value.token", formulaireFactuel.value);
+
+  if (formulaireFactuel.value) {
+    router.push({ name: "ToolsFactuel", params: { id: formulaireFactuel.value.token } });
+  } else {
+    toast.info("Le délail de soumission de l'enquête est passé");
+  }
 };
 
 const goToDetailSoumission = (idSoumission) => {
@@ -347,6 +373,10 @@ function getPercentEvolutionOng(id) {
   return ong?.pourcentage_evolution ?? 0;
 }
 
+function deleteItem(index) {
+  invitationPayload.participants.splice(index, 1);
+}
+
 const changeOrganisationOptions = () => {
   loadingOption.value = false;
   setTimeout(() => {
@@ -379,25 +409,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <h2 class="mt-10 text-lg font-medium intro-y">Soumissions par organisations</h2>
-  <div class="grid grid-cols-12 gap-6 mt-5">
-    <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
-      <!-- <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-0">
-        <div class="relative w-56 text-slate-500">
-          <input type="text" class="w-56 pr-10 form-control box" placeholder="Recherche..." />
-          <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
-        </div>
-      </div> -->
-      <!-- <div class="flex">
-        <button class="mr-2 shadow-md btn btn-primary" @click="openFactuelModal">Remplir formulaire Factuel</button>
-        <button class="mr-2 shadow-md btn btn-primary" @click="openPerceptionModal">Remplir formulaire de perception</button>
-      </div> -->
-      <div class="flex">
-        <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
-        <!-- <button class="mr-2 shadow-md btn btn-primary" @click="opendAddParticipant">Ajouter les participants</button> -->
-        <!-- <button class="mr-2 shadow-md btn btn-primary" @click="sendInvitationLink">Paramètres evaluation perception</button>        -->
-      </div>
-    </div>
+  <div class="flex justify-between mt-4 items-center">
+    <h2 class="text-lg font-medium intro-y">Soumissions par organisations</h2>
+    <button class="btn btn-primary" @click="router.push({ name: 'Programmation_enquete' })">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
   </div>
 
   <div class="p-5 mt-0 intro-y">
@@ -409,7 +423,7 @@ onMounted(async () => {
         </div>
 
         <div class="grid grid-cols-12 gap-6 mt-5">
-          <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+          <!-- <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
                 <div class="flex items-center justify-between">
@@ -429,8 +443,8 @@ onMounted(async () => {
                 </div>
               </div>
             </div>
-          </div>
-          <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+          </div> -->
+          <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
                 <div class="flex items-center justify-between">
@@ -459,7 +473,7 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+          <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
                 <div class="flex items-center justify-between">
@@ -487,7 +501,7 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
+          <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
                 <div class="flex items-center justify-between">
@@ -514,7 +528,7 @@ onMounted(async () => {
       </div>
       <LoaderSnipper v-else />
 
-      <div v-if="statistiques.statut == 1" class="col-span-12 mt-8">
+      <div v-if="statistiques.statut == 1 && statistiques?.formulaire_perception_de_gouvernance " class="col-span-12 mt-8">
         <div class="flex items-center h-10 intro-y">
           <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
         </div>
@@ -566,12 +580,15 @@ onMounted(async () => {
                   <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
                 </div>
                 <div class="mt-4">
+                  <!-- <pre>{{ datas.factuel.pourcentage_evolution }}</pre> -->
                   <p>Évolution soumissions</p>
                   <ProgressBar :percent="datas.factuel ? datas.factuel.pourcentage_evolution : 0" />
                 </div>
               </div>
 
-              <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <!-- <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400"> -->
+
+              <!-- <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                   <button v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" @click.self="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Details de la soumission
@@ -579,22 +596,39 @@ onMounted(async () => {
                   </button>
 
                   <button v-else class="w-full gap-2 py-[22px]"></button>
-                  <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
+                  <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button>
                 </div>
                 <button v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" @click.self="goToPageSynthese" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Fiche de synthèse
                   <ArrowRightIcon class="ml-2 size-5" />
                 </button>
+              </div> -->
+
+              <div v-if="datas.factuel && datas.factuel.pourcentage_evolution > 0" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                  <button @click.self="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                    Details de la soumission
+                    <ExternalLinkIcon class="ml-2 size-5" />
+                  </button>
+
+                  <!-- <button class="w-full gap-2 py-[22px]"></button> -->
+                  <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
+                </div>
+                <button @click.self="goToPageSynthese" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                  Fiche de synthèse
+                  <ArrowRightIcon class="ml-2 size-5" />
+                </button>
               </div>
 
-              <div v-if="!datas.factuel || (datas.factuel && datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-if="!datas.factuel || (datas.factuel && !datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="(datas.factuel && datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <!-- <pre>{{ statistiques.statut }}</pre> -->
+                  <button v-if="(datas.factuel && !datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Continuer
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
 
-                  <button v-else-if="!datas.factuel" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-else-if="!datas.factuel && statistiques.statut === 0" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Demarrer
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
@@ -612,7 +646,7 @@ onMounted(async () => {
               </div>
             </div>
 
-            <div class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques?.formulaire_perception_de_gouvernance " class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation de Perception</div>
               </div>
@@ -649,7 +683,7 @@ onMounted(async () => {
 
               <div v-else-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-if="(!datas.perception && statistiques.statut === 0) || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Envoyer une invitation
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
@@ -695,6 +729,7 @@ onMounted(async () => {
           </div>
           <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
           <ActionPlan :actions="feuilleDeRoute" />
+          <!-- <pre>{{ feuilleDeRoute }}</pre> -->
         </div>
       </div>
 
@@ -774,7 +809,7 @@ onMounted(async () => {
               </form>
               <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="10" v-model.number="participant.phone" />
+                  <InputForm class="" type="text" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="10" v-model="participant.phone" />
                   <!-- <div class="">
                     <label for="Numéro de téléphone" class="form-label">Numéro de téléphone</label>
                     <input id="Numéro de téléphone" type="number" pattern="\d{1,8}" maxlength="8" required v-model.number="currentPhone" class="form-control" placeholder="Numéro de téléphone" />
@@ -786,7 +821,7 @@ onMounted(async () => {
               <div class="flex flex-wrap items-center w-full max-w-full gap-3">
                 <div class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium rounded-sm shadow cursor-pointer bg-blue text-primary" v-for="(participant, index) in invitationPayload.participants" :key="index">
                   <span>{{ participant.type_de_contact === "email" ? participant?.email : participant?.phone }}</span>
-                  <button @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
+                  <button type="button" @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
                 </div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 .mobile-menu {
-  @apply w-full fixed bg-primary/90 z-[60] border-b border-white/[0.08] -mt-5 -mx-8 mb-6 dark:bg-darkmode-700;
+  @apply w-full fixed bg-primary/90 z-[60] border-b border-white/[0.08] mt-[-5.25rem] -mx-8 mb-6 dark:bg-darkmode-700;
   &:before {
     content: "";
     @apply absolute inset-0 z-[-1] w-full h-full bg-black/[0.15];

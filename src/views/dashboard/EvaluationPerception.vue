@@ -264,17 +264,25 @@ const isLastPage = computed(() => currentPage.value === totalPages.value);
 // );
 
 onMounted(async () => {
-  if (getvalidateKey("perception")) {
-    showAlertValidate.value = true;
-  } else {
-    payload.identifier_of_participant = generateUniqueId();
-    await getDataFormPerception();
+  // if (getvalidateKey("perception")) {
+  //   showAlertValidate.value = true;
+  // } else {
+  //   payload.identifier_of_participant = generateUniqueId();
+  //   await getDataFormPerception();
 
-    if (!showAlertValidate.value) {
-      // await getcurrentUserAndFetchOrganization();
-      // findFormulairePerception();
-      initializeFormData();
-    }
+  //   if (!showAlertValidate.value) {
+  //     // await getcurrentUserAndFetchOrganization();
+  //     // findFormulairePerception();
+  //     initializeFormData();
+  //   }
+  // }
+
+  payload.identifier_of_participant = generateUniqueId();
+  await getDataFormPerception();
+
+  if (!showAlertValidate.value) {
+       
+    initializeFormData();
   }
 });
 </script>

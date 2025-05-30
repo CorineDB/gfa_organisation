@@ -7,12 +7,14 @@ import EvaluationService from "@/services/modules/evaluation.gouvernance.service
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { getColorForValue } from "@/utils/findColorIndicator";
-import { useRoute } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
 import { getFieldErrors } from "@/utils/helpers.js";
+import DeleteButton from "@/components/news/DeleteButton.vue";
 
 const route = useRoute();
+const router = useRouter();
 const idEvaluation = route.params.e;
 const organizationId = ref(route.params.s);
 const authUser = ref("");
@@ -46,9 +48,10 @@ const openMesureModal = () => {
 };
 
 const editMesureModal = (mesure) => {
-  isCreate = false
+  // mode.value = "Modifier";
+  isCreate.value = false;
   recommandationPayload.recommandation = mesure.recommandation;
-  showMesureModal.value = true
+  showMesureModal.value = true;
   idSelect.value = mesure.id;
 };
 
@@ -57,12 +60,12 @@ const openActionModal = () => {
 };
 
 const editActionModal = (action) => {
-  isCreate = false
+  isCreate.value = false;
   actionPayload.action = action.action;
   actionPayload.start_at = action.start_at;
   actionPayload.end_at = action.end_at;
   actionPayload.recommandationId = action.recommandationId;
-  showActionModal.value = true
+  showActionModal.value = true;
   idSelect.value = action.id;
 };
 
@@ -82,7 +85,7 @@ const toggleCollapse = (index) => {
 const resetMesureForm = () => {
   recommandationPayload.recommandation = "";
   showMesureModal.value = false;
-  isCreate = true
+  isCreate.value = true;
   errorsMesure.value = {};
 };
 
@@ -93,7 +96,7 @@ const resetActionForm = () => {
   actionPayload.recommandationId = "";
   actionPayload.indicateurs = [];
   showActionModal.value = false;
-  isCreate = true
+  isCreate.value = true;
   errorsActions.value = {};
 };
 
@@ -217,7 +220,7 @@ const deleteActionData = async () => {
       showDeleteActionModal.value = false;
       isLoading.value = false;
       toast.success("Action correctionnelle supprimée");
-      getFeuilleDeRouteData()
+      getFeuilleDeRouteData();
     })
     .catch((e) => {
       isLoading.value = false;
@@ -277,9 +280,22 @@ onMounted(async () => {
 
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
 });
+
+const goBack = () => {
+  router.push({
+    name: "SoumissionsEnqueteDeCollecte",
+    params: {
+      id: route.params.e,
+    },
+  });
+};
 </script>
 
 <template>
+  <div class="flex justify-between mt-4 items-center">
+    <h2 class="text-lg font-medium intro-y">Action à mener et recommandation</h2>
+    <button class="btn btn-primary" @click="goBack">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
+  </div>
   <PreviewComponent class="mt-5 intro-y _box">
     <Preview>
       <TabGroup>
@@ -298,56 +314,59 @@ onMounted(async () => {
               </div>
             </div>
 
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Feuille de Route des mesures a prendre</h2>
-               
-                <div>
-                  <table cellspacing="0" cellpadding="10">
-                    <thead>
-                      <tr>
-                        <th>Action</th>
-                        <th>Status</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Validated At</th>
-                        <th>Actions</th> <!-- New Actions column -->
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!-- Loop through recommendations -->
-                      <template v-for="recommendation in feuilleDeRoute.recommandations" :key="recommendation.id">
-                        <!-- Recommendation row -->
-                        <!-- <tr>
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Feuille de Route des mesures a prendre</h2>
+
+            <div>
+              <table cellspacing="0" cellpadding="10">
+                <thead>
+                  <tr>
+                    <th>Action</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Validated At</th>
+                    <th>Actions</th>
+                    <!-- New Actions column -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loop through recommendations -->
+                  <template v-for="recommendation in feuilleDeRoute.recommandations" :key="recommendation.id">
+                    <!-- Recommendation row -->
+                    <!-- <tr>
                           <td :rowspan="recommendation.actions_a_mener.length + 1">{{ recommendation.recommandation }}</td>
                           <td colspan="5" class="actions-header">
                             
                           </td>
                         </tr> -->
 
-                        <tr class="highlight-row">
-                          <td colspan="5">{{ recommendation.recommandation }}</td>
-                          <td class="actions-cell">
-                            <!-- Actions buttons for the recommendation -->
-                            <button class="action-button" @click="editMesureModal(recommendation)">Edit</button>
-                          </td>
-                        </tr>
-                        <!-- Loop through actions of the current recommendation -->
-                        <tr v-for="action in recommendation.actions_a_mener" :key="action.id">
-                          <td>{{ action.action }}</td>
-                          <td>{{ getStatus(action.statut) }}</td>
-                          <td>{{ action.start_at }}</td>
-                          <td>{{ action.end_at }}</td>
-                          <td>{{ action.validated_at }}</td>
-                          <td class="actions-cell">
-                            <!-- Action buttons for each individual action -->
-                            <button class="action-button" @click="editActionModal(action)">Edit</button>
-                            <button class="action-button" @click="handleDeleteAction(action)">Delete</button>
-                          </td>
-                        </tr>
-                      </template>
-                    </tbody>
-                  </table>
-                </div>
-
+                    <tr class="highlight-row">
+                      <td colspan="5">{{ recommendation.recommandation }}</td>
+                      <td class="actions-cell">
+                        <!-- Actions buttons for the recommendation -->
+                        <button class="action-button mr-2" @click="editMesureModal(recommendation)"><EditIcon class="w-4 h-4" /></button>
+                        <button class="action-button mr-2" @click="handleDeleteMesure(recommendation)"><TrashIcon class="w-4 h-4" /></button>
+                      </td>
+                    </tr>
+                    <!-- Loop through actions of the current recommendation -->
+                    <tr v-for="action in recommendation.actions_a_mener" :key="action.id">
+                      <td>{{ action.action }}</td>
+                      <td>{{ getStatus(action.statut) }}</td>
+                      <td>{{ action.start_at }}</td>
+                      <td>{{ action.end_at }}</td>
+                      <td>{{ action.validated_at }}</td>
+                      <td class="actions-cell">
+                        <!-- Action buttons for each individual action -->
+                        <button class="action-button mr-2" @click="editActionModal(action)"><EditIcon class="w-4 h-4" /></button>
+                        <button class="action-button mr-2" @click="handleDeleteAction(action)"><TrashIcon class="w-4 h-4" /></button>
+                        <!-- <button class="action-button" @click="editActionModal(action)">Edit</button>
+                        <button class="action-button" @click="handleDeleteAction(action)">Delete</button> -->
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
           </TabPanel>
           <!-- Perception-->
           <TabPanel class="leading-relaxed">
@@ -422,6 +441,7 @@ onMounted(async () => {
           <div class="">
             <label class="form-label">Recommandation </label>
             <TomSelect required="false" v-model="actionPayload.recommandationId" :options="{ placeholder: 'Selectionez la mesure auquel il est associe' }" class="w-full">
+              <!-- <option value=""></option> -->
               <option v-for="(mesure, index) in mesuresAPrendre" :key="index" :value="mesure.id">{{ mesure.recommandation }}</option>
             </TomSelect>
             <div v-if="errorsActions.recommandationId" class="mt-2 text-danger">{{ getFieldErrors(errorsActions.recommandationId) }}</div>
@@ -464,7 +484,7 @@ onMounted(async () => {
       </div>
       <div class="flex justify-center w-full gap-3 py-4 text-center">
         <button type="button" @click="cancelSelect" class="mr-1 btn btn-outline-secondary">Annuler</button>
-        <DeleteButton :loading="isLoading" @click="deleteMesuseData" />
+        <DeleteButton :loading="isLoading" @click="deleteMesureData" />
       </div>
     </ModalBody>
   </Modal>

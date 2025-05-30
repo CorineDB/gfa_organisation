@@ -7,20 +7,24 @@ import ComposantesService from "@/services/modules/composante.service";
 import InputForm from "@/components/news/InputForm.vue";
 import verifyPermission from "@/utils/verifyPermission";
 import VButton from "@/components/news/VButton.vue";
- import pagination from "@/components/news/pagination.vue";
+import pagination from "@/components/news/pagination.vue";
 import { helper as $h } from "@/utils/helper";
+import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
+import LoaderSnipper from "@/components/LoaderSnipper.vue";
 
 import { toast } from "vue3-toastify";
 export default {
   components: {
     InputForm,
     VButton,
-   pagination,
+    pagination,
+    LoaderSnipper,
+    NoRecordsMessage,
   },
   data() {
     return {
       search: "",
-      isLoadingOutcome: false,
+      isLoadingOutcome: true,
       itemsPerPage: 3, // Nombre d'éléments par page
       totalItems: null,
       currentPage: 1, // Page courante
@@ -34,6 +38,7 @@ export default {
       isLoading: false,
       formData: {
         nom: "",
+        description: "",
         poids: 0,
         projetId: "",
         pret: 0,
@@ -61,6 +66,16 @@ export default {
 
       return paginatedData;
     },
+    getPlageProjet() {
+      let obj = null;
+
+      if (this.projetId !== "") {
+        //obj = this.projets.find((item) => item.id === this.projetId);
+        obj = this.projets;
+      }
+
+      return obj ? obj : null;
+    },
   },
   watch: {
     projetId(newValue, oldValue) {
@@ -81,6 +96,18 @@ export default {
   },
 
   methods: {
+    text() {},
+    cancel() {
+      this.formData = {
+        nom: "",
+        poids: 0,
+        projetId: "",
+        pret: 0,
+        budgetNational: 0,
+      };
+
+      this.showModal = false;
+    },
     onPageChanged(newPage) {
       this.currentPage = newPage;
       console.log("Page actuelle :", this.currentPage);
@@ -139,6 +166,7 @@ export default {
       console.log("showModal", this.showModal);
       this.update = true;
       this.formData.nom = data.nom;
+      this.formData.description = data.description;
       this.formData.poids = data.poids;
       this.formData.pret = data.pret ?? "";
       this.formData.projetId = data.projetId;
@@ -150,18 +178,17 @@ export default {
     addComposants() {
       this.showModal = true;
       this.isUpdate = false;
-      // this.formData.projetId = this.projetId;
+      this.formData.projetId = this.projetId;
       this.labels = "Ajouter";
     },
     sendForm() {
+      this.formData.projetId = this.projets.id;
       console.log(this.formData);
 
       if (this.update) {
-        this.isLoading = true;
         ComposantesService.update(this.composantsId, this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
-              this.isLoading = false;
               this.update = false;
               this.isLoading = false;
               this.showModal = false;
@@ -176,7 +203,7 @@ export default {
           .catch((error) => {
             console.log(error);
             this.isLoading = false;
-            if (error.response && error.response.data && error.response.data.errors) {
+            if (error.response && error.response.data && Object.keys(error.response.data.errors).length > 0) {
               this.messageErreur = error.response.data.errors;
 
               Object.keys(this.messageErreur).forEach((key) => {
@@ -184,7 +211,7 @@ export default {
               });
               toast.error("Une erreur s'est produite.Vérifier le formulaire de soumission");
             } else {
-              toast.error(error.message);
+              toast.error(error.response.data.message);
               //
             }
           });
@@ -207,7 +234,7 @@ export default {
             this.isLoading = false;
             console.log("error", error);
 
-            if (error.response && error.response.data && error.response.data.errors) {
+            if (error.response && error.response.data && Object.keys(error.response.data.errors).length > 0) {
               this.messageErreur = error.response.data.errors;
 
               Object.keys(this.messageErreur).forEach((key) => {
@@ -217,30 +244,48 @@ export default {
               console.log("this.messageErreur", this.messageErreur);
               toast.error("Une erreur s'est produite.Vérifier le formulaire de soumission");
             } else {
-              toast.error(error.message);
+              toast.error(error.response.data.message);
             }
           });
       }
     },
-    // getListeProjet() {
-    //   ProjetService.get()
-    //     .then((data) => {
-    //       this.projets = data.data.data;
-    //       this.getProjetById();
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // },
     getListeProjet() {
+      this.isLoadingOutcome = true;
+
+      // ProjetService.get()
+      //   .then((data) => {
+      //     this.projets = data.data.data;
+      //     this.composants = data.data.data.composantes;
+      //     this.formData.projetId = data.data.data.id;
+
+      //     console.log(data.data.data.id);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
+
       ProjetService.get()
         .then((data) => {
-          this.composants = data.data.data.composantes;
-          this.formData.projetId = data.data.data.id;
-
-          console.log(data.data.data.id);
+          this.projets = data.data.data;
+          this.getProjetById();
         })
         .catch((error) => {
+          this.isLoadingOutcome = false;
+          console.log(error);
+        });
+    },
+    getProjetById() {
+      if (this.projetId == "") {
+        this.projetId = this.projets.id;
+      }
+
+      ProjetService.getDetailProjet(this.projetId)
+        .then((data) => {
+          this.composants = data.data.data.composantes;
+          this.isLoadingOutcome = false;
+        })
+        .catch((error) => {
+          this.isLoadingOutcome = false;
           console.log(error);
         });
     },
@@ -268,6 +313,21 @@ export default {
 
       <div class="grid grid-cols-3 gap-4">
         <div class="flex col-span-12">
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
+          <TomSelect
+            v-model="projetId"
+            :options="{
+              placeholder: 'Choisir un Output',
+              create: false,
+              onOptionAdd: text(),
+            }"
+            class="w-full"
+          >
+            <option value=""></option>
+            <option v-for="(element, index) in projets" :key="index" :value="element.id">{{ element.codePta }} - {{ element.nom }}</option>
+          </TomSelect>
+        </div>
+        <div class="flex col-span-12">
           <v-select class="w-full" :reduce="(projet) => projet.id" v-model="projetId" label="nom" :options="projets">
             <template #search="{ attributes, events }">
               <input class="vs__search form-input" :required="!projetId" v-bind="attributes" v-on="events" />
@@ -294,7 +354,9 @@ export default {
     </div>
   </div>
 
-  <div v-if="!isLoadingData" class="grid grid-cols-12 gap-6 mt-5">
+  <LoaderSnipper v-if="isLoadingOutcome" />
+  <div v-if="!isLoadingOutcome" class="grid grid-cols-12 gap-6 mt-5">
+    <NoRecordsMessage class="col-span-12" v-if="!paginatedAndFilteredData.length" title="Aucun outCome trouvée" description="Il semble qu'il n'y ait pas d'outComes à afficher. Veuillez en créer un. " />
     <div v-for="(item, index) in paginatedAndFilteredData" :key="index" class="col-span-12 p-4 md:col-span-6 xl:col-span-4">
       <div v-if="verifyPermission('voir-un-outcome')" class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
         <!-- En-tête avec sigle et titre -->
@@ -302,7 +364,7 @@ export default {
           <div class="relative flex flex-col items-center w-full pt-5 lg:flex-row lg:items-start">
             <!-- Circle with initial or image -->
             <div class="flex items-center justify-center w-[90px] h-[90px] text-white rounded-full shadow-md bg-primary flex-shrink-0">
-              {{ item.sigle }}
+              {{ item.codePta }}
             </div>
             <!-- Item details -->
             <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0 flex-1">
@@ -331,14 +393,22 @@ export default {
           <!-- Other details with iconized section headers -->
           <div class="mt-5 space-y-3 text-gray-600">
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ $h.formatCurrency(item.budgetNational) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.budgetNational == 0 ? 0 : $h.formatCurrency(item.budgetNational) }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
 
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Montant financé: {{ $h.formatCurrency(item.pret == null ? 0 : item.pret) }}
+              <!-- <pre>{{ item.pret }} Pret</pre> -->
+              <LinkIcon class="w-4 h-4 mr-2" /> Montant financé: {{ item.pret == 0 ? 0 : $h.formatCurrency(item.pret) }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
+            <!-- <pre>{{ item }}</pre> -->
+            <!-- <div class="flex items-center mt-2">
+              <ClockIcon class="w-4 h-4 mr-2" />
+              <div>
+                Date : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(item.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(item.fin) }}</span>
+              </div>
+            </div> -->
             <div class="flex items-center text-sm font-medium text-gray-700">
               <GlobeIcon class="w-4 h-4 mr-2 text-primary" /> Taux d'exécution physique:
               <span class="ml-2 font-semibold text-gray-900">{{ item.tep }}</span>
@@ -362,7 +432,7 @@ export default {
   </div>
 
   <pagination class="col-span-12" :total-items="totalItems" :items-per-page="itemsPerPage" :is-loading="isLoadingData" @page-changed="onPageChanged" @items-per-page-changed="onItemsPerPageChanged">
-    Slots personnalisés (facultatif)
+    <!-- Slots personnalisés (facultatif) -->
     <template #prev-icon>
       <span>&laquo; Précédent</span>
     </template>
@@ -383,6 +453,11 @@ export default {
         <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
 
+        <div class="input-form mt-3 col-span-12">
+          <label for="validation-form-6" class="form-label w-full"> Description </label>
+          <textarea v-model="formData.description" class="form-control w-full" name="comment" placeholder="Ajouter une description"></textarea>
+        </div>
+
         <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
 
@@ -390,17 +465,30 @@ export default {
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
 
         <!-- <div class="flex col-span-12 mt-4">
-          <v-select class="w-full" :reduce="(projet) => projet.id" v-model="formData.projetId" label="nom" :options="projets">
-            <template #search="{ attributes, events }">
-              <input class="vs__search form-input" :required="!formData.projetId" v-bind="attributes" v-on="events" />
-            </template>
-          </v-select>
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
+          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
+          <TomSelect
+            v-model="formData.projetId"
+            :options="{
+              placeholder: 'Choisir un Output',
+              create: false,
+              onOptionAdd: text(),
+            }"
+            class="w-full"
+          >
+            <option value="">Choisir un projet</option>
+            <option v-for="(element, index) in projets" :key="index" :value="element.id">{{ element.codePta }} - {{ element.nom }}</option>
+          </TomSelect>
         </div> -->
+        <div v-if="getPlageProjet" class="flex items-center mt-2 col-span-12">
+          <ClockIcon class="w-4 h-4 mr-2" />
+          <div>
+            Durée du projet : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(getPlageProjet.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageProjet.fin) }}</span>
+          </div>
+        </div>
       </ModalBody>
       <ModalFooter>
         <div class="flex items-center justify-center">
-          <button type="button" @click="showModal = false" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
+          <button type="button" @click="cancel" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
           <VButton class="inline-block" :label="labels" :loading="isLoading" />
         </div>
       </ModalFooter>
