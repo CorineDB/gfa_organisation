@@ -10,7 +10,7 @@
           <img
             alt="Midone Tailwind HTML Admin Template"
             class="h-48 lg:h-auto"
-            src="@/assets/images/404.svg"
+            src="@/assets/images/3828537.jpg"
           />
         </div>
         <div class="text-white mt-10 lg:mt-0">

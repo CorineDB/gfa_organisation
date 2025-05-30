@@ -60,46 +60,7 @@ const authInterceptor = (config) => {
   return config;
 };
 
-/**
- * Response Interceptor
- * Gestion des erreurs de réponse et du loader
- */
-// const responseErrorInterceptor = error => {
-//     store.commit(SET_LOADER, false); // Désactiver le loader en cas d'erreur
-
-//     const statusCode = parseInt(error.response ? .status ? ? 500);
-//     const errorMessage = error.response ? .data ? .message;
-//     const errorDetails = error.response ? .data ? .errors;
-
-//     store.commit(SET_ERRORS_MESSAGE, { message: errorMessage, errors: errorDetails });
-
-//     switch (statusCode) {
-//         case 400:
-//             // Redirection ou traitement spécifique pour le statut 400
-//             break;
-
-//         case 401:
-//             store.commit("auths/RESET_AUTH_DATA");
-//             router.push("/");
-//             break;
-
-//         case 404:
-//             chargement(false);
-//             break;
-
-//         case 422:
-//             // Traitement des erreurs de validation (422)
-//             break;
-
-//         default:
-//             Vue.$toast.error(errorMessage);
-//             chargement(false);
-//             break;
-//     }
-
-//     return Promise.reject(error);
-// };
-
+ 
 /** Ajout des interceptors à l'instance Axios */
 httpClient.interceptors.request.use(authInterceptor);
 

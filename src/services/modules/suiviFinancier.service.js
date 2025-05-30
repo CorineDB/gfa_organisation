@@ -1,41 +1,37 @@
-
-import ApiService from '@/services/configs/api.service'
+import ApiService from "@/services/configs/api.service";
 
 const SuiviFinanciersService = {
+  query(type, params) {
+    return ApiService.query("suiviFinanciers", {
+      params: params,
+    });
+  },
 
-    query(type, params) {
-      return ApiService.query("suiviFinanciers", {
-        params: params
-      });
-    },
+  get(slug) {
+    return ApiService.get("gfa/suiviFinanciers", slug);
+  },
 
-    get(slug) {
-      return ApiService.get("/suiviFinanciers", slug);
-    },
+  create(params) {
+    return ApiService.post("gfa/suiviFinanciers", params);
+  },
+  importCSV(params) {
+    return ApiService.post("gfa/suiviFinanciers/importation", params);
+  },
 
-    create(params) {
-      return ApiService.post("suiviFinanciers", params);
-    },
-    importCSV(params) {
-      return ApiService.post("suiviFinanciers/importation", params);
-    },
+  update(slug, params) {
+    return ApiService.update("gfa/suiviFinanciers", slug, params);
+  },
 
-    update(slug, params) {
-      return ApiService.update("suiviFinanciers", slug, params);
-    },
+  destroy(slug) {
+    return ApiService.delete(`gfa/suiviFinanciers/${slug}`);
+  },
 
-    destroy(slug) {
-      return ApiService.delete(`suiviFinanciers/${slug}`);
-    },
+  byProgramme(slug) {
+    return ApiService.get(`gfa/programmes/${slug}/suiviFinanciers`);
+  },
+  filtre(params) {
+    return ApiService.post("gfa/suiviFinanciers/filtres", params);
+  },
+};
 
-    byProgramme(slug) {
-      return ApiService.get(`programmes/${slug}/suiviFinanciers`);
-    },
-    filtre(params) {
-      return ApiService.post("suiviFinanciers/filtres", params);
-    },
-
-  };
-
-  export default SuiviFinanciersService;
-  
+export default SuiviFinanciersService;

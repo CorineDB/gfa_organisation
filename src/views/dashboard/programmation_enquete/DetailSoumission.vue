@@ -30,7 +30,12 @@ const getSoumission = async () => {
 };
 
 const goBack = () => {
-  router.back();
+  router.push({
+    name: "SoumissionsEnqueteDeCollecte",
+    params: {
+      id: route.params.e,
+    },
+  });
 };
 
 const filterOptions = computed(() => soumission.value?.formulaire_de_gouvernance?.options_de_reponse);
@@ -40,12 +45,11 @@ onMounted(() => getSoumission());
 <template>
   <div>
     <div v-if="!isLoading">
-      <h2 class="mt-10 text-lg font-medium intro-y">Détail Soumissions</h2>
-      <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
-        <div class="flex">
-          <button @click="goBack()" class="mr-2 shadow-md btn btn-primary"><ArrowLeftIcon class="w-4 h-4 mr-3" />Retour</button>
-        </div>
+      <div class="flex justify-between mt-4 items-center">
+        <h2 class="text-lg font-medium intro-y">Détail Soumissions</h2>
+        <button class="btn btn-primary" @click="goBack">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
       </div>
+
       <table v-if="soumission?.type == 'factuel'" class="w-full my-10 border-collapse table-auto border-slate-500" cellpadding="10" cellspacing="0">
         <thead class="text-white bg-blue-900">
           <tr>
@@ -67,6 +71,8 @@ onMounted(() => getSoumission());
             <template v-for="categorie in gouvernance.categories_de_gouvernance" :key="categorie.id">
               <template v-for="(sousCategorie, scIndex) in categorie.categories_de_gouvernance" :key="sousCategorie.id">
                 <template v-for="(question, qIndex) in sousCategorie.questions_de_gouvernance" :key="question.id">
+                  <!-- <pre>{{ question.reponse_de_la_collecte.preuves }}</pre> -->
+
                   <tr>
                     <!-- Première cellule de catégorie principale avec rowspan -->
                     <td class="font-semibold text-center" v-if="scIndex === 0 && qIndex === 0" :rowspan="categorie.categories_de_gouvernance.reduce((sum, sc) => sum + sc.questions_de_gouvernance.length, 0)">
@@ -79,7 +85,26 @@ onMounted(() => getSoumission());
                     <td>{{ question.nom }}</td>
                     <td class="text-center">{{ question.reponse_de_la_collecte?.nom }}</td>
                     <td class="text-right">{{ question.reponse_de_la_collecte?.point }}</td>
-                    <td class="text-center">{{ question.reponse_de_la_collecte?.sourceDeVerification }}</td>
+                    <td class="text-center">
+                      {{ question.reponse_de_la_collecte?.sourceDeVerification }}
+
+                      <div class="p-4 bg-gray-100 rounded-lg shadow-md w-72">
+                        <h2 class="text-lg font-semibold mb-3">Preuves</h2>
+                        <ul>
+                          <li v-for="(doc, index) in question.reponse_de_la_collecte?.preuves" :key="index" class="p-2 bg-white rounded-md shadow-sm mb-2 hover:bg-gray-200 transition">
+                            <a :href="doc.url" download class="text-blue-500 hover:underline">
+                              {{ doc.nom }}
+                            </a>
+                          </li>
+                        </ul>
+                        <!-- <ul>
+                          <li v-for="(doc, index) in question.reponse_de_la_collecte.preuves" :key="index" class="flex justify-between items-center p-2 bg-white rounded-md shadow-sm mb-2">
+                            <span class="text-gray-700">{{ doc.nom }}</span>
+                            <a :href="doc.url" download class="px-3 py-1 bg-blue-500 text-black text-sm rounded hover:bg-blue-600 transition"> Télécharger </a>
+                          </li>
+                        </ul> -->
+                      </div>
+                    </td>
                   </tr>
                 </template>
               </template>

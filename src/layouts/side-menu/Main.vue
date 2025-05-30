@@ -1,14 +1,16 @@
 <template>
-  <div class="px-3 py-5 -mx-3 md:py-0 sm:-mx-8 sm:px-8">
+  <div class="_px-3 _py-5 _-mx-3 _md:py-0 _sm:-mx-8 _sm:px-8">
     <!-- <DarkModeSwitcher /> -->
     <!-- <MainColorSwitcher /> -->
     <MobileMenu v-if="!isToolsPerception" />
-    <div class="flex mt-[4.7rem] md:mt-0 relative overflow-hidden">
+    <div class="flex mt-[4.7rem] md:mt-0 overflow-hidden">
       <!-- BEGIN: Side Menu -->
       <nav v-if="!isToolsPerception" class="fixed h-screen overflow-scroll side-nav navColor scrollbar-hidden">
-        <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-wrap items-center justify-center mt-3 intro-x">
-          <h1 class="font-semibold text-white">Programme de redevabilité</h1>
-           <p>{{ currentUsers.role }}</p>
+        <router-link :to="{ name: 'DashboardGfa' }" tag="a" class="flex flex-col items-center justify-center mt-3 intro-x">
+          <h1 class="font-semibold text-white text-center lg:text-left">test {{ nomProgramme }}</h1>
+
+          <!-- <h1 class="font-semibold text-white">Programme de redevabilité</h1> -->
+          <p class="block">{{ currentUsers.role }}</p>
           <!-- <img alt="Programme de redevabilité" class="w-[5rem] sm:w-[7rem]" :src="usersProfileImage" /> -->
         </router-link>
         <div class="my-6 side-nav__devider"></div>
@@ -89,6 +91,7 @@
       <div class="pl-0 content" :class="[isToolsPerception ? '' : 'xl:pl-64 md:pl-32']">
         <TopBar v-if="!isToolsPerception" />
         <router-view />
+        <button v-show="showButton" @click="scrollToTop" class="fixed z-50 bottom-5 right-5 bg-primary text-white p-3 rounded-full shadow-lg hover:bg-pending transition-opacity duration-300">↑</button>
       </div>
       <!-- END: Content -->
     </div>
@@ -96,7 +99,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, provide, ref, watch, reactive } from "vue";
+import { computed, onMounted, provide, ref, watch, reactive, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { helper as $h } from "@/utils/helper";
 import { useSideMenuStore } from "@/stores/side-menu";
@@ -108,6 +111,22 @@ import SideMenuTooltip from "@/components/side-menu-tooltip/Main.vue";
 import { linkTo, nestedMenu, enter, leave } from "./index";
 import dom from "@left4code/tw-starter/dist/js/dom";
 import { API_BASE_URL } from "@/services/configs/environment";
+
+// back to top
+
+const showButton = ref(false);
+
+const handleScroll = () => {
+  showButton.value = window.scrollY > 300; // Affiche le bouton après 300px
+};
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -135,6 +154,7 @@ watch(
 const updatedMenu = () => {
   sideMenu.value.forEach((element) => {
     updateMenu.push(element);
+
     // if ($h.getPermission("voir-un-ano") && element.title == "Anos") {
     //   updateMenu.push(element);
     // }
@@ -142,7 +162,7 @@ const updatedMenu = () => {
     //   updateMenu.push(element);
     // }
 
-    // if (element.title == "Dashboard") {
+    // if (element.title =="DashboardGfa") {
     //   updateMenu.push(element);
     // }
 
@@ -322,7 +342,7 @@ const updatedMenu = () => {
     //   // this.maitriseOeuvreVisible = true;
     // }
 
-    // if (element.title == "Dashboard") {
+    // if (element.title =="DashboardGfa") {
     //   if ($h.getPermission("read.statistique")) {
     //     updateMenu.push(element);
     //   }
@@ -400,23 +420,33 @@ const updatedMenu = () => {
 const usersProfileImage = ref("");
 
 const currentUsers = reactive({});
+const nomProgramme = ref("");
 
 onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+
   const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
-  //console.log(usersInfo);
 
   if (usersInfo) {
-    currentUsers.nom = "test";
+    nomProgramme.value = usersInfo.programme.nom;
+
+    let permissions = usersInfo.role[0].permissions;
+
+    sideMenuStore.setTabPermission(permissions);
+
+    sideMenuStore.addToMenuIfPermissionGranted();
+
+    currentUsers.nom = usersInfo.nom;
+
     currentUsers.role = usersInfo.role[0].nom;
-    // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil;
   }
+
+  //console.log(usersInfo);
 
   dom("body").removeClass("error-page").removeClass("login").addClass("main");
   updatedMenu();
-  formattedMenu.value = $h.toRaw(lastMenu.value);
+  formattedMenu.value = $h.toRaw(sideMenu.value);
 });
-
-
 </script>
 <style scoped>
 .navColor {

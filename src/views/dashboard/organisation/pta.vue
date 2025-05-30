@@ -28,11 +28,6 @@
 
           <tbody>
             <tr v-for="pta in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <!-- <th scope="row" class=" p-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                  {{ pta.owner_nom }}
-                   <pre>{{ pta.nom }}</pre>
-                </th> -->
-
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                 <span v-if="pta.isProjet" class="text-lg font-bold"> {{ pta.code }}</span>
                 <span v-if="pta.isComposante" class="text-sm text-blue-500"> {{ pta.code }}</span>
@@ -41,28 +36,11 @@
                 <span v-if="pta.isTache" class="text-sm text-red-600"> {{ pta.code }}</span>
               </td>
               <td>
-                <select v-if="pta.isTache" class="form-select form-select-sm mt-2" aria-label=".form-select-sm example" @change="togglesuivie(pta)">
+                <select v-if="pta.isTache" class="form-select form-select-sm mt-2 w-5/6" aria-label=".form-select-sm example" @change="togglesuivie(pta)" v-model="poidsActuel">
                   <option value="0">0%</option>
                   <option value="50">50%</option>
                   <option value="100">100%</option>
                 </select>
-                <!-- <button
-                    v-if="pta.isTache"
-                    @click="togglesuivie(pta)"
-                    class="flex items-center justify-between px-1 text-white transition-all rounded-full shadow w-14 h-7"
-                    :class="{
-                      'bg-gray-400': false,
-                      'bg-red-400': pta.poidsActuel == 0 || tabletoggle[pta.id] == 0,
-                      'bg-green-400 ': greentoggle && (pta.poidsActuel > 0 || tabletoggle[pta.id] == 1),
-                    }"
-                  >
-                    <div
-                      class="w-5 h-5 transform translate-x-0 bg-white rounded-full"
-                      :class="{
-                        'translate-x-full': pta.poidsActuel > 0 || translatetoggle || tabletoggle[pta.id] == 1,
-                      }"
-                    ></div>
-                  </button> -->
               </td>
             </tr>
           </tbody>
@@ -89,6 +67,7 @@
               <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 3</th>
 
               <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TRIMESTRE 4</th>
+              <th scope="col" colspan="3" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Actions</th>
             </tr>
 
             <tr class="">
@@ -127,7 +106,7 @@
               <th scope="col" class="px-6 py-3 text-center border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">TOTAL</th>
             </tr>
           </thead>
-
+          <!-- <pre>{{ dataNew.length }}</pre> -->
           <tbody>
             <tr v-for="pta in dataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
               <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
@@ -316,13 +295,20 @@
                 <!--  <span v-else class="font-bold" >0 FCFA </span> -->
               </td>
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
+              <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                <button v-if="pta.isActivite" @click="ouvrirModalSuiviFinancierActivite(pta)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Suivre</button>
+
+                <button v-if="pta.isActivite" @click="voirSuiviActivite()" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Voir les suivis</button>
+
+                <!-- <button v-if="pta.isActivite" @click="handleDelete(pta)" class="text-white bg-red-500 hover:bg-red-600 font-medium rounded-lg text-xs px-4 py-2">Supprimer</button> -->
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
-  <NoRecordsMessage class="col-span-12" v-if="!dataNew.length" title="Aucun plan d'action pour l'instant" description="Il semble qu'il n'y ait pas de plan d'action à afficher. Veuillez revenir plus tard." />
+  <NoRecordsMessage class="col-span-12" v-if="!dataNew.length" title="Aucun plan d'action pour l'instant" description="Aucun plan d'action n'est disponible pour le moment. Veuillez en établir un." />
 
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalFiltre" @hidden="showModalFiltre = false">
@@ -367,14 +353,30 @@ import PtabService from "@/services/modules/pta.service.js";
 import BailleursService from "@/services/modules/bailleur.service.js";
 import TacheService from "@/services/modules/tache.service.js";
 import VButton from "@/components/news/VButton.vue";
-import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
 import { toast } from "vue3-toastify";
 import { mapGetters, mapMutations, mapActions, mapState } from "vuex";
+import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
+import SuiviFinancierService from "@/services/modules/suiviFinancier.service";
+// import VButton from "@/components/news/VButton.vue";
+
 export default {
   props: ["ppm"],
-  components: { VButton, NoRecordsMessage },
+  components: { VButton, NoRecordsMessage, VButton },
   data() {
     return {
+      loadingSuiviFinancier: false,
+      erreurSuiviFinancier: null,
+      loadingSuiviFinancier: false,
+      showModalSuiviFinancier: false,
+      suiviFinancier: [],
+      suiviFinancierPayload: {
+        activiteId: null,
+        trimestre: 1, // Trimestre actuel
+        annee: new Date().getFullYear(), // Set current year as default
+        consommer: 0,
+        type: 0,
+      },
+      poidsActuel: "",
       years: [],
       annees: "",
       tabletoggle: [],
@@ -1145,7 +1147,7 @@ export default {
       return programme;
     },
 
-    dataNew() {
+    dataNewR() {
       const programme = [];
       if (this.ptabR != undefined && this.ptabR != null) {
         this.ptabR.forEach((element) => {
@@ -1376,11 +1378,64 @@ export default {
     },
   },
   methods: {
+    removePlan(index) {
+      this.suiviFinancier.splice(index, 1);
+    },
+    handleEdit(params) {
+      console.log(params);
+      this.showModalCreate = true;
+    },
+    handleDelete(params) {
+      // this.idSelect = params.id;
+      // this.deleteModalPreview = true;
+    },
+    resetModalSuiviFinancierActivite(item) {
+      this.suiviFinancier = [];
+      showModalSuiviFinancier.value = false;
+    },
+
+    ouvrirModalSuiviFinancierActivite(item) {
+      this.suiviFinancierPayload.activiteId = item.activite.id;
+      this.suiviFinancierPayload.trimestre = getCurrentQuarter();
+      this.suiviFinancier.push(this.suiviFinancierPayload);
+      this.showModalSuiviFinancier = true;
+    },
+    getCurrentQuarter() {
+      const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
+      return Math.ceil(month / 3); // Calcul du trimestre actuel
+    },
+    suiviFinancierActivite() {
+      this.loadingSuiviFinancier = true;
+
+      for (let index = 0; index < this.suiviFinancier.length; index++) {
+        SuiviFinancierService.create(this.this.suiviFinancier[index])
+          .then(() => {
+            this.loadingSuiviFinancier = false;
+            toast.success("Suivi Financier créer.");
+            resetModalSuiviFinancierActivite();
+            showModalSuiviFinancier.value = false;
+            getDatas();
+          })
+          .catch((error) => {
+            console.log(error);
+            this.loadingSuiviFinancier = false;
+
+            toast.error("Une erreur s'est produite");
+
+            // Mettre à jour les messages d'erreurs dynamiquement
+            if (error.response && error.response.data && error.response.data.errors) {
+              this.erreurSuiviFinancier = error.response.data.errors;
+            } else {
+              toast.error(error.response.data.errors.message);
+            }
+          });
+      }
+    },
     filtreParAnnee(datas) {
       let data = {};
 
       data = {
-        organisationId: this.$route.params.ongId,
+        //organisationId: this.$route.params.ongId,
         annee: datas,
       };
       this.getPta(data);
@@ -1427,66 +1482,90 @@ export default {
       }
     },
     togglesuivie(pta) {
+      console.log("pta", pta);
       //this.dataNew;
 
-      this.redtoggle = false;
-      this.graytoggle = false;
-      //this.greentoggle=true;
-      this.translatetoggle = false;
+      // this.redtoggle = false;
+      // this.graytoggle = false;
+      // //this.greentoggle=true;
+      // this.translatetoggle = false;
 
       //console.log(this.tabletoggle[id]);
 
-      this.chargement = true;
+      // this.chargement = true;
       var form = {
+        poidsActuel: this.poidsActuel,
         tacheId: pta.id,
       };
-      //  console.log(id)
-      if (pta.poidsActuel > 0) {
-        this.tabletoggle[pta.id] = 0;
-        TacheService.deleteSuivis(pta.id)
-          .then((data) => {
-            // this.doSuiviOld = false
-            // this.dataNew;
-            this.$toast.success("suivie supprimé avec succès");
-            // window.location.reload();
-          })
-          .catch((error) => {
-            if (error.response) {
-              // Requête effectuée mais le serveur a répondu par une erreur.
-              const message = error.response.data.message;
-              this.$toast.error(message);
-            } else if (error.request) {
-              // Demande effectuée mais aucune réponse n'est reçue du serveur.
-              //console.log(error.request);
-            } else {
-              // Une erreur s'est produite lors de la configuration de la demande
-              //console.log('dernier message', error.message);
-            }
-          });
-      } else {
-        this.tabletoggle[pta.id] = 1;
 
-        TacheService.suiviTache(form)
-          .then((data) => {
-            // this.doSuiviOld = false
-            // this.dataNew;
-            this.$toast.success("suivie éffectué avec succès");
-            // window.location.reload();
-          })
-          .catch((error) => {
-            if (error.response) {
-              // Requête effectuée mais le serveur a répondu par une erreur.
-              const message = error.response.data.message;
-              this.$toast.error(message);
-            } else if (error.request) {
-              // Demande effectuée mais aucune réponse n'est reçue du serveur.
-              //console.log(error.request);
-            } else {
-              // Une erreur s'est produite lors de la configuration de la demande
-              //console.log('dernier message', error.message);
-            }
-          });
-      }
+      TacheService.suiviTache(form)
+        .then((data) => {
+          // this.doSuiviOld = false
+          // this.dataNew;
+          toast.success("suivie éffectué avec succès");
+          // window.location.reload();
+        })
+        .catch((error) => {
+          if (error.response) {
+            // Requête effectuée mais le serveur a répondu par une erreur.
+            const message = error.response.data.message;
+            toast.error(message);
+          } else if (error.request) {
+            // Demande effectuée mais aucune réponse n'est reçue du serveur.
+            //console.log(error.request);
+          } else {
+            // Une erreur s'est produite lors de la configuration de la demande
+            //console.log('dernier message', error.message);
+          }
+        });
+
+      //  console.log(id)
+      // if (pta.poidsActuel > 0) {
+      //   this.tabletoggle[pta.id] = 0;
+      //   TacheService.deleteSuivis(pta.id)
+      //     .then((data) => {
+      //       // this.doSuiviOld = false
+      //       // this.dataNew;
+      //       this.$toast.success("suivie supprimé avec succès");
+      //       // window.location.reload();
+      //     })
+      //     .catch((error) => {
+      //       if (error.response) {
+      //         // Requête effectuée mais le serveur a répondu par une erreur.
+      //         const message = error.response.data.message;
+      //         this.$toast.error(message);
+      //       } else if (error.request) {
+      //         // Demande effectuée mais aucune réponse n'est reçue du serveur.
+      //         //console.log(error.request);
+      //       } else {
+      //         // Une erreur s'est produite lors de la configuration de la demande
+      //         //console.log('dernier message', error.message);
+      //       }
+      //     });
+      // } else {
+      //   this.tabletoggle[pta.id] = 1;
+
+      //   TacheService.suiviTache(form)
+      //     .then((data) => {
+      //       // this.doSuiviOld = false
+      //       // this.dataNew;
+      //       this.$toast.success("suivie éffectué avec succès");
+      //       // window.location.reload();
+      //     })
+      //     .catch((error) => {
+      //       if (error.response) {
+      //         // Requête effectuée mais le serveur a répondu par une erreur.
+      //         const message = error.response.data.message;
+      //         this.$toast.error(message);
+      //       } else if (error.request) {
+      //         // Demande effectuée mais aucune réponse n'est reçue du serveur.
+      //         //console.log(error.request);
+      //       } else {
+      //         // Une erreur s'est produite lors de la configuration de la demande
+      //         //console.log('dernier message', error.message);
+      //       }
+      //     });
+      // }
       this.chargement = false;
     },
     // exportToExcel() {
@@ -1711,11 +1790,12 @@ export default {
   mounted() {
     this.getPermission();
 
+    const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
+
     if (this.revisionVisible || this.ppmVisible || this.ptaVisible) {
-      console.log(this.$route.params.ongId);
       let data = {};
       data = {
-        organisationId: this.$route.params.ongId,
+        organisationId: usersInfo.profil.id,
       };
       this.getPta(data);
       this.getBailleur();
