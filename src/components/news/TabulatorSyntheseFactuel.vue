@@ -35,9 +35,9 @@
                   {{ sousCategorie.nom }}
                 </td>
                 <td>{{ question.nom }}</td>
-                <td class="text-center">{{ question.reponse.nom }}</td>
-                <td class="text-right">{{ question.reponse.point }}</td>
-                <td class="text-center">{{ question.reponse.sourceDeVerification }}</td>
+                <td class="text-center">{{ question.reponse?.nom }}</td>
+                <td class="text-right">{{ question.reponse?.point }}</td>
+                <td class="text-center">{{ question.reponse?.sourceDeVerification }}</td>
               </tr>
             </template>
           </template>

@@ -5,9 +5,13 @@ import InputForm from "@/components/news/InputForm.vue";
 import Tabulator from "tabulator-tables";
 import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
-import LoaderSnipper from "@/components/LoaderSnipper.vue";
-import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
-import FormulaireFactuel from "@/services/modules/formFactuel.service";
+//import LoaderSnipper from "@/components/LoaderSnipper.vue";
+
+import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
+import ResultatSyntheseService from "@/services/modules/enquetes_de_gouvernance/synthese.service";
+
+import FormulaireFactuel from "@/services/modules/enquetes_de_gouvernance/formFactuel.service";
+import FormulaireDePerception from "@/services/modules/enquetes_de_gouvernance/formPerception.service";
 import { useRouter } from "vue-router";
 import OngService from "@/services/modules/ong.service";
 import { getAllErrorMessages } from "@/utils/gestion-error";
@@ -15,7 +19,6 @@ import ChartProgressionByTime from "../../../components/news/ChartProgressionByT
 import ProgressBar from "../../../components/news/ProgressBar.vue";
 import ChartScroreByPrincipe from "../../../components/news/ChartScroreByPrincipe.vue";
 import { getFieldErrors } from "../../../utils/helpers";
-import ProgrammeService from "@/services/modules/programme.service";
 
 const router = useRouter();
 
@@ -61,7 +64,7 @@ const errors = ref({});
 const createData = async () => {
   payload.formulaires_de_gouvernance = [idFormFactuel.value, idFormPerception.value];
   isLoading.value = true;
-  await EnqueteDeColleteService.create(payload)
+  await EvaluationService.create(payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
@@ -80,7 +83,7 @@ const createData = async () => {
 };
 const getDatas = async () => {
   isLoadingData.value = true;
-  await EnqueteDeColleteService.get()
+  await EvaluationService.get()
     .then((result) => {
       datas.value = result.data.data;
       isLoadingData.value = false;
@@ -95,7 +98,8 @@ const getDatas = async () => {
 const getEvolutionByScore = async (id) => {
   isLoadingDataScore.value = true;
 
-  await ProgrammeService.scoresAuFilDuTemps(id)
+  //await ProgrammeService.scoresAuFilDuTemps(id)
+  await ResultatSyntheseService.getEvolutionByScore(id)
     .then((result) => {
       datasScore.value = result.data.data;
       currentScore.value = datasScore.value[0]?.scores;
@@ -116,7 +120,7 @@ const getFormsFactuel = async () => {
     });
 };
 const getFormsPerception = async () => {
-  await FormulaireFactuel.get("perception")
+  await FormulaireDePerception.get()
     .then((result) => {
       formulairesPerception.value = result.data.data;
     })
@@ -137,7 +141,7 @@ const getOrganisations = async () => {
 const updateData = async () => {
   isLoading.value = true;
   payload.formulaires_de_gouvernance = [idFormFactuel.value, idFormPerception.value];
-  await EnqueteDeColleteService.update(idSelect.value, payload)
+  await EvaluationService.update(idSelect.value, payload)
     .then(() => {
       getDatas();
       resetForm();
@@ -158,7 +162,7 @@ const updateData = async () => {
 const submitData = () => (isCreate.value ? createData() : updateData());
 const deleteData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.destroy(idSelect.value)
+  await EvaluationService.destroy(idSelect.value)
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;

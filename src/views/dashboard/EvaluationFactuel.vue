@@ -1,7 +1,8 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import { reactive } from "vue";
-import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+//import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { toast } from "vue3-toastify";
 import VButton from "@/components/news/VButton.vue";
@@ -164,7 +165,7 @@ const submitData = async () => {
     });
 
     isLoading.value = true;
-    const action = isValidate.value ? EvaluationService.validateSumission(idEvaluation.value, formData) : EvaluationService.submitSumission(idEvaluation.value, formData);
+    const action = isValidate.value ? EvaluationService.validateFactuelSoumission(idEvaluation.value, formData) : EvaluationService.submitFactuelSoumission(idEvaluation.value, formData);
 
     try {
       const result = await action;
