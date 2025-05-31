@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import SyntheseService from "@/services/modules/synthese.service";
+//import SyntheseService from "@/services/modules/synthese.service";
+import ResultatSyntheseService from "@/services/modules/enquetes_de_gouvernance/synthese.service";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { getColorForValue } from "../../utils/findColorIndicator";
@@ -35,7 +36,7 @@ const currentProfileGouvernance = ref("");
 
 const getDataCollection = async () => {
   isLoadingData.value = true;
-  await SyntheseService.getForEvaluation(idEvaluation)
+  await ResultatSyntheseService.getForEvaluation(idEvaluation)
     .then((result) => {
       console.log(result.data);
       currentProfileGouvernance.value = result.data.data.profile_de_gouvernance;

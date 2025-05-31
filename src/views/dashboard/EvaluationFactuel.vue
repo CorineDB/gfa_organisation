@@ -165,7 +165,7 @@ const submitData = async () => {
     });
 
     isLoading.value = true;
-    const action = isValidate.value ? EvaluationService.validateSumission(idEvaluation.value, formData) : EvaluationService.submitSumission(idEvaluation.value, formData);
+    const action = isValidate.value ? EvaluationService.validateFactuelSoumission(idEvaluation.value, formData) : EvaluationService.submitFactuelSoumission(idEvaluation.value, formData);
 
     try {
       const result = await action;

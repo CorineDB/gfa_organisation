@@ -20,8 +20,8 @@
       </tr>
       <!-- Lignes pour afficher chaque question de gouvernance du principe -->
       <tr v-for="(question, qIndex) in principe.questions_de_gouvernance.slice(1)" :key="question.id" :style="{ 'background-color': getColorForValue(question.moyenne_ponderee) }">
-        <td class="py-2 text-center border border-slate-600">{{ question.nom }}</td>
-        <td class="py-2 text-center border border-slate-600">{{ question.moyenne_ponderee }}</td>
+        <td class="py-2 text-center border border-slate-600">{{ question?.nom }}</td>
+        <td class="py-2 text-center border border-slate-600">{{ question?.moyenne_ponderee }}</td>
       </tr>
       <!-- Dernière ligne pour afficher l'indice de perception du principe -->
       <tr class="font-semibold text-black">

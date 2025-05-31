@@ -574,11 +574,11 @@ onMounted(async () => {
               <div class="m-5 text-slate-600 dark:text-slate-500">
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Start At:
-                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel.created_at : "Not Defined" }}</div>
+                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel.created_at : "Pas demarre" }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Submitted_at At:
-                  <div class="ml-2 font-bold">{{ datas.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Not Defined") : "Not Defined" }}</div>
+                  <div class="ml-2 font-bold">{{ datas.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Pas demarre") : "Pas demarre" }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
