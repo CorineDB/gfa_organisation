@@ -512,7 +512,7 @@ export default {
           <p class="mb-3 text-md font-semibold text-primary">Description</p>
           <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description == null ? "Aucune description" : item.description }}</p>
           <div class="m-5 text-slate-600 dark:text-slate-500">
-            <div class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Taux d'exécution physique: {{ item.tep }}</div>
+            <!-- <div class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Taux d'exécution physique: {{ item.tep }}</div> -->
 
             <div class="flex items-center mt-2">
               <CheckSquareIcon class="w-4 h-4 mr-2" /> Statut :

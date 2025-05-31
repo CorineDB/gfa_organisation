@@ -1,6 +1,10 @@
 <template>
   <!-- New sample -->
   <div class="min-h-screen p-6 bg-gray-50">
+    <div class="flex justify-between my-4 items-center">
+      <h2 class="text-lg font-medium intro-y">Détail projet</h2>
+      <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
+    </div>
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="">
@@ -493,7 +497,6 @@ const markerLatLng = ref([47.31322, -1.319482]);
 const loadingOption = ref(true);
 const graphiqueData = ref([]);
 const getStat = function () {
-
   ProjetService.statistiques(route.params.id)
     .then((data) => {
       graphiqueData.value = data.data.data;

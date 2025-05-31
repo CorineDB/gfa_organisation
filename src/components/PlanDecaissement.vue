@@ -383,7 +383,7 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
             </div>
 
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Montant financé: {{ $h.formatCurrency(item.pret) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ $h.formatCurrency(item.pret) }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
             <div class="flex items-center">
@@ -465,7 +465,7 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
         <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
 
-        <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Montant financé tred" />
+        <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
 
         <!-- <pre>{{ getPlageActivites }}</pre> -->

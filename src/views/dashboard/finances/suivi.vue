@@ -882,7 +882,7 @@ onMounted(() => {
             {{ erreurPlanDeDecaissement[index].budgetNational }}
           </p>
 
-          <InputForm v-model="plan.pret" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez le montant financé" label="Saisissez le montant financé" />
+          <InputForm v-model="plan.pret" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez la subvention" label="Saisissez la subvention" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.pret">
             {{ erreurPlanDeDecaissement[index].pret }}
           </p>
