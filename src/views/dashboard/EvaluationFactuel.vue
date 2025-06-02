@@ -75,7 +75,7 @@ const getDataFormFactuel = async () => {
       getFilesFormData();
     } else {
       if (data.statutCode == 206) {
-        router.push({ name: "DetailSoumission", params: { e: data.data.idEvaluation, s: data.data.idSoumission } });
+        router.push({ name: "DetailSoumission", params: { e: data.data.idEvaluation, s: data.data.idSoumission }, query: {type: 'factuel'} });
       }
     }
   } catch (e) {

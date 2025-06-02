@@ -220,13 +220,10 @@ const goToMesuresAPrendre = (org = null) => {
   router.push({ name: "MesuresAPrendre", params: { e: idEvaluation, s: org ?? authUser.value?.profil?.id } });
 };
 
-const goToFactuelSoumissionPage = (Idsoumission, type = 'factuel', status = false) => {
-  /* if (status == true) {
+const goToFactuelSoumissionPage = (Idsoumission, status = false) => {
+  if (status == true) {
     router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
-  } */
-
-  showModalOrganisation.value = false;
-  router.push({ name: "soumission", params: { e: idEvaluation, s: Idsoumission }, query: { type: type } });
+  }
 };
 
 const sendReminder = async () => {
@@ -566,7 +563,7 @@ onMounted(async () => {
           </div>
 
           <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-2">
-            <div v-if="statistiques?.formulaire_factuel_de_gouvernance" @click="goToFactuelSoumissionPage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques?.formulaire_factuel_de_gouvernance" @click="goToFactuelSoumissionPage(datas.id, datas.factuel?.statut)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation factuel</div>
               </div>

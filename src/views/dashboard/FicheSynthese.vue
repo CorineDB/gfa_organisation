@@ -92,13 +92,13 @@ onMounted(async () => {
     <Preview>
       <TabGroup>
         <TabList class="space-x-4 font-bold uppercase nav-boxed-tabs">
-          <Tab class="w-full py-2 bg-white" tag="button">Outil Factuel</Tab>
-          <Tab class="w-full py-2 bg-white" tag="button">Outil de Perception</Tab>
+          <Tab class="w-full py-2 bg-white" tag="button" v-if="!isLoadingData && currentFactuel?.synthese">Outil Factuel</Tab>
+          <Tab class="w-full py-2 bg-white" tag="button" v-if="!isLoadingData && currentPerception?.synthese">Outil de Perception</Tab>
         </TabList>
 
         <TabPanels v-show="!isLoadingData" class="mt-5">
           <!-- Factuel -->
-          <TabPanel class="leading-relaxed">
+          <TabPanel class="leading-relaxed" v-if="!isLoadingData && currentFactuel?.synthese">
             <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE SYNTHESE FACTUELLE GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
@@ -143,7 +143,7 @@ onMounted(async () => {
             <TabulatorSyntheseFactuel v-if="!isLoadingData && currentFactuel?.synthese" :data="currentFactuel?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" />
           </TabPanel>
           <!-- Perception-->
-          <TabPanel class="leading-relaxed">
+          <TabPanel class="leading-relaxed" v-if="!isLoadingData && currentPerception?.synthese">
             <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE SYNTHESE DE PERCEPTION GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
