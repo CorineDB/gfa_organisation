@@ -69,6 +69,7 @@ const getDataFormFactuel = async () => {
 
       formulaireFactuel.value = formDataFactuel.value.formulaire_de_gouvernance;
       payload.formulaireDeGouvernanceId = formulaireFactuel.value.id;
+      payload.soumissionId = formulaireFactuel.value.soumissionId;
       idEvaluation.value = formDataFactuel.value.id;
       initializeFormData();
       getFilesFormData();
@@ -171,7 +172,7 @@ const submitData = async () => {
       const result = await action;
 
       if (result.statutCode == 206) {
-        router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id } });
+        router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id }, query: {type: 'factuel'} });
       }
 
       payload.soumissionId = result.data.data.id;
