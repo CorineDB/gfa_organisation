@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, getCurrentInstance } from "vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
 import DeleteButton from "@/components/news/DeleteButton.vue";
@@ -16,6 +16,13 @@ import { useRouter, useRoute } from "vue-router";
 import ProgressBar from "../../../components/news/ProgressBar.vue";
 import RankingChart from "./RankingChart.vue";
 import ActionPlan from "./ActionPlan.vue";
+
+//vérifier numéro de téléphone
+const { proxy } = getCurrentInstance();
+
+const isValid = computed(() => {
+  return proxy.$isValidPhoneNumber(participant.phone, "BJ");
+});
 
 const router = useRouter();
 
@@ -204,7 +211,7 @@ const openFactuelModal = () => {
   }
 };
 
-const goToDetailSoumission = (idSoumission, type= 'factuel') => {
+const goToDetailSoumission = (idSoumission, type = "factuel") => {
   router.push({ name: "DetailSoumission", params: { e: idEvaluation, s: idSoumission }, query: { type: type } });
 };
 
@@ -256,6 +263,12 @@ const addEmail = () => {
 };
 
 const addPhone = () => {
+  // Check if the phone number is valid
+  if (!isValid.value) {
+    toast.error("Numéro de téléphone invalide");
+    return;
+  }
+
   if (participant.phone) {
     // Check if an phone already exists in the payload
     const isPhoneAdded = invitationPayload.participants.some((item) => item.phone === participant.phone);
@@ -534,7 +547,7 @@ onMounted(async () => {
       </div>
       <LoaderSnipper v-else />
 
-      <div v-if="statistiques.statut == 1 && statistiques?.formulaire_perception_de_gouvernance " class="col-span-12 mt-8">
+      <div v-if="statistiques.statut == 1 && statistiques?.formulaire_perception_de_gouvernance" class="col-span-12 mt-8">
         <div class="flex items-center h-10 intro-y">
           <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
         </div>
@@ -652,7 +665,7 @@ onMounted(async () => {
               </div>
             </div>
 
-            <div v-if="statistiques.formulaire_de_perception_de_gouvernance " class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques.formulaire_de_perception_de_gouvernance" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation de Perception</div>
               </div>
@@ -812,12 +825,26 @@ onMounted(async () => {
               </form>
               <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" type="text" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="10" v-model="participant.phone" />
-                  <!-- <div class="">
-                    <label for="Numéro de téléphone" class="form-label">Numéro de téléphone</label>
-                    <input id="Numéro de téléphone" type="number" pattern="\d{1,8}" maxlength="8" required v-model.number="currentPhone" class="form-control" placeholder="Numéro de téléphone" />
-                  </div> -->
+                  <InputForm class="" type="text" label="Numéro de téléphone" maxlength="13" v-model="participant.phone" />
+
                   <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                </div>
+                <div class="col-span-12">
+                  <!-- Message de validation avec animation -->
+                  <div class="mt-4 _min-h-[1.5rem]">
+                    <p v-if="isValid" class="flex items-center text-green-600 font-medium text-sm animate-pulse">
+                      <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                      Numéro valide
+                    </p>
+                    <p v-else-if="participant.phone && participant.phone.length > 0" class="flex items-center text-red-500 font-medium text-sm">
+                      <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                      Numéro invalide
+                    </p>
+                  </div>
                 </div>
               </form>
               <div v-if="errors.participants" class="mt-2 text-danger">{{ getFieldErrors(errors.participants) }}</div>

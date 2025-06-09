@@ -14,6 +14,7 @@ import { getAllErrorMessages } from "@/utils/gestion-error";
 import { generateUniqueId, generatevalidateKey, getvalidateKey } from "../../utils/helpers";
 import { getFieldErrors } from "@/utils/helpers.js";
 
+
 const TYPE_ORGANISATION = "organisation";
 
 const route = useRoute();
