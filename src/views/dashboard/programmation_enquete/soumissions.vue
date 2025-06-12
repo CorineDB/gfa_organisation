@@ -576,7 +576,7 @@ onMounted(async () => {
           </div>
 
           <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-2">
-            <div v-if="statistiques?.formulaire_factuel_de_gouvernance" @click="goToFactuelSoumissionPage(datas.id, datas.factuel?.statut)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques?.formulaire_factuel_de_gouvernance" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation factuel</div>
               </div>
@@ -686,27 +686,27 @@ onMounted(async () => {
 
                 <div class="mt-4">
                   <p>Évolution soumissions</p>
-                  <ProgressBar :percent="datas.perception.length ? datas.pourcentage_evolution_des_soumissions_de_perception : 0" />
+                  <ProgressBar :percent="datas.perception?.length ? statistiques?.pourcentage_evolution_des_soumissions_de_perception : 0" />
                 </div>
               </div>
 
-              <div v-if="datas.perception.length && datas.pourcentage_evolution_des_soumissions_de_perception >= 100" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-if="datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception >= 100" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <button @click.self="goToPageMarqueur" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Voir Fiche de synthese
                   <ArrowRightIcon class="ml-2 size-5" />
                 </button>
               </div>
 
-              <div v-else-if="!datas.perception.length || (datas.perception.length && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-else-if="!(datas.perception?.length) || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="(!datas.perception.length && statistiques.statut === 0) || (datas.perception.length && datas.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-if="(!datas.perception?.length && statistiques.statut === 0) || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Envoyer une invitation
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
 
                   <button v-else class="w-full gap-2 py-[22px]"></button>
                 </div>
-                <button v-if="datas.perception.length && datas.pourcentage_evolution_des_soumissions_de_perception < 100" @click="sendReminder" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                <button v-if="datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100" @click="sendReminder" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Envoyer un rappel
                   <ExternalLinkIcon class="ml-2 size-5" />
                 </button>

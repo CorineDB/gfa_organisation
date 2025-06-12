@@ -91,6 +91,10 @@ const EvaluationService = {
     return ApiService.post(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${evaluation}/envoi-mail-au-participants`, payload);
   },
 
+  sendReminderToPerceptionParticipants(id) {
+    return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/rappel-soumission`);
+  },
+
   update(slug, params) {
     return ApiService.update("gfa/enquete-de-gouvernance/evaluations-de-gouvernance/", slug, params);
   },

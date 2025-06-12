@@ -167,7 +167,7 @@
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <td v-if="pta.t3Pret != undefined && pta.t3Pret != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span class="font-bold"> {{ $h.formatCurrency(pta.t3Pret) }}  {{pta.t3Pret == null ||pta.t3Pret == 0 ? 0 : $h.formatCurrency(suivi.periode.budget) }}</span>
+                <span class="font-bold"> {{ $h.formatCurrency(pta.t3Pret) }}  {{pta.t3Pret == null ||pta.t3Pret == 0 ? 0 : $h.formatCurrency(suivis?.periode?.budget ?? 0) }}</span>
                 <!--  <span v-else class="font-bold" >0 FCFA</span> -->
               </td>
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
@@ -192,7 +192,7 @@
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>
 
               <td v-if="pta.t4Pret != '' || pta.t4Bn != ''" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
-                <span v-if="pta.t4Pret != undefined && pta.t4Bn != undefined" class="font-bold"> {{ $h.formatCurrency(pta.t4Pret + pta.t4Bn) }}  {{ suivi.periode.budget == null || suivi.periode.budget == 0 ? 0 : $h.formatCurrency(suivi.periode.budget) }}</span>
+                <span v-if="pta.t4Pret != undefined && pta.t4Bn != undefined" class="font-bold"> {{ $h.formatCurrency(pta.t4Pret + pta.t4Bn) }}  {{ suivi?.periode.budget == null || suivi?.periode.budget == 0 ? 0 : $h.formatCurrency(suivi?.periode.budget) }}</span>
                 <!--  <span v-else class="font-bold" >0 FCFA </span> -->
               </td>
               <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700" v-else></td>

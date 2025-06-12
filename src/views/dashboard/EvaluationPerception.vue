@@ -1,7 +1,8 @@
 <script setup>
 import { onMounted, ref, watch } from "vue";
 import { reactive } from "vue";
-import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+//import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { toast } from "vue3-toastify";
 import VButton from "@/components/news/VButton.vue";
@@ -54,13 +55,18 @@ const itemsPerPage = 3;
 const getDataFormPerception = async () => {
   try {
     const { data } = await EvaluationService.getPerceptionFormEvaluation(payload.identifier_of_participant, token);
-    //showAlertValidate.value = data.data.terminer;
+
+    console.log(data.data);
+    showAlertValidate.value = data.data.terminer;
     if (!showAlertValidate.value) {
       formDataPerception.value = data.data;
       formulairePerception.value = formDataPerception.value.formulaire_de_gouvernance;
       idEvaluation.value = formDataPerception.value.id;
       payload.formulaireDeGouvernanceId = formulairePerception.value.id;
       payload.programmeId = formDataPerception.value.programmeId;
+    }
+    else{
+      formDataPerception.value = data;
     }
   } catch (e) {
     toast.error("Erreur lors de la récupération des données.");
@@ -92,7 +98,7 @@ const submitData = async () => {
 
   if (payload.perception.response_data.length > 0) {
     isLoading.value = true;
-    const action = isValidate.value ? EvaluationService.validatePerceptionSumission(idEvaluation.value, payload) : EvaluationService.submitPerceptionSumission(idEvaluation.value, payload);
+    const action = isValidate.value ? EvaluationService.validatePerceptionSoumission(idEvaluation.value, payload) : EvaluationService.submitPerceptionSoumission(idEvaluation.value, payload);
 
     try {
       const result = await action;
@@ -127,6 +133,7 @@ const submitData = async () => {
 };
 const initializeFormData = () => {
   // Initialisation des réponses
+  console.log(formulairePerception.value);
   formulairePerception.value.categories_de_gouvernance.forEach((principe) => {
     principe.questions_de_gouvernance.forEach((question) => {
       responses[question.id] = {
@@ -353,10 +360,14 @@ onMounted(async () => {
   </div>
   <div v-else class="flex w-full justify-center items-center h-[40vh]">
     <Alert class="w-full max-w-screen-md mb-2 alert-primary">
-      <div class="flex items-center">
-        <div class="text-xl font-medium">Formulaire de perception</div>
+
+      <div class="mt-3 text-lg" v-if="formDataPerception.message">{{ formDataPerception.message }}</div>
+      <div v-else>
+        <div class="flex items-center">
+          <div class="text-xl font-medium">Formulaire de perception</div>
+        </div>
+        <div class="mt-3 text-lg">Formulaire de perception déjà remplir. Merci</div>
       </div>
-      <div class="mt-3 text-lg">Formulaire de perception déjà remplir. Merci</div>
     </Alert>
   </div>
 

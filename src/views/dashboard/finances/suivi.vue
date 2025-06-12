@@ -634,6 +634,8 @@ const suiviFinancierActivite = async () => {
       }
     }
   }
+
+  this.showModalSuiviFinancier = false;
 };
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
@@ -850,7 +852,7 @@ onMounted(() => {
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
-              {{ erreurPlanDeDecaissement[index].trimestre }}
+              {{ erreurPlanDeDecaissement[index].annee }}
             </p>
           </div>
 
@@ -940,7 +942,6 @@ onMounted(() => {
 
     <form @submit.prevent="suiviFinancierActivite">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-        <pre>{{ suiviFinancier }}</pre>
         <div v-for="(suivi, index) in suiviFinancier" :key="index" class="col-span-12 border-b pb-4 mb-4">
           <h3 class="text-sm font-medium mb-3">Plan {{ index + 1 }}</h3>
 

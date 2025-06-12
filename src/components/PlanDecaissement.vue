@@ -55,6 +55,7 @@ export default {
       showModal: false,
       isUpdate: false,
       isLoading: false,
+      years: [2024,2025, 2026],
       formData: {
         annee: "",
         trimestre: "",
@@ -378,12 +379,12 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
           <!-- Other details with iconized section headers -->
           <div class="mt-5 space-y-3 text-gray-600">
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ $h.formatCurrency(item.budgetNational) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.pret ? $h.formatCurrency(item.budgetNational) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
 
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ $h.formatCurrency(item.pret) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret ? $h.formatCurrency(item.pret) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
             <div class="flex items-center">
@@ -438,6 +439,16 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
           </TomSelect>
         </div>
 
+        <div class="col-span-12 mt-3">
+            <label class="form-label">Saisissez l'année de décaissement</label>
+            <TomSelect v-model="formData.annee" :options="{ placeholder: 'Selectionez  l\'année de décaissement' }" class="w-full">
+              <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
+            </TomSelect>
+              <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur?.annee">
+                {{ messageErreur.annee }}
+              </p>
+          </div>
+
         <div v-if="!update" class="flex col-span-12 mt-4">
           <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Trimestre</label>
           <TomSelect
@@ -459,21 +470,17 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
 
         <!-- <InputForm v-model="formData.annee" class="col-span-12" type="date" required="required" placeHolder="Annee de base" label="Année de base" /> -->
 
-        <InputForm v-model="formData.annee" :min="2000" class="col-span-12" type="number" :required="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
-        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.annee">{{ messageErreur.annee }}</p>
-
         <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
 
         <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
 
-        <!-- <pre>{{ getPlageActivites }}</pre> -->
         <div class="col-span-12" v-if="getPlageActivites">
           <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivites.durees" :key="t">
             <ClockIcon class="w-4 h-4 mr-2" />
             <div>
-              Plage de date {{ getPlageActivites.durees.length + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(getPlageActivites.durees[getPlageActivites.durees.length - 1].debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageActivites.durees[getPlageActivites.durees.length - 1].fin) }}</span>
+              Plage de date {{ t + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(plage.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(plage.fin) }}</span>
             </div>
           </div>
         </div>
@@ -492,7 +499,7 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Etes vous sûr?</div>
-        <div class="mt-2 text-slate-500">Voulez vous supprimer l'organisation ? <br />Cette action ne peut être annulé</div>
+        <div class="mt-2 text-slate-500">Voulez vous supprimer le plan de decaissement ? <br />Cette action ne peut être annulé</div>
       </div>
       <div class="flex gap-2 px-5 pb-8 text-center">
         <button type="button" @click="showDeleteModal = false" class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>
