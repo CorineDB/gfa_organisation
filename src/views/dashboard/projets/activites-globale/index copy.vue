@@ -170,10 +170,6 @@ export default {
     ...mapActions({
       // Mapping des actions pour le module activites
       prolongerDureeActivite: "activites/PROLONGER_DATE",
-      
-      modifierDuree: "activites/EDIT_DUREE",
-      changerStatutActivite: "activites/CHANGER_STATUT",
-
       // Mapping des actions pour le module planDeDecaissements
       storePlanDecaissement: "planDeDecaissements/STORE_PLAN_DE_DECAISSEMENT",
     }),
@@ -517,39 +513,6 @@ export default {
         });
     },
 
-changerStatut(item, statut = 2) {
-  this.loaderStatut = true;
-
-  const nouveauStatut = statut;//item.statut === 0 ? 2 : 0;
-
-  const payLoad = {
-    statut: nouveauStatut,
-  };
-
-  this.changerStatutActivite({ statut: payLoad, id: item.id })
-    .then((response) => {
-      this.loaderStatut = false;
-      if (response.status == 200 || response.status == 201) {
-        toast.success("Statut changer  avec succès");
-
-        this.loadSousComposantDetails();
-        //this.fetchProjets(this.programmeId);
-      }
-    })
-    .catch((error) => {
-      this.loaderStatut = false;
-
-      console.log(error);
-      toast.error(error.response.data.message);
-
-      // Mettre à jour les messages d'erreurs dynamiquement
-      if (error.response && error.response.data && error.response.data.errors) {
-        this.erreurProlongation = error.response.data.errors;
-        toast.error("Une erreur s'est produite");
-      }
-    });
-},
-
     ouvrirModalPlanDeDecaissementActivite(item) {
       this.planDeDecaissementPayload.activiteId = item.id;
       this.planDeDecaissement.push(this.planDeDecaissementPayload);
@@ -792,25 +755,6 @@ changerStatut(item, statut = 2) {
                       @click="ouvrirModalProlongerActivite(item)">
                       <CalendarIcon class="w-4 h-4 mr-2" /> Prolonger
                     </DropdownItem>
-
-                    <DropdownItem title="cliquer pour marquer l'activité comme terminer"
-                      v-if="verifyPermission('modifier-une-activite') && item.statut == 0"
-                      @click="changerStatut(item, 2)">
-                      <CalendarIcon class="w-4 h-4 mr-2" /> Terminer
-                    </DropdownItem>
-                    
-                    <DropdownItem title="cliquer pour marquer l'activité comme pas démarré"
-                      v-if="verifyPermission('modifier-une-activite') && item.statut == 0"
-                      @click="changerStatut(item, -1)">
-                      <CalendarIcon class="w-4 h-4 mr-2" /> Pas Démarrer
-                    </DropdownItem>
-
-                    <DropdownItem title="cliquer pour démarré l'activité"
-                      v-else-if="verifyPermission('modifier-une-activite') && (item.statut !== 0)"
-                      @click="changerStatut(item, 0)">
-                      <CalendarIcon class="w-4 h-4 mr-2" /> Démarrer
-                    </DropdownItem>
-
                     <DropdownItem v-if="verifyPermission('creer-un-plan-de-decaissement')"
                       @click="ouvrirModalPlanDeDecaissementActivite(item)">
                       <CalendarIcon class="w-4 h-4 mr-2" /> Plan de decaissement
