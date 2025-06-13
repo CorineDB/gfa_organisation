@@ -504,12 +504,12 @@ export default {
           <!-- Other details with iconized section headers -->
           <div class="mt-5 space-y-3 text-gray-600">
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ $h.formatCurrency(item.budgetNational) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.budgetNational ? $h.formatCurrency(item.budgetNational) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
 
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ $h.formatCurrency(item.pret == null ? 0 : item.pret) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret ? $h.formatCurrency(item.pret) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
             <!-- <div class="flex items-center text-sm font-medium text-gray-700">

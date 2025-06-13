@@ -14,6 +14,7 @@ import PlanDecaissementComponent from "@/components/PlanDecaissement.vue";
 import { helper as $h } from "@/utils/helper";
 import ChartJauge from "../../../../components/news/ChartJauge.vue";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
+import AuthService from "@/services/modules/auth.service";
 
 export default {
   components: {
@@ -29,7 +30,6 @@ export default {
 
   data() {
     return {
-      years: [2024,2025, 2026],
       search: "",
       isLoadingActivites: false,
       itemsPerPage: 3, // Nombre d'éléments par page
@@ -89,6 +89,10 @@ export default {
       loadingCloturer: false,
       erreurPlanDeDecaissement: null,
       activiteId: null,
+      dureeId: null,
+      editDuree: false,
+      debutProgramme: "",
+      finProgramme: "",
     };
   },
 
@@ -107,6 +111,17 @@ export default {
       this.totalItems = totalFilteredItems;
 
       return paginatedData;
+    },
+    years() {
+      let anneeDebut = parseInt(`${this.debutProgramme.split("-")[0]}`);
+      let anneeFin = parseInt(`${this.finProgramme.split("-")[0]}`);
+      let annees = [];
+      for (let annee = anneeDebut; annee <= anneeFin; annee++) {
+        if (annee <= new Date().getFullYear()) {
+          annees.push(annee);
+        }
+      }
+      return annees;
     },
     getPlageProjet() {
       let obj = null;
@@ -147,6 +162,17 @@ export default {
   },
 
   methods: {
+    async getcurrentUser() {
+      await AuthService.getCurrentUser()
+        .then((result) => {
+          this.debutProgramme = result.data.data.programme.debut;
+          this.finProgramme = result.data.data.programme.fin;
+        })
+        .catch((e) => {
+          console.error(e);
+          toast.error("Une erreur est survenue: Utilisateur connecté .");
+        });
+    },
     changeActiviteId(id) {
       this.selectedIds.activiteId = id;
 
@@ -479,6 +505,19 @@ export default {
       this.showModalProlongement = true;
     },
 
+    editModalProlongerActivite(item, duree) {
+      this.editDuree = true;
+      this.dateDebut = duree.debut;
+      this.dateFin = duree.fin;
+
+      this.dateDebutOld = duree.debut;
+      this.dateFinOld = duree.fin;
+      this.activiteId = item.id;
+      this.dureeId = duree.id;
+      this.selectedIds.activiteId = this.activiteId;
+      this.showModalProlongement = true;
+    },
+
     prolongementActivite() {
       this.loadingProlonger = true;
 
@@ -491,6 +530,7 @@ export default {
         .then((response) => {
           if (response.status == 200 || response.status == 201) {
             this.showModalProlongement = false;
+            this.loadingProlonger = false;
 
             this.dateDebut = "";
             this.dateDebutOld = "";
@@ -515,6 +555,54 @@ export default {
             toast.error("Une erreur s'est produite");
           }
         });
+    },
+
+
+    modifierDureeActivite() {
+      this.loadingProlonger = true;
+
+      let payLoad = {
+        debut: this.dateDebut,
+        fin: this.dateFin,
+      };
+
+      this.modifierDuree({ dates: payLoad, id: this.activiteId, duree: this.dureeId })
+        .then((response) => {
+          if (response.status == 200 || response.status == 201) {
+            this.showModalProlongement = false;
+            this.loadingProlonger = false;
+
+            this.dateDebut = "";
+            this.dateDebutOld = "";
+            this.dateFin = "";
+            this.dateFinOld = "";
+
+            toast.success("Duree modifiée avec succès");
+
+            this.loadSousComposantDetails();
+            //this.fetchProjets(this.programmeId);
+          }
+        })
+        .catch((error) => {
+          this.loadingProlonger = false;
+
+          console.log(error);
+          toast.error(error.response.data.message);
+
+          // Mettre à jour les messages d'erreurs dynamiquement
+          if (error.response && error.response.data && error.response.data.errors) {
+            this.erreurProlongation = error.response.data.errors;
+            toast.error("Une erreur s'est produite");
+          }
+        });
+    },
+
+    submitDuree(){
+      if(this.editDuree ) {
+        this.modifierDureeActivite();
+      }else{
+         this.prolongementActivite();
+      }
     },
 
 changerStatut(item, statut = 2) {
@@ -606,6 +694,7 @@ changerStatut(item, statut = 2) {
     if (this.selectedIds.activiteId !== "" || this.selectedIds.activiteId !== null) {
       this.getInfoActivite(this.selectedIds.activiteId);
     }
+    this.getcurrentUser();
   },
 };
 </script>
@@ -832,12 +921,12 @@ changerStatut(item, statut = 2) {
 
               <div class="mt-5 space-y-3 text-gray-600">
                 <div class="flex items-center">
-                  <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ $h.formatCurrency(item.budgetNational) }}
+                  <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.budgetNational ? $h.formatCurrency(item.budgetNational) : 0 }}
                   <div class="ml-2 italic font-bold">Fcfa</div>
                 </div>
 
                 <div class="flex items-center">
-                  <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret == null ? 0 : $h.formatCurrency(item.pret)
+                  <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret ? $h.formatCurrency(item.pret): 0
                   }}
                   <div class="ml-2 italic font-bold">Fcfa</div>
                 </div>
@@ -862,13 +951,30 @@ changerStatut(item, statut = 2) {
                       class="font-bold"> {{ $h.reformatDate(item.fin) }}</span>
                   </div>
                 </div>
+                
                 <div class="flex items-center mt-2" v-for="(plage, t) in item.durees" :key="t">
+                  
+                  <ClockIcon class="w-4 h-4 mr-2" v-if="t <= item.durees.length - 1" />
+                  
+                  <div v-if="t <= item.durees.length - 1">
+                    Plage de date {{ t + 1 }} : Du 
+                    <span class="pr-1 font-bold"> {{ $h.reformatDate(plage.debut) }}</span>
+                    au
+                    <span class="font-bold"> {{ $h.reformatDate(plage.fin) }}</span>
+                  </div>
+
+                  <button class="p-1.5 text-primary" @click="editModalProlongerActivite(item, plage)">
+                    <Edit3Icon class="size-5" />
+                  </button>
+                </div>
+                
+                <!-- <div class="flex items-center mt-2" v-for="(plage, t) in item.durees" :key="t">
                   <ClockIcon class="w-4 h-4 mr-2" />
                   <div>
                     Plage de date {{ t + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(plage.debut)
                       }}</span> au <span class="font-bold"> {{ $h.reformatDate(plage.fin) }}</span>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -1010,30 +1116,31 @@ changerStatut(item, statut = 2) {
 
   <Modal backdrop="static" :show="showModalProlongement" @hidden="showModalProlongement = false">
     <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">Prolonger l'activite</h2>
+      <h2 class="mr-auto text-base font-medium">{{ editDuree ? "Modifier l'activite" : "Prolonger l'activite"}}</h2>
     </ModalHeader>
 
-    <form @submit.prevent="prolongementActivite">
+    <form @submit.prevent="submitDuree">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
         <InputForm v-model="dateDebut" :min="dateDebutOld" class="col-span-12" type="date" :required="true"
           placeHolder="Entrer la nouvelle date debut" label="Nouvelle date debut de l'activite" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12"
           v-if="erreurProlongation != null && erreurProlongation.debut">{{ erreurProlongation.debut }}</p>
 
-        <InputForm v-model="dateFin" :min="dateFinOld" class="col-span-12" type="date" :required="true"
+        <InputForm v-model="dateFin" :min="dateFinOld" class="col-span-12 mt-4" type="date" :required="true"
           placeHolder="Entrer la nouvelle date fin" label="Nouvelle date fin de l'activite" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12"
           v-if="erreurProlongation != null && erreurProlongation.fin">
           {{ erreurProlongation.fin }}</p>
 
-        <div class="col-span-12" v-if="getPlageActivite">
+
+        <div class="col-span-12 mt-4" v-if="getPlageActivite">
           <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivite.durees" :key="t">
             <ClockIcon class="w-4 h-4 mr-2" />
             <div>
-              Plage de date {{ getPlageActivite.durees.length + 1 }} : Du <span class="pr-1 font-bold"> {{
-                $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].debut) }}</span> au <span
-                class="font-bold"> {{ $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].fin)
-                }}</span>
+              Plage de date {{ t + 1 }} : Du 
+              <span class="pr-1 font-bold"> {{ $h.reformatDate(plage.debut) }}</span>
+              au 
+              <span class="font-bold"> {{ $h.reformatDate(plage.fin) }} </span>
             </div>
           </div>
         </div>
@@ -1050,7 +1157,7 @@ changerStatut(item, statut = 2) {
         <div class="flex items-center justify-center">
           <button type="button" @click="showModalProlongement = false"
             class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
-          <VButton class="inline-block" label="Prolonger" :loading="loadingProlonger" :type="submit" />
+          <VButton class="inline-block" :label="editDuree ? 'Modifier' : 'Prolonger'" :loading="loadingProlonger" :type="submit" />
         </div>
       </ModalFooter>
     </form>
@@ -1064,25 +1171,22 @@ changerStatut(item, statut = 2) {
     <form @submit.prevent="planDeDecaissementActivite">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
         <div v-for="(plan, index) in planDeDecaissement" :key="index" class="col-span-12 border-b pb-4 mb-4">
-          <h3 class="text-sm font-medium mb-2">Plan {{ index + 1 }}</h3>
-
-          <InputForm v-model="plan.annee" :min="2000" class="col-span-12" type="number" :required="true"
-            placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
+          <h3 class="text-sm font-medium mb-2">Plan {{ index + 1 }}</h3>            
 
           <div class="col-span-12 mt-3">
-            <label class="form-label">Saisissez l'année de décaissement</label>
-            <TomSelect v-model="plan.annee" :options="{ placeholder: 'Selectionez  l\'année de décaissement' }" class="w-full">
+            <label class="form-label">Sélectionnner l'année de décaissement</label>
+            <TomSelect v-model="plan.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
-              <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.annee">
-                {{ erreurPlanDeDecaissement[index].annee }}
-              </p>
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.annee">
+              {{ erreurPlanDeDecaissement[index].annee }}
+            </p>
           </div>
-          <div class="flex col-span-12 mt-4">
-            <label for="_input-wizard-10"
-              class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Sélectionnez
-              le trimestre</label>
-            <TomSelect v-model="plan.trimestre" :options="{ placeholder: 'Choisir un trimestre', create: false, }" class="w-full">
+
+          <div class="col-span-12 mt-4">
+
+            <label class="form-label">Sélectionnner le trimestre</label>
+            <TomSelect v-model="plan.trimestre" :options="{ placeholder: 'Choisir un trimestre' }" class="w-full">
               <option value="">Choisir un trimestre</option>
               <option value="1">Trimestre 1</option>
               <option value="2">Trimestre 2</option>
@@ -1095,37 +1199,37 @@ changerStatut(item, statut = 2) {
           </p>
 
 
-          <InputForm v-model="plan.budgetNational" :min="0" class="col-span-12" type="number" :required="true"
+          <InputForm v-model="plan.budgetNational" :min="0" class="col-span-12 mt-4" type="number" :required="true"
             placeHolder="Saisissez le fond propre" label="Saisissez le fond propre" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12"
             v-if="erreurPlanDeDecaissement?.[index]?.budgetNational">
             {{ erreurPlanDeDecaissement[index].budgetNational }}
           </p>
 
-          <InputForm v-model="plan.pret" :min="0" class="col-span-12" type="number" :required="true"
+          <InputForm v-model="plan.pret" :min="0" class="col-span-12 mt-4" type="number" :required="true"
             placeHolder="Saisissez la subvention" label="Saisissez la subvention" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.pret">
             {{ erreurPlanDeDecaissement[index].pret }}
           </p>
 
-          <button type="button" @click="removePlan(index)" class="mt-2 text-red-600 text-sm underline">Supprimer ce
+          <button type="button" @click="removePlan(index)" class="mt-4 text-red-600 text-sm underline">Supprimer ce
             plan</button>
         </div>
 
         <button type="button" @click="addPlan" class="col-span-12 btn btn-outline-primary">Ajouter un autre
           plan</button>
 
-        <div class="col-span-12" v-if="getPlageActivite">
-          <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivite.durees" :key="t">
-            <ClockIcon class="w-4 h-4 mr-2" />
-            <div>
-              Plage de date {{ getPlageActivite.durees.length + 1 }} : Du <span class="pr-1 font-bold"> {{
-                $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].debut) }}</span> au <span
-                class="font-bold"> {{ $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].fin)
-                }}</span>
+          <div class="col-span-12 mt-4" v-if="getPlageActivite">
+            <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivite.durees" :key="t">
+              <ClockIcon class="w-4 h-4 mr-2" />
+              <div>
+                Plage de date {{ t + 1 }} : Du <span class="pr-1 font-bold"> {{
+                  $h.reformatDate(plage.debut) }}</span> au <span
+                  class="font-bold"> {{ $h.reformatDate(plage.fin)
+                  }}</span>
+              </div>
             </div>
           </div>
-        </div>
 
         <div v-if="getPlageProjet" class="flex items-center mt-2 col-span-12">
           <ClockIcon class="w-4 h-4 mr-2" />

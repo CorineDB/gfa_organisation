@@ -84,6 +84,7 @@ import SuiviIndicateur from "../views/dashboard/indicateurs/SuiviIndicateur.vue"
 import DetailSuivi from "../views/dashboard/indicateurs/DetailSuivi.vue";
 import SurveyFormView from "../views/dashboard/SurveyFormView.vue";
 import DetailEvaluationIndividuel from "../views/dashboard/DetailEvaluationIndividuel.vue";
+import DetailSuiviFinancier from "../views/dashboard/finances/DetailSuiviFinancier.vue";
 
 const routes = [
   {
@@ -201,6 +202,11 @@ const routes = [
         component: finances_suivi,
 
         name: "finances_suivi",
+      },
+      {
+        path: "suiviFinancier/:id",
+        name: "Détail du suivi financier",
+        component: DetailSuiviFinancier,
       },
       {
         path: "/dashboard/finances/plan-de-decaissement",

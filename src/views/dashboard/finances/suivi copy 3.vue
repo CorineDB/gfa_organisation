@@ -42,8 +42,7 @@ const storePlanDecaissement = async (payload) => {
 //     }),
 
 const erreurPlanDeDecaissement = ref(null);
-//const planDeDecaissement = ref([]);
-let planDeDecaissement = ref([]);
+const planDeDecaissement = ref([]);
 const loadingPlanDeDecaissement = ref(false);
 const showModalPlanDeDecaissement = ref(false);
 
@@ -211,12 +210,9 @@ const getPlageActivite = computed(() => {
   // Retourne le nom ou `null` si non trouvé
 });
 
-//const showModalSuiviFinancier = ref(false);
-let showModalSuiviFinancier = ref(false);
-//const loadingSuiviFinancier = ref(false);
-let loadingSuiviFinancier = ref(false);
-//const erreurSuiviFinancier = ref(null);
-let erreurSuiviFinancier = ref(null);
+const showModalSuiviFinancier = ref(false);
+const loadingSuiviFinancier = ref(false);
+const erreurSuiviFinancier = ref(null);
 
 const payload = reactive({
   consommer: "",
@@ -600,10 +596,10 @@ const suiviFinancierActivite = async () => {
       console.log("index === suiviFinancier.value.length - 1", index === suiviFinancier.value.length - 1);
 
       if (index === suiviFinancier.value.length - 1) {
-        showModalSuiviFinancier = false;
+        this.showModalSuiviFinancier = false;
 
         setTimeout(() => {
-          planDeDecaissement = [];
+          this.planDeDecaissement = [];
         }, 500);
       }
 
@@ -617,7 +613,7 @@ const suiviFinancierActivite = async () => {
 
       // Mettre à jour les messages d'erreurs dynamiquement
       if (error.response && error.response.data && error.response.data.errors.length > 0) {
-        erreurSuiviFinancier = error.response.data.errors;
+        this.erreurSuiviFinancier = error.response.data.errors;
         toast.error("Une erreur s'est produite dans votre formualaire");
       } else {
         toast.error(`Suivi ${index + 1} : ${error.response.data.message}`);
@@ -638,6 +634,8 @@ const suiviFinancierActivite = async () => {
       }
     }
   }
+
+  this.showModalSuiviFinancier = false;
 };
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
@@ -737,9 +735,9 @@ onMounted(() => {
                     <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Activités</th>
                   </tr>
                 </thead>
-                <tbody class="text-sm divide-y divide-gray-200 bg-white">
+                <tbody>
                   <tr style="height: 49px" v-for="(suivi, index) in datas.suiviFinanciers" :key="index" class="bg-white border-b hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi?.activite?.codePta }}-{{ suivi?.activite?.nom }}</span>
                     </td>
                   </tr>
@@ -747,7 +745,7 @@ onMounted(() => {
               </table>
             </div>
 
-            <div class="absolute shadow-md perso left-[295px] sm:rounded-lg">
+            <div class="absolute shadow-md perso left-[150px] sm:rounded-lg">
               <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="sticky top-0 text-xs text-gray-700 uppercase _z-20 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
@@ -773,48 +771,48 @@ onMounted(() => {
                     <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
                   </tr>
                 </thead>
-                <tbody class="text-sm divide-y divide-gray-200 bg-white">
+                <tbody>
                   <tr v-for="(suivi, index) in datas.suiviFinanciers" :key="index" class="bg-white border-b hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.annee }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.trimestre }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.periode.budget == null || suivi.periode.budget == 0 ? 0 : $h.formatCurrency(suivi.periode.budget) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.periode.consommer == null || suivi.periode.consommer == 0 ? 0 : $h.formatCurrency(suivi.periode.consommer) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.periode.disponible == null || suivi.periode.disponible == 0 ? 0 : $h.formatCurrency(suivi.periode.disponible) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.periode.pourcentage }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.exercice.budget == null || suivi.exercice.budget == 0 ? 0 : $h.formatCurrency(suivi.exercice.budget) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.exercice.consommer == null || suivi.exercice.consommer == 0 ? 0 : $h.formatCurrency(suivi.exercice.consommer) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.exercice.disponible == null || suivi.exercice.disponible == 0 ? 0 : $h.formatCurrency(suivi.exercice.disponible) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.exercice.pourcentage }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.cumul.budget == null || suivi.cumul.budget == 0 ? 0 : $h.formatCurrency(suivi.cumul.budget) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.cumul.consommer == null || suivi.cumul.consommer == 0 ? 0 : $h.formatCurrency(suivi.cumul.consommer) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.cumul.disponible == null || suivi.cumul.disponible == 0 ? 0 : $h.formatCurrency(suivi.cumul.disponible) }}</span>
                     </td>
-                    <td class="p-4 border-b border-slate-200">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.cumul.pourcentage }}</span>
                     </td>
                     <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700 text-center">
@@ -853,8 +851,8 @@ onMounted(() => {
             <TomSelect v-model="plan.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
-              {{ erreurPlanDeDecaissement[index].trimestre }}
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+              {{ erreurPlanDeDecaissement[index].annee }}
             </p>
           </div>
 
@@ -871,7 +869,7 @@ onMounted(() => {
               <option value="3">Trimestre 3</option>
               <option value="4">Trimestre 4</option>
             </TomSelect>
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
               {{ erreurPlanDeDecaissement[index].trimestre }}
             </p>
           </div>
@@ -897,7 +895,7 @@ onMounted(() => {
             <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivite.durees" :key="t">
               <ClockIcon class="w-4 h-4 mr-2" />
               <div>
-                Plage de date {{ t + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].fin) }}</span>
+                Plage de date {{ getPlageActivite.durees.length + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageActivite.durees[getPlageActivite.durees.length - 1].fin) }}</span>
               </div>
             </div>
           </div>
@@ -944,7 +942,6 @@ onMounted(() => {
 
     <form @submit.prevent="suiviFinancierActivite">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-      
         <div v-for="(suivi, index) in suiviFinancier" :key="index" class="col-span-12 border-b pb-4 mb-4">
           <h3 class="text-sm font-medium mb-3">Plan {{ index + 1 }}</h3>
 
