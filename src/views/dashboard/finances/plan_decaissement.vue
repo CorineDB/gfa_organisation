@@ -19,13 +19,12 @@
   <!-- <pre>{{ dataNew }}</pre> -->
   <div v-if="currentPage && ptaVisible" class="current">
     <div style="max-height: 80vh" class="relative flex overflow-y-auto">
-      <div style="width: 33.33%; position: sticky; left: 0; background: transparent; z-index: 1; margin-right: 1%">
+      <div style="position: sticky; left: 0; background: transparent; z-index: 1; margin-right: 1%">
         <table class="top-0 left-0 block w-full text-sm text-left table-fixed border-collaspe table1">
           <thead class="sticky top-0 z-20 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr style="height: 82px" class="">
               <!-- <th rowspan="2" class=" w-24 px-6 py-3 border dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Bailleurs</th> -->
               <th scope="col" rowspan="2" class="p-4 border-b border-slate-200">Code PTBA</th>
-              <th scope="col" rowspan="2" class="p-4 border-b border-slate-200">Etat des taches</th>
             </tr>
             <tr></tr>
           </thead>
@@ -47,37 +46,12 @@
                 </span>
                 <span v-if="pta.isTache" class="text-sm text-red-600"> {{ pta.code }}</span>
               </td>
-              <td v-if="pta.isTache" class="p-4 border-b border-slate-200">
-                <!-- <pre>{{ pta }}</pre> -->
-                <select class="form-select form-select-sm mt-2" aria-label=".form-select-sm example" v-model="pta.poidsActuel" @change="togglesuivie(pta)">
-                  <option :value="0">0%</option>
-                  <option :value="50">50%</option>
-                  <option :value="100">100%</option>
-                </select>
-                <!-- <button
-                    v-if="pta.isTache"
-                    @click="togglesuivie(pta)"
-                    class="flex items-center justify-between px-1 text-white transition-all rounded-full shadow w-14 h-7"
-                    :class="{
-                      'bg-gray-400': false,
-                      'bg-red-400': pta.poidsActuel == 0 || tabletoggle[pta.id] == 0,
-                      'bg-green-400 ': greentoggle && (pta.poidsActuel > 0 || tabletoggle[pta.id] == 1),
-                    }"
-                  >
-                    <div
-                      class="w-5 h-5 transform translate-x-0 bg-white rounded-full"
-                      :class="{
-                        'translate-x-full': pta.poidsActuel > 0 || translatetoggle || tabletoggle[pta.id] == 1,
-                      }"
-                    ></div>
-                  </button> -->
-              </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div class="absolute shadow-md perso left-64 sm:rounded-lg">
+      <div class="absolute shadow-md perso left-[6.5rem] sm:rounded-lg">
         <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
           <thead class="sticky top-0 text-xs text-gray-700 uppercase _z-20 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr class="">
@@ -179,7 +153,7 @@
 
               <!-- v-if="pta.t3Pret != '' || pta.t3Bn != ''" -->
               <td class="p-4 border-b border-slate-200">
-                <span class="font-bold"> {{ $h.formatCurrency(pta.t3Pret + pta.t3Bn) }} {{ pta.t3Pret + pta.t3Bn == null || pta.t3Pret + pta.t3Bn == 0 ? 0 : $h.formatCurrency(pta.t3Pret + pta.t3Bn) }}</span>
+                <span class="font-bold"> <!-- {{ $h.formatCurrency(pta.t3Pret + pta.t3Bn) }}  -->{{ pta.t3Pret + pta.t3Bn == null || pta.t3Pret + pta.t3Bn == 0 ? 0 : $h.formatCurrency(pta.t3Pret + pta.t3Bn) }}</span>
                 <!--  <span v-else class="font-bold" >0 FCFA </span> -->
               </td>
               <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->

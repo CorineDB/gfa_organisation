@@ -18,6 +18,11 @@ const showModalFiltre = ref(false);
 const debutProgramme = ref("");
 const finProgramme = ref("");
 
+const getCurrentQuarter = () => {
+  const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
+  return Math.ceil(month / 3); // Calcul du trimestre actuel
+};
+
 const years = computed(() => {
   console.log("debut", `${debutProgramme.value.split("-")}`);
   console.log("fin", `${finProgramme.value.split("-")}`);
@@ -46,29 +51,25 @@ const getcurrentUser = async () => {
 
 const payload = reactive({
   activiteId: route.params.id,
-  trimestre: 1, // Trimestre actuel
+  trimestre: getCurrentQuarter(), // Trimestre actuel
   annee: new Date().getFullYear(), // Set current year as default
   consommer: 0,
   // type: 0,
 });
 
-const getCurrentQuarter = () => {
-  const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
-  return Math.ceil(month / 3); // Calcul du trimestre actuel
-};
-
 const openFilterModal = () => {
   filterPayload.trimestre = getCurrentQuarter(); //
+  filterPayload.annee = new Date().getFullYear(), // Set current year as default
   showModalFiltre.value = true;
 };
 
 const filterPayload = reactive({
-  trimestre: 1, // Trimestre actuel
+  trimestre: getCurrentQuarter(), // Trimestre actuel
   annee: new Date().getFullYear(), // Set current year as default
 });
 
 const resetFilter = function () {
-  filterPayload.trimestre = 1;
+  filterPayload.trimestre = getCurrentQuarter();
   filterPayload.annee = new Date().getFullYear();
   getDatas();
 };
@@ -86,7 +87,7 @@ const erreurSuiviFinancier = ref(null);
 
 const filter = ref({
   annee: new Date().getFullYear(),
-  trimestre: 1,
+  trimestre: getCurrentQuarter(),
 });
 
 const isLoadingFilter = ref(false);
@@ -281,7 +282,7 @@ const cancelSelect = () => {
 };
 const resetForm = () => {
   payload.activiteId = route.params.id;
-  payload.trimestre = 1; // Trimestre actuel
+  payload.trimestre = getCurrentQuarter(); // Trimestre actuel
   payload.annee = new Date().getFullYear(); // Set current year as default
   payload.consommer = 0;
   // payload.type = 0;
@@ -289,7 +290,7 @@ const resetForm = () => {
 };
 const openCreateModal = () => {
   showModalCreate.value = isCreate.value = true;
-  payload.trimestre = 1; // Trimestre actuel
+  payload.trimestre = getCurrentQuarter(); // Trimestre actuel
   payload.annee = new Date().getFullYear(); // Set current year as default
   payload.consommer = 0;
   // payload.type = "";
@@ -378,18 +379,27 @@ onMounted(() => {
               <option value="budget-alloue">Budget Alloue</option>
             </TomSelect>
           </div> -->
-          <div class="col-span-12">
-            <InputForm v-model="payload.trimestre" :min="1" :max="4" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Sélectionnez le trimestre" label="Sélectionnez le trimestre" />
+
+          <div class="col-span-12 mt-4">
+            <label class="form-label">Sélectionnez l'année de décaissement</label>
+            <TomSelect v-model="payload.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
+              <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
+            </TomSelect>
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
-              {{ erreurSuiviFinancier[index].trimestre }}
+              {{ erreurSuiviFinancier[index].annee }}
             </p>
           </div>
 
-          <div class="col-span-12">
-            <pre>{{ payload.annee }}</pre>
-            <InputForm v-model="payload.annee" :min="2000" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.annee">
-              {{ erreurSuiviFinancier[index].annee }}
+          <div class="col-span-12 w-full mt-4">
+            <label class="form-label">Sélectionnez le trimestre</label>
+            <TomSelect v-model="payload.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full">
+              <option value="1">Trimestre 1</option>
+              <option value="2">Trimestre 2</option>
+              <option value="3">Trimestre 3</option>
+              <option value="4">Trimestre 4</option>
+            </TomSelect>
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+              {{ erreurSuiviFinancier[index].trimestre }}
             </p>
           </div>
 
@@ -414,7 +424,6 @@ onMounted(() => {
     <form @submit.prevent="filterSuiviFinancierActivite">
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
-          <!-- <pre>{{years}}</pre> -->
           <div class="">
             <label class="form-label">Année</label>
             <TomSelect v-model="filterPayload.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">

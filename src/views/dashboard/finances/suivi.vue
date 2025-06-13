@@ -745,7 +745,7 @@ onMounted(() => {
               </table>
             </div>
 
-            <div class="absolute shadow-md perso left-[150px] sm:rounded-lg">
+            <div class="absolute shadow-md perso left-[19rem] sm:rounded-lg">
               <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="sticky top-0 text-xs text-gray-700 uppercase _z-20 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
@@ -776,7 +776,7 @@ onMounted(() => {
                     <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
                       <span class="font-bold">{{ suivi.annee }}</span>
                     </td>
-                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
+                    <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700 text-right">
                       <span class="font-bold">{{ suivi.trimestre }}</span>
                     </td>
                     <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-700">
@@ -846,22 +846,17 @@ onMounted(() => {
         <div v-for="(plan, index) in planDeDecaissement" :key="plan.id" class="col-span-12 border-b pb-4 mb-4">
           <h3 class="text-sm font-medium mb-2">Plan {{ index + 1 }}</h3>
 
-          <div class="col-span-12 mt-3">
+          <div class="col-span-12 mt-4">
             <label class="form-label">Année</label>
             <TomSelect v-model="plan.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
               {{ erreurPlanDeDecaissement[index].annee }}
             </p>
           </div>
 
-          <!-- <InputForm v-model="plan.annee" :min="2000" class="col-span-12" type="number" :required="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.annee">
-            {{ erreurPlanDeDecaissement[index].annee }}
-          </p> -->
-
-          <div class="w-full mt-3">
+          <div class="w-full mt-4">
             <label class="form-label">Sélectionnez le trimestre</label>
             <TomSelect v-model="plan.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full">
               <option value="1">Trimestre 1</option>
@@ -869,27 +864,22 @@ onMounted(() => {
               <option value="3">Trimestre 3</option>
               <option value="4">Trimestre 4</option>
             </TomSelect>
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
               {{ erreurPlanDeDecaissement[index].trimestre }}
             </p>
           </div>
 
-          <!-- <InputForm v-model="plan.trimestre" :min="1" :max="4" class="col-span-12" type="number" :required="true" placeHolder="Sélectionnez le trimestre" label="Sélectionnez le trimestre" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
-            {{ erreurPlanDeDecaissement[index].trimestre }}
-          </p> -->
-
-          <InputForm v-model="plan.budgetNational" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Saisissez le fond propre" />
+          <InputForm v-model="plan.budgetNational" :min="0" class="col-span-12 mt-4" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Saisissez le fond propre" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.budgetNational">
             {{ erreurPlanDeDecaissement[index].budgetNational }}
           </p>
 
-          <InputForm v-model="plan.pret" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez la subvention" label="Saisissez la subvention" />
+          <InputForm v-model="plan.pret" :min="0" class="col-span-12 mt-4" type="number" :required="true" placeHolder="Saisissez la subvention" label="Saisissez la subvention" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.pret">
             {{ erreurPlanDeDecaissement[index].pret }}
           </p>
 
-          <button type="button" @click="removePlan(index)" class="mt-2 text-red-600 text-sm underline">Supprimer ce plan</button>
+          <button type="button" @click="removePlan(index)" class="mt-4 text-red-600 text-sm underline">Supprimer ce plan</button>
 
           <div class="col-span-12" v-if="getPlageActivite">
             <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivite.durees" :key="t">
