@@ -74,7 +74,7 @@
           </li>
         </ul> -->
         <LoaderSnipper v-if="isLoadingDataCadre" />
-        <TabulatorCadreMesure v-else :data="cadreRendement" :years="annees" />
+        <TabulatorCadreMesure v-else :data="cadreRendement" :years="annees" @refreshData="getDatasCadre"/>
         <!-- <LoaderSnipper v-else /> -->
 
         <!-- Modal for creating/updating -->

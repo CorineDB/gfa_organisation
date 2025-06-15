@@ -27,12 +27,12 @@
       <tbody>
         <template v-for="(result, i) in data" :key="result.id">
           <tr class="uppercase" :class="[result.type == 'produit' ? 'text-black' : 'text-white']" :style="{ 'background-color': findColorCadreMesure(result.type) }">
-            <td :colspan="13 + years.length * 2" class="font-semibold">{{ result.type }} {{ result.indice }}</td>
+            <td :colspan="13 + years.length * 2" class="font-semibold p-2">{{ result.type }} {{ result.indice }}</td>
           </tr>
           <template v-for="(indicateur, j) in result.indicateurs" :key="indicateur.id">
             <tr>
               <!-- Première colonne fixe -->
-              <td class="font-semibold sticky-column" v-if="j === 0" :rowspan="result.indicateurs.length" style="left: 0">
+              <td class="font-semibold sticky-column p-2" v-if="j === 0" :rowspan="result.indicateurs.length" style="left: 0">
                 {{ result.nom }}
               </td>
 
@@ -40,33 +40,32 @@
               <td class="font-semibold sticky-column-second" style="left: 500px">Ind {{ indicateur.code }}</td>
 
               <!-- Troisième colonne fixe -->
-              <td class="sticky-column-third" style="left: 580px">
+              <td class="sticky-column-third p-2" style="left: 580px">
                 {{ indicateur.nom }}
               </td>
 
               <!-- Colonnes restantes -->
-              <td>{{ indicateur.description ?? "" }}</td>
+              <td class="p-2">{{ indicateur.description ?? "" }}</td>
               <td v-html="formatObject(indicateur.valeurDeBase)"></td>
               <td v-for="(year, index) in years" :key="index">
                 <span v-html="formatObject(indicateur.valeursCible.find((valeur) => valeur.annee === year)?.valeurCible)"></span>
               </td>
-              <td></td>
+              <td v-html="formatObject(indicateur.valeurCibleTotal)"></td>
               <td v-for="(year, index) in years" :key="index">
                 <span v-html="formatObject(indicateur.valeursCible.find((valeur) => valeur.annee === year)?.valeur_realiser)"></span>
               </td>
-              <td></td>
-              <td></td>
-              <td>{{ indicateur.sources_de_donnee }}</td>
-              <td>{{ indicateur.methode_de_la_collecte }}</td>
-              <td>{{ indicateur.frequence_de_la_collecte }}</td>
-              <td>
+              <td v-html="formatObject(indicateur.valeurRealiserTotal)"></td>
+              <td v-html="formatObject(indicateur.taux_realisation)"></td>
+              <td class="p-2">{{ indicateur.sources_de_donnee }}</td>
+              <td class="p-2">{{ indicateur.methode_de_la_collecte }}</td>
+              <td class="p-2">{{ indicateur.frequence_de_la_collecte }}</td>
+              <td class="p-2">
                 {{ indicateur.ug_responsable?.nom ?? "" }} <br />
                 {{ formatResponsable(indicateur.organisations_responsable) }}
               </td>
-              <td class="space-x-3">
+              <td class="p-2 space-x-3">
                 <button title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary"><CornerUpLeftIcon class="size-5" /></button>
                 <button title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary"><EyeIcon class="size-5" /></button>
-                <button title="Supprimer" @click="handleDelete(result)" class="btn text-danger"><TrashIcon class="size-5" /></button>
               </td>
             </tr>
           </template>
@@ -101,14 +100,13 @@
     <form @submit.prevent="submitSuivi">
       <ModalBody>
         <div class="grid grid-cols-1 gap-5">
-          <!-- <div class="flex-1">
+          <div class="flex-1">
             <label class="form-label">Année de suivi</label>
-            <TomSelect v-model.number="payloadSuivi.annee" name="annee_suivi" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
-              <option value=""></option>
+            <TomSelect v-model="payloadSuivi.annee" name="annee_suivi" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
               <option v-for="annee in years" :key="annee" :value="annee">{{ annee }}</option>
             </TomSelect>
-          </div> -->
-          <InputForm label="Année de suivi" class="flex-1" v-model="payloadSuivi.annee" type="number" />
+          </div>
+          <!-- <InputForm label="Année de suivi" class="flex-1" v-model="payloadSuivi.annee" type="number" /> -->
           <div v-if="!isAgregerCurrentIndicateur" class="flex flex-wrap items-center justify-between gap-3">
             <InputForm label="Valeur cible" class="flex-1" v-model="payloadSuivi.valeurCible" type="number" />
             <InputForm label="Valeur réalisée" class="flex-1" v-model="payloadSuivi.valeurRealise" type="number" />
@@ -119,7 +117,7 @@
             <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]">
               <div v-for="(base, index) in valueKeysIndicateurSuivi" :key="index" class="input-group">
                 <div class="flex items-center justify-center text-sm truncate input-group-text">{{ base.libelle }}</div>
-                <input type="number" class="form-control" v-model.number="valeurCible.find((item) => item.keyId === base.id).value" @input="updateValueCible(base.id, $event.target.value)" placeholder="valeur cible" aria-label="valeur" aria-describedby="input-group-valeur" />
+                <input type="number" class="form-control" v-model="valeurCible.find((item) => item.keyId === base.id).value" @input="updateValueCible(base.id, $event.target.value)" placeholder="valeur cible" aria-label="valeur" aria-describedby="input-group-valeur" />
               </div>
             </div>
           </div>
@@ -128,7 +126,7 @@
             <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]">
               <div v-for="(base, index) in valueKeysIndicateurSuivi" :key="index" class="input-group">
                 <div class="flex items-center justify-center text-sm truncate input-group-text">{{ base.libelle }}</div>
-                <input type="number" class="form-control" v-model.number="valeurRealise.find((item) => item.keyId === base.id).value" @input="updateValueRealiser(base.id, $event.target.value)" placeholder="valeur réalisée" aria-label="valeur" aria-describedby="input-group-valeur" />
+                <input type="number" class="form-control" v-model="valeurRealise.find((item) => item.keyId === base.id).value" @input="updateValueRealiser(base.id, $event.target.value)" placeholder="valeur réalisée" aria-label="valeur" aria-describedby="input-group-valeur" />
               </div>
             </div>
           </div>
@@ -203,6 +201,8 @@ import { findColorCadreMesure } from "../utils/findColorIndicator";
 import { sourcesDonnees } from "../utils/constants";
 import { useRouter } from "vue-router";
 
+const emit = defineEmits(["refreshData"]);
+
 const props = defineProps({
   data: Array,
   years: Array,
@@ -215,6 +215,11 @@ const optionsSuivi = [
   { label: "Par trimestre", id: "trimestre" },
 ];
 
+const getCurrentQuarter = function () {
+  const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
+  return Math.ceil(month / 3); // Calcul du trimestre actuel
+}
+
 const idSelect = ref("");
 const nameSelect = ref("");
 const valueKeysIndicateurSuivi = ref([]);
@@ -223,9 +228,12 @@ const showModalSuivi = ref(false);
 const showModalEdit = ref(false);
 const deleteModalPreview = ref(false);
 const isLoading = ref(false);
+const valeurCible = ref([]);
+const valeurRealise = ref([]);
+
 const payloadSuivi = reactive({
-  annee: "",
-  trimestre: "",
+  annee: new Date().getFullYear(),
+  trimestre: getCurrentQuarter(),
   valeurCible: "",
   valeurRealise: "",
   commmentaire: "",
@@ -233,10 +241,9 @@ const payloadSuivi = reactive({
   indicateurId: "",
   sources_de_donnee: "",
 });
+
 const suiviOption = ref(optionsSuivi[0].id);
 // État réactif pour stocker les valeurs des inputs
-const valeurCible = ref([]);
-const valeurRealise = ref([]);
 
 const goToDetailSuivi = (id) => {
   router.push({
@@ -275,6 +282,16 @@ const resetFormSuivi = () => {
   Object.keys(payloadSuivi).forEach((key) => {
     payloadSuivi[key] = "";
   });
+
+  payloadSuivi['annee'] = new Date().getFullYear();
+  payloadSuivi['trimestre'] = getCurrentQuarter();
+  payloadSuivi['valeurCible'] = "";
+  payloadSuivi['valeurRealise'] = "";
+  payloadSuivi['commmentaire'] = "";
+  payloadSuivi['dateSuivie'] = "";
+  payloadSuivi['indicateurId'] = "";
+  payloadSuivi['sources_de_donnee'] = "";
+
   showModalSuivi.value = false;
 };
 // Submit data (create or update)
@@ -284,8 +301,9 @@ const submitData = async () => {
   try {
     await action;
     toast.success(`Suivi Ajouté avec succès.`);
-    // getDatas();
     resetFormSuivi();
+    // getDatas();
+    emit("refreshData", data);
   } catch (e) {
     toast.error(getAllErrorMessages(e));
   } finally {
@@ -305,18 +323,21 @@ const submitSuivi = async () => {
     payloadSuivi.valeurRealise = valeurRealise.value;
   }
 
+  console.log(payloadSuivi);
+
   isLoading.value = true;
   const action = IndicateursService.createSuivi(payloadSuivi);
   try {
     await action;
     toast.success(`Suivi Ajouté avec succès.`);
-    // getDatas();
     resetFormSuivi();
-  } catch (e) {
-    toast.error(getAllErrorMessages(e));
-  } finally {
+    //getDatas();
     showModalSuivi.value = false;
     isLoading.value = false;
+    //emit("refreshData", data);
+  } catch (e) {
+    console.log(e);
+    toast.error(getAllErrorMessages(e));
   }
 };
 
@@ -326,6 +347,7 @@ const deleteData = async () => {
     isLoading.value = true;
     await IndicateursService.destroy(idSelect.value);
     toast.success("Indicateur supprimé avec succès.");
+    emit("refreshData", data);
     // getDatas();
   } catch (e) {
     console.error(e);
@@ -349,7 +371,15 @@ const handleEdit = (data) => {
   showModalEdit.value = true;
 };
 const handleSuivi = (data) => {
+  
+  valeurCible.value = data.valeursCible.filter((valeurCible) => valeurCible.annee === payloadSuivi.annee).map((v) => v.valeurCible);
   isAgregerCurrentIndicateur.value = data.agreger;
+  if(isAgregerCurrentIndicateur.value == false){
+    Object.keys(valeurCible.value[0]).forEach((key) => {
+      payloadSuivi.valeurCible = valeurCible.value[0][key];
+    });
+  }
+
   payloadSuivi.indicateurId = data.id;
   valueKeysIndicateurSuivi.value = data.value_keys;
   resetValues();

@@ -245,6 +245,7 @@
     <section class="p-6 bg-white rounded-md shadow-md">
       <h2 class="text-lg font-semibold text-gray-700">Suivi Indicateurs</h2>
       <div class="mt-4 overflow-x-auto">
+        <TabulatorSuiviIndicateur :data="suivis" :years="annees" :isDataLoading="isLoadingDataCadre"/>
         <!-- <TabulatorSuiviIndicateurDetail v-if="suivis.length > 0" :data="suivis" :years="annees" />
         <p v-else>Pas de suivi disponible pour l'instant</p> -->
       </div>
@@ -261,6 +262,7 @@ import { toast } from "vue3-toastify";
 import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 // import TabulatorSuiviIndicateurDetail from "@/components/TabulatorSuiviIndicateurDetail.vue";
+import TabulatorSuiviIndicateur from "@/components/TabulatorSuiviIndicateur.vue";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
@@ -421,20 +423,25 @@ const formatterUSD = new Intl.NumberFormat("fr-FR", {
 });
 
 const suivis = ref([]);
+const isLoadingDataCadre = ref(false);
 const idProgramme = ref("");
 const debutProgramme = ref("");
 const finProgramme = ref("");
 
 // Fetch data
 const getDatasCadre = async () => {
-  //isLoadingDataCadre.value = true;
+  isLoadingDataCadre.value = true;
   try {
-    const { data } = await IndicateursService.getCadreRendement(idProgramme.value);
+    /* const { data } = await IndicateursService.getCadreRendement(idProgramme.value);
+    suivis.value = data.data; */
+
+    const { data } = await IndicateursService.getAllSuivis();
     suivis.value = data.data;
+    console.log("suivis.value : ", suivis.value);
   } catch (e) {
-    // toast.error("Erreur lors de la récupération des données.");
+    toast.error("Erreur lors de la récupération des données.");
   } finally {
-    // isLoadingDataCadre.value = false;
+    isLoadingDataCadre.value = false;
   }
 };
 
