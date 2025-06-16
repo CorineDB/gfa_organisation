@@ -127,7 +127,7 @@
           <div class="flex-1">
             <label class="form-label" for="description">Commentaire</label>
             <div class="">
-              <textarea name="description" class="form-control" id="description" v-model="payloadSuivi.commmentaire" cols="30" rows="2"></textarea>
+              <textarea name="description" class="form-control" id="description" v-model="payloadSuivi.commentaire" cols="30" rows="2"></textarea>
             </div>
           </div>
         </div>
@@ -230,7 +230,7 @@ const payloadSuivi = reactive({
   trimestre: getCurrentQuarter(),
   valeurCible: "",
   valeurRealise: "",
-  commmentaire: "",
+  commentaire: "",
   dateSuivie: "",
   indicateurId: "",
   sources_de_donnee: ""
@@ -384,7 +384,7 @@ const resetFormSuivi = () => {
   payloadSuivi['trimestre'] = getCurrentQuarter();
   payloadSuivi['valeurCible'] = "";
   payloadSuivi['valeurRealise'] = "";
-  payloadSuivi['commmentaire'] = "";
+  payloadSuivi['commentaire'] = "";
   payloadSuivi['dateSuivie'] = "";
   payloadSuivi['indicateurId'] = "";
   payloadSuivi['sources_de_donnee'] = "";
