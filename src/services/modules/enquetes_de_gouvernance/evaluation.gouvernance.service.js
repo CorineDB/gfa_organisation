@@ -111,15 +111,15 @@ const EvaluationService = {
   },
 
   getRecommandationsEvaluation(idEvaluation) {
-    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/recommandations`);
+    return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${idEvaluation}/recommandations`);
   },
   
   getActionsAMenerEvaluation(idEvaluation) {
-    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/actions-a-mener`);
+    return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${idEvaluation}/actions-a-mener`);
   },
   
   getFeuilleDeRouteEvaluation(idEvaluation) {
-    return ApiService.get(`gfa/evaluations-de-gouvernance/${idEvaluation}/feuille-de-route`);
+    return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${idEvaluation}/feuille-de-route`);
   },
 };
 

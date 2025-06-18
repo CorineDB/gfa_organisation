@@ -108,8 +108,8 @@
           </div>
           <!-- <InputForm label="Année de suivi" class="flex-1" v-model="payloadSuivi.annee" type="number" /> -->
           <div v-if="!isAgregerCurrentIndicateur" class="flex flex-wrap items-center justify-between gap-3">
-            <InputForm label="Valeur cible" class="flex-1" v-model="payloadSuivi.valeurCible" type="number" />
-            <InputForm label="Valeur réalisée" class="flex-1" v-model="payloadSuivi.valeurRealise" type="number" />
+            <InputForm label="Valeur cible" class="flex-1" v-model="payloadSuivi.valeurCible"/>
+            <InputForm label="Valeur réalisée" class="flex-1" v-model="payloadSuivi.valeurRealise"/>
           </div>
 
           <div v-if="valueKeysIndicateurSuivi.length > 0 && isAgregerCurrentIndicateur" class="">
@@ -117,7 +117,7 @@
             <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]">
               <div v-for="(base, index) in valueKeysIndicateurSuivi" :key="index" class="input-group">
                 <div class="flex items-center justify-center text-sm truncate input-group-text">{{ base.libelle }}</div>
-                <input type="number" class="form-control" v-model="valeurCible.find((item) => item.keyId === base.id).value" @input="updateValueCible(base.id, $event.target.value)" placeholder="valeur cible" aria-label="valeur" aria-describedby="input-group-valeur" />
+                <input class="form-control" v-model="valeurCible.find((item) => item.keyId === base.id).value" @input="updateValueCible(base.id, $event.target.value)" placeholder="valeur cible" aria-label="valeur" aria-describedby="input-group-valeur" />
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@
             <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]">
               <div v-for="(base, index) in valueKeysIndicateurSuivi" :key="index" class="input-group">
                 <div class="flex items-center justify-center text-sm truncate input-group-text">{{ base.libelle }}</div>
-                <input type="number" class="form-control" v-model="valeurRealise.find((item) => item.keyId === base.id).value" @input="updateValueRealiser(base.id, $event.target.value)" placeholder="valeur réalisée" aria-label="valeur" aria-describedby="input-group-valeur" />
+                <input class="form-control" v-model="valeurRealise.find((item) => item.keyId === base.id).value" @input="updateValueRealiser(base.id, $event.target.value)" placeholder="valeur réalisée" aria-label="valeur" aria-describedby="input-group-valeur" />
               </div>
             </div>
           </div>
@@ -232,8 +232,8 @@ const valeurCible = ref([]);
 const valeurRealise = ref([]);
 
 const payloadSuivi = reactive({
-  annee: new Date().getFullYear(),
-  trimestre: getCurrentQuarter(),
+  annee: `${new Date().getFullYear()}`,
+  trimestre: `${getCurrentQuarter()}`,
   valeurCible: "",
   valeurRealise: "",
   commentaire: "",
@@ -267,15 +267,15 @@ const updateValueRealiser = (keyId, newValue) => {
 const resetValues = () => {
   valeurCible.value = valueKeysIndicateurSuivi.value.map((item) => ({
     keyId: item.id,
-    value: "",
+    value: valeurCible.value[0][item.key] ?? "",
   }));
   valeurRealise.value = valueKeysIndicateurSuivi.value.map((item) => ({
     keyId: item.id,
-    value: "",
+    value: valeurRealise.value[item.key] ?? "",
   }));
 };
 
-const resetFormSuivi = () => {
+const resetFormSuivi = async () => {
   if (isAgregerCurrentIndicateur.value) {
     resetValues();
   }
@@ -283,8 +283,8 @@ const resetFormSuivi = () => {
     payloadSuivi[key] = "";
   });
 
-  payloadSuivi['annee'] = new Date().getFullYear();
-  payloadSuivi['trimestre'] = getCurrentQuarter();
+  payloadSuivi['annee'] = `${new Date().getFullYear()}`;
+  payloadSuivi['trimestre'] = `${getCurrentQuarter()}`;
   payloadSuivi['valeurCible'] = "";
   payloadSuivi['valeurRealise'] = "";
   payloadSuivi['commentaire'] = "";
@@ -293,6 +293,7 @@ const resetFormSuivi = () => {
   payloadSuivi['sources_de_donnee'] = "";
 
   showModalSuivi.value = false;
+  isLoading.value = false;
 };
 // Submit data (create or update)
 const submitData = async () => {
@@ -303,7 +304,7 @@ const submitData = async () => {
     toast.success(`Suivi Ajouté avec succès.`);
     resetFormSuivi();
     // getDatas();
-    emit("refreshData", data);
+    emit("refreshData");
   } catch (e) {
     toast.error(getAllErrorMessages(e));
   } finally {
@@ -312,6 +313,7 @@ const submitData = async () => {
 };
 const submitSuivi = async () => {
   payloadSuivi.trimestre = Number(payloadSuivi.trimestre);
+  payloadSuivi.annee = Number(payloadSuivi.annee);
   if (optionsSuivi[0].id == suiviOption.value) {
     delete payloadSuivi.trimestre;
   } else {
@@ -330,11 +332,9 @@ const submitSuivi = async () => {
   try {
     await action;
     toast.success(`Suivi Ajouté avec succès.`);
-    resetFormSuivi();
-    //getDatas();
-    showModalSuivi.value = false;
-    isLoading.value = false;
-    //emit("refreshData", data);
+    await resetFormSuivi();
+    
+    emit("refreshData");
   } catch (e) {
     console.log(e);
     toast.error(getAllErrorMessages(e));
@@ -347,7 +347,7 @@ const deleteData = async () => {
     isLoading.value = true;
     await IndicateursService.destroy(idSelect.value);
     toast.success("Indicateur supprimé avec succès.");
-    emit("refreshData", data);
+    emit("refreshData");
     // getDatas();
   } catch (e) {
     console.error(e);
@@ -372,7 +372,7 @@ const handleEdit = (data) => {
 };
 const handleSuivi = (data) => {
   
-  valeurCible.value = data.valeursCible.filter((valeurCible) => valeurCible.annee === payloadSuivi.annee).map((v) => v.valeurCible);
+  valeurCible.value = data.valeursCible.filter((valeurCible) => valeurCible.annee === Number(payloadSuivi.annee)).map((v) => v.valeurCible);
   isAgregerCurrentIndicateur.value = data.agreger;
   if(isAgregerCurrentIndicateur.value == false){
     Object.keys(valeurCible.value[0]).forEach((key) => {
@@ -383,8 +383,9 @@ const handleSuivi = (data) => {
   payloadSuivi.indicateurId = data.id;
   valueKeysIndicateurSuivi.value = data.value_keys;
   resetValues();
-  showModalSuivi.value = true;
+  showModalSuivi.value = true;  
 };
+
 
 // Handle delete action
 const handleDelete = (data) => {

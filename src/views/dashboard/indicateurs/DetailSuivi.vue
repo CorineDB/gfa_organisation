@@ -270,7 +270,10 @@ const handleEditSuivi = (data) => {
   console.log(data);
   isCreate.value = false;
   idSelect.value = data.id;
-  payloadSuivi.dateSuivie = `${new Date(data.dateSuivie).format("mm/dd/yyyy")}`; 
+
+  const date = new Date(data.dateSuivie);
+  payloadSuivi.dateSuivie = date.toISOString().slice(0, 10); // mm/dd/yyyy
+
   payloadSuivi.sources_de_donnee = data.sources_de_donnee;
   payloadSuivi.commentaire = data.commentaire;
   payloadSuivi.annee = `${new Date(data.dateSuivie).getFullYear()}`; 
@@ -385,7 +388,6 @@ const submitSuivi = async () => {
     getDatas();
     showModalSuivi.value = false;
     isLoading.value = false;
-    //emit("refreshData", data);
   } catch (e) {
     console.log(e);
     toast.error(getAllErrorMessages(e));
@@ -468,12 +470,20 @@ onMounted(() => {
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-end col-span-12 mt-2 intro-y sm:flex-nowrap"></div>
   </div>
-  <div v-if="datas.length > 0" class="p-4 space-y-3 text-base box">
-    <p><span class="font-semibold uppercase">Indicateur : </span>{{ datas[0]?.valeurCible.indicateur?.nom }}</p>
-    <p><span class="font-semibold uppercase">Catégorie : </span>{{ datas[0]?.valeurCible.indicateur?.categorie?.nom }}</p>
-    <p v-if="datas[0]?.valeurCible.indicateur?.description"><span class="font-semibold uppercase">Description : </span>{{ datas[0]?.valeurCible.indicateur?.description }}</p>
-    <p><span class="font-semibold uppercase">Unité de mesure : </span>{{ datas[0]?.valeurCible.indicateur?.unitee_mesure?.nom }}</p>
-    <!-- <p><span class="font-semibold">Valeur de base : </span>{{ formatValeurDeBase(datas[0]?.valeurCible.indicateur.valeurDeBase) }}</p> -->
+  
+  <div v-if="datas.length > 0" class="grid grid-cols-12 gap-5 mt-5">
+    <div class="col-span-12 p-5 cursor-pointer sm:col-span-4 2xl:col-span-4 box bg-primary zoom-in">
+      <div class="text-base font-medium text-white">Indicateur</div>
+      <div class="text-white text-opacity-80">{{ datas[0]?.valeurCible.indicateur?.nom }}</div>
+    </div>
+    <div class="col-span-12 p-5 cursor-pointer sm:col-span-4 2xl:col-span-4 bg-primary box zoom-in">
+      <div class="text-base font-medium text-white">Catégorie</div>
+      <div class="text-white dark:text-slate-500 text-opacity-80">{{ datas[0]?.valeurCible.indicateur?.categorie.type ?? datas[0]?.valeurCible.indicateur?.type ?? datas[0]?.valeurCible.indicateur?.categorie?.nom }}</div>
+    </div>
+    <div class="col-span-12 p-5 cursor-pointer bg-primary sm:col-span-4 2xl:col-span-4 box zoom-in">
+      <div class="text-base font-medium text-white">Unité de mesure</div>
+      <div class="text-white text-opacity-80">{{ datas[0]?.valeurCible.indicateur?.unitee_mesure?.nom }}</div>
+    </div>
   </div>
   <div class="p-5 mt-5 intro-y box">
 
@@ -598,7 +608,6 @@ onMounted(() => {
           <div class="flex-1">
             <label class="form-label">Source de données</label>
             <TomSelect v-model="payloadSuivi.sources_de_donnee" name="source" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
-              <option value=""></option>
               <option v-for="(source, index) in sourcesDonnees" :key="index" :value="source">{{ source }}</option>
             </TomSelect>
           </div>
@@ -613,7 +622,7 @@ onMounted(() => {
       <ModalFooter>
         <div class="flex gap-2">
           <button type="button" @click="resetFormSuivi" class="w-full px-2 py-2 my-3 btn btn-outline-secondary">Annuler</button>
-          <VButton :loading="isLoading" label="Enrégistrer" />
+          <VButton :loading="isLoading" :label="isCreate ? 'Enrégistrer' : 'Modifier'" />
         </div>
       </ModalFooter>
     </form>

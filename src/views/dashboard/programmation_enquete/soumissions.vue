@@ -743,7 +743,7 @@ onMounted(async () => {
               <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Voir Feuille de route</button>
             </div>
           </div>
-          <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
+          <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button>
           <ActionPlan :actions="feuilleDeRoute" />
           <!-- <pre>{{ feuilleDeRoute }}</pre> -->
         </div>
