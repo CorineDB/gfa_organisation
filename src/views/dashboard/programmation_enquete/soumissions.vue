@@ -733,23 +733,21 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div v-else class="flex flex-col justify-start col-span-4 p-4 p-6 overflow-x-auto bg-white rounded-md shadow">
+        <div v-else class="flex flex-col justify-start col-span-4 p-6 overflow-x-auto bg-white rounded-md shadow">
           <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
             <div class="flex">
               <h2 class="mr-5 text-lg font-medium truncate">Actions correctionnelle en cours</h2>
             </div>
-            <div class="flex">
+          </div>
+
+           <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
               <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
               <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Voir Feuille de route</button>
+              <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button>
             </div>
-          </div>
-          <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button>
           <ActionPlan :actions="feuilleDeRoute" />
-          <!-- <pre>{{ feuilleDeRoute }}</pre> -->
         </div>
       </div>
-
-      <!-- <ActionsMener v-if="idEvaluation && statistiques.statut == 1" :evaluation="idEvaluation" /> -->
     </div>
     <LoaderSnipper v-if="isLoadingData" />
   </div>

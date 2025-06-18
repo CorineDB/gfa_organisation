@@ -55,10 +55,10 @@ export default {
       selectedFilter: "0",
       filters: [
         { label: "Toutes", value: "all" },
-        { label: "Terminer", value: "2" },
-        { label: "En cours", value: "0" },
-        { label: "En retard", value: "1" },
-        { label: "Non démarrer", value: "-1" },
+        { label: "Terminer", value: 2 },
+        { label: "En cours", value: 0 },
+        { label: "En retard", value: 1 },
+        { label: "Non démarrer", value: -1 },
       ],
     };
   },
@@ -93,6 +93,7 @@ export default {
       if (this.selectedFilter === "all") {
         return this.actions;
       }
+      console.log(Number(this.selectedFilter));
       return this.actions.filter((action) => action.statut == this.selectedFilter);
     },
   },
