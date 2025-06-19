@@ -70,7 +70,7 @@ const getDataFormFactuel = async () => {
 
       formulaireFactuel.value = formDataFactuel.value.formulaire_de_gouvernance;
       payload.formulaireDeGouvernanceId = formulaireFactuel.value.id;
-      payload.soumissionId = formulaireFactuel.value.soumissionId;
+      payload.soumissionId = formulaireFactuel.value.formulaire_de_gouvernance.soumissionId;
       idEvaluation.value = formDataFactuel.value.id;
       initializeFormData();
       getFilesFormData();
@@ -172,7 +172,10 @@ const submitData = async () => {
     try {
       const result = await action;
 
-      if (result.statutCode == 206) {
+      if (result.statutCode == 206) {/* 
+        removeObjectWithOptionResponseEmpty();
+        payload.factuel.response_data = [];
+        payload.factuel.comite_members = []; */
         router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id }, query: {type: 'factuel'} });
       }
 
@@ -191,6 +194,9 @@ const submitData = async () => {
         } else {
           toast.error(getAllErrorMessages(e));
         }
+
+        showAlertValidate.value = false;
+        showModalPreview.value = false;
       }
     } finally {
       isLoading.value = false;
@@ -404,6 +410,12 @@ const changeOrganisation = () => {
   organisationSelected.value ? initializeFormData() : (organisationSelected.value = true);
 };
 
+const resetForm = () => {
+  showModalPreview.value = false;
+  isValidate.value = false;
+  errors.value = {};
+};
+
 const resetValidation = () => {
   showModalPreview.value = false;
   isValidate.value = false;
@@ -526,6 +538,7 @@ const toggle = (id) => {
                     <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="space-y-2">
                       <h2 class="font-bold text-lg">{{ typeGouvernance.nom }}</h2>
 
+                      {{ errors }}
                       <div v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex">
                         <div @click="toggle(principe.id)" class="_bg-blue-900 text-white px-4 py-2 cursor-pointer rounded-md" :class="hasInvalidResponses(principe) ? 'bg-danger' : 'bg-primary'">
                           {{ principe.nom }}
@@ -640,6 +653,9 @@ const toggle = (id) => {
                                           <label :for="question.id" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg cursor-pointer transition-colors duration-200"> Parcourir les fichiers </label>
                                           <p class="text-xs text-gray-500 mt-2">PDF, DOC, JPG, PNG - Max 10MB par fichier</p>
                                         </div>
+                                      </div>
+                                      <div>
+                                        {{errors?.factuel?.response_data[questionIndex]['preuves']}}
                                       </div>
 
                                       <!-- Section des fichiers uploadés -->
@@ -800,6 +816,8 @@ const toggle = (id) => {
                                     </div>
                                   </div>
                                 </div>
+
+                                preuves : {{responses[question.id]?.preuves.length}}
 
                                 <!-- Section pour réponse "Oui" -->
                                 <div v-if="findResponse(responses[question.id]?.optionDeReponseId) == 'oui'" class="space-y-4">
