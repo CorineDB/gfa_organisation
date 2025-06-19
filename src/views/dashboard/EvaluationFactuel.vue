@@ -14,7 +14,6 @@ import { getAllErrorMessages } from "@/utils/gestion-error";
 import { generateUniqueId, generatevalidateKey, getvalidateKey } from "../../utils/helpers";
 import { getFieldErrors } from "@/utils/helpers.js";
 
-
 const TYPE_ORGANISATION = "organisation";
 
 const route = useRoute();
@@ -76,7 +75,7 @@ const getDataFormFactuel = async () => {
       getFilesFormData();
     } else {
       if (data.statutCode == 206) {
-        router.push({ name: "DetailSoumission", params: { e: data.data.idEvaluation, s: data.data.idSoumission }, query: {type: 'factuel'} });
+        router.push({ name: "DetailSoumission", params: { e: data.data.idEvaluation, s: data.data.idSoumission }, query: { type: "factuel" } });
       }
     }
   } catch (e) {
@@ -173,7 +172,7 @@ const submitData = async () => {
       const result = await action;
 
       if (result.statutCode == 206) {
-        router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id }, query: {type: 'factuel'} });
+        router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id }, query: { type: "factuel" } });
       }
 
       payload.soumissionId = result.data.data.id;
@@ -184,7 +183,8 @@ const submitData = async () => {
         showModalPreview.value = false;
       }
     } catch (e) {
-      console.error(e);
+      console.log(e);
+      toast.error(e.response.data.message);
       if (isValidate.value) {
         if (e.response && e.response.status === 422) {
           errors.value = e.response.data.errors;
@@ -294,12 +294,11 @@ function addMembers() {
 }
 
 function saveMembers() {
-  if(isEdit.value){
-    updateMember()
-  }
-  else{
+  if (isEdit.value) {
+    updateMember();
+  } else {
     console.log("Members");
-    addMembers()
+    addMembers();
   }
 }
 
@@ -310,7 +309,7 @@ function editMember(member, index) {
   currentMember.value = {
     nom: member.nom,
     prenom: member.prenom,
-    contact: member.contact
+    contact: member.contact,
   };
 }
 
@@ -505,9 +504,7 @@ const toggle = (id) => {
               <label class="text-lg form-label">Membres</label>
               <ul class="space-y-2">
                 <li class="text-base text-primary" v-for="(member, index) in payload.factuel?.comite_members" :key="index">
-                  <span class="mr-2">
-                    {{ member.nom }} {{ member.prenom }} - {{ member.contact }}
-                  </span> 
+                  <span class="mr-2"> {{ member.nom }} {{ member.prenom }} - {{ member.contact }} </span>
                   <button class="btn btn-primary btn-sm" @click="editMember(member, index)">Modifier</button>
                 </li>
               </ul>
@@ -921,6 +918,7 @@ const toggle = (id) => {
       </ModalHeader>
 
       <ModalBody class="space-y-5">
+        <pre>{{errors.factuel}}</pre>
         <div v-if="errors.factuel" class="my-2 text-danger">{{ getFieldErrors(errors.factuel) }}</div>
         <div v-if="errors['factuel.comite_members']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.comite_members"]) }}</div>
         <div v-if="errors['factuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.response_data"]) }}</div>
