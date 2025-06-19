@@ -70,7 +70,7 @@ const getDataFormFactuel = async () => {
 
       formulaireFactuel.value = formDataFactuel.value.formulaire_de_gouvernance;
       payload.formulaireDeGouvernanceId = formulaireFactuel.value.id;
-      payload.soumissionId = formulaireFactuel.value.formulaire_de_gouvernance.soumissionId;
+      payload.soumissionId = formulaireFactuel.value.soumissionId;
       idEvaluation.value = formDataFactuel.value.id;
       initializeFormData();
       getFilesFormData();
@@ -172,10 +172,7 @@ const submitData = async () => {
     try {
       const result = await action;
 
-      if (result.statutCode == 206) {/* 
-        removeObjectWithOptionResponseEmpty();
-        payload.factuel.response_data = [];
-        payload.factuel.comite_members = []; */
+      if (result.statutCode == 206) {
         router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id }, query: {type: 'factuel'} });
       }
 
@@ -191,12 +188,15 @@ const submitData = async () => {
       if (isValidate.value) {
         if (e.response && e.response.status === 422) {
           errors.value = e.response.data.errors;
+
+          console.log('factuel.response_data : ', errors.value['factuel.response_data']);
+          if(errors.value['factuel.response_data']){
+            showModalPreview.value = false;
+            toast.error(getAllErrorMessages(e));            
+          }
         } else {
           toast.error(getAllErrorMessages(e));
         }
-
-        showAlertValidate.value = false;
-        showModalPreview.value = false;
       }
     } finally {
       isLoading.value = false;
@@ -410,12 +410,6 @@ const changeOrganisation = () => {
   organisationSelected.value ? initializeFormData() : (organisationSelected.value = true);
 };
 
-const resetForm = () => {
-  showModalPreview.value = false;
-  isValidate.value = false;
-  errors.value = {};
-};
-
 const resetValidation = () => {
   showModalPreview.value = false;
   isValidate.value = false;
@@ -538,7 +532,6 @@ const toggle = (id) => {
                     <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="space-y-2">
                       <h2 class="font-bold text-lg">{{ typeGouvernance.nom }}</h2>
 
-                      {{ errors }}
                       <div v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex">
                         <div @click="toggle(principe.id)" class="_bg-blue-900 text-white px-4 py-2 cursor-pointer rounded-md" :class="hasInvalidResponses(principe) ? 'bg-danger' : 'bg-primary'">
                           {{ principe.nom }}
@@ -614,6 +607,11 @@ const toggle = (id) => {
                                           </label>
                                         </div>
                                       </div>
+
+                                      <div v-if="errors['factuel.response_data.' + questionIndex + 'optionDeReponseId']" 
+                                        class="my-2 text-danger">
+                                        {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'optionDeReponseId']) }}
+                                      </div>
                                     </div>
 
                                     <!-- Section conditionnelle pour "Oui" -->
@@ -635,12 +633,22 @@ const toggle = (id) => {
                                             <option value="autre">Autres sources</option>
                                           </TomSelect>
                                         </div>
+
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerificationId']" 
+                                          class="my-2 text-danger">
+                                          {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'sourceDeVerificationId']) }}
+                                        </div>
                                       </div>
 
                                       <!-- Champ autre source (conditionnel) -->
                                       <div v-if="responses[question.id]?.sourceDeVerificationId == 'autre'" class="space-y-3">
                                         <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-edit mr-2 text-orange-500"></i>Précisez la source </label>
                                         <input type="text" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200" v-model="responses[question.id].sourceDeVerification" placeholder="Saisissez votre source personnalisée..." />
+
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerification']" 
+                                          class="my-2 text-danger">
+                                          {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'sourceDeVerification']) }}
+                                        </div>
                                       </div>
 
                                       <!-- Section Upload de fichiers -->
@@ -653,9 +661,10 @@ const toggle = (id) => {
                                           <label :for="question.id" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg cursor-pointer transition-colors duration-200"> Parcourir les fichiers </label>
                                           <p class="text-xs text-gray-500 mt-2">PDF, DOC, JPG, PNG - Max 10MB par fichier</p>
                                         </div>
-                                      </div>
-                                      <div>
-                                        {{errors?.factuel?.response_data[questionIndex]['preuves']}}
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves']" 
+                                          class="my-2 text-danger">
+                                          {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'preuves']) }}
+                                        </div>
                                       </div>
 
                                       <!-- Section des fichiers uploadés -->
@@ -678,6 +687,10 @@ const toggle = (id) => {
                                               <a :href="file.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
                                                 <i class="fas fa-external-link-alt"></i>
                                               </a>
+                                              <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves.' + index]" 
+                                                class="my-2 text-danger">
+                                                {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'preuves.' + index]) }}
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
@@ -816,8 +829,6 @@ const toggle = (id) => {
                                     </div>
                                   </div>
                                 </div>
-
-                                preuves : {{responses[question.id]?.preuves.length}}
 
                                 <!-- Section pour réponse "Oui" -->
                                 <div v-if="findResponse(responses[question.id]?.optionDeReponseId) == 'oui'" class="space-y-4">
