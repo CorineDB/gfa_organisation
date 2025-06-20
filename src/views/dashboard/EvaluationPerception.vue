@@ -119,6 +119,11 @@ const submitData = async () => {
       if (isValidate.value) {
         if (e.response && e.response.status === 422) {
           errors.value = e.response.data.errors;
+
+          if(errors.value['perception.response_data']){
+            showModalPreview.value = false;
+            toast.error(getAllErrorMessages(e));            
+          }
         } else {
           toast.error(getAllErrorMessages(e));
         }
@@ -306,6 +311,7 @@ onMounted(async () => {
           </TomSelect>
         </div>
       </div>
+      
       <div>
         <div class="py-5 intro-x" v-if="formDataPerception.id">
           <div class="space-y-8">
@@ -331,6 +337,11 @@ onMounted(async () => {
                                 {{ option.libelle }}
                               </label>
                             </div>
+                          </div>
+
+                          <div v-if="errors['perception.response_data.' + questionIndex]" 
+                            class="my-2 text-danger">
+                            {{ getFieldErrors(errors['perception.response_data.' + questionIndex]) }}
                           </div>
                         </div>
                       </div>
@@ -379,11 +390,6 @@ onMounted(async () => {
       </ModalHeader>
 
       <ModalBody class="space-y-5">
-        <!-- <div v-if="errors.perception" class="my-2 text-danger">{{ getFieldErrors(errors.perception) }}</div> -->
-        <div v-if="errors['perception.age']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.age"]) }}</div>
-        <div v-if="errors['perception.categorieDeParticipant']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.categorieDeParticipant"]) }}</div>
-        <div v-if="errors['perception.sexe']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.sexe"]) }}</div>
-        <div v-if="errors['perception.commentaire']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.commentaire"]) }}</div>
         <p v-if="payload.organisationId">
           Patenaire: <span class="text-primary">{{ findOrganisation(payload.organisationId) }}</span>
         </p>
@@ -393,6 +399,7 @@ onMounted(async () => {
             <option value=""></option>
             <option v-for="(categorie, index) in categorieDeParticipant" :key="index" :value="categorie.id">{{ categorie.label }}</option>
           </TomSelect>
+          <div v-if="errors['perception.categorieDeParticipant']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.categorieDeParticipant"]) }}</div>
         </div>
         <div class="flex flex-wrap items-center justify-around gap-2">
           <div>
@@ -403,6 +410,7 @@ onMounted(async () => {
                 <label class="form-check-label" :for="`sex-${sexe.id}${index}`">{{ sexe.label }}</label>
               </div>
             </div>
+            <div v-if="errors['perception.sexe']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.sexe"]) }}</div>
           </div>
           <div>
             <label class="form-label">Âge<span class="text-danger">*</span> </label>
@@ -412,6 +420,7 @@ onMounted(async () => {
                 <label class="form-check-label" :for="`age-${age.id}${index}`">{{ age.label }}</label>
               </div>
             </div>
+            <div v-if="errors['perception.age']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.age"]) }}</div>
           </div>
         </div>
         <div>
@@ -419,6 +428,7 @@ onMounted(async () => {
           <div class="">
             <textarea name="commentaire" class="form-control" v-model="payload.perception.commentaire" cols="30" rows="3"></textarea>
           </div>
+          <div v-if="errors['perception.commentaire']" class="my-2 text-danger">{{ getFieldErrors(errors["perception.commentaire"]) }}</div>
         </div>
         <div class="max-h-[40vh] h-[40vh] overflow-y-auto">
           <p class="mb-3">Formulaire</p>
@@ -439,6 +449,10 @@ onMounted(async () => {
                         <p class="text-base font-medium">
                           Réponse : <span class="text-primary"> {{ findResponse(responses[question.id]?.optionDeReponseId) }}</span>
                         </p>
+                      </div>
+                      <div v-if="errors['perception.response_data.' + questionIndex]" 
+                        class="my-2 text-danger">
+                        {{ getFieldErrors(errors['perception.response_data.' + questionIndex]) }}
                       </div>
                     </div>
                   </div>
