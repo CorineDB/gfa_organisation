@@ -15,40 +15,70 @@
         <stop offset="0%" stop-color="#f59e0b" />
         <stop offset="100%" stop-color="#064e3b" />
       </linearGradient>
-      <path ref="arc" d="M5 95 A80 80 0 0 1 185 95" stroke="url(#gradient)" fill="none" stroke-width="10" stroke-linecap="round" :style="{ strokeDasharray: `${strokeDashValue} ${arcLength - strokeDashValue}` }" />
+      <path 
+        ref="arc" 
+        d="M5 95 A80 80 0 0 1 185 95" 
+        stroke="url(#gradient)" 
+        fill="none" 
+        stroke-width="10" 
+        stroke-linecap="round" 
+        :style="{ strokeDasharray: `${strokeDashValue} ${arcLength - strokeDashValue}` }" 
+      />
     </svg>
     <div id="center-circle">
       <span id="name">{{ label }}</span>
-      <span id="temperature">{{ temperature }}</span>
+      <span id="temperature">{{ displayValue }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import { computed, ref, onMounted, nextTick } from "vue";
 
-// Prop for the temperature value
+// Props pour la valeur de température et le label
 const props = defineProps({
   temperature: {
-    type: Number,
+    type: [Number, String],
     required: true,
-    validator: (value) => value >= 0 && value <= 100, // Ensure the value is between 0 and 100
   },
-  label: String,
+  label: {
+    type: String,
+    default: ''
+  },
 });
 
-// References for SVG arc
+// Références pour l'arc SVG
 const arc = ref(null);
 const arcLength = ref(0);
 
-// Compute the stroke dash value based on the temperature prop
-const strokeDashValue = computed(() => {
-  const step = arcLength.value / 100; // Steps correspond to 0–100 range
-  return props.temperature * step;
+// Extraire la valeur numérique de la température
+const numericValue = computed(() => {
+  if (typeof props.temperature === 'number') {
+    return props.temperature;
+  }
+  
+  // Si c'est une string, extraire le nombre
+  const match = String(props.temperature).match(/(\d+(?:\.\d+)?)/);
+  return match ? parseFloat(match[1]) : 0;
 });
 
-// Initialize the arc length when the component is mounted
-onMounted(() => {
+// Valeur d'affichage (garde le format original)
+const displayValue = computed(() => {
+  return props.temperature;
+});
+
+// Calculer la valeur du stroke dash basée sur la température
+const strokeDashValue = computed(() => {
+  if (arcLength.value === 0) return 0;
+  
+  const value = Math.min(Math.max(numericValue.value, 0), 100); // Limiter entre 0 et 100
+  const step = arcLength.value / 100;
+  return value * step;
+});
+
+// Initialiser la longueur de l'arc quand le composant est monté
+onMounted(async () => {
+  await nextTick(); // Attendre que le DOM soit rendu
   if (arc.value) {
     arcLength.value = arc.value.getTotalLength();
   }
@@ -78,21 +108,24 @@ onMounted(() => {
   position: absolute;
   font-size: 0.7em;
   color: #afafaf;
+  font-weight: 600;
 }
 
 #major-ticks span:nth-child(1) {
   top: 50%;
+  left: 8px;
   transform: translateY(-50%);
 }
 
 #major-ticks span:nth-child(2) {
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 #major-ticks span:nth-child(3) {
   top: 50%;
-  right: 5px;
+  right: 8px;
   transform: translateY(-50%);
 }
 
@@ -112,6 +145,7 @@ onMounted(() => {
   height: 1px;
   border-top: 1px solid #afafaf;
   transform: rotate(calc((var(--i) - 1) * 9deg));
+  transform-origin: center;
 }
 
 #minor-ticks::after {
@@ -145,7 +179,7 @@ svg {
 }
 
 svg path {
-  transition: 1s;
+  transition: stroke-dasharray 1s ease-in-out;
 }
 
 #center-circle {
@@ -155,9 +189,11 @@ svg path {
   background: linear-gradient(180deg, #ffffff 0%, #e7ecf1 100%);
   border-radius: 50%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 #center-circle::before {
@@ -167,19 +203,19 @@ svg path {
   height: 145px;
   background: linear-gradient(0deg, #ffffff 0%, #e7ecf1 100%);
   border-radius: 50%;
+  z-index: -1;
 }
 
 #name {
-  position: absolute;
   font-size: 1em;
   color: #7f7f7f;
   font-weight: 700;
-  top: 40px;
+  margin-bottom: 10px;
 }
 
 #temperature {
-  position: absolute;
-  font-size: 3em;
+  font-size: 2.5em;
   color: #afafaf;
+  font-weight: bold;
 }
 </style>

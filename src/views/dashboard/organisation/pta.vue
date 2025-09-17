@@ -2390,55 +2390,20 @@ export default {
       }
     },
     togglesuivie(pta) {
-      //this.dataNew;
-
-      /* this.redtoggle = false;
-      this.graytoggle = false;
-      //this.greentoggle=true;
-      this.translatetoggle = false;
-
-      //console.log(this.tabletoggle[id]);
-
-      this.chargement = true;
-
-      //  console.log(id)
-      /* if (pta.poidsActuel > 0) {
-        this.tabletoggle[pta.id] = 0;
-        TacheService.deleteSuivis(pta.id)
-          .then((data) => {
-            // this.doSuiviOld = false
-            // this.dataNew;
-            this.$toast.success("suivie supprimé avec succès");
-            // window.location.reload();
-          })
-          .catch((error) => {
-            if (error.response) {
-              // Requête effectuée mais le serveur a répondu par une erreur.
-              const message = error.response.data.message;
-              this.$toast.error(message);
-            } else if (error.request) {
-              // Demande effectuée mais aucune réponse n'est reçue du serveur.
-              //console.log(error.request);
-            } else {
-              // Une erreur s'est produite lors de la configuration de la demande
-              //console.log('dernier message', error.message);
-            }
-          });
-      } else { */
+      
         
         var form = {
           tacheId: pta.id,
           poidsActuel: this.tabletoggle[pta.id],
         };
 
-        //this.tabletoggle[pta.id] = 1;
+        
 
         TacheService.suiviTache(form)
           .then((data) => {
-            // this.doSuiviOld = false
-            // this.dataNew;
-            this.$toast.success("suivie éffectué avec succès");
-            // window.location.reload();
+            
+            toast.success("suivie éffectué avec succès");
+             
           })
           .catch((error) => {
             if (error.response) {

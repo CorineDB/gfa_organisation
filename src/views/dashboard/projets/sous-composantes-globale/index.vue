@@ -565,7 +565,7 @@ export default {
         <InputForm v-model="formData.pret" class="col-span-12 mt-4 no-spin" type="number" required="required" placeHolder="Fond propre" label="Subvention" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
 
-        <!-- <pre>{{ formData.composanteId }}</pre> -->
+       
         <div class="flex col-span-12 mt-4">
           <TomSelect
             @change="mettreAjoutOutcome(formData.composanteId)"
@@ -592,14 +592,7 @@ export default {
           </div>
         </div>
 
-        <!-- <div v-if="getMontantRestant" class="flex items-center mt-2 col-span-12">
-          <DollarSignIcon class="w-4 h-4 mr-2" />
-          <div>
-            Montant restant de OutCome : <br />
-            Fond Propre <span class="pr-1 font-bold"> {{ $h.formatCurrency(getMontantRestant.budgetRestant) }}</span> <br />
-            Montant budgétisé : <span class="font-bold"> {{ $h.formatCurrency(getMontantRestant.pretRestant) }}</span>
-          </div>
-        </div> -->
+        
       </ModalBody>
       <ModalFooter>
         <div class="flex items-center justify-center">
@@ -610,7 +603,7 @@ export default {
     </form>
   </Modal>
 
-  <Modal backdrop="static" :show="showDeleteModal" @hidden="showDeleteModal = false">
+  <Modal backdrop="static"  :show="showDeleteModal" @hidden="showDeleteModal = false">
     <ModalBody class="p-0">
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />

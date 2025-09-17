@@ -176,23 +176,30 @@ const submitData = async () => {
       }
 
       payload.soumissionId = result.data.data.id;
+
+      console.log("isValidate.value", isValidate.value);
       if (isValidate.value) {
         toast.success(`${result.data.message}`);
         generatevalidateKey("factuel");
         showAlertValidate.value = true;
         showModalPreview.value = false;
+
+        localStorage.removeItem("member");
+        payload.factuel.comite_members = [];
       }
+      console.log("member", localStorage.getItem("member"));
+      console.log("payload.factuel.comite_members", payload.factuel.comite_members);
     } catch (e) {
-      console.log(e);
+      console.log("erreur", e);
       toast.error(e.response.data.message);
       if (isValidate.value) {
         if (e.response && e.response.status === 422) {
           errors.value = e.response.data.errors;
 
-          console.log('factuel.response_data : ', errors.value['factuel.response_data']);
-          if(errors.value['factuel.response_data']){
+          console.log("factuel.response_data : ", errors.value["factuel.response_data"]);
+          if (errors.value["factuel.response_data"]) {
             showModalPreview.value = false;
-            toast.error(getAllErrorMessages(e));            
+            toast.error(getAllErrorMessages(e));
           }
         } else {
           toast.error(getAllErrorMessages(e));
@@ -435,6 +442,8 @@ onMounted(async () => {
 
   console.log(JSON.parse(localStorage.getItem("member")));
 
+  console.log('localStorage.getItem("member")', localStorage.getItem("member"));
+
   if (localStorage.getItem("member")) {
     payload.factuel.comite_members = JSON.parse(localStorage.getItem("member"));
   } else {
@@ -605,9 +614,8 @@ const toggle = (id) => {
                                         </div>
                                       </div>
 
-                                      <div v-if="errors['factuel.response_data.' + questionIndex + 'optionDeReponseId']" 
-                                        class="my-2 text-danger">
-                                        {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'optionDeReponseId']) }}
+                                      <div v-if="errors['factuel.response_data.' + questionIndex + 'optionDeReponseId']" class="my-2 text-danger">
+                                        {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "optionDeReponseId"]) }}
                                       </div>
                                     </div>
 
@@ -631,9 +639,8 @@ const toggle = (id) => {
                                           </TomSelect>
                                         </div>
 
-                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerificationId']" 
-                                          class="my-2 text-danger">
-                                          {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'sourceDeVerificationId']) }}
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerificationId']" class="my-2 text-danger">
+                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "sourceDeVerificationId"]) }}
                                         </div>
                                       </div>
 
@@ -642,9 +649,8 @@ const toggle = (id) => {
                                         <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-edit mr-2 text-orange-500"></i>Précisez la source </label>
                                         <input type="text" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200" v-model="responses[question.id].sourceDeVerification" placeholder="Saisissez votre source personnalisée..." />
 
-                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerification']" 
-                                          class="my-2 text-danger">
-                                          {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'sourceDeVerification']) }}
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerification']" class="my-2 text-danger">
+                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "sourceDeVerification"]) }}
                                         </div>
                                       </div>
 
@@ -658,9 +664,8 @@ const toggle = (id) => {
                                           <label :for="question.id" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg cursor-pointer transition-colors duration-200"> Parcourir les fichiers </label>
                                           <p class="text-xs text-gray-500 mt-2">PDF, DOC, JPG, PNG - Max 10MB par fichier</p>
                                         </div>
-                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves']" 
-                                          class="my-2 text-danger">
-                                          {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'preuves']) }}
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves']" class="my-2 text-danger">
+                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "preuves"]) }}
                                         </div>
                                       </div>
 
@@ -684,9 +689,8 @@ const toggle = (id) => {
                                               <a :href="file.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
                                                 <i class="fas fa-external-link-alt"></i>
                                               </a>
-                                              <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves.' + index]" 
-                                                class="my-2 text-danger">
-                                                {{ getFieldErrors(errors['factuel.response_data.' + questionIndex + 'preuves.' + index]) }}
+                                              <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves.' + index]" class="my-2 text-danger">
+                                                {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "preuves." + index]) }}
                                               </div>
                                             </div>
                                           </div>
@@ -947,7 +951,7 @@ const toggle = (id) => {
       </ModalHeader>
 
       <ModalBody class="space-y-5">
-        <pre>{{errors.factuel}}</pre>
+        <pre>{{ errors.factuel }}</pre>
         <div v-if="errors.factuel" class="my-2 text-danger">{{ getFieldErrors(errors.factuel) }}</div>
         <div v-if="errors['factuel.comite_members']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.comite_members"]) }}</div>
         <div v-if="errors['factuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.response_data"]) }}</div>

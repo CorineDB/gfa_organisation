@@ -1,35 +1,10 @@
 <template>
   <div class="flex flex-col items-center mt-8 mb-4 intro-y sm:flex-row">
     <h2 class="mr-auto text-lg font-medium">Dashboard projet : {{ currentUser.projet?.nom }}</h2>
-    <!-- <div class="flex w-full mt-4 sm:w-auto sm:mt-0">
-      <button class="mr-2 shadow-md btn btn-primary" @click="addProjet()">Ajouter un projet</button>
-    </div> -->
   </div>
 
-  <!-- <div style="height:600px; width:800px">
-    <l-map ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]">
-      <l-tile-layer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        layer-type="base"
-        name="OpenStreetMap"
-      ></l-tile-layer>
-      <l-marker :lat-lng="markerLatLng" >
-
-        <l-popup>Hello!</l-popup>
-
-      </l-marker>
-
-    </l-map>
-    
-  </div> -->
-  <!-- <l-map style="height: 350px" :zoom="zoom" :center="center">
-<l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
-<l-polygon :lat-lngs="polygon.latlngs" :color="polygon.color"></l-polygon>
-</l-map> -->
-  <div>
-    <!-- <h3>An interactive leaflet map</h3> -->
-    <div id="map" style="height: 40vh"></div>
-  </div>
+   
+ 
   <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
     <ModalHeader>
       <h2 v-if="!isUpdate" class="mr-auto text-base font-medium">Ajouter un projet</h2>
@@ -162,69 +137,10 @@
     </div>
   </div>
 
-  <!-- <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3">
-    <div href="#" class="relative shadow-2xl box group _bg-white zoom-in" v-for="(item, index) in projets" :key="index">
-      <div class="relative m-5 bg-white">
-        <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">{{ item.nom }}</div>
-      </div>
-
-      <div class="relative mt-[12px] m-5 h-40 2xl:h-56 image-fit rounded-md overflow-hidden before:block before:absolute before:w-full before:h-full before:top-0 before:left-0 before:z-10 before:bg-gradient-to-t before:from-black before:to-black/10">
-        <div class="absolute top-0 left-0 w-1/2 h-0 group-hover:h-full bg-[#02008052] transition-all duration-[.5s]"></div>
-        <div class="absolute bottom-0 right-0 w-1/2 h-0 group-hover:h-full bg-[#02008052] transition-all duration-[.5s]"></div>
-        <div class="absolute z-10 top-0 right-0 bottom-0 left-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-[.5s]">
-          <div class="w-[60px] h-[60px] text-white bg-[#171a1d] rounded-[60px] rotate-90 flex justify-center items-center group-hover:rotate-45 transition-all duration-[.5s]">
-            <ArrowUpIcon class="w-4 h-4" />
-          </div>
-        </div>
-        <div class="relative h-64 overflow-hidden group/hw hway hway-active">
-          <div class="absolute top-0 left-0 bg-[#007580] h-[55%] w-full group-[.hway-active]/hw:w-0 transition-all duration-[.5s]"></div>
-          <div class="absolute bottom-0 right-0 bg-[#007580] h-[55%] w-full group-[.hway-active]/hw:w-0 transition-all duration-[.5s]"></div>
-          <img class="object-contain group-hover:opacity-30 transition-all duration-[.5s] h-auto" src="https://images.unsplash.com/photo-1497375638960-ca368c7231e4?q=80&w=1680&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
-          Section description cachée au départ
-          <div class="absolute inset-0 flex items-start justify-center p-5 text-white transition-opacity duration-500 bg-black opacity-0 bg-opacity-80 group-hover:opacity-100">
-            <div>
-              <p class="text-base font-bold lg:text-lg">Description du projet</p>
-              <p class="px-2 text-sm lg:text-base line-clamp-7">{{ item.description }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="m-5 text-slate-600 dark:text-slate-500">
-        <div class="flex items-center"><LinkIcon class="w-4 h-4 mr-2" /> Budget: {{ $h.formatCurrency(item.budgetNational) }} <div class="italic font-bold ml-2">Fcfa</div>
-          </div>
-        <div v-if="item.owner !== null" class="flex items-center"><GlobeIcon class="w-4 h-4 mr-2" /> Organisation:  <span class="pl-2  shadow-md p-1 rounded-md bg-green-400 text-white" >{{ item.owner.user.nom }}</span></div>
-        <div class="flex items-center mt-2">
-          <ClockIcon class="w-4 h-4 mr-2" />
-          <div>
-            Date : Du <span class="pr-1 font-bold">  {{ $h.reformatDate(item.debut) }}</span> au  <span class="font-bold"> {{ $h.reformatDate(item.fin) }}</span>
-          </div>
-        </div>
-        <div class="flex items-center mt-2">
-          <CheckSquareIcon class="w-4 h-4 mr-2 " /> Statut :
-          <span class="pl-2 shadow-md p-1 rounded-md bg-black text-white" v-if="item.statut == -2"> Non validé </span>
-          <span class="pl-2 shadow-md p-1 rounded-md bg-green-500 text-white" v-else-if="item.statut == -1"> Validé </span>
-          <span class="pl-1 shadow-md p-1 rounded-md bg-yellow-500 text-white" v-else-if="item.statut == 0"> En cours </span>
-          <span class="pl-1 shadow-md p-1 rounded-md bg-red-500 text-white" v-else-if="item.statut == 1"> En retard </span>
-          <span class="pl-2" v-else-if="item.statut == 2">Terminé</span>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-center p-5 border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
-        <a class="flex items-center mr-auto text-primary" href="javascript:;" @click="goToDetail(item)"> <EyeIcon class="w-4 h-4 mr-1" /> Détail </a>
-        <a class="flex items-center mr-3" href="javascript:;" @click="modifierProjet(item)"> <CheckSquareIcon class="w-4 h-4 mr-1" /> Modifier </a>
-        <a class="flex items-center text-danger" href="javascript:;" @click="supprimerProjet(item)"> <Trash2Icon class="w-4 h-4 mr-1" /> Supprimer </a>
-      </div>
-
-      <div class="absolute bottom-0 flex w-full">
-        <div class="w-1/3 p-1 bg-green-500"></div>
-        <div class="flex flex-col w-2/3">
-          <div class="p-0.5 bg-yellow-500"></div>
-          <div class="p-0.5 bg-red-500"></div>
-        </div>
-      </div>
-    </div>
-  </div> -->
+  <div>
+    <!-- <h3>An interactive leaflet map</h3> -->
+    <div id="map" style="height: 40vh"></div>
+  </div>
 </template>
 
 <script>

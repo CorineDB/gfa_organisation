@@ -1000,11 +1000,12 @@ changerStatut(item, statut = 2) {
     <div class="flex flex-col items-center p-6 mb-3 bg-white rounded-md shadow">
       <p class="text-xl font-bold text-center">TEP DE L'ACTIVITE</p>
 
-      <ChartJauge label="TEP" :temperature="activiteTep * 100 ?? 0" />
+      <ChartJauge label="TEP" :temperature="`${activiteTep.toFixed(2)  ?? 0} %`"/>
+
     </div>
     <div class="flex flex-col items-center p-6 mb-3 bg-white rounded-md shadow">
       <p class="text-xl font-bold text-center">TEF DE L'ACTIVITE</p>
-      <ChartJauge label="TEF" :temperature="activiteTef * 100 ?? 0" />
+      <ChartJauge label="TEF" :temperature="`${activiteTef.toFixed(2)  ?? 0}%`"/>
     </div>
   </div>
 

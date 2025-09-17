@@ -18,9 +18,6 @@ import ActiviteService from "@/services/modules/activite.service";
 import PlanDeCaissement from "@/services/modules/plan.decaissement.service";
 import PlanDeDecaissementService from "@/services/modules/plan.decaissement.service";
 
-// import SuiviFinancierService from "@/services/modules/suiviFinancier.service";
-// import SuiviFinancierService from "@/services/modules/suiviFinancier.service";
-
 // Ajout de plan de décaissement
 
 const store = useStore();
@@ -34,14 +31,8 @@ const storePlanDecaissement = async (payload) => {
   await store.dispatch("planDeDecaissements/STORE_PLAN_DE_DECAISSEMENT", payload);
 };
 
-// ...mapActions({
-//       // Mapping des actions pour le module activites
-//       prolongerDureeActivite: "activites/PROLONGER_DATE",
-//       // Mapping des actions pour le module planDeDecaissements
-//       storePlanDecaissement: "planDeDecaissements/STORE_PLAN_DE_DECAISSEMENT",
-//     }),
-
 //const planDeDecaissement = ref([]);
+const erreurPlanDeDecaissement = ref(null)
 let planDeDecaissement = ref([]);
 const loadingPlanDeDecaissement = ref(false);
 const showModalPlanDeDecaissement = ref(false);
@@ -63,53 +54,222 @@ const removePlanDeDecaissement = function (index) {
   planDeDecaissement.value.splice(index, 1);
 };
 
+// const planDeDecaissementActivite = async function () {
+//   loadingPlanDeDecaissement.value = true;
+
+//   let errorIndex = [];
+
+//   for (let index = 0; index < planDeDecaissement.value.length; index++) {
+//     let plan = listePlanDeDecaissement.value.filter((plan) => plan.annee == planDeDecaissement.value[index].annee && plan.trimestre == planDeDecaissement.value[index].trimestre);
+
+//     const action = plan.length > 0 ? PlanDeCaissement.update(plan[0].id, planDeDecaissement.value[index]) : PlanDeDecaissementService.create(planDeDecaissement.value[index]);
+
+//     try {
+//       await action;
+
+//       toast.success(`Plan  de decaissement n° ${index + 1} enrégistré avec succès`);
+
+//       errorIndex.push(index);
+
+//       console.log("A", index === planDeDecaissement.value.length - 1);
+
+//       if (index === planDeDecaissement.value.length - 1) {
+//         showModalPlanDeDecaissement.value = false;
+
+//         setTimeout(() => {
+//           this.planDeDecaissement = [];
+//         }, 500);
+//       }
+//     } catch (error) {
+//       loadingPlanDeDecaissement.value = false;
+
+//       // Mettre à jour les messages d'erreurs dynamiquement
+//       if (error.response && error.response.data && error.response.data.errors.length > 0) {
+//         erreurPlanDeDecaissement.value = error.response.data.errors;
+//         toast.error("Une erreur s'est produite dans votre formualaire");
+//       } else {
+//         toast.error(`Plan ${index + 1} : ${error.response.data.message}`);
+//       }
+//     } finally {
+//       loadingPlanDeDecaissement.value = false;
+//       getListePlanDeDecaissement(planDeDecaissement.value[0].activiteId);
+//     }
+
+//     if (planDeDecaissement.value.length > 0) {
+//       if (errorIndex.length > 0) {
+//         errorIndex.forEach((item) => {
+//           removePlan(item);
+//         });
+//       }
+//     }
+//   }
+// };
+
 const planDeDecaissementActivite = async function () {
   loadingPlanDeDecaissement.value = true;
 
-  let errorIndex = [];
+  // Réinitialiser les erreurs au début
+  erreurPlanDeDecaissement.value = [];
 
+  let successIndexes = [];
+  let hasErrors = false;
+
+  // Traiter chaque plan individuellement
   for (let index = 0; index < planDeDecaissement.value.length; index++) {
-    let plan = listePlanDeDecaissement.value.filter((plan) => plan.annee == planDeDecaissement.value[index].annee && plan.trimestre == planDeDecaissement.value[index].trimestre);
-
-    const action = plan.length > 0 ? PlanDeCaissement.update(plan[0].id, planDeDecaissement.value[index]) : PlanDeDecaissementService.create(planDeDecaissement.value[index]);
-
     try {
+      // Rechercher si un plan existe déjà pour cette année/trimestre
+      let existingPlan = listePlanDeDecaissement.value.find((plan) => plan.annee == planDeDecaissement.value[index].annee && plan.trimestre == planDeDecaissement.value[index].trimestre);
+
+      // Choisir l'action appropriée (create ou update)
+      const action = existingPlan ? PlanDeCaissement.update(existingPlan.id, planDeDecaissement.value[index]) : PlanDeDecaissementService.create(planDeDecaissement.value[index]);
+
       await action;
 
-      toast.success(`Plan  de decaissement n° ${index + 1} enrégistré avec succès`);
+      // Succès pour ce plan
+      toast.success(`Plan de décaissement n° ${index + 1} enregistré avec succès`);
+      successIndexes.push(index);
 
-      errorIndex.push(index);
-
-      if (index === planDeDecaissement.value.length - 1) {
-        showModalPlanDeDecaissement.value = false;
-
-        setTimeout(() => {
-          this.planDeDecaissement = [];
-        }, 500);
+      // S'assurer qu'il n'y a pas d'erreur pour cet index
+      if (erreurPlanDeDecaissement.value[index]) {
+        erreurPlanDeDecaissement.value[index] = null;
       }
     } catch (error) {
-      loadingPlanDeDecaissement.value = false;
+      hasErrors = true;
+      console.error(`Erreur pour le plan ${index + 1}:`, error);
 
-      // Mettre à jour les messages d'erreurs dynamiquement
-      if (error.response && error.response.data && error.response.data.errors.length > 0) {
-        erreurPlanDeDecaissement.value = error.response.data.errors;
-        toast.error("Une erreur s'est produite dans votre formualaire");
-      } else {
-        toast.error(`Plan ${index + 1} : ${error.response.data.message}`);
+      // Initialiser le tableau d'erreurs si nécessaire
+      if (!erreurPlanDeDecaissement.value) {
+        erreurPlanDeDecaissement.value = [];
       }
-    } finally {
-      loadingPlanDeDecaissement.value = false;
-      getListePlanDeDecaissement(planDeDecaissement.value[0].activiteId);
-    }
 
-    if (planDeDecaissement.value.length > 0) {
-      if (errorIndex.length > 0) {
-        errorIndex.forEach((item) => {
-          removePlan(item);
+      // Traitement des erreurs de validation
+      if (error.response?.data?.errors) {
+        // S'assurer que l'index existe dans le tableau d'erreurs
+        if (!erreurPlanDeDecaissement.value[index]) {
+          erreurPlanDeDecaissement.value[index] = {};
+        }
+
+        // Traiter les erreurs de validation
+        const errors = error.response.data.errors;
+
+        if (Array.isArray(errors)) {
+          // Si errors est un tableau d'objets d'erreurs
+          errors.forEach((errorObj) => {
+            Object.keys(errorObj).forEach((field) => {
+              erreurPlanDeDecaissement.value[index][field] = $h.extractContentFromArray(errorObj[field]);
+            });
+          });
+        } else if (typeof errors === "object") {
+          // Si errors est un objet avec les champs d'erreurs
+          Object.keys(errors).forEach((field) => {
+            erreurPlanDeDecaissement.value[index][field] = $h.extractContentFromArray(errors[field]);
+          });
+        }
+
+        // Afficher les erreurs dans les toasts
+        Object.keys(erreurPlanDeDecaissement.value[index]).forEach((field) => {
+          const errorMessage = erreurPlanDeDecaissement.value[index][field];
+          if (errorMessage) {
+            toast.error(`Plan ${index + 1} - ${field}: ${errorMessage}`);
+          }
         });
+      } else {
+        // Erreur générale
+        const errorMessage = error.response?.data?.message || error.message || "Erreur inconnue";
+        toast.error(`Plan ${index + 1}: ${errorMessage}`);
+
+        // Stocker l'erreur générale
+        if (!erreurPlanDeDecaissement.value[index]) {
+          erreurPlanDeDecaissement.value[index] = {};
+        }
+        erreurPlanDeDecaissement.value[index].general = errorMessage;
       }
     }
   }
+
+  // Finalisation
+  try {
+    // Recharger la liste des plans
+    if (planDeDecaissement.value.length > 0) {
+      await getListePlanDeDecaissement(planDeDecaissement.value[0].activiteId);
+    }
+
+    // Si tout s'est bien passé, fermer le modal et nettoyer
+    if (!hasErrors) {
+      showModalPlanDeDecaissement.value = false;
+
+      setTimeout(() => {
+        planDeDecaissement.value = [];
+        erreurPlanDeDecaissement.value = [];
+      }, 500);
+    } else {
+      // Supprimer les plans qui ont été enregistrés avec succès
+      // On inverse l'ordre pour éviter les problèmes d'index
+      successIndexes
+        .sort((a, b) => b - a)
+        .forEach((index) => {
+          planDeDecaissement.value.splice(index, 1);
+          erreurPlanDeDecaissement.value.splice(index, 1);
+        });
+
+      if (successIndexes.length > 0) {
+        toast.info(`${successIndexes.length} plan(s) enregistré(s) avec succès. Veuillez corriger les erreurs pour les autres.`);
+      }
+    }
+  } catch (error) {
+    console.error("Erreur lors du rechargement des données:", error);
+    toast.error("Erreur lors du rechargement des données");
+  } finally {
+    loadingPlanDeDecaissement.value = false;
+  }
+};
+
+// Fonction utilitaire pour nettoyer les erreurs d'un plan spécifique
+const clearPlanErrors = (planIndex) => {
+  if (erreurPlanDeDecaissement.value && erreurPlanDeDecaissement.value[planIndex]) {
+    erreurPlanDeDecaissement.value[planIndex] = null;
+  }
+};
+
+// Fonction pour nettoyer toutes les erreurs
+const clearAllErrors = () => {
+  erreurPlanDeDecaissement.value = [];
+};
+
+// Amélioration de la fonction removePlan pour gérer les erreurs
+const removePlan = (index) => {
+  // Supprimer le plan
+  planDeDecaissement.value.splice(index, 1);
+
+  // Supprimer les erreurs correspondantes et réorganiser les index
+  if (erreurPlanDeDecaissement.value.length > 0) {
+    erreurPlanDeDecaissement.value.splice(index, 1);
+  }
+};
+
+// Fonction pour nettoyer l'erreur d'un champ spécifique
+const clearFieldError = (planIndex, fieldName) => {
+  if (erreurPlanDeDecaissement.value?.[planIndex]?.[fieldName]) {
+    erreurPlanDeDecaissement.value[planIndex][fieldName] = null;
+  }
+};
+
+// Fonction pour fermer le modal avec nettoyage
+const closeModal = () => {
+  showModalPlanDeDecaissement.value = false;
+  clearAllErrors();
+};
+
+// Fonction addPlan améliorée
+const addPlan = () => {
+  planDeDecaissement.value.push({
+    id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
+    annee: String(new Date().getFullYear()),
+    trimestre: String(getCurrentQuarter()),
+    budgetNational: "",
+    pret: "",
+    activiteId: planDeDecaissementPayload.value.activiteId, // Assurez-vous d'avoir cette valeur
+  });
 };
 
 const loaderListePlan = ref(false);
@@ -140,17 +300,17 @@ const ouvrirModalPlanDeDecaissementActivite = function (data) {
 
   const newItem = {
     activiteId: data.activite.id,
-    trimestre: this.getCurrentQuarter(),
-    annee: new Date().getFullYear(),
-    budgetNational: 0,
-    pret: 0,
+    trimestre: String(this.getCurrentQuarter()),
+    annee: String(new Date().getFullYear()),
+    budgetNational: '',
+    pret: '',
     id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
   };
 
   getListePlanDeDecaissement(data.activite.id);
 
   showModalPlanDeDecaissement.value = true;
-  planDeDecaissementPayload.value.activiteId = data.activite.id;
+  planDeDecaissementPayload.value  = newItem;
   planDeDecaissement.value.push(planDeDecaissementPayload.value);
   showModalPlanDeDecaissement.value = true;
 };
@@ -211,7 +371,7 @@ const getPlageActivite = computed(() => {
 });
 
 //const showModalSuiviFinancier = ref(false);
-let showModalSuiviFinancier = ref(false);
+const showModalSuiviFinancier = ref(false);
 //const loadingSuiviFinancier = ref(false);
 let loadingSuiviFinancier = ref(false);
 //const erreurSuiviFinancier = ref(null);
@@ -257,9 +417,6 @@ const years = computed(() => {
 const getcurrentUser = async () => {
   await AuthService.getCurrentUser()
     .then((result) => {
-      // responsablesForm.value.ug = result.data.data.profil.id;
-      // ugs.value.push({ id: result.data.data.profil.id, nom: result.data.data.profil.nom });
-      // idProgramme.value = result.data.data.programme.id;
       console.log("debut", result.data.data.programme.debut);
       console.log("fin", result.data.data.programme.debut);
       debutProgramme.value = result.data.data.programme.debut;
@@ -524,17 +681,6 @@ const resetModalSuiviFinancierActivite = (item) => {
   suiviFinancier.value = [];
   showModalSuiviFinancier.value = false;
 };
-const addPlan = () => {
-  const newItem = {
-    activiteId: planDeDecaissementPayload.value.activiteId,
-    trimestre: 1, // Trimestre actuel
-    annee: new Date().getFullYear(), // Set current year as default
-    budgetNational: 0,
-    pret: 0,
-    id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
-  };
-  planDeDecaissement.value.push(newItem);
-};
 
 const addSuivi = function () {
   const newItem = {
@@ -559,9 +705,9 @@ const addSuivi = function () {
   filterSuiviFinancierActiviteParAnnee(suiviFinancier.value[0].activiteId, payLoad, suiviFinancier.value.length - 1);
 };
 
-const removePlan = (index) => {
-  suiviFinancier.value.splice(index, 1);
-};
+// const removePlan = (index) => {
+//   suiviFinancier.value.splice(index, 1);
+// };
 
 const removeSuivi = (index) => {
   suiviFinancier.value.splice(index, 1);
@@ -575,17 +721,7 @@ const suiviFinancierActivite = async () => {
   console.log("suiviFinancier.value.length", suiviFinancier.value.length);
 
   for (let index = 0; index < suiviFinancier.value.length; index++) {
-    console.log("tableauListeSuivi.value", tableauListeSuivi.value);
-
-    console.log("suiviFinancier.value[index]", suiviFinancier.value[index]);
-
     let suivi = tableauListeSuivi.value.filter((suivi) => suivi.annee == suiviFinancier.value[index].annee && suivi.trimestre == suiviFinancier.value[index].trimestre);
-
-    console.log("suivi", suivi);
-
-    console.log("suivi.length", suivi.length);
-
-    // console.log("suivi[0]?.id", suivi[0]?.id);
 
     const action = suivi.length > 0 ? SuiviFinancier.update(suivi[0]?.id, suiviFinancier.value[index]) : SuiviFinancierService.create(suiviFinancier.value[index]);
 
@@ -599,10 +735,10 @@ const suiviFinancierActivite = async () => {
       console.log("index === suiviFinancier.value.length - 1", index === suiviFinancier.value.length - 1);
 
       if (index === suiviFinancier.value.length - 1) {
-        showModalSuiviFinancier = false;
+        // showModalSuiviFinancier = false;
 
         setTimeout(() => {
-          planDeDecaissement = [];
+          resetModalSuiviFinancierActivite();
         }, 500);
       }
 
@@ -746,7 +882,7 @@ onMounted(() => {
               </table>
             </div>
 
-            <div class="absolute shadow-md perso left-80 sm:rounded-lg">
+            <div class="absolute shadow-md perso left-40 sm:rounded-lg">
               <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="sticky top-0 text-xs text-gray-700 uppercase _z-20 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
@@ -837,7 +973,7 @@ onMounted(() => {
     <LoaderSnipper v-if="isLoadingData" />
   </div>
 
-  <Modal backdrop="static" :show="showModalPlanDeDecaissement" @hidden="showModalPlanDeDecaissement = false">
+  <!-- <Modal backdrop="static" :show="showModalPlanDeDecaissement" @hidden="showModalPlanDeDecaissement = false">
     <ModalHeader>
       <h2 class="mr-auto text-base font-medium">Plan de décaissement</h2>
     </ModalHeader>
@@ -850,6 +986,7 @@ onMounted(() => {
           <div class="col-span-12 mt-3">
             <label class="form-label">Année</label>
             <TomSelect v-model="plan.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
+              <option>Sélectionnez une année</option>
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
@@ -857,10 +994,7 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- <InputForm v-model="plan.annee" :min="2000" class="col-span-12" type="number" :required="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.annee">
-            {{ erreurPlanDeDecaissement[index].annee }}
-          </p> -->
+          
 
           <div class="w-full mt-3">
             <label class="form-label">Sélectionnez le trimestre</label>
@@ -875,10 +1009,7 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- <InputForm v-model="plan.trimestre" :min="1" :max="4" class="col-span-12" type="number" :required="true" placeHolder="Sélectionnez le trimestre" label="Sélectionnez le trimestre" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
-            {{ erreurPlanDeDecaissement[index].trimestre }}
-          </p> -->
+          
 
           <InputForm v-model="plan.budgetNational" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Saisissez le fond propre" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.budgetNational">
@@ -918,6 +1049,115 @@ onMounted(() => {
         </div>
       </ModalFooter>
     </form>
+  </Modal> -->
+
+  <Modal backdrop="static" :show="showModalPlanDeDecaissement" @hidden="showModalPlanDeDecaissement = false">
+    <ModalHeader>
+      <h2 class="mr-auto text-base font-medium">Plan de décaissement</h2>
+    </ModalHeader>
+
+    <form @submit.prevent="planDeDecaissementActivite">
+      <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
+        <!-- Affichage des erreurs générales -->
+        <div v-if="erreurPlanDeDecaissement && erreurPlanDeDecaissement.some((err) => err?.general)" class="col-span-12 bg-red-50 border border-red-200 rounded-md p-3">
+          <h4 class="text-red-800 font-medium text-sm mb-2">Erreurs générales :</h4>
+          <ul class="text-red-700 text-sm">
+            <li v-for="(error, index) in erreurPlanDeDecaissement" :key="index">
+              <span v-if="error?.general">Plan {{ index + 1 }}: {{ error.general }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div v-for="(plan, index) in planDeDecaissement" :key="plan.id || index" class="col-span-12 border-b pb-4 mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-medium">Plan {{ index + 1 }}</h3>
+            <!-- Indicateur d'erreur pour ce plan -->
+            <span v-if="erreurPlanDeDecaissement?.[index] && Object.keys(erreurPlanDeDecaissement[index]).some((key) => key !== 'general' && erreurPlanDeDecaissement[index][key])" class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full"> Erreurs détectées </span>
+          </div>
+
+          <!-- Sélection de l'année -->
+          <div class="col-span-12 mt-3">
+            <label class="form-label">Année</label>
+            <TomSelect v-model="plan.annee" :options="{ placeholder: 'Sélectionnez une année' }" class="w-full" :class="{ 'border-red-500': erreurPlanDeDecaissement?.[index]?.annee }" @change="clearFieldError(index, 'annee')">
+              <option v-for="(year, yearIndex) in years" :key="yearIndex" :value="year">{{ year }}</option>
+            </TomSelect>
+            <p class="text-red-500 text-xs mt-1" v-if="erreurPlanDeDecaissement?.[index]?.annee">
+              {{ erreurPlanDeDecaissement[index].annee }}
+            </p>
+          </div>
+
+          <!-- Sélection du trimestre -->
+          <div class="w-full mt-3">
+            <label class="form-label">Sélectionnez le trimestre</label>
+            <TomSelect v-model="plan.trimestre" :options="{ placeholder: 'Sélectionnez le trimestre' }" class="w-full" :class="{ 'border-red-500': erreurPlanDeDecaissement?.[index]?.trimestre }" @change="clearFieldError(index, 'trimestre')">
+              <option value="1">Trimestre 1</option>
+              <option value="2">Trimestre 2</option>
+              <option value="3">Trimestre 3</option>
+              <option value="4">Trimestre 4</option>
+            </TomSelect>
+            <p class="text-red-500 text-xs mt-1" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
+              {{ erreurPlanDeDecaissement[index].trimestre }}
+            </p>
+          </div>
+
+          <!-- Budget National / Fond propre -->
+          <div class="col-span-12 mt-3">
+            <InputForm v-model="plan.budgetNational" :min="0" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Saisissez le fond propre" :class="{ 'border-red-500': erreurPlanDeDecaissement?.[index]?.budgetNational }" @input="clearFieldError(index, 'budgetNational')" />
+            <p class="text-red-500 text-xs mt-1" v-if="erreurPlanDeDecaissement?.[index]?.budgetNational">
+              {{ erreurPlanDeDecaissement[index].budgetNational }}
+            </p>
+          </div>
+
+          <!-- Prêt / Subvention -->
+          <div class="col-span-12 mt-3">
+            <InputForm v-model="plan.pret" :min="0" type="number" :required="true" placeHolder="Saisissez la subvention" label="Saisissez la subvention" :class="{ 'border-red-500': erreurPlanDeDecaissement?.[index]?.pret }" @input="clearFieldError(index, 'pret')" />
+            <p class="text-red-500 text-xs mt-1" v-if="erreurPlanDeDecaissement?.[index]?.pret">
+              {{ erreurPlanDeDecaissement[index].pret }}
+            </p>
+          </div>
+
+          <!-- Bouton supprimer -->
+          <button type="button" @click="removePlan(index)" class="mt-2 text-red-600 text-sm underline hover:text-red-800 transition-colors">Supprimer ce plan</button>
+
+          <!-- Affichage des plages d'activité -->
+          <div class="col-span-12" v-if="getPlageActivite">
+            <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivite.durees" :key="t">
+              <ClockIcon class="w-4 h-4 mr-2 text-gray-500" />
+              <div class="text-sm text-gray-600">
+                Plage de date {{ t + 1 }} : Du
+                <span class="pr-1 font-bold">{{ $h.reformatDate(plage.debut) }}</span>
+                au
+                <span class="font-bold">{{ $h.reformatDate(plage.fin) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Affichage de la durée du projet -->
+          <div v-if="getPlageProjet" class="flex items-center mt-2 col-span-12">
+            <ClockIcon class="w-4 h-4 mr-2 text-gray-500" />
+            <div class="text-sm text-gray-600">
+              Durée du projet : Du
+              <span class="px-1 font-bold">{{ $h.reformatDate(getPlageProjet.debut) }}</span>
+              au
+              <span class="font-bold">{{ $h.reformatDate(getPlageProjet.fin) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bouton ajouter un plan -->
+        <button type="button" @click="addPlan" class="col-span-12 btn btn-outline-primary hover:bg-primary hover:text-white transition-colors">
+          <PlusIcon class="w-4 h-4 mr-2" />
+          Ajouter un autre plan
+        </button>
+      </ModalBody>
+
+      <ModalFooter>
+        <div class="flex items-center justify-center space-x-2">
+          <button type="button" @click="closeModal" class="w-full btn btn-outline-secondary hover:bg-gray-100 transition-colors">Annuler</button>
+          <VButton class="w-full" label="Enregistrer" :loading="loadingPlanDeDecaissement" type="submit" :disabled="loaderListePlan || loadingPlanDeDecaissement" />
+        </div>
+      </ModalFooter>
+    </form>
   </Modal>
 
   <!-- Modal Delete -->
@@ -936,7 +1176,6 @@ onMounted(() => {
   </Modal>
   <!-- End Modal -->
 
-
   <Modal backdrop="static" :show="showModalSuiviFinancier" @hidden="showModalSuiviFinancier = false">
     <ModalHeader>
       <h2 class="mr-auto text-base font-medium">{{ mode }} un Suivi Financier</h2>
@@ -944,7 +1183,6 @@ onMounted(() => {
 
     <form @submit.prevent="suiviFinancierActivite">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-      
         <div v-for="(suivi, index) in suiviFinancier" :key="index" class="col-span-12 border-b pb-4 mb-4">
           <h3 class="text-sm font-medium mb-3">Plan {{ index + 1 }}</h3>
 
@@ -955,13 +1193,6 @@ onMounted(() => {
               {{ erreurSuiviFinancier[index].consommer }}
             </p>
           </div>
-
-          <!-- <div class="mt-5">
-            <InputForm v-model="suivi.trimestre" :min="1" :max="4" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Sélectionnez le trimestre" label="Sélectionnez le trimestre" />
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
-              {{ erreurSuiviFinancier[index].trimestre }}
-            </p>
-          </div> -->
 
           <div class="w-full mt-3">
             <label class="form-label">Sélectionnez le trimestre</label>
@@ -976,24 +1207,16 @@ onMounted(() => {
             </p>
           </div>
 
-          <!-- <div class="mt-5">
-            <InputForm v-model="suivi.annee" :min="2000" class="col-span-12" type="number" :required="true" :disabled="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.annee">
-              {{ erreurSuiviFinancier[index].annee }}
-            </p>
-          </div> -->
-
           <div class="col-span-12 mt-3">
             <label class="form-label">Année</label>
             <TomSelect v-model="suivi.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full" @change="miseAjourTabSuivi(suivi.activiteId, suivi.annee, index)">
+              <option>Sélectionnez une année</option>
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
               {{ erreurSuiviFinancier[index].trimestre }}
             </p>
           </div>
-
-          <!-- <pre>getPlageActivite :{{ getPlageActivite.activite }}</pre> -->
 
           <button type="button" @click="removeSuivi(index)" class="mt-2 text-red-600 text-sm underline">Supprimer ce suivi</button>
         </div>

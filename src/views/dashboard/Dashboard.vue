@@ -501,9 +501,9 @@ const markerLatLng = ref([47.31322, -1.319482]);
 const loadingOption = ref(true);
 const graphiqueData = ref([]);
 const getStat = function () {
-  console.log(JSON.parse(localStorage.getItem("authenticateUser")).projet.id);
+  //console.log(JSON.parse(localStorage.getItem("authenticateUser")).projet.id);
 
-  const ongId = JSON.parse(localStorage.getItem("authenticateUser")).projet.id;
+  const ongId = JSON.parse(localStorage.getItem("authenticateUser"))?.projet.id;
   // route.params.id
   ProjetService.statistiques(ongId)
     .then((data) => {
