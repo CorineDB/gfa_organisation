@@ -1,1 +1,173 @@
-getCleIndicateursDatas  keyIndicateursDatas uniteDeMesureDatas getUniteMesureDatas router.push getSiteDatas
+{
+    "1D6O5Rx9emkMLN7KGav4RVDxly1w0XEK9PB2bjPrdJ6ZYWzgq9p35AoO8AgroVlP": {
+      "questionId": "1D6O5Rx9emkMLN7KGav4RVDxly1w0XEK9PB2bjPrdJ6ZYWzgq9p35AoO8AgroVlP",
+      "optionDeReponseId": "j3MaWRGDD2KlwpxWj0zBX93NR8r1M4n8ln6PJY7GvAmkELVZegodyq5aYzrPAvdX",
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": [
+        "[object File]"
+      ]
+    },
+    "0NXAzVl8KGmv6WOVAx41d5plzZDbgoBDRoE2MraNPy9Y73XkL8qje0JRw6YLDrk9": {
+      "questionId": "0NXAzVl8KGmv6WOVAx41d5plzZDbgoBDRoE2MraNPy9Y73XkL8qje0JRw6YLDrk9",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "KO0bAWv1yXKWzZY0JpDO92LxVvwje5BOkmBl18Nmabk63P7Ad4qogMRGrzm4DZ95": {
+      "questionId": "KO0bAWv1yXKWzZY0JpDO92LxVvwje5BOkmBl18Nmabk63P7Ad4qogMRGrzm4DZ95",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "mWx0YzZXm9DaJXe61lr7wRvzqd3KAbEXjVByY8jG2ZLO4k0NWPMxo5Vgpl7AajR6": {
+      "questionId": "mWx0YzZXm9DaJXe61lr7wRvzqd3KAbEXjVByY8jG2ZLO4k0NWPMxo5Vgpl7AajR6",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "5KGMa0XN56KV9dl8wWj0r137YeAb4kQJb7QvXaDJ2LRZqzymPpoMxGOgNb7WO2xl": {
+      "questionId": "5KGMa0XN56KV9dl8wWj0r137YeAb4kQJb7QvXaDJ2LRZqzymPpoMxGOgNb7WO2xl",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "L0Xkrp19DPw5Y9KM8g3j6a04AXpLJqQMyMQNom7edl1GRWrykzZOb2vVxmPyq4VW": {
+      "questionId": "L0Xkrp19DPw5Y9KM8g3j6a04AXpLJqQMyMQNom7edl1GRWrykzZOb2vVxmPyq4VW",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "2o0G4Dmg8z6ra0D5NJo2Pb4OqyxXZ1Ea2XnmGWgjM3YKl7wpLRdk9vVAekpyZN7r": {
+      "questionId": "2o0G4Dmg8z6ra0D5NJo2Pb4OqyxXZ1Ea2XnmGWgjM3YKl7wpLRdk9vVAekpyZN7r",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "5Z0g6mkYdV6X5ropDbe74PGzkMWAZOEx8lE1N0gK2Jq8xjaY9yl3RLwmv2JDxAWo": {
+      "questionId": "5Z0g6mkYdV6X5ropDbe74PGzkMWAZOEx8lE1N0gK2Jq8xjaY9yl3RLwmv2JDxAWo",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "x0mYadqXkjzX79qRweDZaxmL168OrvEWGmEMPlgY5dWKANy20G4J3VpobOwzp7N6": {
+      "questionId": "x0mYadqXkjzX79qRweDZaxmL168OrvEWGmEMPlgY5dWKANy20G4J3VpobOwzp7N6",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "76M9apy8Km9JAyLgzRGp3PjDlOweW0n79gQZ4Xrox2V8dN17kv6MYqb5axrb2jLX": {
+      "questionId": "76M9apy8Km9JAyLgzRGp3PjDlOweW0n79gQZ4Xrox2V8dN17kv6MYqb5axrb2jLX",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "W5G2yVlav97y4pP2OkYNGLZ0ezdKwxQ8oLBD3WlmXRaVMAJ1go5q6j8rbNdqjL0M": {
+      "questionId": "W5G2yVlav97y4pP2OkYNGLZ0ezdKwxQ8oLBD3WlmXRaVMAJ1go5q6j8rbNdqjL0M",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "KVxjkgYAj9YZgr7AyMJVdx5wo6leK3E4MvnO8X2WRkL0mvqGaNPb41pzD6apoM0L": {
+      "questionId": "KVxjkgYAj9YZgr7AyMJVdx5wo6leK3E4MvnO8X2WRkL0mvqGaNPb41pzD6apoM0L",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "jMZODlArx2L1GgDvM0y7VNlK8e63bPQVlDnArpW5JojRwadzkZYX94qOmVaKgm29": {
+      "questionId": "jMZODlArx2L1GgDvM0y7VNlK8e63bPQVlDnArpW5JojRwadzkZYX94qOmVaKgm29",
+      "optionDeReponseId": "j3MaWRGDD2KlwpxWj0zBX93NR8r1M4n8ln6PJY7GvAmkELVZegodyq5aYzrPAvdX",
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": [
+        "[object File]"
+      ]
+    },
+    "L96Dq8Y7DYgJOe7yMv1z54m8r2jLApQm5oQdlbo6WPxwR0qNGV3kZXKa9rK0yPj3": {
+      "questionId": "L96Dq8Y7DYgJOe7yMv1z54m8r2jLApQm5oQdlbo6WPxwR0qNGV3kZXKa9rK0yPj3",
+      "optionDeReponseId": "j3MaWRGDD2KlwpxWj0zBX93NR8r1M4n8ln6PJY7GvAmkELVZegodyq5aYzrPAvdX",
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "4jvz2KldALo9VbXWxG2apDvlRZdJ3gQLleQj105mP4K67zywNOkq8MerYPYMR6rN": {
+      "questionId": "4jvz2KldALo9VbXWxG2apDvlRZdJ3gQLleQj105mP4K67zywNOkq8MerYPYMR6rN",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "NaAzL9oylwGaMLeXZ3RK0WOJ4grx98nyaPnDNvPYpkyj2b17VmoAqdz560ROdkGm": {
+      "questionId": "NaAzL9oylwGaMLeXZ3RK0WOJ4grx98nyaPnDNvPYpkyj2b17VmoAqdz560ROdkGm",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "RD3MVwlXMxlYD8bJOrNevjyGRZozdAnpozE31La0g9Pwk4WmVq2X6pK75exbqN9Z": {
+      "questionId": "RD3MVwlXMxlYD8bJOrNevjyGRZozdAnpozE31La0g9Pwk4WmVq2X6pK75exbqN9Z",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "p4KzOWRaVX5lJrwg6Dk8vbWYN0ao1Lnkoanj7PxO2mRqMZ49Kp3zAydGe95J7ymL": {
+      "questionId": "p4KzOWRaVX5lJrwg6Dk8vbWYN0ao1Lnkoanj7PxO2mRqMZ49Kp3zAydGe95J7ymL",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "zb46L0ed3r97MVJ2XdOglw1zAxR4ybQPjPnPp8LvmkaWGjeZ5DKNo60Yq9DY7ygP": {
+      "questionId": "zb46L0ed3r97MVJ2XdOglw1zAxR4ybQPjPnPp8LvmkaWGjeZ5DKNo60Yq9DY7ygP",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "ql8rm9WaWjqKwa40mdglM5ZNeDOovxQgKKQyL6XYbA7JpkRPzrV3G2198XKM2jp4": {
+      "questionId": "ql8rm9WaWjqKwa40mdglM5ZNeDOovxQgKKQyL6XYbA7JpkRPzrV3G2198XKM2jp4",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    },
+    "j8D7pMG6R2KAG683PZ5lx7LeVzOkm4BqNjQy9bXW0qMJa1YodvpwjNgDrlrKV5Rw": {
+      "questionId": "j8D7pMG6R2KAG683PZ5lx7LeVzOkm4BqNjQy9bXW0qMJa1YodvpwjNgDrlrKV5Rw",
+      "optionDeReponseId": null,
+      "sourceDeVerificationId": "",
+      "sourceDeVerification": " ",
+      "preuves": []
+    }
+  }
+
+  🔵 [submitFactuelSoumission] - Début fonction
+evaluation.gouvernance.service.js?t=1758612522729:62 🔵 [submitFactuelSoumission] - Type de params: object
+evaluation.gouvernance.service.js?t=1758612522729:63 🔵 [submitFactuelSoumission] - params instanceof FormData: true
+evaluation.gouvernance.service.js?t=1758612522729:64 🔵 [submitFactuelSoumission] - params: FormData {}[[Prototype]]: FormData
+evaluation.gouvernance.service.js?t=1758612522729:68 🟢 [submitFactuelSoumission] - FORMDATA détecté - préservation activée
+evaluation.gouvernance.service.js?t=1758612522729:73 🟢 [submitFactuelSoumission] - Config pour FormData: {preserveFormData: true, headers: {…}}headers: {}preserveFormData: true[[Prototype]]: Object
+api.service.js?t=1758612522729:31 🟠 [ApiService.post] - Début fonction
+api.service.js?t=1758612522729:32 🟠 [ApiService.post] - Resource: gfa/enquete-de-gouvernance/evaluations-de-gouvernance/AVp5zvagdgV3Wa07prNQJRMw2XG6A4oqxBLzljmKv1eD5YyZPqxknOb8MOjQPw1y/soumissions-factuel
+api.service.js?t=1758612522729:33 🟠 [ApiService.post] - Type de params: object
+api.service.js?t=1758612522729:34 🟠 [ApiService.post] - params instanceof FormData: true
+api.service.js?t=1758612522729:35 🟠 [ApiService.post] - Config reçu: {preserveFormData: true, headers: {…}}headers: {}preserveFormData: true[[Prototype]]: Object
+api.service.js?t=1758612522729:36 🟠 [ApiService.post] - params: FormData {}[[Prototype]]: FormDataappend: ƒ append()delete: ƒ delete()entries: ƒ entries()forEach: ƒ forEach()get: ƒ ()getAll: ƒ getAll()has: ƒ has()keys: ƒ keys()set: ƒ ()values: ƒ values()constructor: ƒ FormData()Symbol(Symbol.iterator): ƒ entries()Symbol(Symbol.toStringTag): "FormData"[[Prototype]]: Object
+api.service.js?t=1758612522729:40 Config dans ApiService.post: {}[[Prototype]]: Object
+api.service.js?t=1758612522729:44 🟠 [ApiService.post] - Config.headers existe
+api.service.js?t=1758612522729:47 🟢 [ApiService.post] - FORMDATA avec preserveFormData - pas de Content-Type
+api.service.js?t=1758612522729:65 🟠 [ApiService.post] - Headers finaux: {Accept: 'application/json'}Accept: "application/json"[[Prototype]]: Object
+api.service.js?t=1758612522729:71 🟠 [ApiService.post] - RequestConfig final: {headers: {…}}headers: {Accept: 'application/json'}[[Prototype]]: Object
+api.service.js?t=1758612522729:72 🟠 [ApiService.post] - Params avant envoi httpClient: FormData {}
+api.service.js?t=1758612522729:73 🟠 [ApiService.post] - params instanceof FormData avant httpClient: true

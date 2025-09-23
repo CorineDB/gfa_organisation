@@ -725,7 +725,7 @@ onMounted(async () => {
 
         <!-- Ranking Section -->
         <div v-if="statistiques.pourcentage_evolution < 100" class="col-span-4 p-6 bg-white rounded-md shadow-lg">
-          <h2 class="mb-4 text-lg font-bold">Ranking of Submissions</h2>
+          <h2 class="mb-4 text-lg font-bold">Classement des soumissions</h2>
 
           <div class="">
             <!-- List rankings dynamically -->

@@ -17,7 +17,7 @@ import store from "../stores/index";
 
 function determineContentType(payLoad) {
   if (payLoad instanceof FormData) {
-    return "multipart/form-data";
+    return undefined;
   } else {
     return "application/json";
   }
@@ -48,14 +48,28 @@ const httpClient = axios.create(config);
  * Ajout du token d'authentification si disponible
  */
 const authInterceptor = (config) => {
+  console.log("🔴 [authInterceptor] - Config avant modification:", config);
+  console.log("🔴 [authInterceptor] - Headers avant:", config.headers);
+  console.log("🔴 [authInterceptor] - Data type:", typeof config.data);
+  console.log("🔴 [authInterceptor] - Data instanceof FormData:", config.data instanceof FormData);
+
   let token = store.getters["auths/GET_ACCESS_TOKEN"];
   if (token) {
     token = token.slice(0, -1); // Optionnel : si besoin de modifier le token
     config.headers.Authorization = `Bearer ${token}`;
   }
 
+  // Protection spéciale pour FormData - supprimer Content-Type si présent
+  if (config.data instanceof FormData && config.headers['Content-Type']) {
+    console.log("🔴 [authInterceptor] - Suppression Content-Type pour FormData");
+    delete config.headers['Content-Type'];
+  }
+
   // Réinitialisation des erreurs
   store.commit(SET_ERRORS_MESSAGE, { message: null, errors: [] });
+
+  console.log("🔴 [authInterceptor] - Headers après:", config.headers);
+  console.log("🔴 [authInterceptor] - Config final:", config);
 
   return config;
 };

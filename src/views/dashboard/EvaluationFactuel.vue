@@ -121,13 +121,14 @@ function removeObjectWithOptionResponseEmpty() {
   payload.factuel.response_data = payload.factuel.response_data.filter((item) => item.optionDeReponseId !== "null");
 }
 const submitData = async () => {
-  // Convertir `responses` en tableau et l'affecter à `payload.factuel.response_data`
+  // NE PAS écraser payload.factuel.response_data - il contient déjà les données filtrées
+  // payload.factuel.response_data est déjà rempli par submitAnsweredQuestionsOnly()
 
-  payload.factuel.response_data = Object.values(responses);
+  console.log("📦 [submitData] - Utilisation des données filtrées:", payload.factuel.response_data.length, "réponses");
+  console.log("📦 [submitData] - payload.factuel.response_data:", payload.factuel.response_data);
 
-  console.log("payload.factuel.response_data.length > 0", payload.factuel.response_data.length > 0);
-
-  removeObjectWithOptionResponseEmpty();
+  // Pas besoin de removeObjectWithOptionResponseEmpty() car les données sont déjà filtrées
+  // removeObjectWithOptionResponseEmpty();
   if (payload.factuel.response_data.length > 0) {
     // alert("ok");
     removeNullSourceDeVerificationId();
@@ -166,6 +167,7 @@ const submitData = async () => {
     });
 
     isLoading.value = true;
+
     const action = isValidate.value ? EvaluationService.validateFactuelSoumission(idEvaluation.value, formData) : EvaluationService.submitFactuelSoumission(idEvaluation.value, formData);
 
     try {
@@ -222,7 +224,7 @@ const initializeFormData = () => {
         critere.questions_de_gouvernance.forEach((question) => {
           responses[question.id] = {
             questionId: question.id,
-            optionDeReponseId: question.reponse_de_la_collecte?.optionDeReponseId ?? "null",
+            optionDeReponseId: question.reponse_de_la_collecte?.optionDeReponseId ?? null,
             sourceDeVerificationId: "",
             sourceDeVerification: question.reponse_de_la_collecte?.sourceDeVerification ?? " ",
             description: findResponse2(question.reponse_de_la_collecte?.optionDeReponseId) == "partiellement" ? "" : undefined,
@@ -282,7 +284,8 @@ const getSourceName = (sourceId, sources) => {
 const nextPage = () => {
   if (currentPage.value < totalPages.value - 1) {
     currentPage.value++;
-    submitData();
+    // Utiliser la nouvelle fonction de sauvegarde sélective
+    submitAnsweredQuestionsOnly();
   }
 };
 const saveFormData = () => {
@@ -383,6 +386,97 @@ const findResponse2 = (id) => {
   }
 
   return "";
+};
+
+const handleResponseChange = (questionId, optionId) => {
+  const responseSlug = findResponse2(optionId);
+
+  if (responseSlug === "partiellement" || responseSlug === "non") {
+    // Vider les fichiers quand la réponse est "Partiellement" ou "Non"
+    if (responses[questionId]) {
+      responses[questionId].preuves = [];
+    }
+  }
+};
+
+const submitAnsweredQuestionsOnly = async () => {
+  console.log("🔵 responses complet:", responses);
+
+  // Étape 1 : Filtrage initial des réponses (réponses non-null et non-vides)
+  const answeredQuestions = Object.values(responses).filter((response) => {
+    const hasAnswer = response.optionDeReponseId !== null &&
+                     response.optionDeReponseId !== "" &&
+                     response.optionDeReponseId !== "null" &&
+                     response.optionDeReponseId !== undefined;
+
+    console.log(`🔸 Question ${response.questionId}: optionDeReponseId = ${response.optionDeReponseId}, hasAnswer = ${hasAnswer}`);
+    return hasAnswer;
+  });
+
+  console.log("🟢 answeredQuestions (", answeredQuestions.length, "):", answeredQuestions);
+
+  // Étape 2 : Validation des réponses complètes selon les règles métier
+  const completeAnswers = answeredQuestions.filter((response) => {
+    const responseSlug = findResponse2(response.optionDeReponseId);
+    console.log(`🔸 Question ${response.questionId}: responseSlug = "${responseSlug}"`);
+
+    if (responseSlug === "oui") {
+      // Pour "oui", il faut des preuves ET une source (officielle ou personnalisée)
+
+      // Validation preuves (obligatoire)
+      const hasProofs = Array.isArray(response.preuves) && response.preuves.length > 0;
+
+      // Validation source (obligatoire - soit officielle soit personnalisée)
+      let hasValidSource = false;
+
+      if (response.sourceDeVerificationId === "autre") {
+        // Source personnalisée : sourceDeVerification doit être rempli
+        hasValidSource = response.sourceDeVerification &&
+                        response.sourceDeVerification.trim() !== "" &&
+                        response.sourceDeVerification !== " ";
+        console.log(`🔹 "OUI" - Source personnalisée: "${response.sourceDeVerification}", valide: ${hasValidSource}`);
+      } else {
+        // Source officielle : sourceDeVerificationId doit être rempli et différent de "autre"
+        hasValidSource = response.sourceDeVerificationId &&
+                        response.sourceDeVerificationId !== "" &&
+                        response.sourceDeVerificationId !== "autre";
+        console.log(`🔹 "OUI" - Source officielle: "${response.sourceDeVerificationId}", valide: ${hasValidSource}`);
+      }
+
+      const isComplete = hasProofs && hasValidSource;
+      console.log(`🔹 "OUI" - hasProofs: ${hasProofs}, hasValidSource: ${hasValidSource}, isComplete: ${isComplete}`);
+      return isComplete;
+    }
+
+    if (responseSlug === "partiellement") {
+      // Pour "partiellement", il faut une description
+      const hasDescription = response.description && response.description.trim() !== "";
+      console.log(`🔹 "PARTIELLEMENT" - hasDescription: ${hasDescription}`);
+      return hasDescription;
+    }
+
+    if (responseSlug === "non") {
+      // Pour "non", pas de validation supplémentaire nécessaire
+      console.log(`🔹 "NON" - toujours valide`);
+      return true;
+    }
+
+    console.log(`🔸 Slug non reconnu: "${responseSlug}" - considéré comme invalide`);
+    return false;
+  });
+
+  console.log("🟡 completeAnswers (", completeAnswers.length, "):", completeAnswers);
+
+  // Étape 3 : Préparation du payload
+  payload.factuel.response_data = completeAnswers;
+
+  // Étape 4 : Sauvegarde conditionnelle
+  if (payload.factuel.response_data.length > 0) {
+    console.log("🚀 Sauvegarde de", completeAnswers.length, "réponses complètes");
+    await submitData();
+  } else {
+    console.log("❌ Aucune réponse complète à sauvegarder");
+  }
 };
 
 const invalidResponses = computed(() => {
@@ -527,190 +621,182 @@ const toggle = (id) => {
           </div>
         </div>
         <div>
-          <div class="py-5 intro-x" v-if="formDataFactuel.id">
-            <div class="space-y-0">
-              <!-- v-for type_gouvernance -->
-              <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="transition-all">
-                <h1 class="mb-5 text-2xl font-semibold text-gray-800">{{ typeGouvernance.nom }}</h1>
-                <!-- v-for Principe -->
-                <div class="space-y-6">
-                  <div class="p-4 space-y-4">
-                    <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="space-y-2">
-                      <h2 class="font-bold text-lg">{{ typeGouvernance.nom }}</h2>
+          <div class="py-5 intro-x flex overflow-y-scroll" v-if="formDataFactuel.id">
+            <pre>{{responses}}</pre>
+            <div>
+              <div class="space-y-0">
+                <!-- v-for type_gouvernance -->
+                <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="transition-all">
+                  <h1 class="mb-5 text-2xl font-semibold text-gray-800">{{ typeGouvernance.nom }}</h1>
+                  <!-- v-for Principe -->
+                  <div class="space-y-6">
+                    <div class="p-4 space-y-4">
+                      <div v-show="currentPage === typeGouvernanceIndex" v-for="(typeGouvernance, typeGouvernanceIndex) in formulaireFactuel.categories_de_gouvernance" :key="typeGouvernanceIndex" class="space-y-2">
+                        <h2 class="font-bold text-lg">{{ typeGouvernance.nom }}</h2>
 
-                      <div v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex">
-                        <div @click="toggle(principe.id)" class="_bg-blue-900 text-white px-4 py-2 cursor-pointer rounded-md" :class="hasInvalidResponses(principe) ? 'bg-danger' : 'bg-primary'">
-                          {{ principe.nom }}
-                        </div>
-                        <div v-show="openAccordions[principe.id]" class="pl-4 mt-2 space-y-2">
-                          <div v-for="(critere, critereIndex) in principe.categories_de_gouvernance" :key="critereIndex">
-                            <div @click="toggle(critere.id)" class="_bg-blue-700 text-white px-4 py-2 cursor-pointer rounded-md" :class="hasInvalidResponsesForCritere(critere) ? 'bg-danger' : 'bg-primary/90'">
-                              {{ critere.nom }}
-                            </div>
-                            <div v-show="openAccordions[critere.id]" class="pl-4 mt-2 space-y-2">
-                              <div v-for="(question, questionIndex) in critere.questions_de_gouvernance" :key="questionIndex" class="bg-white p-4 rounded shadow border-l-4 border-yellow-500">
-                                <div class="bg-white rounded-xl shadow-lg border-l-6 border-blue-600 overflow-hidden mb-6">
-                                  <!-- En-tête de la question -->
-                                  <div @click="toggle(question.id)" class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100 cursor-pointer hover:bg-blue-100 transition-colors duration-200">
-                                    <div class="flex items-center gap-3">
-                                      <span class="bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full">{{ questionIndex + 1 }}</span>
-                                      <h3 class="text-xl font-semibold text-gray-800">{{ question.nom }}</h3>
-                                    </div>
-                                  </div>
-
-                                  <!-- <pre>{{ responses[question.id] }}</pre> -->
-
-                                  <!-- Contenu principal -->
-                                  <div v-show="openAccordions[question.id]" class="p-6 space-y-6">
-                                    <!-- <div class="space-y-4">
-                                      <h4 class="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2">
-                                        <i class="fas fa-question-circle text-blue-500"></i>
-                                        Sélectionnez votre réponse :
-                                      </h4>
-
-                                     
-
-                                      <div class="space-y-3">
-                                        <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}`" class="hidden" type="hidden" :name="`${question.id}`" value="null" v-model="responses[question.id].optionDeReponseId" />
-
-                                        <div v-for="(option, optionIndex) in formulaireFactuel.options_de_reponse" :key="optionIndex" classs="inline-block">
-                                          <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition-all duration-200 group" :for="`radio${question.id}${optionIndex}`">
-                                            <input v-if="responses[question.id]?.optionDeReponseId" :id="`radio${question.id}${optionIndex}`" class="w-5 h-5 text-blue-600 accent-blue-900 mr-4" type="radio" :name="`${question.id}-${question.slug}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" />
-                                            <span class="text-gray-700 font-medium group-hover:text-blue-700">
-                                              {{ option.libelle }}
-                                            </span>
-                                          </label>
-                                        </div>
+                        <div v-for="(principe, principeIndex) in typeGouvernance.categories_de_gouvernance" :key="principeIndex">
+                          <div @click="toggle(principe.id)" class="_bg-blue-900 text-white px-4 py-2 cursor-pointer rounded-md" :class="hasInvalidResponses(principe) ? 'bg-danger' : 'bg-primary'">
+                            {{ principe.nom }}
+                          </div>
+                          <div v-show="openAccordions[principe.id]" class="pl-4 mt-2 space-y-2">
+                            <div v-for="(critere, critereIndex) in principe.categories_de_gouvernance" :key="critereIndex">
+                              <div @click="toggle(critere.id)" class="_bg-blue-700 text-white px-4 py-2 cursor-pointer rounded-md" :class="hasInvalidResponsesForCritere(critere) ? 'bg-danger' : 'bg-primary/90'">
+                                {{ critere.nom }}
+                              </div>
+                              <div v-show="openAccordions[critere.id]" class="pl-4 mt-2 space-y-2">
+                                <div v-for="(question, questionIndex) in critere.questions_de_gouvernance" :key="questionIndex" class="bg-white p-4 rounded shadow border-l-4 border-yellow-500">
+                                  <div class="bg-white rounded-xl shadow-lg border-l-6 border-blue-600 overflow-hidden mb-6">
+                                    <!-- En-tête de la question -->
+                                    <div @click="toggle(question.id)" class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-blue-100 cursor-pointer hover:bg-blue-100 transition-colors duration-200">
+                                      <div class="flex items-center gap-3">
+                                        <span class="bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full">{{ questionIndex + 1 }}</span>
+                                        <h3 class="text-xl font-semibold text-gray-800">{{ question.nom }}</h3>
                                       </div>
-                                    </div> -->
+                                    </div>
 
-                                    <div class="space-y-4">
-                                      <h4 class="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2 justify-center">
-                                        <i class="fas fa-question-circle text-blue-500"></i>
-                                        Sélectionnez votre réponse :
-                                      </h4>
+                                    <!-- <pre>{{ responses[question.id] }}</pre> -->
 
-                                      <div class="space-y-3 text-center">
-                                        <div v-for="(option, optionIndex) in formulaireFactuel.options_de_reponse" :key="optionIndex" class="inline-block ml-3">
-                                          <label
-                                            class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 group"
-                                            :for="`radio${question.id}${optionIndex}`"
-                                            :class="{
-                                              'border-blue-600 bg-blue-50': responses[question.id]?.optionDeReponseId === option.id,
-                                              'border-gray-200 hover:border-blue-300 hover:bg-blue-50': responses[question.id]?.optionDeReponseId !== option.id,
-                                            }"
-                                          >
-                                            <input :id="`radio${question.id}${optionIndex}`" class="w-5 h-5 text-blue-600 accent-blue-900 mr-4" type="radio" :name="`${question.id}-${question.slug}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" />
-                                            <span
-                                              class="text-gray-700 font-medium"
+                                    <!-- Contenu principal -->
+                                    <div v-show="openAccordions[question.id]" class="p-6 space-y-6">
+                                      <div class="space-y-4">
+                                        <h4 class="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2 justify-center">
+                                          <i class="fas fa-question-circle text-blue-500"></i>
+                                          Sélectionnez votre réponse :
+                                        </h4>
+
+                                        <pre>{{ responses[question.id]}}</pre>
+
+                                        <div class="space-y-3 text-center">
+                                          <div v-for="(option, optionIndex) in formulaireFactuel.options_de_reponse" :key="optionIndex" class="inline-block ml-3">
+                                            <input :id="`radio${question.id}${optionIndex}`" class="hidden" type="radio" :name="`question-${question.id}`" :value="option.id" v-model="responses[question.id].optionDeReponseId" @change="handleResponseChange(question.id, option.id)" />
+                                            <label
+                                              class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 group hover:shadow-md"
+                                              :for="`radio${question.id}${optionIndex}`"
                                               :class="{
-                                                'text-blue-700': responses[question.id]?.optionDeReponseId === option.id,
-                                                'group-hover:text-blue-700': responses[question.id]?.optionDeReponseId !== option.id,
+                                                'border-blue-600 bg-blue-50 shadow-md': responses[question.id]?.optionDeReponseId === option.id,
+                                                'border-gray-200 hover:border-blue-300 hover:bg-blue-50': responses[question.id]?.optionDeReponseId !== option.id,
                                               }"
                                             >
-                                              {{ option.libelle }}
-                                            </span>
-                                          </label>
-                                        </div>
-                                      </div>
-
-                                      <div v-if="errors['factuel.response_data.' + questionIndex + 'optionDeReponseId']" class="my-2 text-danger">
-                                        {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "optionDeReponseId"]) }}
-                                      </div>
-                                    </div>
-
-                                    <!-- Section conditionnelle pour "Oui" -->
-                                    <div v-if="findResponse2(responses[question.id].optionDeReponseId) == 'oui'" class="bg-green-50 border border-green-200 rounded-lg p-6 space-y-6">
-                                      <div class="flex items-center gap-2 mb-4">
-                                        <i class="fas fa-check-circle text-green-600"></i>
-                                        <h5 class="text-lg font-semibold text-green-800">Informations complémentaires</h5>
-                                      </div>
-
-                                      <!-- Section Source -->
-                                      <div class="space-y-3">
-                                        <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-link mr-2 text-blue-500"></i>Source de vérification </label>
-                                        <div v-if="sources.length" class="relative">
-                                          <TomSelect :options="{ placeholder: 'Sélectionnez une source' }" class="w-full border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200" v-model="responses[question.id].sourceDeVerificationId">
-                                            <option value="">Sélectionner une source</option>
-                                            <option v-for="(source, indexSource) in sources" :key="indexSource" :value="source.id">
-                                              {{ source.intitule }}
-                                            </option>
-                                            <option value="autre">Autres sources</option>
-                                          </TomSelect>
-                                        </div>
-
-                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerificationId']" class="my-2 text-danger">
-                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "sourceDeVerificationId"]) }}
-                                        </div>
-                                      </div>
-
-                                      <!-- Champ autre source (conditionnel) -->
-                                      <div v-if="responses[question.id]?.sourceDeVerificationId == 'autre'" class="space-y-3">
-                                        <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-edit mr-2 text-orange-500"></i>Précisez la source </label>
-                                        <input type="text" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200" v-model="responses[question.id].sourceDeVerification" placeholder="Saisissez votre source personnalisée..." />
-
-                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerification']" class="my-2 text-danger">
-                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "sourceDeVerification"]) }}
-                                        </div>
-                                      </div>
-
-                                      <!-- Section Upload de fichiers -->
-                                      <div class="space-y-3">
-                                        <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-paperclip mr-2 text-purple-500"></i>Pièces justificatives </label>
-                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 hover:bg-blue-50 transition-colors duration-200">
-                                          <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
-                                          <p class="text-gray-600 mb-3">Cliquez pour parcourir</p>
-                                          <input type="file" :id="question.id" multiple :ref="question.id" @change="handleFileUpload($event, question.id)" class="hidden" />
-                                          <label :for="question.id" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg cursor-pointer transition-colors duration-200"> Parcourir les fichiers </label>
-                                          <p class="text-xs text-gray-500 mt-2">PDF, DOC, JPG, PNG - Max 10MB par fichier</p>
-                                        </div>
-                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves']" class="my-2 text-danger">
-                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "preuves"]) }}
-                                        </div>
-                                      </div>
-
-                                      <!-- Section des fichiers uploadés -->
-                                      <div v-if="responses[question.id]?.preuves.length" class="bg-gray-50 rounded-lg p-4">
-                                        <h6 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                          <i class="fas fa-file-alt text-blue-500"></i>
-                                          Fichiers joints ({{ responses[question.id]?.preuves.length }})
-                                        </h6>
-
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                          <div v-for="(file, index) in responses[question.id]?.preuves" :key="index" class="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow duration-200">
-                                            <div class="flex items-center gap-3">
-                                              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-file text-blue-600"></i>
+                                              <div
+                                                class="w-5 h-5 mr-4 border-2 rounded-full flex items-center justify-center transition-all duration-200"
+                                                :class="{
+                                                  'border-blue-600 bg-blue-600': responses[question.id]?.optionDeReponseId === option.id,
+                                                  'border-gray-300': responses[question.id]?.optionDeReponseId !== option.id,
+                                                }"
+                                              >
+                                                <div v-if="responses[question.id]?.optionDeReponseId === option.id" class="w-2 h-2 bg-white rounded-full"></div>
                                               </div>
-                                              <div class="flex-1 min-w-0">
-                                                <p class="text-sm font-medium text-gray-900 truncate">{{ file.nom }}</p>
-                                                <p class="text-xs text-gray-500">{{ file.size ? formatFileSize(file.size) : "Taille inconnue" }}</p>
-                                              </div>
-                                              <a :href="file.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
-                                                <i class="fas fa-external-link-alt"></i>
-                                              </a>
-                                              <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves.' + index]" class="my-2 text-danger">
-                                                {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "preuves." + index]) }}
+                                              <span
+                                                class="text-gray-700 font-medium"
+                                                :class="{
+                                                  'text-blue-700': responses[question.id]?.optionDeReponseId === option.id,
+                                                  'group-hover:text-blue-700': responses[question.id]?.optionDeReponseId !== option.id,
+                                                }"
+                                              >
+                                                {{ option.libelle }}
+                                              </span>
+                                            </label>
+                                          </div>
+                                        </div>
+
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'optionDeReponseId']" class="my-2 text-danger">
+                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "optionDeReponseId"]) }}
+                                        </div>
+                                      </div>
+
+                                      <!-- Section conditionnelle pour "Oui" -->
+                                      <div v-if="findResponse2(responses[question.id].optionDeReponseId) == 'oui'" class="bg-green-50 border border-green-200 rounded-lg p-6 space-y-6">
+                                        <div class="flex items-center gap-2 mb-4">
+                                          <i class="fas fa-check-circle text-green-600"></i>
+                                          <h5 class="text-lg font-semibold text-green-800">Informations complémentaires</h5>
+                                        </div>
+
+                                        <!-- Section Source -->
+                                        <div class="space-y-3">
+                                          <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-link mr-2 text-blue-500"></i>Source de vérification </label>
+                                          <div class="relative">
+                                            <TomSelect :options="{ placeholder: 'Sélectionnez une source' }" class="w-full border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200" v-model="responses[question.id].sourceDeVerificationId">
+                                              <option value="">Sélectionner une source</option>
+                                              <option v-for="(source, indexSource) in sources" :key="indexSource" :value="source.id">
+                                                {{ source.intitule }}
+                                              </option>
+                                              <option value="autre">Autres sources</option>
+                                            </TomSelect>
+                                          </div>
+
+                                          <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerificationId']" class="my-2 text-danger">
+                                            {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "sourceDeVerificationId"]) }}
+                                          </div>
+                                        </div>
+
+                                        <!-- Champ autre source (conditionnel) -->
+                                        <div v-if="responses[question.id]?.sourceDeVerificationId == 'autre'" class="space-y-3">
+                                          <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-edit mr-2 text-orange-500"></i>Précisez la source </label>
+                                          <input type="text" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200" v-model="responses[question.id].sourceDeVerification" placeholder="Saisissez votre source personnalisée..." />
+
+                                          <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerification']" class="my-2 text-danger">
+                                            {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "sourceDeVerification"]) }}
+                                          </div>
+                                        </div>
+
+                                        <!-- Section Upload de fichiers -->
+                                        <div class="space-y-3">
+                                          <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-paperclip mr-2 text-purple-500"></i>Pièces justificatives </label>
+                                          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 hover:bg-blue-50 transition-colors duration-200">
+                                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-3"></i>
+                                            <p class="text-gray-600 mb-3">Cliquez pour parcourir</p>
+                                            <input type="file" :id="question.id" multiple :ref="question.id" @change="handleFileUpload($event, question.id)" class="hidden" />
+                                            <label :for="question.id" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg cursor-pointer transition-colors duration-200"> Parcourir les fichiers </label>
+                                            <p class="text-xs text-gray-500 mt-2">PDF, DOC, JPG, PNG - Max 10MB par fichier</p>
+                                          </div>
+                                          <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves']" class="my-2 text-danger">
+                                            {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "preuves"]) }}
+                                          </div>
+                                        </div>
+
+                                        <!-- Section des fichiers uploadés -->
+                                        <div v-if="responses[question.id]?.preuves.length" class="bg-gray-50 rounded-lg p-4">
+                                          <h6 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                                            <i class="fas fa-file-alt text-blue-500"></i>
+                                            Fichiers joints ({{ responses[question.id]?.preuves.length }})
+                                          </h6>
+
+                                          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                            <div v-for="(file, index) in responses[question.id]?.preuves" :key="index" class="bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md transition-shadow duration-200">
+                                              <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                  <i class="fas fa-file text-blue-600"></i>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                  <p class="text-sm font-medium text-gray-900 truncate">{{ file.nom }}</p>
+                                                  <p class="text-xs text-gray-500">{{ file.size ? formatFileSize(file.size) : "Taille inconnue" }}</p>
+                                                </div>
+                                                <a :href="file.url" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 transition-colors duration-200">
+                                                  <i class="fas fa-external-link-alt"></i>
+                                                </a>
+                                                <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves.' + index]" class="my-2 text-danger">
+                                                  {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "preuves." + index]) }}
+                                                </div>
                                               </div>
                                             </div>
                                           </div>
                                         </div>
                                       </div>
-                                    </div>
 
-                                    <!-- Section conditionnelle pour "Partiellement" -->
-                                    <div v-else-if="findResponse2(responses[question.id].optionDeReponseId) == 'partiellement'" class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 space-y-4">
-                                      <div class="flex items-center gap-2 mb-4">
-                                        <i class="fas fa-exclamation-triangle text-yellow-600"></i>
-                                        <h5 class="text-lg font-semibold text-yellow-800">Précisions nécessaires</h5>
-                                      </div>
+                                      <!-- Section conditionnelle pour "Partiellement" -->
+                                      <div v-else-if="findResponse2(responses[question.id].optionDeReponseId) == 'partiellement'" class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 space-y-4">
+                                        <div class="flex items-center gap-2 mb-4">
+                                          <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                                          <h5 class="text-lg font-semibold text-yellow-800">Précisions nécessaires</h5>
+                                        </div>
 
-                                      <div class="space-y-3">
-                                        <label class="block text-sm font-semibold text-gray-700" for="description"> <i class="fas fa-comment-alt mr-2 text-blue-500"></i>Description détaillée </label>
-                                        <textarea name="description" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 resize-none" id="description" v-model="responses[question.id].description" cols="30" rows="4" placeholder="Veuillez préciser les détails de votre réponse..."></textarea>
-                                        <div v-if="errors.description" class="flex items-center gap-2 mt-2 text-red-600">
-                                          <i class="fas fa-exclamation-circle"></i>
-                                          <span class="text-sm">{{ getFieldErrors(errors.description) }}</span>
+                                        <div class="space-y-3">
+                                          <label class="block text-sm font-semibold text-gray-700" for="description"> <i class="fas fa-comment-alt mr-2 text-blue-500"></i>Description détaillée </label>
+                                          <textarea name="description" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 resize-none" id="description" v-model="responses[question.id].description" cols="30" rows="4" placeholder="Veuillez préciser les détails de votre réponse..."></textarea>
+                                          <div v-if="errors.description" class="flex items-center gap-2 mt-2 text-red-600">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <span class="text-sm">{{ getFieldErrors(errors.description) }}</span>
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
@@ -725,16 +811,14 @@ const toggle = (id) => {
                   </div>
                 </div>
               </div>
-            </div>
-            <!-- <div class="flex justify-center w-full mt-5">
-              <VButton v-if="isPreview" label="Prévisualiser" class="px-8 py-3 w-max" @click="openPreview" />
-            </div> -->
-            <div class="flex justify-center gap-3 my-8">
-              <button @click="prevPage()" :disabled="currentPage === 0" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
-              <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
-              <button v-if="!isPreview" @click="nextPage()" class="px-4 py-3 btn btn-outline-primary" :disabled="currentPage === totalPages - 1">Suivant</button>
+              
+              <div class="flex justify-center gap-3 my-8">
+                <button @click="prevPage()" :disabled="currentPage === 0" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
+                <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
+                <button v-if="!isPreview" @click="nextPage()" class="px-4 py-3 btn btn-outline-primary" :disabled="currentPage === totalPages - 1">Suivant</button>
 
-              <button v-if="isPreview" @click="openPreview" class="px-4 py-3 btn btn-outline-primary">Prévisualiser</button>
+                <button v-if="isPreview" @click="openPreview" class="px-4 py-3 btn btn-outline-primary">Prévisualiser</button>
+              </div>
             </div>
           </div>
         </div>
@@ -825,6 +909,7 @@ const toggle = (id) => {
                                     <div>
                                       <p class="text-sm font-medium text-gray-600">Réponse sélectionnée</p>
                                       <p class="text-lg font-semibold text-blue-700">
+                                       
                                         {{ findResponse(responses[question.id]?.optionDeReponseId) }}
                                       </p>
                                     </div>
@@ -951,7 +1036,7 @@ const toggle = (id) => {
       </ModalHeader>
 
       <ModalBody class="space-y-5">
-        <pre>{{ errors.factuel }}</pre>
+        
         <div v-if="errors.factuel" class="my-2 text-danger">{{ getFieldErrors(errors.factuel) }}</div>
         <div v-if="errors['factuel.comite_members']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.comite_members"]) }}</div>
         <div v-if="errors['factuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.response_data"]) }}</div>

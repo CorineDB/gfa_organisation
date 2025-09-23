@@ -308,7 +308,7 @@ onMounted(async () => {
                 <div @click="gotoSoumissions(item)" class="_flex _flex-col _items-start w-full gap-2 mt-2 cursor-pointer">
                   <!-- Item details -->
                   <div class="text-center lg:text-left lg:mt-0">
-                    <span class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary line-clamp-1 hover:line-clamp-none transition-all break-words"> {{ item.intitule }} terztrrt'é'é'fdsfdsdfs </span>
+                    <span class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary line-clamp-1 hover:line-clamp-none transition-all break-words"> {{ item.intitule }}</span>
                   </div>
                 </div>
 

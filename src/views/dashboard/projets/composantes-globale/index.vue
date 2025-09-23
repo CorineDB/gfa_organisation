@@ -305,40 +305,6 @@ export default {
 <template>
   <h2 class="mt-10 text-lg font-medium intro-y">OutComes</h2>
 
-  <!-- Filtre -->
-  <!-- <div class="container px-4 mx-auto">
-    Combined Filter Section
-    <div class="relative p-6 mt-3 space-y-3 bg-white rounded-lg shadow-md">
-      <h2 class="mb-4 text-base font-bold">Filtre</h2>
-
-      <div class="grid grid-cols-3 gap-4">
-        <div class="flex col-span-12">
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
-          <TomSelect
-            v-model="projetId"
-            :options="{
-              placeholder: 'Choisir un Output',
-              create: false,
-              onOptionAdd: text(),
-            }"
-            class="w-full"
-          >
-            <option value=""></option>
-            <option v-for="(element, index) in projets" :key="index" :value="element.id">{{ element.codePta }} - {{ element.nom }}</option>
-          </TomSelect>
-        </div>
-        <div class="flex col-span-12">
-          <v-select class="w-full" :reduce="(projet) => projet.id" v-model="projetId" label="nom" :options="projets">
-            <template #search="{ attributes, events }">
-              <input class="vs__search form-input" :required="!projetId" v-bind="attributes" v-on="events" />
-            </template>
-          </v-select>
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
   <!-- Titre de la page -->
   <div class="grid grid-cols-12 gap-6 mt-5">
     <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y">
@@ -398,21 +364,10 @@ export default {
             </div>
 
             <div class="flex items-center">
-              <!-- <pre>{{ item.pret }} Pret</pre> -->
               <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret == 0 ? 0 : $h.formatCurrency(item.pret) }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
-            <!-- <pre>{{ item }}</pre> -->
-            <!-- <div class="flex items-center mt-2">
-              <ClockIcon class="w-4 h-4 mr-2" />
-              <div>
-                Date : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(item.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(item.fin) }}</span>
-              </div>
-            </div> -->
-            <!-- <div class="flex items-center text-sm font-medium text-gray-700">
-              <GlobeIcon class="w-4 h-4 mr-2 text-primary" /> Taux d'exécution physique:
-              <span class="ml-2 font-semibold text-gray-900">{{ item.tep }}</span>
-            </div> -->
+
             <div class="flex items-center text-sm font-medium text-gray-700">
               <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut:
               <span v-if="item.statut == -2" class="ml-2 text-gray-900">Non validé</span>
@@ -421,10 +376,6 @@ export default {
               <span v-else-if="item.statut == 1" class="ml-2 text-gray-900">En retard</span>
               <span v-else-if="item.statut == 2" class="ml-2 text-gray-900">Terminé</span>
             </div>
-            <!-- <div class="flex items-center text-sm font-medium text-gray-700">
-              <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Poids:
-              <span class="ml-2 font-semibold text-gray-900">{{ item.poids }}</span>
-            </div> -->
           </div>
         </div>
       </div>
@@ -451,30 +402,26 @@ export default {
     <form @submit.prevent="sendForm">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
         <div class="col-span-12 md:col-span-6">
-            <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
-             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
+          <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
+          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
         </div>
-      
 
-        <div class="input-form mt-3 col-span-12 md:col-span-6">
+        <div class="input-form _mt-3 col-span-12 md:col-span-6">
           <label for="validation-form-6" class="form-label w-full"> Description </label>
           <textarea v-model="formData.description" class="form-control w-full" name="comment" placeholder="Ajouter une description"></textarea>
         </div>
 
         <div class="col-span-12 md:col-span-6">
-           <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
-
+          <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
+          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
         </div>
-       
+
         <div class="col-span-12 md:col-span-6">
-           <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
-           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
-
+          <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
+          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
         </div>
-       
-        
-        <div v-if="getPlageProjet" class="flex items-center mt-2 col-span-12 ">
+
+        <div v-if="getPlageProjet" class="flex items-center mt-2 col-span-12">
           <ClockIcon class="w-4 h-4 mr-2" />
           <div>
             Durée du projet : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(getPlageProjet.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageProjet.fin) }}</span>
