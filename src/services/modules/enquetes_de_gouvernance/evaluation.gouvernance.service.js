@@ -58,66 +58,60 @@ const EvaluationService = {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${idEvaluation}/soumissions-factuel/${idSoumissions}`);
   },
   submitFactuelSoumission(id, params) {
-    console.log("🔵 [submitFactuelSoumission] - Début fonction");
-    console.log("🔵 [submitFactuelSoumission] - Type de params:", typeof params);
-    console.log("🔵 [submitFactuelSoumission] - params instanceof FormData:", params instanceof FormData);
-    console.log("🔵 [submitFactuelSoumission] - params:", params);
+     
 
     // Étape 1 : Vérifier la préservation du FormData
     if (params instanceof FormData) {
-      console.log("🟢 [submitFactuelSoumission] - FORMDATA détecté - préservation activée");
+     
       const config = {
         preserveFormData: true,
         headers: {}
       };
-      console.log("🟢 [submitFactuelSoumission] - Config pour FormData:", config);
+     
       return ApiService.post(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/soumissions-factuel`, params, config);
     } else if (params && typeof params === 'object') {
-      console.log("🟡 [submitFactuelSoumission] - OBJET JSON détecté");
+       
       // Pour les objets JSON
       const config = {
         headers: {
           'Content-Type': 'application/json'
         }
       };
-      console.log("🟡 [submitFactuelSoumission] - Config pour JSON:", config);
+      
       return ApiService.post(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/soumissions-factuel`, JSON.stringify(params), config);
     }
 
-    console.log("🔴 [submitFactuelSoumission] - CAS PAR DÉFAUT");
+    
     // Cas par défaut
     return ApiService.post(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/soumissions-factuel`, params);
   },
   validateFactuelSoumission(id, params) {
-    console.log("🔵 [validateFactuelSoumission] - Début fonction");
-    console.log("🔵 [validateFactuelSoumission] - Type de params:", typeof params);
-    console.log("🔵 [validateFactuelSoumission] - params instanceof FormData:", params instanceof FormData);
-    console.log("🔵 [validateFactuelSoumission] - params:", params);
+    
 
     // Étape 1 : Vérifier la préservation du FormData
     if (params instanceof FormData) {
-      console.log("🟢 [validateFactuelSoumission] - FORMDATA détecté - préservation activée");
+       
       // Ne pas modifier params, laisser FormData intact
       // Config vide pour indiquer à ApiService de ne pas ajouter Content-Type
       const config = {
         preserveFormData: true,
         headers: {}
       };
-      console.log("🟢 [validateFactuelSoumission] - Config pour FormData:", config);
+     
       return ApiService.post(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/validate-soumission-factuel`, params, config);
     } else if (params && typeof params === 'object') {
-      console.log("🟡 [validateFactuelSoumission] - OBJET JSON détecté");
+      
       // Pour les objets JSON
       const config = {
         headers: {
           'Content-Type': 'application/json'
         }
       };
-      console.log("🟡 [validateFactuelSoumission] - Config pour JSON:", config);
+       
       return ApiService.post(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/validate-soumission-factuel`, JSON.stringify(params), config);
     }
 
-    console.log("🔴 [validateFactuelSoumission] - CAS PAR DÉFAUT");
+    
     // Cas par défaut
     return ApiService.post(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/validate-soumission-factuel`, params);
   },
