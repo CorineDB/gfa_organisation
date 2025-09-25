@@ -80,7 +80,7 @@ const participant = reactive({
 
 const participantErrors = ref({
   email: "",
-  phone: ""
+  phone: "",
 });
 
 const isEditMode = ref(false);
@@ -107,7 +107,7 @@ const getDatas = async () => {
     .then((result) => {
       datas.value = result.data.data;
 
-      console.log("getDatas", datas);
+     //console.log("getDatas", datas);
 
       if (datas.value.factuel?.comite_members) {
         localStorage.setItem("member", JSON.stringify(datas.value.factuel.comite_members));
@@ -285,7 +285,7 @@ const addEmail = () => {
     // Mode édition - nettoyer les propriétés non utilisées
     const cleanParticipant = {
       type_de_contact: participant.type_de_contact,
-      email: participant.email
+      email: participant.email,
     };
     invitationPayload.participants[editingIndex.value] = cleanParticipant;
     toast.success("Email modifié avec succès");
@@ -299,11 +299,11 @@ const addEmail = () => {
       // Add the participant to the payload - retirer la clé phone
       const cleanParticipant = {
         type_de_contact: participant.type_de_contact,
-        email: participant.email
+        email: participant.email,
       };
       invitationPayload.participants.unshift(cleanParticipant);
 
-      console.log(invitationPayload.participants)
+      console.log(invitationPayload.participants);
       toast.success("Email ajouté avec succès");
     } else {
       participantErrors.value.email = "Adresse email déjà ajoutée";
@@ -334,7 +334,7 @@ const addPhone = () => {
     // Mode édition - nettoyer les propriétés non utilisées
     const cleanParticipant = {
       type_de_contact: participant.type_de_contact,
-      phone: participant.phone
+      phone: participant.phone,
     };
     invitationPayload.participants[editingIndex.value] = cleanParticipant;
     toast.success("Téléphone modifié avec succès");
@@ -348,11 +348,11 @@ const addPhone = () => {
       // Add the participant to the payload - retirer la clé email
       const cleanParticipant = {
         type_de_contact: participant.type_de_contact,
-        phone: participant.phone
+        phone: participant.phone,
       };
       invitationPayload.participants.unshift(cleanParticipant);
 
-      console.log(invitationPayload.participants)
+      console.log(invitationPayload.participants);
 
       toast.success("Téléphone ajouté avec succès");
     } else {
@@ -374,9 +374,18 @@ const resetEditMode = () => {
 
 const resetInvitationForm = () => {
   resetEditMode(); // Reset edit mode when form is reset
-  /*
-  invitationPayload.participants = [];
-  invitationPayload.nbreParticipants = 0; */
+
+  // Vider les champs du formulaire
+  participant.email = "";
+  participant.phone = "";
+  participant.type_de_contact = options[0].id;
+
+  // Réinitialiser le nombre de participants
+  invitationPayload.nbreParticipants = 0;
+
+  // Réinitialiser les erreurs des champs
+  participantErrors.value.email = "";
+  participantErrors.value.phone = "";
 
   getEvaluation();
   showInvitationModal.value = false;
@@ -393,6 +402,11 @@ const sendInvitation = async () => {
   try {
     await EvaluationService.addParticipantPerception(idEvaluation, invitationPayload);
     toast.success(`Invitation envoye.`);
+
+    // Vider le tableau après envoi réussi
+    invitationPayload.participants = [];
+    invitationPayload.nbreParticipants = 0;
+
     resetInvitationForm();
     errors.value = {};
   } catch (e) {
@@ -503,8 +517,6 @@ const organisations = computed(() => datas.value.map((item) => ({ nom: item.nom,
 const organisationsOptions = computed(() => datas.value.options_de_reponse_stats.map((item) => ({ nom: item.nom, id: item.id })));
 
 onMounted(async () => {
-
-
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
   getDatas();
   getEvaluation();
@@ -528,7 +540,6 @@ onMounted(async () => {
         </div>
 
         <div class="grid grid-cols-12 gap-6 mt-5">
-         
           <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
@@ -649,19 +660,19 @@ onMounted(async () => {
 
               <div class="m-5 text-slate-600 dark:text-slate-500">
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Start At:
-                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel.created_at : "Pas demarre" }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Démarré le :
+                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel.created_at : "Pas démarré" }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Submitted_at At:
-                  <div class="ml-2 font-bold">{{ datas.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Pas demarre") : "Pas demarre" }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Soumis le :
+                  <div class="ml-2 font-bold">{{ datas.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Pas soumis") : "Pas soumis" }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total questions répondues :
                   <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.reponses_de_la_collecte?.length : 0 }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total Membres du comite:
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total membres du comité :
                   <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
                 </div>
                 <div class="mt-4">
@@ -671,23 +682,7 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <!-- <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400"> -->
-
-              <!-- <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" @click.self="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
-                    Details de la soumission
-                    <ExternalLinkIcon class="ml-2 size-5" />
-                  </button>
-
-                  <button v-else class="w-full gap-2 py-[22px]"></button>
-                  <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button>
-                </div>
-                <button v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" @click.self="goToPageSynthese" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
-                  Fiche de synthèse
-                  <ArrowRightIcon class="ml-2 size-5" />
-                </button>
-              </div> -->
+              
 
               <div v-if="datas.factuel && datas.factuel.pourcentage_evolution > 0" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
@@ -738,15 +733,16 @@ onMounted(async () => {
 
               <div class="m-5 text-slate-600 dark:text-slate-500">
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Start At
-                  <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception.created_at : "Pas demarre" }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Démarré le :
+                  <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception.created_at : "Pas démarré" }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total participants:
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total participants :
+
                   <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.length : 0 }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total questions répondues :
                   <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
                 </div>
 
@@ -864,7 +860,7 @@ onMounted(async () => {
     <form @submit.prevent="sendInvitation">
       <ModalBody>
         <div class="max-w-screen-lg p-4 mx-auto mt-4 box">
-          <InputForm class="" :control="getFieldErrors(errors.nbreParticipants)" label="Nombre de participants djksd" pattern="\d{1,8}" maxlength="8" v-model.number="invitationPayload.nbreParticipants" type="number" />
+          <InputForm class="" :control="getFieldErrors(errors.nbreParticipants)" label="Nombre de participants" pattern="\d{1,8}" maxlength="8" v-model.number="invitationPayload.nbreParticipants" type="number" />
         </div>
         <hr class="my-5" />
         <div class="max-w-screen-lg p-4 mx-auto mt-6 box">
@@ -888,29 +884,25 @@ onMounted(async () => {
                   </div>
                   <button class="btn btn-primary">
                     <PlusIcon v-if="!isEditMode" class="w-4 h-4 mr-3" />
-                    <EditIcon v-else class="w-4 h-4 mr-3"/>
-                    {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+                    <EditIcon v-else class="w-4 h-4 mr-3" />
+                    {{ isEditMode ? "Modifier" : "Ajouter" }}
                   </button>
-                  <button v-if="isEditMode" type="button" @click="resetEditMode" class="btn btn-outline-secondary">
-                    Annuler
-                  </button>
+                  <button v-if="isEditMode" type="button" @click="resetEditMode" class="btn btn-outline-secondary">Annuler</button>
                 </div>
               </form>
               <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
                 <div class="flex items-end gap-4">
                   <div class="flex-1">
                     <InputForm class="" type="text" label="Numéro de téléphone" maxlength="13" v-model="participant.phone" />
-                    <p class="text-xs text-primary mt-3" >Ecrivez le numéro directement sans espace ni de signe + (Ex : 229XXZZIIAA)</p>
+                    <p class="text-xs text-primary mt-3">Ecrivez le numéro directement sans espace ni de signe + (Ex : 229XXZZIIAA)</p>
                   </div>
 
                   <button class="btn btn-primary">
                     <PlusIcon v-if="!isEditMode" class="w-4 h-4 mr-3" />
-                    <EditIcon v-else class="fas fa-save w-4 h-4 mr-3"/>
-                    {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+                    <EditIcon v-else class="fas fa-save w-4 h-4 mr-3" />
+                    {{ isEditMode ? "Modifier" : "Ajouter" }}
                   </button>
-                  <button v-if="isEditMode" type="button" @click="resetEditMode" class="btn btn-outline-secondary">
-                    Annuler
-                  </button>
+                  <button v-if="isEditMode" type="button" @click="resetEditMode" class="btn btn-outline-secondary">Annuler</button>
                 </div>
                 <div class="col-span-12">
                   <!-- Message de validation avec animation -->
@@ -930,7 +922,7 @@ onMounted(async () => {
                   </div>
                 </div>
               </form>
-              <div v-if="errors.participants" class="mt-2 text-danger">{{ getFieldErrors(errors.participants) }}</div>
+
               <div class="flex flex-wrap items-center w-full max-w-full gap-3">
                 <div class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium rounded-sm shadow cursor-pointer bg-blue text-primary" v-for="(participant, index) in invitationPayload.participants" :key="index">
                   <span>{{ participant.type_de_contact === "email" ? participant?.email : participant?.phone }}</span>

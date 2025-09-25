@@ -8,7 +8,8 @@ import { toast } from "vue3-toastify";
 import VButton from "@/components/news/VButton.vue";
 import AuthService from "@/services/modules/auth.service";
 import InputForm from "@/components/news/InputForm.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+// import { CornerDownLeftIcon } from "lucide-vue-next";
 import { getAllErrorMessages } from "@/utils/gestion-error";
 import { computed } from "vue";
 import { ages, categorieDeParticipant, sexes } from "../../utils/constants";
@@ -18,6 +19,7 @@ import { getFieldErrors } from "@/utils/helpers.js";
 const TYPE_ORGANISATION = "organisation";
 
 const route = useRoute();
+const router = useRouter();
 const token = route.params.id;
 
 const payload = reactive({
@@ -92,9 +94,14 @@ const getcurrentUserAndFetchOrganization = async () => {
 function removeObjectWithOptionResponseEmpty() {
   payload.perception.response_data = payload.perception.response_data.filter((item) => item.optionDeReponseId !== "null");
 }
+
 const submitData = async () => {
   payload.perception.response_data = Object.values(responses);
+
+  console.log(payload)
   removeObjectWithOptionResponseEmpty();
+
+  console.log(payload)
 
   if (payload.perception.response_data.length > 0) {
     isLoading.value = true;
@@ -163,18 +170,7 @@ const changePage = (pageNumber) => {
   currentPage.value = pageNumber;
   submitData();
 };
-// const prevPage = () => {
-//   if (currentPage.value >= 1) {
-//     currentPage.value--;
-//     submitData();
-//   }
-// };
-// const nextPage = () => {
-//   if (currentPage.value < totalPages.value - 1) {
-//     currentPage.value++;
-//     submitData();
-//   }
-// };
+ 
 const saveFormData = () => {
   localStorage.setItem("formData", JSON.stringify(formData));
 };
@@ -220,13 +216,7 @@ const openPreview = () => {
 const changeOrganisation = () => {
   organisationSelected.value ? initializeFormData() : (organisationSelected.value = true);
 };
-// const totalPages = computed(() => {
-//   if (formulairePerception.value.categories_de_gouvernance) {
-//     return formulairePerception.value.categories_de_gouvernance.length;
-//   } else {
-//     return 0;
-//   }
-// });
+ 
 
 // Fonctions pour changer de page
 const nextPage = () => {
@@ -267,27 +257,10 @@ const goToPage = (page) => {
 
 const isLastPage = computed(() => currentPage.value === totalPages.value);
 
-// watch(
-//   formData,
-//   (newValue) => {
-//     localStorage.setItem("formData", JSON.stringify(newValue));
-//   },
-//   { deep: true }
-// );
+ 
 
 onMounted(async () => {
-  // if (getvalidateKey("perception")) {
-  //   showAlertValidate.value = true;
-  // } else {
-  //   payload.identifier_of_participant = generateUniqueId();
-  //   await getDataFormPerception();
-
-  //   if (!showAlertValidate.value) {
-  //     // await getcurrentUserAndFetchOrganization();
-  //     // findFormulairePerception();
-  //     initializeFormData();
-  //   }
-  // }
+  
 
   payload.identifier_of_participant = generateUniqueId();
   await getDataFormPerception();
@@ -299,6 +272,11 @@ onMounted(async () => {
 });
 </script>
 <template>
+  <!-- <div class="flex justify-between my-4 items-center">
+    <h2 class="text-lg font-medium intro-y">Evaluation perception</h2>
+    <button class="btn btn-primary" @click="router.go(-1)">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
+  </div> -->
+
   <div v-if="!showAlertValidate" class="">
     <div v-if="!isLoadingDataPerception" class="mx-auto mt-5 max-w-screen-2xl">
       <div v-if="formDataPerception.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataPerception.intitule }}</div>
