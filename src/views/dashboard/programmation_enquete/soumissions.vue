@@ -77,6 +77,14 @@ const participant = reactive({
   email: "",
   phone: "",
 });
+
+const participantErrors = ref({
+  email: "",
+  phone: ""
+});
+
+const isEditMode = ref(false);
+const editingIndex = ref(-1);
 const createData = async () => {
   isLoading.value = true;
   await EvaluationGouvernance.create(payload)
@@ -246,46 +254,127 @@ const sendReminder = async () => {
     });
 };
 
+const editParticipant = (participantData, index) => {
+  isEditMode.value = true;
+  editingIndex.value = index;
+  participant.type_de_contact = participantData.type_de_contact;
+  participant.email = participantData.email || "";
+  participant.phone = participantData.phone || "";
+  participantErrors.value.email = "";
+  participantErrors.value.phone = "";
+};
+
 const addEmail = () => {
-  if (participant.email) {
+  // Réinitialiser l'erreur
+  participantErrors.value.email = "";
+
+  // Validation de l'email
+  if (!participant.email || participant.email.trim() === "") {
+    participantErrors.value.email = "L'adresse email est requise";
+    return;
+  }
+
+  // Validation format email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(participant.email)) {
+    participantErrors.value.email = "Format d'email invalide";
+    return;
+  }
+
+  if (isEditMode.value) {
+    // Mode édition - nettoyer les propriétés non utilisées
+    const cleanParticipant = {
+      type_de_contact: participant.type_de_contact,
+      email: participant.email
+    };
+    invitationPayload.participants[editingIndex.value] = cleanParticipant;
+    toast.success("Email modifié avec succès");
+    resetEditMode();
+  } else {
+    // Mode ajout
     // Check if an email already exists in the payload
     const isEmailAdded = invitationPayload.participants.some((item) => item.email === participant.email);
 
     if (!isEmailAdded) {
-      // Add the participant to the payload
-      invitationPayload.participants.unshift({ ...participant }); // Use spread to avoid reference issues
-      participant.email = ""; // Clear the email field after adding
+      // Add the participant to the payload - retirer la clé phone
+      const cleanParticipant = {
+        type_de_contact: participant.type_de_contact,
+        email: participant.email
+      };
+      invitationPayload.participants.unshift(cleanParticipant);
+
+      console.log(invitationPayload.participants)
+      toast.success("Email ajouté avec succès");
     } else {
-      // Show a message if the email is already added
-      toast.info("Adresse email déjà ajoutée");
+      participantErrors.value.email = "Adresse email déjà ajoutée";
+      return;
     }
   }
+
+  participant.email = ""; // Clear the email field after adding/editing
 };
 
 const addPhone = () => {
-  // Check if the phone number is valid
-  if (!isValid.value) {
-    toast.error("Numéro de téléphone invalide");
+  // Réinitialiser l'erreur
+  participantErrors.value.phone = "";
+
+  // Validation du téléphone
+  if (!participant.phone || participant.phone.trim() === "") {
+    participantErrors.value.phone = "Le numéro de téléphone est requis";
     return;
   }
 
-  if (participant.phone) {
+  // Check if the phone number is valid
+  if (!isValid.value) {
+    participantErrors.value.phone = "Numéro de téléphone invalide";
+    return;
+  }
+
+  if (isEditMode.value) {
+    // Mode édition - nettoyer les propriétés non utilisées
+    const cleanParticipant = {
+      type_de_contact: participant.type_de_contact,
+      phone: participant.phone
+    };
+    invitationPayload.participants[editingIndex.value] = cleanParticipant;
+    toast.success("Téléphone modifié avec succès");
+    resetEditMode();
+  } else {
+    // Mode ajout
     // Check if an phone already exists in the payload
     const isPhoneAdded = invitationPayload.participants.some((item) => item.phone === participant.phone);
 
     if (!isPhoneAdded) {
-      // Add the participant to the payload
-      invitationPayload.participants.unshift({ ...participant }); // Use spread to avoid reference issues
-      participant.phone = ""; // Clear the phone field after adding
+      // Add the participant to the payload - retirer la clé email
+      const cleanParticipant = {
+        type_de_contact: participant.type_de_contact,
+        phone: participant.phone
+      };
+      invitationPayload.participants.unshift(cleanParticipant);
+
+      console.log(invitationPayload.participants)
+
+      toast.success("Téléphone ajouté avec succès");
     } else {
-      // Show a message if the phone is already added
-      toast.info("Numéro de téléphone déja ajouté");
+      participantErrors.value.phone = "Numéro de téléphone déjà ajouté";
+      return;
     }
   }
+
+  participant.phone = ""; // Clear the phone field after adding/editing
+};
+
+const resetEditMode = () => {
+  isEditMode.value = false;
+  editingIndex.value = -1;
+  participant.email = "";
+  participant.phone = "";
+  participant.type_de_contact = options[0].id;
 };
 
 const resetInvitationForm = () => {
-  /* 
+  resetEditMode(); // Reset edit mode when form is reset
+  /*
   invitationPayload.participants = [];
   invitationPayload.nbreParticipants = 0; */
 
@@ -307,8 +396,12 @@ const sendInvitation = async () => {
     resetInvitationForm();
     errors.value = {};
   } catch (e) {
+    console.log("e", e);
+    console.log("e.response && e.response.status === 422", e.response && e.response.status === 422);
     if (e.response && e.response.status === 422) {
-      errors.value = e.response.data.errors;
+      // Récupérer les erreurs depuis la response
+      errors.value = e.response.data.errors || e.response.data || {};
+      console.log("errors.value", errors.value);
     } else {
       toast.error(getAllErrorMessages(e));
     }
@@ -408,16 +501,9 @@ const currentOrganisation = computed(() => datas.value.find((item) => item.id ==
 const statsOptions = computed(() => statistiques.value.options_de_reponse_stats);
 const organisations = computed(() => datas.value.map((item) => ({ nom: item.nom, id: item.id })));
 const organisationsOptions = computed(() => datas.value.options_de_reponse_stats.map((item) => ({ nom: item.nom, id: item.id })));
-// const currentOptionsPerception = computed(() => {
-//   return statistiques.value.options_de_reponse_stats.find((item) => item.id == currentOrganisationsOptions.value);
-// });
 
 onMounted(async () => {
-  /* await getDatas();
-  if (route.query.ong) {
-    changeCurrentDetailOrganisation(route.query.ong.toString());
-  }
-  getEvaluation(); */
+
 
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
   getDatas();
@@ -442,27 +528,7 @@ onMounted(async () => {
         </div>
 
         <div class="grid grid-cols-12 gap-6 mt-5">
-          <!-- <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-            <div class="report-box zoom-in">
-              <div class="p-5 text-center box">
-                <div class="flex items-center justify-between">
-                  <GlobeIcon class="size-10 text-primary" />
-
-                  <div class="mt-2 text-lg font-medium leading-8">Organisations</div>
-                </div>
-                <div class="flex items-center justify-around mt-4">
-                  <div class="flex gap-2 text-lg text-left">
-                    <div class="mt-1 text-primary">
-                      Total:
-                      <span class="font-semibold">
-                        {{ datas.length }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
+         
           <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
@@ -697,7 +763,7 @@ onMounted(async () => {
                 </button>
               </div>
 
-              <div v-else-if="!(datas.perception?.length) || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-else-if="!datas.perception?.length || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                   <button v-if="(!datas.perception?.length && statistiques.statut === 0) || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Envoyer une invitation
@@ -740,11 +806,11 @@ onMounted(async () => {
             </div>
           </div>
 
-           <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
-              <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
-              <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Voir Feuille de route</button>
-              <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button>
-            </div>
+          <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
+            <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
+            <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Voir Feuille de route</button>
+            <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Emettre une mesure a prendre</button>
+          </div>
           <ActionPlan :actions="feuilleDeRoute" />
         </div>
       </div>
@@ -798,7 +864,7 @@ onMounted(async () => {
     <form @submit.prevent="sendInvitation">
       <ModalBody>
         <div class="max-w-screen-lg p-4 mx-auto mt-4 box">
-          <InputForm class="" :control="getFieldErrors(errors.nbreParticipants)" label="Nombre de participants" pattern="\d{1,8}" maxlength="8" v-model.number="invitationPayload.nbreParticipants" type="number" />
+          <InputForm class="" :control="getFieldErrors(errors.nbreParticipants)" label="Nombre de participants djksd" pattern="\d{1,8}" maxlength="8" v-model.number="invitationPayload.nbreParticipants" type="number" />
         </div>
         <hr class="my-5" />
         <div class="max-w-screen-lg p-4 mx-auto mt-6 box">
@@ -817,15 +883,34 @@ onMounted(async () => {
               </div>
               <form v-show="participant.type_de_contact === options[0].id" @submit.prevent="addEmail">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" label="Adresse email" v-model="participant.email" type="email" />
-                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                  <div class="flex-1">
+                    <InputForm class="" label="Adresse email" v-model="participant.email" type="email" />
+                  </div>
+                  <button class="btn btn-primary">
+                    <PlusIcon v-if="!isEditMode" class="w-4 h-4 mr-3" />
+                    <EditIcon v-else class="w-4 h-4 mr-3"/>
+                    {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+                  </button>
+                  <button v-if="isEditMode" type="button" @click="resetEditMode" class="btn btn-outline-secondary">
+                    Annuler
+                  </button>
                 </div>
               </form>
               <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" type="text" label="Numéro de téléphone" maxlength="13" v-model="participant.phone" />
+                  <div class="flex-1">
+                    <InputForm class="" type="text" label="Numéro de téléphone" maxlength="13" v-model="participant.phone" />
+                    <p class="text-xs text-primary mt-3" >Ecrivez le numéro directement sans espace ni de signe + (Ex : 229XXZZIIAA)</p>
+                  </div>
 
-                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                  <button class="btn btn-primary">
+                    <PlusIcon v-if="!isEditMode" class="w-4 h-4 mr-3" />
+                    <EditIcon v-else class="fas fa-save w-4 h-4 mr-3"/>
+                    {{ isEditMode ? 'Modifier' : 'Ajouter' }}
+                  </button>
+                  <button v-if="isEditMode" type="button" @click="resetEditMode" class="btn btn-outline-secondary">
+                    Annuler
+                  </button>
                 </div>
                 <div class="col-span-12">
                   <!-- Message de validation avec animation -->
@@ -849,7 +934,24 @@ onMounted(async () => {
               <div class="flex flex-wrap items-center w-full max-w-full gap-3">
                 <div class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium rounded-sm shadow cursor-pointer bg-blue text-primary" v-for="(participant, index) in invitationPayload.participants" :key="index">
                   <span>{{ participant.type_de_contact === "email" ? participant?.email : participant?.phone }}</span>
-                  <button type="button" @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
+                  <div class="flex items-center gap-1">
+                    <button type="button" @click="editParticipant(participant, index)" class="p-1 transition-colors hover:bg-blue-100" title="Modifier">
+                      <PencilIcon class="w-4 h-4 text-blue-600" />
+                    </button>
+                    <button type="button" @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100" title="Supprimer">
+                      <TrashIcon class="w-4 h-4 text-danger" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Affichage des erreurs -->
+              <div v-if="Object.keys(errors).length > 0" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div v-for="(errorMessages, field) in errors" :key="field" class="mb-2 last:mb-0">
+                  <div v-for="(error, index) in errorMessages" :key="index" class="text-sm text-red-600 flex items-start gap-2">
+                    <i class="fas fa-exclamation-circle text-red-500 mt-0.5 text-xs"></i>
+                    {{ error }}
+                  </div>
                 </div>
               </div>
             </div>

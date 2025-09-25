@@ -56,6 +56,15 @@ const currentMember = ref({
 });
 const sources = ref([]);
 const errors = ref({});
+const memberFormErrors = ref({});
+
+// Computed pour l'erreur des membres - réactif
+const membersError = computed(() => {
+  if (!payload.factuel.comite_members || payload.factuel.comite_members.length === 0) {
+    return ["Veuillez ajouter au moins un membre au comité avant de valider."];
+  }
+  return null;
+});
 
 const getDataFormFactuel = async () => {
   try {
@@ -65,9 +74,14 @@ const getDataFormFactuel = async () => {
     if (!showAlertValidate.value) {
       formDataFactuel.value = data.data;
 
+      console.log("formDataFactuel.value.formulaire_de_gouvernance.soumissionId", formDataFactuel.value.formulaire_de_gouvernance.soumissionId);
+
       formulaireFactuel.value = formDataFactuel.value.formulaire_de_gouvernance;
+      //payload.formulaireDeGouvernanceId = formDataFactuel.value.formulaire_de_gouvernance.soumissionId;
       payload.formulaireDeGouvernanceId = formulaireFactuel.value.id;
-      payload.soumissionId = formulaireFactuel.value.soumissionId;
+      payload.soumissionId = formDataFactuel.value.formulaire_de_gouvernance.soumissionId;
+
+      console.log("payload.soumissionId", payload);
       idEvaluation.value = formDataFactuel.value.id;
       initializeFormData();
       getFilesFormData();
@@ -82,6 +96,7 @@ const getDataFormFactuel = async () => {
     isLoadingDataFactuel.value = false;
   }
 };
+
 const getSource = async () => {
   try {
     const { data } = await EvaluationService.getSource();
@@ -91,6 +106,7 @@ const getSource = async () => {
   } finally {
   }
 };
+
 const getcurrentUserAndFetchOrganization = async () => {
   await AuthService.getCurrentUser()
     .then((result) => {
@@ -112,15 +128,32 @@ function removeNullSourceDeVerificationId() {
     }
   });
 }
+
 function removeObjectWithOptionResponseEmpty() {
   payload.factuel.response_data = payload.factuel.response_data.filter((item) => item.optionDeReponseId !== "null");
 }
+
+const finalSubmit = () => {
+  // Vérifier qu'il y a au moins un membre avant la soumission
+  if (!payload.factuel.comite_members || payload.factuel.comite_members.length === 0) {
+    toast.error("Veuillez ajouter au moins un membre au comité avant de valider.");
+    openMemberModal(); // Ouvrir le modal d'ajout de membre avec réinitialisation des erreurs
+    return;
+  }
+
+  isValidate.value = true;
+  submitAnsweredQuestionsOnly();
+  // submitData();
+};
+
 const submitData = async () => {
+  errors.value = {}; // Réinitialiser les erreurs avant chaque soumission
+
+  console.log("payload", payload);
+
   if (payload.factuel.response_data.length > 0) {
     const formData = new FormData();
 
-    // Fonction pour ajouter les données dans FormData de manière récursive
-    // En excluant les fichiers de `preuves` qui seront ajoutés manuellement
     const appendFormData = (data, root = "") => {
       if (Array.isArray(data)) {
         data.forEach((item, index) => {
@@ -161,7 +194,7 @@ const submitData = async () => {
         router.push({ name: "DetailSoumission", params: { e: idEvaluation.value, s: result.data.soumission.id }, query: { type: "factuel" } });
       }
 
-      payload.soumissionId = result.data.data.id;
+      // payload.soumissionId = result.data.data.id;
 
       if (isValidate.value) {
         toast.success(`${result.data.message}`);
@@ -173,6 +206,7 @@ const submitData = async () => {
         payload.factuel.comite_members = [];
       }
     } catch (e) {
+      console.error(e);
       toast.error(e.response.data.message);
       if (isValidate.value) {
         if (e.response && e.response.status === 422) {
@@ -253,13 +287,17 @@ const handleFileUpload = (event, questionIndex) => {
   responses[questionIndex].preuves = files; // Store files directly as an array of File objects
 };
 const changePage = (pageNumber) => {
-  submitData();
+  isValidate.value = false;
+  submitAnsweredQuestionsOnly();
+  //submitData();
   currentPage.value = pageNumber;
 };
 const prevPage = () => {
   if (currentPage.value >= 1) {
+    isValidate.value = false;
     currentPage.value--;
-    submitData();
+    submitAnsweredQuestionsOnly();
+    // submitData();
   }
 };
 
@@ -289,21 +327,69 @@ function findFormulaireFactuel() {
   formulaireFactuel.value = formDataFactuel.value.formulaires_de_gouvernance.find((formulaire) => formulaire.id === idFactuel);
 }
 
+function validateMemberForm() {
+  memberFormErrors.value = {};
+
+  if (!currentMember.value.nom || currentMember.value.nom.trim() === "") {
+    memberFormErrors.value.nom = ["Le nom est requis."];
+  }
+
+  if (!currentMember.value.prenom || currentMember.value.prenom.trim() === "") {
+    memberFormErrors.value.prenom = ["Le prénom est requis."];
+  }
+
+  if (!currentMember.value.contact || currentMember.value.contact === "") {
+    memberFormErrors.value.contact = ["Le contact est requis."];
+  } else if (!/^\d{8,13}$/.test(currentMember.value.contact.toString())) {
+    memberFormErrors.value.contact = ["Le contact doit contenir entre 8 et 13 chiffres."];
+  }
+
+  return Object.keys(memberFormErrors.value).length === 0;
+}
+
 function addMembers() {
+  if (!validateMemberForm()) {
+    toast.error("Veuillez corriger les erreurs dans le formulaire.");
+    return;
+  }
+
+  payload.factuel.comite_members.push({ ...currentMember.value });
+  currentMember.value = { nom: "", prenom: "", contact: "" };
+  memberFormErrors.value = {}; // Réinitialiser les erreurs après ajout réussi
+  toast.success("Membre ajouté avec succès !");
+  // Ne pas fermer le modal pour permettre l'ajout de plusieurs membres
+}
+
+function addMemberAndClose() {
+  if (!validateMemberForm()) {
+    toast.error("Veuillez corriger les erreurs dans le formulaire.");
+    return;
+  }
+
   payload.factuel.comite_members.push({ ...currentMember.value });
   showModal.value = false;
   currentMember.value = { nom: "", prenom: "", contact: "" };
+  memberFormErrors.value = {}; // Réinitialiser les erreurs
+  toast.success("Membre ajouté avec succès !");
 }
 
 function saveMembers() {
   if (isEdit.value) {
     updateMember();
   } else {
-    addMembers();
+    addMemberAndClose();
   }
 }
 
+function openMemberModal() {
+  memberFormErrors.value = {}; // Réinitialiser les erreurs
+  isEdit.value = false;
+  currentMember.value = { nom: "", prenom: "", contact: "" };
+  showModal.value = true;
+}
+
 function editMember(member, index) {
+  memberFormErrors.value = {}; // Réinitialiser les erreurs
   isEdit.value = true;
   currentIndex.value = index;
   showModal.value = true;
@@ -340,45 +426,23 @@ const findResponse = (id) => {
 };
 
 const findQuestionDetails = computed(() => {
-  console.log("\n🔍 DEBUG findQuestionDetails - DÉBUT DE LA RECHERCHE");
-  console.log("📊 Questions invalides:", invalidResponses.value.length);
-
   if (!invalidResponses.value.length) {
-    console.log("❌ Aucune question invalide - Retour null");
     return null;
   }
 
   const questionId = invalidResponses.value[0].index;
-  console.log("🎯 Recherche des détails pour la question ID:", questionId);
-
-  console.log("🏗️ Structure du formulaire:", {
-    typesDeGouvernance: formulaireFactuel.value.categories_de_gouvernance?.length || 0,
-  });
 
   for (const type_gouvernance of formulaireFactuel.value.categories_de_gouvernance || []) {
-    console.log(`\n📋 Analyse type: ${type_gouvernance.nom}`);
-    console.log(`   Principes: ${type_gouvernance.categories_de_gouvernance?.length || 0}`);
-
     for (const principe of type_gouvernance.categories_de_gouvernance || []) {
-      console.log(`  📝 Analyse principe: ${principe.nom}`);
-      console.log(`     Critères: ${principe.categories_de_gouvernance?.length || 0}`);
-
       for (const critere of principe.categories_de_gouvernance || []) {
-        console.log(`    🎯 Analyse critère: ${critere.nom}`);
-        console.log(`       Questions: ${critere.questions_de_gouvernance?.length || 0}`);
-
         for (const question of critere.questions_de_gouvernance || []) {
-          console.log(`      🔍 Question: ${question.id} (${question.nom})`);
-
           if (question.id === questionId) {
-            console.log("✅ CORRESPONDANCE TROUVÉE!");
             const result = {
               nom_typeGouvernance: type_gouvernance.nom,
               nom_principe: principe.nom,
               nom_critere: critere.nom,
               nom_question: question.nom,
             };
-            console.log("🎉 Détails de la question:", result);
             return result;
           }
         }
@@ -386,7 +450,6 @@ const findQuestionDetails = computed(() => {
     }
   }
 
-  console.log("❌ Aucune correspondance trouvée pour l'ID:", questionId);
   return null;
 });
 
@@ -461,172 +524,112 @@ const hasValidSource = (data) => {
 };
 
 const submitAnsweredQuestionsOnly = async () => {
-  console.log("\n🚀 DEBUG submitAnsweredQuestionsOnly - DÉBUT DE LA FONCTION");
-  console.log("📊 État initial des réponses:", Object.keys(responses).length, "réponses totales");
-
+  errors.value = {}; // Réinitialiser les erreurs avant chaque soumission
   // Étape 1 : Filtrage initial des réponses (réponses non-null et non-vides)
-  console.log("\n🔍 ÉTAPE 1 - Filtrage initial des réponses");
+
   const answeredQuestions = Object.values(responses).filter((response) => {
     const hasAnswer = response.optionDeReponseId !== null && response.optionDeReponseId !== "" && response.optionDeReponseId !== "null" && response.optionDeReponseId !== undefined;
-    console.log(`📝 Question ${response.questionId}:`, {
-      optionDeReponseId: response.optionDeReponseId,
-      hasAnswer: hasAnswer,
-    });
+
     return hasAnswer;
   });
-  console.log("✅ Réponses avec optionDeReponseId:", answeredQuestions.length, "questions");
+
+  console.log();
 
   // Étape 2 : Validation des réponses complètes selon les règles métier
-  console.log("\n🔍 ÉTAPE 2 - Validation des réponses complètes");
   const completeAnswers = answeredQuestions.filter((response) => {
-    console.log(`\n📝 Validation question ${response.questionId}:`);
     const responseSlug = findResponse2(response.optionDeReponseId);
-    console.log(`🏷️  Slug:`, responseSlug);
 
     if (responseSlug === "oui") {
-      console.log("✅ Type OUI - Validation preuves et sources");
-
       // Validation preuves (obligatoire) - nouvelles preuves OU preuves existantes
       const hasProofs = (Array.isArray(response.preuves) && response.preuves.length > 0) || (Array.isArray(response.existingProofs) && response.existingProofs.length > 0);
-      console.log(`📎 Preuves valides:`, hasProofs, {
-        newProofs: response.preuves?.length || 0,
-        existingProofs: response.existingProofs?.length || 0,
-      });
 
       // Validation source (obligatoire - soit officielle soit personnalisée)
       let hasValidSource = false;
       if (response.sourceDeVerificationId === "autre") {
         hasValidSource = response.sourceDeVerification && response.sourceDeVerification.trim() !== "" && response.sourceDeVerification !== " ";
-        console.log(`🔗 Source personnalisée valide:`, hasValidSource, response.sourceDeVerification);
       } else {
         hasValidSource = response.sourceDeVerificationId && response.sourceDeVerificationId !== "" && response.sourceDeVerificationId !== "autre";
-        console.log(`🔗 Source officielle valide:`, hasValidSource, response.sourceDeVerificationId);
       }
 
       const isComplete = hasProofs && hasValidSource;
-      console.log(`🎯 OUI complet:`, isComplete);
       return isComplete;
     }
 
     if (responseSlug === "partiellement") {
-      console.log("⚠️  Type PARTIELLEMENT - Validation description");
       const hasDescription = response.description && response.description.trim() !== "";
-      console.log(`📝 Description valide:`, hasDescription, `"${response.description}"`);
       return hasDescription;
     }
 
     if (responseSlug === "non") {
-      console.log("❌ Type NON - Validation automatique");
       return true;
     }
 
-    console.log("❓ Type inconnu - Rejeté");
     return false;
   });
-  console.log("✅ Réponses complètes:", completeAnswers.length, "questions");
 
-  // Étape 3 : Préparation du payload
-  console.log("\n🔍 ÉTAPE 3 - Préparation du payload");
-  payload.factuel.response_data = completeAnswers;
-  console.log("📦 Payload préparé avec", payload.factuel.response_data.length, "réponses");
+  // Étape 3 : Préparation du payload - exclure existingProofs
+  payload.factuel.response_data = completeAnswers.map((answer) => {
+    const { existingProofs, ...cleanedAnswer } = answer;
+    return cleanedAnswer;
+  });
+
+  console.log("payload.factuel.response_data", payload.factuel.response_data);
 
   // Étape 4 : Sauvegarde conditionnelle
-  console.log("\n🔍 ÉTAPE 4 - Sauvegarde conditionnelle");
   if (payload.factuel.response_data.length > 0) {
-    console.log("💾 Données à sauvegarder détectées - Application de l'algorithme de validation");
-
     // Application de l'algorithme de validation des sources avant soumission
     const validatedResponseData = payload.factuel.response_data.map((response) => {
-      console.log(`\n🔧 Validation finale question ${response.questionId}:`);
       const responseSlug = findResponse2(response.optionDeReponseId);
 
       if (responseSlug === "oui") {
         const validatedResponse = { ...response };
-        console.log("🔄 Validation source pour OUI:");
 
         if (response.sourceDeVerificationId === "autre") {
           if (response.sourceDeVerification && response.sourceDeVerification.trim() !== "" && response.sourceDeVerification !== " ") {
             validatedResponse.sourceDeVerificationId = null;
-            console.log("✅ Source personnalisée: sourceDeVerificationId → null");
           }
         } else if (response.sourceDeVerificationId && response.sourceDeVerificationId !== "" && response.sourceDeVerificationId !== "autre") {
           validatedResponse.sourceDeVerification = null;
-          console.log("✅ Source officielle: sourceDeVerification → null");
         } else if (!response.sourceDeVerificationId || response.sourceDeVerificationId === "") {
           validatedResponse.sourceDeVerificationId = null;
-          console.log("✅ Source vide: sourceDeVerificationId → null");
         }
 
         return validatedResponse;
       }
 
-      console.log("➡️ Pas de validation spéciale nécessaire");
       return response;
     });
-
-    console.log("📋 Données validées:", validatedResponseData.length, "réponses");
 
     // Utiliser les données validées pour la soumission
     const originalResponseData = payload.factuel.response_data;
     payload.factuel.response_data = validatedResponseData;
 
-    console.log("🚀 Appel submitData()");
     await submitData();
 
     // Restaurer les données originales après soumission pour ne pas impacter l'état
     payload.factuel.response_data = originalResponseData;
-    console.log("🔄 Données originales restaurées");
   } else {
-    console.log("❌ Aucune donnée à sauvegarder");
   }
-
-  console.log("🏁 DEBUG submitAnsweredQuestionsOnly - FIN DE LA FONCTION\n");
 };
 
 const invalidResponses = computed(() => {
-  console.log("🔍 DEBUG invalidResponses - DÉBUT DE L'ANALYSE");
-  console.log("📊 Analyse des réponses:", Object.keys(responses).length, "réponses à analyser");
-
   return Object.entries(responses).reduce((acc, [index, data]) => {
-    console.log(`\n📝 Question ${index}:`, {
-      questionId: data.questionId,
-      optionDeReponseId: data.optionDeReponseId,
-      preuves: data.preuves?.length || 0,
-      existingProofs: data.existingProofs?.length || 0,
-      sourceDeVerificationId: data.sourceDeVerificationId,
-      sourceDeVerification: data.sourceDeVerification,
-      description: data.description?.length || 0,
-    });
-
     // Utiliser le slug pour une détection robuste
     const responseSlug = findResponse2(data.optionDeReponseId);
-    console.log(`🏷️  Slug de réponse pour ${index}:`, responseSlug);
 
-    console.log("data.optionDeReponseId", data.optionDeReponseId);
-
-    const isNullResponse = data.optionDeReponseId === "null";
-    console.log(`❌ Réponse nulle pour ${index}:`, isNullResponse);
+    const isNullResponse = data.optionDeReponseId === "null" || data.optionDeReponseId === null;
 
     const hasValidProofs = (Array.isArray(data.preuves) && data.preuves.length > 0) || (Array.isArray(data.existingProofs) && data.existingProofs.length > 0);
-    console.log(`📎 Preuves valides pour ${index}:`, hasValidProofs, {
-      newProofs: data.preuves?.length || 0,
-      existingProofs: data.existingProofs?.length || 0,
-    });
 
     const hasValidSourceValidation = hasValidSource(data);
-    console.log(`🔗 Source valide pour ${index}:`, hasValidSourceValidation);
 
     const isOuiAndMissingProofOrSource = responseSlug === "oui" && (!hasValidProofs || !hasValidSourceValidation);
-    console.log(`✅ OUI manquant preuve/source pour ${index}:`, isOuiAndMissingProofOrSource);
 
     const isPartiellementAndNoDescription = responseSlug === "partiellement" && (!data.description || data.description.trim() === "");
-    console.log(`⚠️  PARTIELLEMENT sans description pour ${index}:`, isPartiellementAndNoDescription);
 
     const isInvalid = isNullResponse || isOuiAndMissingProofOrSource || isPartiellementAndNoDescription;
-    console.log(`🚫 Question ${index} invalide:`, isInvalid);
 
     if (isInvalid) {
-      console.log(`➕ Ajout question invalide ${index} à la liste`);
       acc.push({ index, questionId: data.questionId });
     }
 
@@ -729,7 +732,28 @@ const toggle = (id) => {
     <p class="mt-1 text-gray-600"><span class="font-semibold">Question :</span> {{ findQuestionDetails.nom_question }}</p>
   </div>
 
-  <!-- <pre>{{ responses }}</pre> -->
+  <!-- Section d'affichage des erreurs -->
+  <div v-if="Object.keys(errors).length > 0" class="p-4 bg-red-50 border border-red-200 rounded-lg my-3">
+    <div class="flex items-start gap-3">
+      <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-1">
+        <i class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
+      </div>
+      <div class="flex-1">
+        <h3 class="text-lg font-semibold text-red-800 mb-2">Erreurs de validation</h3>
+        <div class="space-y-2">
+          <div v-for="(errorList, field) in errors" :key="field" class="bg-white border border-red-100 rounded-lg p-3">
+            <!-- <h4 class="font-medium text-red-700 mb-1">{{ field }}</h4> -->
+            <ul class="space-y-1">
+              <li v-for="(error, index) in errorList" :key="index" class="text-sm text-red-600 flex items-start gap-2">
+                <i class="fas fa-circle text-red-400 text-xs mt-1.5"></i>
+                {{ error }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div v-if="!showModalPreview">
     <div class="flex justify-between my-4 items-center">
@@ -740,20 +764,7 @@ const toggle = (id) => {
     <div v-if="!showAlertValidate" class="">
       <div v-if="!isLoadingDataFactuel" class="">
         <div v-if="formDataFactuel.id" class="w-full p-4 font-bold text-center text-white uppercase rounded bg-primary">{{ formDataFactuel.intitule }}</div>
-        <div class="flex items-center justify-between mt-5">
-          <div class="min-w-[250px]">
-            <button class="btn btn-primary" @click="showModal = true">Ajouter membres</button>
-            <div v-if="payload.factuel.comite_members?.length > 0" class="mt-3 space-y-1">
-              <label class="text-lg form-label">Membres</label>
-              <ul class="space-y-2">
-                <li class="text-base text-primary" v-for="(member, index) in payload.factuel?.comite_members" :key="index">
-                  <span class="mr-2"> {{ member.nom }} {{ member.prenom }} - {{ member.contact }} </span>
-                  <button class="btn btn-primary btn-sm" @click="editMember(member, index)">Modifier</button>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
+
         <div>
           <div class="py-5 intro-x overflow-y-scroll" v-if="formDataFactuel.id">
             <div class="space-y-0">
@@ -989,17 +1000,25 @@ const toggle = (id) => {
         <p><span class="text-sm font-bold">Organisation:</span> {{ authUser?.nom }}</p>
       </div>
 
+      <div class="flex items-center justify-between mt-5">
+        <div class="min-w-[250px]">
+          <button class="btn btn-primary" @click="openMemberModal">Ajouter membres</button>
+          <div v-if="payload.factuel.comite_members?.length > 0" class="mt-3 space-y-1">
+            <label class="text-lg form-label">Membres</label>
+            <ul class="space-y-2">
+              <li class="text-base text-primary" v-for="(member, index) in payload.factuel?.comite_members" :key="index">
+                <span class="mr-2"> {{ member.nom }} {{ member.prenom }} - {{ member.contact }} </span>
+                <button class="btn btn-primary btn-sm" @click="editMember(member, index)">Modifier</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <div class="space-y-5">
         <div v-if="errors.factuel" class="my-2 text-danger">{{ getFieldErrors(errors.factuel) }}</div>
-        <div v-if="errors['factuel.comite_members']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.comite_members"]) }}</div>
+        <div v-if="membersError" class="my-2 text-danger">{{ getFieldErrors(membersError) }}</div>
         <div v-if="errors['factuel.response_data']" class="my-2 text-danger">{{ getFieldErrors(errors["factuel.response_data"]) }}</div>
-
-        <div v-if="payload.factuel.comite_members.length > 0" class="mt-3 space-y-1">
-          <label class="form-label">Membres</label>
-          <ul class="space-y-2">
-            <li class="text-base text-primary" v-for="(member, index) in payload.factuel.comite_members" :key="index">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</li>
-          </ul>
-        </div>
 
         <div class="_max-h-[40vh] _h-[40vh] overflow-y-auto">
           <p class="mb-3">Formulaire</p>
@@ -1150,7 +1169,7 @@ const toggle = (id) => {
     <div class="w-full">
       <div class="flex gap-2">
         <button type="button" @click="resetValidation" class="w-full px-2 py-2 my-3 btn btn-outline-secondary">Annuler</button>
-        <VButton label="Valider" class="w-full px-2 py-2 my-3" :loading="isLoading" @click="submitData()" />
+        <VButton label="Valider" class="w-full px-2 py-2 my-3" :loading="isLoading" @click="finalSubmit()" />
       </div>
     </div>
   </div>
@@ -1163,19 +1182,27 @@ const toggle = (id) => {
 
       <ModalBody class="space-y-5">
         <div class="grid grid-cols-1 gap-4">
-          <InputForm label="Nom" v-model="currentMember.nom" />
-          <InputForm label="Prénom" v-model="currentMember.prenom" />
+          <InputForm label="Nom" v-model="currentMember.nom" :control="memberFormErrors.nom && memberFormErrors.nom.join(', ')" />
+          <InputForm label="Prénom" v-model="currentMember.prenom" :control="memberFormErrors.prenom && memberFormErrors.prenom.join(', ')" />
         </div>
         <div class="w-full">
-          <label for="contact" class="form-label">Contact <span class="text-danger">*</span> </label>
-          <input id="contact" pattern="\d*" type="text" required v-model.number="currentMember.contact" class="form-control" placeholder="Contact" />
+          <InputForm
+            label="Contact"
+            type="text"
+            pattern="\d*"
+            placeholder="Contact"
+            v-model="currentMember.contact"
+            :control="memberFormErrors.contact && memberFormErrors.contact.join(', ')"
+            required
+          />
         </div>
       </ModalBody>
     </div>
     <ModalFooter>
       <div class="flex gap-2">
         <button type="button" @click="showModal = false" class="w-full px-2 py-2 my-3 btn btn-outline-secondary">Annuler</button>
-        <button type="button" @click="saveMembers" class="w-full px-2 py-2 my-3 btn btn-primary">Ajouter</button>
+        <button v-if="!isEdit" type="button" @click="addMembers" class="w-full px-2 py-2 my-3 btn btn-outline-primary">Ajouter et continuer</button>
+        <button type="button" @click="saveMembers" class="w-full px-2 py-2 my-3 btn btn-primary">{{ isEdit ? 'Modifier' : 'Ajouter et fermer' }}</button>
       </div>
     </ModalFooter>
   </Modal>
