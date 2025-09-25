@@ -24,7 +24,7 @@
             <div v-if="activeTab === 'json' || activeTab === 'design'" class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
               <button class="btn btn-primary px-3 sm:px-4 py-2 text-sm sm:text-base" @click="saveForm" :disabled="isSaving">
                 <span class="hidden sm:inline" v-if="isSaving">💾 Sauvegarde...</span>
-                <span class="hidden sm:inline" v-else>💾 Sauvegarder commme brouillon</span>
+                <span class="hidden sm:inline" v-else>💾 Sauvegarder comme brouillon</span>
                 <span class="sm:hidden" v-if="isSaving">💾</span>
                 <span class="sm:hidden" v-else>💾</span>
               </button>
@@ -955,7 +955,10 @@ const clearForm = () => {
   newField.label = "";
   newField.value = "";
   newField.options = "";
+  payload.form_data = "";
   toast.success("Formulaire vidé");
+
+  console.log("Formulaire vidé:", form);
 };
 
 const copyJson = async () => {
@@ -1134,6 +1137,9 @@ const clearDraft = () => {
 
 
 const updateFormDataFromBuilder = () => {
+
+  console.log(form)
+  console.log(formJson.value)
   if (form.sections.length > 0 && form.sections.some((section) => section.elements.length > 0)) {
     payload.form_data = formJson.value;
     toast.success("Données du formulaire mises à jour depuis le créateur");

@@ -214,12 +214,11 @@ const routes = [
 
         name: "plan_de_decaissement",
       },
-
-      {
-        path: "tools-perception/:id",
-        name: "ToolsPerception",
-        component: EvaluationPerception,
-      },
+      // {
+      //   path: "tools-perception/:id",
+      //   name: "ToolsPerception",
+      //   component: EvaluationPerception,
+      // },
       {
         path: "create-factuel",
         name: "create_form_factuel",
@@ -416,6 +415,11 @@ const routes = [
     path: "/formulaireFactuel/:code",
     name: "FormulaireFactuel",
     component: FormulaireFactuel,
+  },
+  {
+    path: "/tools-perception/:id",
+    name: "ToolsPerception",
+    component: EvaluationPerception,
   },
 
   {
