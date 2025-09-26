@@ -11,6 +11,7 @@
         <p class="text-sm text-gray-600">
           Manager: <span class="font-medium text-primary">{{ graphiqueData?.projet_manager ?? "" }}</span>
         </p>
+        <button class="btn btn-primary" @click="goToOutcome()">Faire le plan d'action</button>
       </div>
     </div>
     <div class="grid grid-cols-12 gap-6 mt-5">
@@ -245,7 +246,7 @@
     <section class="p-6 bg-white rounded-md shadow-md">
       <h2 class="text-lg font-semibold text-gray-700">Suivi Indicateurs</h2>
       <div class="mt-4 overflow-x-auto">
-        <TabulatorSuiviIndicateur :data="suivis" :years="annees" :isDataLoading="isLoadingDataCadre"/>
+        <TabulatorSuiviIndicateur :data="suivis" :years="annees" :isDataLoading="isLoadingDataCadre" />
         <!-- <TabulatorSuiviIndicateurDetail v-if="suivis.length > 0" :data="suivis" :years="annees" />
         <p v-else>Pas de suivi disponible pour l'instant</p> -->
       </div>
@@ -275,7 +276,6 @@ import AuthService from "@/services/modules/auth.service";
 import ChartJauge from "../../components/news/ChartJauge.vue";
 import Tabulator from "tabulator-tables";
 import { mapGetters, mapActions, mapMutations, mapState } from "vuex";
-
 
 const tabulator = ref();
 const filterStatut = ref(0);
@@ -319,6 +319,10 @@ const initTabulator = () => {
       },
     ],
   });
+};
+
+const goToOutcome = () => {
+  router.push({ name: "composantes_globale" });
 };
 
 const applyFilter = () => {
@@ -417,6 +421,7 @@ function convertDaysToYearsMonthsDays(totalDays) {
   return result.join(", ");
 }
 
+
 const formatterUSD = new Intl.NumberFormat("fr-FR", {
   style: "currency",
   currency: "XOF",
@@ -502,58 +507,60 @@ const loadingOption = ref(true);
 const graphiqueData = ref([]);
 const getStat = function () {
   //console.log(JSON.parse(localStorage.getItem("authenticateUser")).projet.id);
+  console.log(localStorage.getItem("authenticateUser"));
 
-  const ongId = JSON.parse(localStorage.getItem("authenticateUser"))?.projet.id;
-  // route.params.id
-  ProjetService.statistiques(ongId)
-    .then((data) => {
-      graphiqueData.value = data.data.data;
-      initTabulator();
-      if (graphiqueData.value?.sites?.length > 0) {
-        // alert("ok");
-        myIcon.value = L.icon({
-          iconUrl: icon,
-          iconSize: [30, 30],
-          iconAnchor: [22, 94],
-          popupAnchor: [-3, -76],
-          shadowUrl: markerShadow,
-          shadowSize: [60, 30],
-          shadowAnchor: [22, 94],
+  if (localStorage.getItem("authenticateUser")) {
+    const user = JSON.parse(localStorage.getItem("authenticateUser"));
+    const ongId = user?.projet?.id;
+
+    if (ongId) {
+      // route.params.id
+      ProjetService.statistiques(ongId)
+        .then((data) => {
+          graphiqueData.value = data.data.data;
+          initTabulator();
+          // Initialiser l'icône
+          myIcon.value = L.icon({
+            iconUrl: icon,
+            iconSize: [30, 30],
+            iconAnchor: [22, 94],
+            popupAnchor: [-3, -76],
+            shadowUrl: markerShadow,
+            shadowSize: [60, 30],
+            shadowAnchor: [22, 94],
+          });
+
+          // Initialiser la carte
+          initialMap.value = L.map("map", {
+            zoomControl: true,
+            zoom: 1,
+            zoomAnimation: false,
+            fadeAnimation: true,
+            markerZoomAnimation: true,
+          }).setView([6.8041, 2.4152], 6);
+
+          L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          }).addTo(initialMap.value);
+
+          // Ajouter des marqueurs seulement si des sites existent
+          if (graphiqueData.value?.sites?.length > 0) {
+            const markers = L.markerClusterGroup();
+
+            graphiqueData.value.sites.forEach((site) => {
+              const marker = new L.marker([parseFloat(site.latitude), parseFloat(site.longitude)], { icon: myIcon.value });
+              markers.addLayer(marker);
+            });
+
+            initialMap.value.addLayer(markers);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
         });
-
-        // Initialiser la carte
-        initialMap.value = L.map("map", {
-          zoomControl: true,
-          zoom: 1,
-          zoomAnimation: false,
-          fadeAnimation: true,
-          markerZoomAnimation: true,
-        }).setView([6.8041, 2.4152], 6);
-
-        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        }).addTo(initialMap.value);
-
-        // Ajouter des marqueurs individuels
-        L.marker([6.3746, 2.6004], { icon: myIcon.value }).addTo(initialMap.value);
-        L.marker([6.3752, 2.8349], { icon: myIcon.value }).addTo(initialMap.value);
-
-        // Créer un groupe de marqueurs
-        const markers = L.markerClusterGroup();
-
-        // Ajouter des marqueurs à partir de `addressPoints`
-        addressPoints.forEach((element, index) => {
-          const each_marker = new L.marker([element.latitude, element.longitude], { icon: myIcon.value }).bindPopup(`<strong> Hello Bangladesh! </strong> <br> I am a popup number ${index}`);
-          markers.addLayer(each_marker);
-        });
-
-        initialMap.value.addLayer(markers);
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    }
+  }
 };
 
 onMounted(() => {
