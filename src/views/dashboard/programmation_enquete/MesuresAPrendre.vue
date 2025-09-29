@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, computed, reactive, ref } from "vue";
 import SyntheseService from "@/services/modules/synthese.service";
-import RecommandationService from "@/services/modules/recommandation.service";
-import ActionAMenerService from "@/services/modules/action_a_mener.service";
-import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+import RecommandationService from "@/services/modules/enquetes_de_gouvernance/recommandation.service";
+import ActionAMenerService from "@/services/modules/enquetes_de_gouvernance/action_a_mener.service";
+import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { getColorForValue } from "@/utils/findColorIndicator";
@@ -40,8 +40,8 @@ const currentFactuel = ref("");
 const currentPerception = ref("");
 const currentProfileGouvernance = ref("");
 
-const recommandationPayload = reactive({ recommandation: "", evaluationId: idEvaluation });
-const actionPayload = reactive({ action: "", start_at: "", end_at: "", recommandationId: mesuresAPrendre.length ? mesuresAPrendre[0].id : "", indicateurs: [], evaluationId: idEvaluation });
+const recommandationPayload = reactive({ recommandation: "", evaluationId: idEvaluation, indicateurs: [], principes_factuel_de_gouvernance: [], questions_operationnelle: [], principes_de_perception_de_gouvernance: [] });
+const actionPayload = reactive({ action: "", start_at: "", end_at: "", recommandationId: mesuresAPrendre.length ? mesuresAPrendre[0].id : "", indicateurs: [], principes_factuel_de_gouvernance: [], questions_operationnelle: [], principes_de_perception_de_gouvernance: [], evaluationId: idEvaluation });
 
 const openMesureModal = () => {
   showMesureModal.value = true;
@@ -84,6 +84,10 @@ const toggleCollapse = (index) => {
 
 const resetMesureForm = () => {
   recommandationPayload.recommandation = "";
+  recommandationPayload.indicateurs = [];
+  recommandationPayload.questions_operationnelle = [];
+  recommandationPayload.principes_factuel_de_gouvernance = [];
+  recommandationPayload.principes_de_perception_de_gouvernance = [];
   showMesureModal.value = false;
   isCreate.value = true;
   errorsMesure.value = {};
@@ -95,6 +99,9 @@ const resetActionForm = () => {
   actionPayload.end_at = "";
   actionPayload.recommandationId = "";
   actionPayload.indicateurs = [];
+  actionPayload.questions_operationnelle = [];
+  actionPayload.principes_factuel_de_gouvernance = [];
+  actionPayload.principes_de_perception_de_gouvernance = [];
   showActionModal.value = false;
   isCreate.value = true;
   errorsActions.value = {};
@@ -273,6 +280,7 @@ const getStatus = (statut) => {
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
 
 onMounted(async () => {
+  console.log(idEvaluation.value)
   await getMesuresData();
   await getFeuilleDeRouteData();
   //await getDataCollection();

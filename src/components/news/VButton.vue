@@ -7,11 +7,15 @@ const props = defineProps({
     type: String,
     default: "Ajouter",
   },
+  color: {
+    type: String,
+    default: "btn-primary",
+  }
 });
 </script>
 
 <template>
-  <button class="w-full px-2 py-2 my-3 align-top btn btn-primary" type="submit" :disabled="props.loading">
+  <button class="w-full px-2 py-2 my-3 align-top btn" :class=[props.color] type="submit" :disabled="props.loading">
     <span class="text-sm font-semibold" v-if="!props.loading">
       {{ props.label }}
     </span>

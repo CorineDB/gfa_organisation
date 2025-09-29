@@ -84,6 +84,7 @@ import SuiviIndicateur from "../views/dashboard/indicateurs/SuiviIndicateur.vue"
 import DetailSuivi from "../views/dashboard/indicateurs/DetailSuivi.vue";
 import SurveyFormView from "../views/dashboard/SurveyFormView.vue";
 import DetailEvaluationIndividuel from "../views/dashboard/DetailEvaluationIndividuel.vue";
+import DetailSuiviFinancier from "../views/dashboard/finances/DetailSuiviFinancier.vue";
 
 const routes = [
   {
@@ -203,17 +204,21 @@ const routes = [
         name: "finances_suivi",
       },
       {
+        path: "suiviFinancier/:id",
+        name: "Détail du suivi financier",
+        component: DetailSuiviFinancier,
+      },
+      {
         path: "/dashboard/finances/plan-de-decaissement",
         component: plan_de_decaissement,
 
         name: "plan_de_decaissement",
       },
-
-      {
-        path: "tools-perception/:id",
-        name: "ToolsPerception",
-        component: EvaluationPerception,
-      },
+      // {
+      //   path: "tools-perception/:id",
+      //   name: "ToolsPerception",
+      //   component: EvaluationPerception,
+      // },
       {
         path: "create-factuel",
         name: "create_form_factuel",
@@ -410,6 +415,11 @@ const routes = [
     path: "/formulaireFactuel/:code",
     name: "FormulaireFactuel",
     component: FormulaireFactuel,
+  },
+  {
+    path: "/tools-perception/:id",
+    name: "ToolsPerception",
+    component: EvaluationPerception,
   },
 
   {

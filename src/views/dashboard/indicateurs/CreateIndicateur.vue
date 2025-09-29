@@ -57,24 +57,9 @@
           <button v-if="authUserType == 'unitee-de-gestion'" class="text-base btn btn-primary" @click="openCreateModal"><PlusIcon class="mr-1 size-4" />Ajouter</button>
         </div>
 
-        <!-- Data List -->
-        <!-- <ul v-if="!isLoadingData" class="overflow-y-auto max-h-[80vh]">
-          <li v-for="data in filterData" :key="data.id" class="flex items-center justify-between gap-2 px-2 py-2 text-base rounded-md hover:bg-blue-100 list-data">
-            <div class="p-2 form-check">
-              <span class="form-check-label">{{ data.nom }}</span>
-            </div>
-            <div class="flex items-center gap-1 space-x-1 text-white transition-all opacity-0 container-buttons">
-              <button class="p-2 rounded-md bg-primary" @click="handleEdit(data)">
-                <Edit3Icon class="size-6" />
-              </button>
-              <button class="p-2 rounded-md bg-danger" @click="handleDelete(data)">
-                <TrashIcon class="size-5" />
-              </button>
-            </div>
-          </li>
-        </ul> -->
+         
         <LoaderSnipper v-if="isLoadingDataCadre" />
-        <TabulatorCadreMesure v-else :data="cadreRendement" :years="annees" />
+        <TabulatorCadreMesure v-else :data="cadreRendement" :years="annees" @refreshData="getDatasCadre"/>
         <!-- <LoaderSnipper v-else /> -->
 
         <!-- Modal for creating/updating -->

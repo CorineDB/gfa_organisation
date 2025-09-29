@@ -1,17 +1,28 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, getCurrentInstance } from "vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
 import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
-import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
-import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+//import EnqueteDeColleteService from "@/services/modules/enqueteDeCollecte.service";
+//import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+
+import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
+import ResultatSyntheseService from "@/services/modules/enquetes_de_gouvernance/synthese.service";
+
 import { getFieldErrors } from "@/utils/helpers.js";
 import { useRouter, useRoute } from "vue-router";
 import ProgressBar from "../../../components/news/ProgressBar.vue";
 import RankingChart from "./RankingChart.vue";
 import ActionPlan from "./ActionPlan.vue";
+
+//vérifier numéro de téléphone
+const { proxy } = getCurrentInstance();
+
+const isValid = computed(() => {
+  return proxy.$isValidPhoneNumber(participant.phone, "BJ");
+});
 
 const router = useRouter();
 
@@ -66,9 +77,17 @@ const participant = reactive({
   email: "",
   phone: "",
 });
+
+const participantErrors = ref({
+  email: "",
+  phone: "",
+});
+
+const isEditMode = ref(false);
+const editingIndex = ref(-1);
 const createData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.create(payload)
+  await EvaluationGouvernance.create(payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
@@ -87,6 +106,8 @@ const getDatas = async () => {
   await EvaluationService.getSoumissionsEvaluation(idEvaluation)
     .then((result) => {
       datas.value = result.data.data;
+
+     //console.log("getDatas", datas);
 
       if (datas.value.factuel?.comite_members) {
         localStorage.setItem("member", JSON.stringify(datas.value.factuel.comite_members));
@@ -135,7 +156,7 @@ const getEvaluation = async () => {
   await EvaluationService.findEvaluation(idEvaluation)
     .then((result) => {
       statistiques.value = result.data.data;
-      console.log(statistiques.value);
+      console.log("statistiques : ", statistiques.value);
       isLoadingStats.value = false;
     })
     .catch((e) => {
@@ -147,7 +168,7 @@ const getEvaluation = async () => {
 
 const updateData = async () => {
   isLoading.value = true;
-  await EnqueteDeColleteService.update(idSelect.value, payload)
+  await EvaluationGouvernance.update(idSelect.value, payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
@@ -198,8 +219,8 @@ const openFactuelModal = () => {
   }
 };
 
-const goToDetailSoumission = (idSoumission) => {
-  router.push({ name: "DetailSoumission", params: { e: idEvaluation, s: idSoumission } });
+const goToDetailSoumission = (idSoumission, type = "factuel") => {
+  router.push({ name: "DetailSoumission", params: { e: idEvaluation, s: idSoumission }, query: { type: type } });
 };
 
 const goToPageSynthese = () => {
@@ -233,42 +254,138 @@ const sendReminder = async () => {
     });
 };
 
+const editParticipant = (participantData, index) => {
+  isEditMode.value = true;
+  editingIndex.value = index;
+  participant.type_de_contact = participantData.type_de_contact;
+  participant.email = participantData.email || "";
+  participant.phone = participantData.phone || "";
+  participantErrors.value.email = "";
+  participantErrors.value.phone = "";
+};
+
 const addEmail = () => {
-  if (participant.email) {
+  // Réinitialiser l'erreur
+  participantErrors.value.email = "";
+
+  // Validation de l'email
+  if (!participant.email || participant.email.trim() === "") {
+    participantErrors.value.email = "L'adresse email est requise";
+    return;
+  }
+
+  // Validation format email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(participant.email)) {
+    participantErrors.value.email = "Format d'email invalide";
+    return;
+  }
+
+  if (isEditMode.value) {
+    // Mode édition - nettoyer les propriétés non utilisées
+    const cleanParticipant = {
+      type_de_contact: participant.type_de_contact,
+      email: participant.email,
+    };
+    invitationPayload.participants[editingIndex.value] = cleanParticipant;
+    toast.success("Email modifié avec succès");
+    resetEditMode();
+  } else {
+    // Mode ajout
     // Check if an email already exists in the payload
     const isEmailAdded = invitationPayload.participants.some((item) => item.email === participant.email);
 
     if (!isEmailAdded) {
-      // Add the participant to the payload
-      invitationPayload.participants.unshift({ ...participant }); // Use spread to avoid reference issues
-      participant.email = ""; // Clear the email field after adding
+      // Add the participant to the payload - retirer la clé phone
+      const cleanParticipant = {
+        type_de_contact: participant.type_de_contact,
+        email: participant.email,
+      };
+      invitationPayload.participants.unshift(cleanParticipant);
+
+      console.log(invitationPayload.participants);
+      toast.success("Email ajouté avec succès");
     } else {
-      // Show a message if the email is already added
-      toast.info("Adresse email déjà ajoutée");
+      participantErrors.value.email = "Adresse email déjà ajoutée";
+      return;
     }
   }
+
+  participant.email = ""; // Clear the email field after adding/editing
 };
 
 const addPhone = () => {
-  if (participant.phone) {
+  // Réinitialiser l'erreur
+  participantErrors.value.phone = "";
+
+  // Validation du téléphone
+  if (!participant.phone || participant.phone.trim() === "") {
+    participantErrors.value.phone = "Le numéro de téléphone est requis";
+    return;
+  }
+
+  // Check if the phone number is valid
+  if (!isValid.value) {
+    participantErrors.value.phone = "Numéro de téléphone invalide";
+    return;
+  }
+
+  if (isEditMode.value) {
+    // Mode édition - nettoyer les propriétés non utilisées
+    const cleanParticipant = {
+      type_de_contact: participant.type_de_contact,
+      phone: participant.phone,
+    };
+    invitationPayload.participants[editingIndex.value] = cleanParticipant;
+    toast.success("Téléphone modifié avec succès");
+    resetEditMode();
+  } else {
+    // Mode ajout
     // Check if an phone already exists in the payload
     const isPhoneAdded = invitationPayload.participants.some((item) => item.phone === participant.phone);
 
     if (!isPhoneAdded) {
-      // Add the participant to the payload
-      invitationPayload.participants.unshift({ ...participant }); // Use spread to avoid reference issues
-      participant.phone = ""; // Clear the phone field after adding
+      // Add the participant to the payload - retirer la clé email
+      const cleanParticipant = {
+        type_de_contact: participant.type_de_contact,
+        phone: participant.phone,
+      };
+      invitationPayload.participants.unshift(cleanParticipant);
+
+      console.log(invitationPayload.participants);
+
+      toast.success("Téléphone ajouté avec succès");
     } else {
-      // Show a message if the phone is already added
-      toast.info("Numéro de téléphone déja ajouté");
+      participantErrors.value.phone = "Numéro de téléphone déjà ajouté";
+      return;
     }
   }
+
+  participant.phone = ""; // Clear the phone field after adding/editing
+};
+
+const resetEditMode = () => {
+  isEditMode.value = false;
+  editingIndex.value = -1;
+  participant.email = "";
+  participant.phone = "";
+  participant.type_de_contact = options[0].id;
 };
 
 const resetInvitationForm = () => {
-  /* 
-  invitationPayload.participants = [];
-  invitationPayload.nbreParticipants = 0; */
+  resetEditMode(); // Reset edit mode when form is reset
+
+  // Vider les champs du formulaire
+  participant.email = "";
+  participant.phone = "";
+  participant.type_de_contact = options[0].id;
+
+  // Réinitialiser le nombre de participants
+  invitationPayload.nbreParticipants = 0;
+
+  // Réinitialiser les erreurs des champs
+  participantErrors.value.email = "";
+  participantErrors.value.phone = "";
 
   getEvaluation();
   showInvitationModal.value = false;
@@ -285,11 +402,20 @@ const sendInvitation = async () => {
   try {
     await EvaluationService.addParticipantPerception(idEvaluation, invitationPayload);
     toast.success(`Invitation envoye.`);
+
+    // Vider le tableau après envoi réussi
+    invitationPayload.participants = [];
+    invitationPayload.nbreParticipants = 0;
+
     resetInvitationForm();
     errors.value = {};
   } catch (e) {
+    console.log("e", e);
+    console.log("e.response && e.response.status === 422", e.response && e.response.status === 422);
     if (e.response && e.response.status === 422) {
-      errors.value = e.response.data.errors;
+      // Récupérer les erreurs depuis la response
+      errors.value = e.response.data.errors || e.response.data || {};
+      console.log("errors.value", errors.value);
     } else {
       toast.error(getAllErrorMessages(e));
     }
@@ -389,17 +515,8 @@ const currentOrganisation = computed(() => datas.value.find((item) => item.id ==
 const statsOptions = computed(() => statistiques.value.options_de_reponse_stats);
 const organisations = computed(() => datas.value.map((item) => ({ nom: item.nom, id: item.id })));
 const organisationsOptions = computed(() => datas.value.options_de_reponse_stats.map((item) => ({ nom: item.nom, id: item.id })));
-// const currentOptionsPerception = computed(() => {
-//   return statistiques.value.options_de_reponse_stats.find((item) => item.id == currentOrganisationsOptions.value);
-// });
 
 onMounted(async () => {
-  /* await getDatas();
-  if (route.query.ong) {
-    changeCurrentDetailOrganisation(route.query.ong.toString());
-  }
-  getEvaluation(); */
-
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
   getDatas();
   getEvaluation();
@@ -423,27 +540,6 @@ onMounted(async () => {
         </div>
 
         <div class="grid grid-cols-12 gap-6 mt-5">
-          <!-- <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
-            <div class="report-box zoom-in">
-              <div class="p-5 text-center box">
-                <div class="flex items-center justify-between">
-                  <GlobeIcon class="size-10 text-primary" />
-
-                  <div class="mt-2 text-lg font-medium leading-8">Organisations</div>
-                </div>
-                <div class="flex items-center justify-around mt-4">
-                  <div class="flex gap-2 text-lg text-left">
-                    <div class="mt-1 text-primary">
-                      Total:
-                      <span class="font-semibold">
-                        {{ datas.length }}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
           <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
             <div class="report-box zoom-in">
               <div class="p-5 text-center box">
@@ -528,7 +624,7 @@ onMounted(async () => {
       </div>
       <LoaderSnipper v-else />
 
-      <div v-if="statistiques.statut == 1 && statistiques?.formulaire_perception_de_gouvernance " class="col-span-12 mt-8">
+      <div v-if="statistiques.statut == 1 && statistiques?.formulaire_perception_de_gouvernance" class="col-span-12 mt-8">
         <div class="flex items-center h-10 intro-y">
           <h2 class="mr-5 text-lg font-medium truncate">Fiches</h2>
         </div>
@@ -557,27 +653,27 @@ onMounted(async () => {
           </div>
 
           <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2 lg:grid-cols-2">
-            <div @click="goToFactuelSoumissionPage(datas.id)" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques?.formulaire_factuel_de_gouvernance" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation factuel</div>
               </div>
 
               <div class="m-5 text-slate-600 dark:text-slate-500">
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Start At:
-                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.created_at : "Not Defined" }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Démarré le :
+                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel.created_at : "Pas démarré" }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Submitted_at At:
-                  <div class="ml-2 font-bold">{{ datas?.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Not Defined") : "Not Defined" }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Soumis le :
+                  <div class="ml-2 font-bold">{{ datas.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Pas soumis") : "Pas soumis" }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
-                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel.reponses_de_la_collecte.length : 0 }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total questions répondues :
+                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.reponses_de_la_collecte?.length : 0 }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total Membres du comite:
-                  <div class="ml-2 font-bold">{{ datas?.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total membres du comité :
+                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
                 </div>
                 <div class="mt-4">
                   <!-- <pre>{{ datas.factuel.pourcentage_evolution }}</pre> -->
@@ -586,27 +682,11 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <!-- <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400"> -->
-
-              <!-- <div v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" @click.self="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
-                    Details de la soumission
-                    <ExternalLinkIcon class="ml-2 size-5" />
-                  </button>
-
-                  <button v-else class="w-full gap-2 py-[22px]"></button>
-                  <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button>
-                </div>
-                <button v-if="(datas.factuel && datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution >= 100)" @click.self="goToPageSynthese" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
-                  Fiche de synthèse
-                  <ArrowRightIcon class="ml-2 size-5" />
-                </button>
-              </div> -->
+              
 
               <div v-if="datas.factuel && datas.factuel.pourcentage_evolution > 0" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button @click.self="goToDetailSoumission(datas?.factuel?.id)" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button @click.self="goToDetailSoumission(datas.factuel.id, 'factuel')" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Details de la soumission
                     <ExternalLinkIcon class="ml-2 size-5" />
                   </button>
@@ -646,51 +726,49 @@ onMounted(async () => {
               </div>
             </div>
 
-            <div v-if="statistiques?.formulaire_perception_de_gouvernance " class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
+            <div v-if="statistiques.formulaire_de_perception_de_gouvernance" class="relative transition-all duration-500 border-l-4 shadow-2xl box group _bg-white zoom-in border-primary hover:border-secondary">
               <div class="relative m-5 bg-white">
                 <div class="text-[#171a1d] group-hover:text-[#007580] font-medium text-[14px] md:text-[16px] lg:text-[18px] leading-[30px] pt-[10px]">Evaluation de Perception</div>
               </div>
 
               <div class="m-5 text-slate-600 dark:text-slate-500">
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Start At
-                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception.created_at : "Not Defined" }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Démarré le :
+                  <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception.created_at : "Pas démarré" }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total participants:
-                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.length : 0 }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total participants :
+
+                  <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.length : 0 }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total question repondu:
-                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
-                </div>
-                <div class="flex items-center">
-                  <div class="ml-2 font-bold">{{ datas?.perception ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total questions répondues :
+                  <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
                 </div>
 
                 <div class="mt-4">
                   <p>Évolution soumissions</p>
-                  <ProgressBar :percent="datas.perception ? datas.pourcentage_evolution_des_soumissions_de_perception : 0" />
+                  <ProgressBar :percent="datas.perception?.length ? statistiques?.pourcentage_evolution_des_soumissions_de_perception : 0" />
                 </div>
               </div>
 
-              <div v-if="datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception >= 100" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-if="datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception >= 100" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <button @click.self="goToPageMarqueur" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Voir Fiche de synthese
                   <ArrowRightIcon class="ml-2 size-5" />
                 </button>
               </div>
 
-              <div v-else-if="!datas.perception || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+              <div v-else-if="!datas.perception?.length || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="(!datas.perception && statistiques.statut === 0) || (datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-if="(!datas.perception?.length && statistiques.statut === 0) || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Envoyer une invitation
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
 
                   <button v-else class="w-full gap-2 py-[22px]"></button>
                 </div>
-                <button v-if="datas.perception && datas.pourcentage_evolution_des_soumissions_de_perception < 100" @click="sendReminder" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                <button v-if="datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100" @click="sendReminder" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Envoyer un rappel
                   <ExternalLinkIcon class="ml-2 size-5" />
                 </button>
@@ -709,7 +787,7 @@ onMounted(async () => {
 
         <!-- Ranking Section -->
         <div v-if="statistiques.pourcentage_evolution < 100" class="col-span-4 p-6 bg-white rounded-md shadow-lg">
-          <h2 class="mb-4 text-lg font-bold">Ranking of Submissions</h2>
+          <h2 class="mb-4 text-lg font-bold">Classement des soumissions</h2>
 
           <div class="">
             <!-- List rankings dynamically -->
@@ -717,23 +795,21 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div v-else class="flex flex-col justify-start col-span-4 p-4 p-6 overflow-x-auto bg-white rounded-md shadow">
+        <div v-else class="flex flex-col justify-start col-span-4 p-6 overflow-x-auto bg-white rounded-md shadow">
           <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
             <div class="flex">
               <h2 class="mr-5 text-lg font-medium truncate">Actions correctionnelle en cours</h2>
             </div>
-            <div class="flex">
-              <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
-              <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Voir Feuille de route</button>
-            </div>
           </div>
-          <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
+
+          <div class="flex flex-wrap items-center justify-between col-span-12 my-2 intro-y sm:flex-nowrap">
+            <!-- <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary" >Emettre une mesure a prendre</button> -->
+            <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Voir Feuille de route</button>
+            <button @click="goToMesuresAPrendre" class="mr-2 shadow-md btn btn-primary">Emettre une mesure a prendre</button>
+          </div>
           <ActionPlan :actions="feuilleDeRoute" />
-          <!-- <pre>{{ feuilleDeRoute }}</pre> -->
         </div>
       </div>
-
-      <!-- <ActionsMener v-if="idEvaluation && statistiques.statut == 1" :evaluation="idEvaluation" /> -->
     </div>
     <LoaderSnipper v-if="isLoadingData" />
   </div>
@@ -803,25 +879,71 @@ onMounted(async () => {
               </div>
               <form v-show="participant.type_de_contact === options[0].id" @submit.prevent="addEmail">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" label="Adresse email" v-model="participant.email" type="email" />
-                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                  <div class="flex-1">
+                    <InputForm class="" label="Adresse email" v-model="participant.email" type="email" />
+                  </div>
+                  <button class="btn btn-primary">
+                    <PlusIcon v-if="!isEditMode" class="w-4 h-4 mr-3" />
+                    <EditIcon v-else class="w-4 h-4 mr-3" />
+                    {{ isEditMode ? "Modifier" : "Ajouter" }}
+                  </button>
+                  <button v-if="isEditMode" type="button" @click="resetEditMode" class="btn btn-outline-secondary">Annuler</button>
                 </div>
               </form>
               <form v-show="participant.type_de_contact === options[1].id" @submit.prevent="addPhone">
                 <div class="flex items-end gap-4">
-                  <InputForm class="" type="text" label="Numéro de téléphone" pattern="\d{1,8}" maxlength="10" v-model="participant.phone" />
-                  <!-- <div class="">
-                    <label for="Numéro de téléphone" class="form-label">Numéro de téléphone</label>
-                    <input id="Numéro de téléphone" type="number" pattern="\d{1,8}" maxlength="8" required v-model.number="currentPhone" class="form-control" placeholder="Numéro de téléphone" />
-                  </div> -->
-                  <button class="btn btn-primary"><PlusIcon class="w-4 h-4 mr-3" />Ajouter</button>
+                  <div class="flex-1">
+                    <InputForm class="" type="text" label="Numéro de téléphone" maxlength="13" v-model="participant.phone" />
+                    <p class="text-xs text-primary mt-3">Ecrivez le numéro directement sans espace ni de signe + (Ex : 229XXZZIIAA)</p>
+                  </div>
+
+                  <button class="btn btn-primary">
+                    <PlusIcon v-if="!isEditMode" class="w-4 h-4 mr-3" />
+                    <EditIcon v-else class="fas fa-save w-4 h-4 mr-3" />
+                    {{ isEditMode ? "Modifier" : "Ajouter" }}
+                  </button>
+                  <button v-if="isEditMode" type="button" @click="resetEditMode" class="btn btn-outline-secondary">Annuler</button>
+                </div>
+                <div class="col-span-12">
+                  <!-- Message de validation avec animation -->
+                  <div class="mt-4 _min-h-[1.5rem]">
+                    <p v-if="isValid" class="flex items-center text-green-600 font-medium text-sm animate-pulse">
+                      <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                      Numéro valide
+                    </p>
+                    <p v-else-if="participant.phone && participant.phone.length > 0" class="flex items-center text-red-500 font-medium text-sm">
+                      <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                      Numéro invalide
+                    </p>
+                  </div>
                 </div>
               </form>
-              <div v-if="errors.participants" class="mt-2 text-danger">{{ getFieldErrors(errors.participants) }}</div>
+
               <div class="flex flex-wrap items-center w-full max-w-full gap-3">
                 <div class="flex items-center justify-between gap-2 px-2 py-1 text-sm font-medium rounded-sm shadow cursor-pointer bg-blue text-primary" v-for="(participant, index) in invitationPayload.participants" :key="index">
                   <span>{{ participant.type_de_contact === "email" ? participant?.email : participant?.phone }}</span>
-                  <button type="button" @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100"><XIcon class="w-4 h-4 text-danger" /></button>
+                  <div class="flex items-center gap-1">
+                    <button type="button" @click="editParticipant(participant, index)" class="p-1 transition-colors hover:bg-blue-100" title="Modifier">
+                      <PencilIcon class="w-4 h-4 text-blue-600" />
+                    </button>
+                    <button type="button" @click="deleteItem(index)" class="p-1 transition-colors hover:bg-red-100" title="Supprimer">
+                      <TrashIcon class="w-4 h-4 text-danger" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Affichage des erreurs -->
+              <div v-if="Object.keys(errors).length > 0" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div v-for="(errorMessages, field) in errors" :key="field" class="mb-2 last:mb-0">
+                  <div v-for="(error, index) in errorMessages" :key="index" class="text-sm text-red-600 flex items-start gap-2">
+                    <i class="fas fa-exclamation-circle text-red-500 mt-0.5 text-xs"></i>
+                    {{ error }}
+                  </div>
                 </div>
               </div>
             </div>

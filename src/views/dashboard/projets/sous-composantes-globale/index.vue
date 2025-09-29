@@ -504,18 +504,18 @@ export default {
           <!-- Other details with iconized section headers -->
           <div class="mt-5 space-y-3 text-gray-600">
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ $h.formatCurrency(item.budgetNational) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.budgetNational ? $h.formatCurrency(item.budgetNational) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
 
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Montant financé: {{ $h.formatCurrency(item.pret == null ? 0 : item.pret) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret ? $h.formatCurrency(item.pret) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
-            <div class="flex items-center text-sm font-medium text-gray-700">
+            <!-- <div class="flex items-center text-sm font-medium text-gray-700">
               <GlobeIcon class="w-4 h-4 mr-2 text-primary" /> Taux d'exécution physique:
               <span class="ml-2 font-semibold text-gray-900">{{ item.tep }}</span>
-            </div>
+            </div> -->
             <div class="flex items-center text-sm font-medium text-gray-700">
               <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut:
               <span v-if="item.statut == -2" class="ml-2 text-gray-900">Non validé</span>
@@ -562,10 +562,10 @@ export default {
         <InputForm v-model="formData.budgetNational" class="col-span-12 mt-4 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
 
-        <InputForm v-model="formData.pret" class="col-span-12 mt-4 no-spin" type="number" required="required" placeHolder="Fond propre" label="Montant financé" />
+        <InputForm v-model="formData.pret" class="col-span-12 mt-4 no-spin" type="number" required="required" placeHolder="Fond propre" label="Subvention" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
 
-        <!-- <pre>{{ formData.composanteId }}</pre> -->
+       
         <div class="flex col-span-12 mt-4">
           <TomSelect
             @change="mettreAjoutOutcome(formData.composanteId)"
@@ -592,14 +592,7 @@ export default {
           </div>
         </div>
 
-        <!-- <div v-if="getMontantRestant" class="flex items-center mt-2 col-span-12">
-          <DollarSignIcon class="w-4 h-4 mr-2" />
-          <div>
-            Montant restant de OutCome : <br />
-            Fond Propre <span class="pr-1 font-bold"> {{ $h.formatCurrency(getMontantRestant.budgetRestant) }}</span> <br />
-            Montant budgétisé : <span class="font-bold"> {{ $h.formatCurrency(getMontantRestant.pretRestant) }}</span>
-          </div>
-        </div> -->
+        
       </ModalBody>
       <ModalFooter>
         <div class="flex items-center justify-center">
@@ -610,7 +603,7 @@ export default {
     </form>
   </Modal>
 
-  <Modal backdrop="static" :show="showDeleteModal" @hidden="showDeleteModal = false">
+  <Modal backdrop="static"  :show="showDeleteModal" @hidden="showDeleteModal = false">
     <ModalBody class="p-0">
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />

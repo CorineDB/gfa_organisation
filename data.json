@@ -1,1 +1,26 @@
-getCleIndicateursDatas  keyIndicateursDatas uniteDeMesureDatas getUniteMesureDatas router.push getSiteDatas
+[
+    {
+        "id": "PrAJaL1KZ0ADkN61X43ovVY7aPKBeE5aL3WjlQ2RdJMpLxgyzmrnwqG98g0lzdm6",
+        "nom": "site a projet 1",
+        "quartier": "HAKOUE",
+        "arrondissement": "AVLO",
+        "commune": "GRAND-POPO",
+        "departement": "MONO",
+        "longitude": "0.000172",
+        "latitude": "0.032616"
+    },
+    {
+        "id": "xLrG2l7Q9Y1qpDyw8oRmVejMBzEPxnbqanbJLavGX2N6r3AKdZ4k7lQ0gkA3nNEj",
+        "nom": "site b projet 1",
+        "quartier": "FITA",
+        "arrondissement": "KPINGNI",
+        "commune": "DASSA-ZOUME",
+        "departement": "COLLINES",
+        "longitude": "-0.018883",
+        "latitude": "0.015621"
+    }
+]
+
+
+fetchProjets
+prepareCoordinatesData

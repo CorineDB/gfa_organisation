@@ -1,0 +1,34 @@
+ALGORITHME : Afficher des coordonnées sur la carte Leaflet
+
+ÉTAPES :
+
+1. PRÉPARATION DES DONNÉES
+   - Créer un tableau de coordonnées avec latitude, longitude et libellé
+   - Structure : [{ lat: number, lng: number, label: string }]
+
+2. FONCTION D'AFFICHAGE DES COORDONNÉES
+   - Créer une fonction qui prend en paramètre le tableau de coordonnées
+   - Vérifier que la carte est initialisée
+   - Parcourir le tableau de coordonnées
+
+3. CRÉATION DES MARQUEURS
+   - Pour chaque coordonnée, créer un marqueur L.marker()
+   - Utiliser l'icône personnalisée existante (myIcon.value)
+   - Positionner le marqueur aux coordonnées [lat, lng]
+
+4. AJOUT DES POPUPS
+   - Associer un popup à chaque marqueur avec bindPopup()
+   - Contenu du popup : afficher les coordonnées et le libellé
+   - Format : "Libellé<br>Lat: X.XXXX<br>Lng: Y.YYYY"
+
+5. AJOUT À LA CARTE
+   - Ajouter chaque marqueur à la carte avec addTo(initialMap.value)
+   - Ou utiliser le système de clustering existant si préféré
+
+6. INTÉGRATION DANS LE COMPOSANT
+   - Appeler la fonction d'affichage après l'initialisation de la carte
+   - Dans la fonction getStat() après la création de la carte
+
+7. GESTION DES ERREURS
+   - Vérifier que les coordonnées sont valides (lat: -90 à 90, lng: -180 à 180)
+   - Gérer le cas où aucune coordonnée n'est fournie

@@ -120,10 +120,9 @@ import { useSimpleMenuStore } from "@/stores/simple-menu";
 import { helper as $h } from "@/utils/helper";
 import TopBar from "@/components/top-bar/Main.vue";
 import MobileMenu from "@/components/mobile-menu/Main.vue";
-import DarkModeSwitcher from "@/components/dark-mode-switcher/Main.vue";
-import MainColorSwitcher from "@/components/main-color-switcher/Main.vue";
 import { linkTo, nestedMenu, enter, leave } from "@/layouts/side-menu";
 import dom from "@left4code/tw-starter/dist/js/dom";
+import AuthService from "@/services/modules/auth.service";
 
 const route = useRoute();
 const router = useRouter();
@@ -144,17 +143,39 @@ watch(
   }
 );
 
+const users = reactive();
+
+function getUser() {
+  AuthService.getCurrentUser()
+    .then((data) => {
+      users.value = data.data.data;
+
+      localStorage.setItem("authenticateUser", JSON.stringify(users.value));
+
+      const usersInfo = JSON.parse(localStorage.getItem("authenticateUser"));
+
+      if (usersInfo) {
+        nomProgramme.value = usersInfo.programme.nom;
+
+        let permissions = usersInfo.role[0].permissions;
+
+        sideMenuStore.setTabPermission(permissions);
+
+        sideMenuStore.addToMenuIfPermissionGranted();
+
+        currentUsers.nom = usersInfo.nom;
+
+        currentUsers.role = usersInfo.role[0].nom;
+      }
+    })
+    .catch((e) => {
+      // disabled()
+      alert(e);
+    });
+}
+
 onMounted(() => {
-  // simpleMenuStore.setMenu;
-  console.log("permissions", usersInfo.roles);
-
-  if (usersInfo) {
-    let permissions = usersInfo.role[0].permissions;
-
-    simpleMenuStore.setTabPermission(permissions);
-
-    simpleMenuStore.addToMenuIfPermissionGranted();
-  }
+  getUser();
 
   dom("body").removeClass("error-page").removeClass("login").addClass("main");
   formattedMenu.value = $h.toRaw(simpleMenu.value);

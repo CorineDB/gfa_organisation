@@ -58,16 +58,7 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
       pageName: "suivi_indicateur",
       title: "Suivi Indicateurs",
     },
-    // audit: {
-    //   icon: "ServerIcon",
-    //   pageName: "audit",
-    //   title: "Audit",
-    // },
-    // rapport: {
-    //   icon: "ArchiveIcon",
-    //   pageName: "rapport",
-    //   title: "Rapport",
-    // },
+
     gestionFinancier: {
       icon: "DollarSignIcon",
       title: "Gestion Financière",
@@ -83,27 +74,7 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
       pageName: "plan_de_decaissement",
       title: "Plan de Décaissement",
     },
-    // organisation: {
-    //   icon: "CpuIcon",
-    //   pageName: "Ongs",
-    //   title: "Organisations",
-    // },
-    // outils: {
-    //   icon: "FolderIcon",
-    //   pageName: "projets",
-    //   title: "Outils de collecte",
-    //   subMenu: [],
-    // },
-    // creationFactuel: {
-    //   icon: "SettingsIcon",
-    //   pageName: "create_form_factuel",
-    //   title: "Création Formulaire Factuel",
-    // },
-    // creationPerception: {
-    //   icon: "SettingsIcon",
-    //   pageName: "create_form_perception",
-    //   title: "Création Formulaire de Perception",
-    // },
+
     programmationEnquete: {
       icon: "BarChart2Icon",
       pageName: "Programmation_enquete",
@@ -133,87 +104,7 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
       title: "Rôles",
     },
 
-    // sourceVerification: {
-    //   icon: "BarChart2Icon",
-    //   pageName: "sources_verification",
-    //   title: "Sources de vérification",
-    // },
-    // fonds: {
-    //   icon: "BarChart2Icon",
-    //   pageName: "fonds",
-    //   title: "Fonds",
-    // },
-    // roles: {
-    //   icon: "BarChart2Icon",
-    //   pageName: "Roles",
-    //   title: "Rôles et permissions",
-    // },
-    menu: [
-      // {
-      //   icon: "GridIcon",
-      //   pageName:"DashboardGfa",
-      //   title: "Dashboard GFA",
-      // },
-      // {
-      //   icon: "FolderIcon",
-      //   title: "Gestion Financière",
-      //   subMenu: [
-      //     {
-      //       icon: "BarChart2Icon",
-      //       pageName: "plan_de_decaissement",
-      //       title: "Plan De decaissement",
-      //     },
-      //     {
-      //       icon: "BarChart2Icon",
-      //       pageName: "finances_suivi",
-      //       title: "Suivi financier",
-      //     },
-      //   ],
-      // },
-      // {
-      //   icon: "FolderIcon",
-      //   title: "Cadre Mesure Rendement",
-      //   subMenu: [
-      //     {
-      //       icon: "BarChart2Icon",
-      //       pageName: "indicateur",
-      //       title: "Indicateurs",
-      //     },
-      //     {
-      //       icon: "BarChart2Icon",
-      //       pageName: "suivi_indicateur",
-      //       title: "Suivis Indicateur",
-      //     },
-      //   ],
-      // },
-      // {
-      //   icon: "BarChart2Icon",
-      //   pageName: "Programmation_enquete",
-      //   title: "Évaluations & Résulats",
-      // },
-      // {
-      //   icon: "BarChart2Icon",
-      //   pageName: "EnqueteIndividuel",
-      //   title: "Enquête personnalisé",
-      // },
-      // {
-      //   icon: "UsersIcon",
-      //   pageName: "personnel",
-      //   title: "Personnel",
-      //   subMenu: [
-      //     {
-      //       icon: "UsersIcon",
-      //       pageName: "Utilisateur",
-      //       title: "Membres",
-      //     },
-      //     {
-      //       icon: "KeyIcon",
-      //       pageName: "Roles",
-      //       title: "Roles",
-      //     },
-      //   ],
-      // },
-    ],
+    menu: [],
   }),
   actions: {
     setTabPermission(newTabPermission) {
@@ -226,6 +117,7 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
 
       this.menu.push(this.dashboard);
       if (this.tabPermission.some((permission) => permission.slug === "voir-un-projet" || permission.slug === "voir-ptab" || permission.slug === "voir-un-outcome" || permission.slug === "voir-un-output" || permission.slug === "voir-une-activite" || permission.slug === "voir-une-tache") && haveProject !== null) {
+        this.menu.push(this.dashboard);
         this.menu.push(this.projets);
         this.projets.subMenu = [];
         if (this.tabPermission.some((permission) => permission.slug === "voir-ptab")) {
@@ -247,51 +139,29 @@ export const useSimpleMenuStore = defineStore("simpleMenu", {
         if (this.tabPermission.some((permission) => permission.slug === "voir-une-tache")) {
           this.projets.subMenu.push(this.tache);
         }
-      }
 
-      if (this.tabPermission.some((permission) => permission.slug === "voir-un-indicateur" || permission.slug === "voir-suivi-indicateur")) {
-        this.menu.push(this.cadreMesureRendements);
-        this.cadreMesureRendements.subMenu = [];
-        if (this.tabPermission.some((permission) => permission.slug === "voir-un-indicateur")) {
-          this.cadreMesureRendements.subMenu.push(this.indicateurs);
+        if (this.tabPermission.some((permission) => permission.slug === "voir-un-indicateur" || permission.slug === "voir-suivi-indicateur")) {
+          this.menu.push(this.cadreMesureRendements);
+          this.cadreMesureRendements.subMenu = [];
+          if (this.tabPermission.some((permission) => permission.slug === "voir-un-indicateur")) {
+            this.cadreMesureRendements.subMenu.push(this.indicateurs);
+          }
+          if (this.tabPermission.some((permission) => permission.slug === "voir-un-suivi-indicateur")) {
+            this.cadreMesureRendements.subMenu.push(this.suiviIndicateurs);
+          }
         }
-        if (this.tabPermission.some((permission) => permission.slug === "voir-un-suivi-indicateur")) {
-          this.cadreMesureRendements.subMenu.push(this.suiviIndicateurs);
-        }
-      }
 
-      // if (this.tabPermission.some((permission) => permission.slug === "voir-un-audit")) {
-      //   this.menu.push(this.audit);
-      // }
-      // if (this.tabPermission.some((permission) => permission.slug === "voir-un-rapport")) {
-      //   this.menu.push(this.rapport);
-      // }
-
-      if (this.tabPermission.some((permission) => permission.slug === "voir-un-suivi-financier" || permission.slug === "voir-un-plan-de-decaissement")) {
-        this.menu.push(this.gestionFinancier);
-        this.gestionFinancier.subMenu = [];
-        if (this.tabPermission.some((permission) => permission.slug === "voir-un-suivi-financier")) {
-          this.gestionFinancier.subMenu.push(this.suiviFinancier);
-        }
-        if (this.tabPermission.some((permission) => permission.slug === "voir-un-plan-de-decaissement")) {
-          this.gestionFinancier.subMenu.push(this.planDecaissement);
+        if (this.tabPermission.some((permission) => permission.slug === "voir-un-suivi-financier" || permission.slug === "voir-un-plan-de-decaissement")) {
+          this.menu.push(this.gestionFinancier);
+          this.gestionFinancier.subMenu = [];
+          if (this.tabPermission.some((permission) => permission.slug === "voir-un-suivi-financier")) {
+            this.gestionFinancier.subMenu.push(this.suiviFinancier);
+          }
+          if (this.tabPermission.some((permission) => permission.slug === "voir-un-plan-de-decaissement")) {
+            this.gestionFinancier.subMenu.push(this.planDecaissement);
+          }
         }
       }
-
-      // if (this.tabPermission.some((permission) => permission.slug === "voir-une-organisation")) {
-      //   this.menu.push(this.organisation);
-      // }
-
-      // if (this.tabPermission.some((permission) => permission.slug === "voir-formulaire-factuel")) {
-      //   this.menu.push(this.outils);
-      //   this.outils.subMenu = [];
-      //   if (this.tabPermission.some((permission) => permission.slug === "voir-formulaire-factuel")) {
-      //     this.outils.subMenu.push(this.creationFactuel);
-      //   }
-      //   if (this.tabPermission.some((permission) => permission.slug === "voir-formulaire-factuel")) {
-      //     this.outils.subMenu.push(this.creationPerception);
-      //   }
-      // }
 
       if (this.tabPermission.some((permission) => permission.slug === "voir-resultats-evaluation")) {
         this.menu.push(this.programmationEnquete);

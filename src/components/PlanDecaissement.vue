@@ -55,6 +55,7 @@ export default {
       showModal: false,
       isUpdate: false,
       isLoading: false,
+      years: [2024, 2025, 2026],
       formData: {
         annee: "",
         trimestre: "",
@@ -91,7 +92,6 @@ export default {
     obtenirDate(annee) {
       // Convertir l'année en chaîne et concaténer avec "-01-01"
       let myDate = `${annee}-01-01`;
-      //console.log("myDate", myDate);
 
       const date = new Date(myDate); // Exemple de date
       const dateISO = date.toISOString().split("T")[0];
@@ -104,9 +104,6 @@ export default {
     text() {},
     onPageChanged(newPage) {
       this.currentPage = newPage;
-      //console.log("Page actuelle :", this.currentPage);
-      // Charger les données pour la page actuelle
-      // this.loadDataForPage(newPage);
     },
     onItemsPerPageChanged(itemsPerPage) {
       this.itemsPerPage = itemsPerPage;
@@ -136,7 +133,7 @@ export default {
     verifyPermission,
     supprimerPlanDeDecaissement(data) {
       this.showDeleteModal = true;
-      //console.log("this.planDeDecaissementId", this.planDeDecaissementId);
+
       this.planDeDecaissementId = data.id;
     },
     deleteplanDeDecaissement() {
@@ -152,17 +149,16 @@ export default {
           }, 100);
         })
         .catch((error) => {
-          //console.log("error", error);
           this.deleteLoader = false;
           toast.error("Erreur lors de la suppression");
         });
     },
     modifierPlanDeDecaissement(data) {
       this.messageErreur = {};
-      //console.log(data);
+
       this.labels = "Modifier";
       this.showModal = true;
-      //console.log("showModal", this.showModal);
+
       this.update = true;
 
       this.formData.pret = data.pret ?? "";
@@ -170,14 +166,8 @@ export default {
       this.formData.budgetNational = data.budgetNational;
       this.formData.trimestre = data.trimestre.toString();
 
-      //console.log("data.annee", data.annee);
-
       this.formData.annee = data.annee;
       this.planDeDecaissementId = data.id;
-
-      //console.log("planDeDecaissementId", this.planDeDecaissementId);
-
-      //console.log("this.formData", this.formData);
     },
     addPlanDeDecaissement() {
       this.showModal = true;
@@ -186,13 +176,6 @@ export default {
       this.labels = "Ajouter";
     },
     sendForm() {
-      // let oldDate = this.formData.annee;
-
-      // if (this.formData.annee) {
-      //   const dateObj = new Date(this.formData.annee); // Convertir la chaîne en objet Date
-      //   this.formData.annee = dateObj.getFullYear(); // Extraire l'année
-      // }
-
       if (this.update) {
         PlanDeCaissement.update(this.planDeDecaissementId, this.formData)
           .then((response) => {
@@ -202,16 +185,14 @@ export default {
               this.showModal = false;
               toast.success("Modification éffectuée");
               this.getListePlanDeDecaissement(this.formData.activiteId);
-              // this.formData.projetId = this.projetId;
 
               this.clearObjectValues(this.formData);
               this.getListePlanDeDecaissement();
-              //this.sendRequest = false;
             }
           })
           .catch((error) => {
             this.formData.annee = new Date(oldDate).toISOString().split("T")[0];
-            //console.log(error);
+
             this.isLoading = false;
             if (error.response && error.response.data && error.response.data.errors) {
               this.messageErreur = error.response.data.errors;
@@ -219,7 +200,6 @@ export default {
               Object.keys(this.messageErreur).forEach((key) => {
                 this.messageErreur[key] = $h.extractContentFromArray(this.messageErreur[key]);
               });
-              toast.error("Une erreur s'est produite.Vérifier le formulaire de soumission");
             } else {
               toast.error(error.message);
               //
@@ -231,23 +211,9 @@ export default {
         this.formData.budgetNational = parseInt(this.formData.budgetNational);
         this.formData.pret = parseInt(this.formData.pret);
 
-        console.log("this.formData.annee", this.formData.annee);
-
-        // if (this.formData.annee) {
-        //   const dateObj = new Date(this.formData.annee); // Convertir la chaîne en objet Date
-        //   this.formData.annee = dateObj.getFullYear(); // Extraire l'année
-        // }
-
-        // console.log("this.formData.annee", this.formData.annee);
-
-        // //console.log("this.activiteId", this.activiteId);
-
         PlanDeCaissement.create(this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
-              //console.log("this.formData.activiteId", this.formData.activiteId);
-              //this.activiteIdLocal = this.formData.activiteId;
-
               this.getListePlanDeDecaissement(this.formData.activiteId);
               this.isLoading = false;
               toast.success("Ajout éffectué");
@@ -259,11 +225,11 @@ export default {
             }
           })
           .catch((error) => {
-            //console.log("error", error)
-
             this.isLoading = false;
 
-            toast.error(error.message);
+            console.log("error", error);
+
+            toast.error(error.response.data.message);
 
             if (error.response && error.response.data && error.response.data.errors) {
               this.messageErreur = error.response.data.errors;
@@ -272,7 +238,9 @@ export default {
                 this.messageErreur[key] = $h.extractContentFromArray(this.messageErreur[key]);
               });
 
-              if (error.response.data.message !== "") toast.error(error.response.data.message);
+              for (let item in this.messageErreur) {
+                toast.error(this.messageErreur[item]);
+              }
             } else {
               toast.error(error.message);
             }
@@ -282,17 +250,11 @@ export default {
     getListePlanDeDecaissement(id) {
       ActiviteService.plansDeDecaissement(id)
         .then((data) => {
-          //console.log(data.data.data);
           this.planDeDecaissement = data.data.data;
         })
-        .catch((error) => {
-          //console.log(error);
-        });
+        .catch((error) => {});
     },
 
-    // getListeplanDeDecaissement(data) {
-    //   this.planDeDecaissement = data.composantes;
-    // },
     filter() {},
   },
   watch: {
@@ -330,10 +292,7 @@ export default {
       </div>
     </div>
   </div>
-  <!-- <pre>{{isLoadingData}}</pre>
-v-if="!isLoadingData"
-v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
-  <!-- <pre>{{ planDeDecaissement }}</pre> -->
+
   <div class="grid grid-cols-12 gap-6 mt-5">
     <NoRecordsMessage class="col-span-12" v-if="!planDeDecaissement.length" title="Aucun plan de décaissement disponible" description="Il semble qu'il n'y ait pas de plan de décaissement à afficher. Veuillez ajouter des suivis financiers aux différentes activités." />
 
@@ -342,18 +301,11 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
         <!-- En-tête avec sigle et titre -->
         <div class="relative flex items-start pt-5">
           <div class="relative flex flex-col items-center w-full pt-5 lg:flex-row lg:items-start">
-            <!-- Circle with initial or image -->
-            <!-- <div class="flex items-center justify-center w-[90px] h-[90px] text-white rounded-full shadow-md bg-primary flex-shrink-0">
-              {{ item.annee }}
-            </div> -->
             <!-- Item details -->
             <div class="w-full">
               <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0 flex-1">
                 <a href="" class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary _truncate text-center lg:text-left"> {{ item.activite.nom }}</a>
               </div>
-              <!-- <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0 flex-1">
-                <a href="" class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary _truncate text-center lg:text-left"> {{ item.annee }}</a>
-              </div> -->
             </div>
           </div>
           <!-- Dropdown for actions -->
@@ -372,18 +324,15 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
 
         <!-- Description section with distinct styling -->
         <div class="mt-5 text-center lg:text-left">
-          <!-- <p class="mb-3 text-lg font-semibold text-primary">Description</p>
-          <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description == null ? "Aucune description" : item.description }}</p> -->
-
           <!-- Other details with iconized section headers -->
           <div class="mt-5 space-y-3 text-gray-600">
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ $h.formatCurrency(item.budgetNational) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.pret ? $h.formatCurrency(item.budgetNational) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
 
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Montant financé: {{ $h.formatCurrency(item.pret) }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret ? $h.formatCurrency(item.pret) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
             <div class="flex items-center">
@@ -438,6 +387,16 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
           </TomSelect>
         </div>
 
+        <div class="col-span-12 mt-3">
+          <label class="form-label">Saisissez l'année de décaissement</label>
+          <TomSelect v-model="formData.annee" :options="{ placeholder: 'Selectionez  l\'année de décaissement' }" class="w-full">
+            <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
+          </TomSelect>
+        </div>
+        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur?.annee">
+          {{ messageErreur.annee }}
+        </p>
+
         <div v-if="!update" class="flex col-span-12 mt-4">
           <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Trimestre</label>
           <TomSelect
@@ -459,21 +418,17 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
 
         <!-- <InputForm v-model="formData.annee" class="col-span-12" type="date" required="required" placeHolder="Annee de base" label="Année de base" /> -->
 
-        <InputForm v-model="formData.annee" :min="2000" class="col-span-12" type="number" :required="true" placeHolder="Saisissez l'année" label="Saisissez l'année de décaissement" />
-        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.annee">{{ messageErreur.annee }}</p>
-
         <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
 
-        <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Montant financé tred" />
+        <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
 
-        <!-- <pre>{{ getPlageActivites }}</pre> -->
         <div class="col-span-12" v-if="getPlageActivites">
           <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivites.durees" :key="t">
             <ClockIcon class="w-4 h-4 mr-2" />
             <div>
-              Plage de date {{ getPlageActivites.durees.length + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(getPlageActivites.durees[getPlageActivites.durees.length - 1].debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageActivites.durees[getPlageActivites.durees.length - 1].fin) }}</span>
+              Plage de date {{ t + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(plage.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(plage.fin) }}</span>
             </div>
           </div>
         </div>
@@ -492,7 +447,7 @@ v-if="verifyPermission('voir-un-plan-de-decaissement')" -->
       <div class="p-5 text-center">
         <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl">Etes vous sûr?</div>
-        <div class="mt-2 text-slate-500">Voulez vous supprimer l'organisation ? <br />Cette action ne peut être annulé</div>
+        <div class="mt-2 text-slate-500">Voulez vous supprimer le plan de decaissement ? <br />Cette action ne peut être annulé</div>
       </div>
       <div class="flex gap-2 px-5 pb-8 text-center">
         <button type="button" @click="showDeleteModal = false" class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>

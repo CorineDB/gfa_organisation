@@ -26,28 +26,51 @@ const ApiService = {
     });
   },
 
-  post(resource, params) {
+  post(resource, params , config = {}) {
     return new Promise(async (resolve, reject) => {
-      const contentType = determineContentType(params);
+       
 
-      const headers = {
-        Accept: "application/json",
-        "Content-Type": contentType,
-      };
+      let headers = { Accept: "application/json" };
 
-      const requestConfig = {
-        headers,
-      };
+      console.log("Config dans ApiService.post:", config.headers);
+
+      // Étape 2 : Corriger pour respecter FormData
+      if (config.headers) {
+        
+        // Si config.headers existe ET c'est FormData avec preserveFormData
+        if (config.preserveFormData && params instanceof FormData) {
+           
+          // Pour FormData, on ne veut PAS de Content-Type du tout
+          headers = { ...headers };
+          // Forcer l'absence de Content-Type pour FormData
+          delete headers['Content-Type'];
+        } else {
+         
+          // Merger normalement pour JSON ou autres cas
+          headers = { ...headers, ...config.headers };
+        }
+      } else {
+        
+        // Logique originale quand pas de config.headers
+        const contentType = determineContentType(params);
+         
+        if (contentType) {
+          headers["Content-Type"] = contentType;
+        }
+      }
+
+      
+
+      const requestConfig = { ...config, headers };
+      // Nettoyer le flag preserveFormData avant envoi
+      delete requestConfig.preserveFormData;
+
+      
 
       await httpClient
         .post(`${resource}`, params, requestConfig)
-        .then((response, status) => {
-          resolve(response, status);
-        })
-        .catch((response, status) => {
-          console.log("echec");
-          reject(response, status);
-        });
+        .then((response) => resolve(response))
+        .catch((error) => reject(error));
     });
   },
 

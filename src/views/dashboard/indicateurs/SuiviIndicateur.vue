@@ -2,7 +2,7 @@
   <div>
     <h2 class="mt-10 text-lg font-medium intro-y">Suivi Indicateurs</h2>
     <LoaderSnipper v-if="isLoadingDataCadre" />
-    <TabulatorSuiviIndicateur v-else :data="suivis" :years="annees" />
+    <TabulatorSuiviIndicateur v-else :data="suivis" :years="annees" :isDataLoading="isLoadingDataCadre"/>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ import IndicateursService from "@/services/modules/indicateur.service";
 import AuthService from "@/services/modules/auth.service";
 import { toast } from "vue3-toastify";
 import { computed } from "vue";
-import TabulatorSuiviIndicateur from "../../../components/TabulatorSuiviIndicateur.vue";
+import TabulatorSuiviIndicateur from "@/components/TabulatorSuiviIndicateur.vue";
 
 const suivis = ref([]);
 const isLoadingDataCadre = ref(false);

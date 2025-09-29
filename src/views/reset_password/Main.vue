@@ -125,12 +125,12 @@ const ressetPassword = async () => {
     chargement.value = true;
     try {
       const result = await resetPassword.create(payload);
-      if (result.data.statut == "success") {
-        console.log("Season 1");
+      toast.success("Mot de passe modifier veuillez vous connecter");
+      chargement.value = false;
+      setTimeout(() => {
         router.push({ name: "login" });
-        chargement.value = false;
-        toast.success("Mot de passe modifier veuillez vous connecter");
-      }
+      }, 100);
+
       // showFormSuccess.value = true;
       // } else {
       //   console.log("Season 2");

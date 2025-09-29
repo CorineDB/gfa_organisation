@@ -32,6 +32,9 @@ const SuiviFinanciersService = {
   filtre(params) {
     return ApiService.post("gfa/suiviFinanciers/filtres", params);
   },
+  getSuiviByActivite(slug, params) {
+    return ApiService.post(`gfa/activites/${slug}/suivis-financier`, params);
+  },
 };
 
 export default SuiviFinanciersService;

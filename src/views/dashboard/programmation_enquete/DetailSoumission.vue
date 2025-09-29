@@ -3,7 +3,8 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
-import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+//import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
+import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
 import { computed } from "vue";
 
@@ -11,15 +12,16 @@ const route = useRoute();
 const router = useRouter();
 const idEvaluation = route.params.e;
 const idSoumission = route.params.s;
+const type = route.query.type;
 const isLoading = ref(true);
 const soumission = ref({});
 const filterSoumission = ref([]);
 
 const getSoumission = async () => {
-  await EvaluationService.getOneSoumissionsEvaluation(idEvaluation, idSoumission)
+  await EvaluationService.getOneSoumissionsEvaluation(idEvaluation, idSoumission, type)
     .then((result) => {
       soumission.value = result.data.data;
-      filterSoumission.value = soumission.value?.formulaire_de_gouvernance?.categories_de_gouvernance;
+      filterSoumission.value = soumission.value?.categories_de_gouvernance;
       isLoading.value = false;
     })
     .catch((e) => {
@@ -38,7 +40,7 @@ const goBack = () => {
   });
 };
 
-const filterOptions = computed(() => soumission.value?.formulaire_de_gouvernance?.options_de_reponse);
+const filterOptions = computed(() => soumission.value?.options_de_reponse);
 
 onMounted(() => getSoumission());
 </script>
@@ -50,7 +52,7 @@ onMounted(() => getSoumission());
         <button class="btn btn-primary" @click="goBack">Retour <CornerDownLeftIcon class="w-4 h-4 ml-2" /></button>
       </div>
 
-      <table v-if="soumission?.type == 'factuel'" class="w-full my-10 border-collapse table-auto border-slate-500" cellpadding="10" cellspacing="0">
+      <table v-if="type == 'factuel'" class="w-full my-10 border-collapse table-auto border-slate-500" cellpadding="10" cellspacing="0">
         <thead class="text-white bg-blue-900">
           <tr>
             <th class="py-3 border border-slate-900">Principes</th>
@@ -105,6 +107,8 @@ onMounted(() => getSoumission());
                         </ul> -->
                       </div>
                     </td>
+
+                    
                   </tr>
                 </template>
               </template>
