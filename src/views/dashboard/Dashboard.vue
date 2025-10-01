@@ -123,29 +123,7 @@
         </div>
       </div>
 
-      <!-- <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
-        <div class="report-box zoom-in">
-          <div class="p-5 text-center box">
-            <div class="flex items-center justify-between">
-              <PercentIcon class="size-10 text-warning" />
-              <div class="mt-2 text-lg font-medium leading-8">Évolution</div>
-            </div>
-            <div class="flex items-center justify-around mt-4">
-              <div class="flex gap-2 text-lg text-left">
-                <div class="mt-1 text-primary">
-                  TEP:
-                  <span class="font-semibold"> {{ graphiqueData?.tep ?? 0 }} % </span>
-                </div>
-                <div class="w-px h-8 bg-slate-400"></div>
-                <div class="mt-1 text-primary">
-                  TEF:
-                  <span class="font-semibold"> {{ graphiqueData?.tef ?? 0 }} % </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
+      
     </div>
 
     <!-- Content Grid -->

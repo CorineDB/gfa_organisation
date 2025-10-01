@@ -23,9 +23,6 @@
 
     <Breadcrumb />
 
-
-   
-
     <!-- BEGIN: Account Menu -->
 
     <Dropdown class="w-8 h-8 intro-x">
@@ -103,7 +100,7 @@ onMounted(() => {
 
   if (usersInfo) {
     // usersProfileImage.value = API_BASE_URL + usersInfo.users.profil
-     currentUsers.nom = usersInfo.nom
+    currentUsers.nom = usersInfo.nom;
     // currentUsers.nom = "test";
     // currentUsers.prenom = usersInfo.users.prenom
     currentUsers.role = usersInfo.role[0].nom;
@@ -129,28 +126,20 @@ const logout = () => {
 
   AuthentificationService.logout()
     .then(() => {
-      // localStorage.removeItem("bsdInfo");
-      // localStorage.removeItem("access_token");
-      // localStorage.removeItem("authenticateUser");
       store.resetInfo();
       message.type = "success";
       message.message = "Vous êtes déconnecté";
       successNotificationToggle();
-      //toast success
-      // setTimeout(() => {
-      //   router.push("/");
-      // }, 100);
     })
     .catch((error) => {
       setTimeout(() => {
         router.push("/");
       }, 100);
-      if (error.response) {
-        const message = error.response.data.message;
-        // message.type = "erreur";
-        // message.message = message;
-        // successNotificationToggle();
-      }
+      console.log(error);
+
+      // Afficher le message d'erreur du serveur
+      const errorMessage = error.response?.data?.message || "Erreur de déconnexion";
+      toast.error(errorMessage);
     });
 };
 

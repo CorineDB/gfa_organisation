@@ -252,17 +252,7 @@ export default {
     getListeProjet() {
       this.isLoadingOutcome = true;
 
-      // ProjetService.get()
-      //   .then((data) => {
-      //     this.projets = data.data.data;
-      //     this.composants = data.data.data.composantes;
-      //     this.formData.projetId = data.data.data.id;
-
-      //     console.log(data.data.data.id);
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
+      
 
       ProjetService.get()
         .then((data) => {
@@ -323,22 +313,22 @@ export default {
   <LoaderSnipper v-if="isLoadingOutcome" />
   <div v-if="!isLoadingOutcome" class="grid grid-cols-12 gap-6 mt-5">
     <NoRecordsMessage class="col-span-12" v-if="!paginatedAndFilteredData.length" title="Aucun outCome trouvée" description="Il semble qu'il n'y ait pas d'outComes à afficher. Veuillez en créer un. " />
-    <div v-for="(item, index) in paginatedAndFilteredData" :key="index" class="col-span-12 p-4 md:col-span-6 xl:col-span-4">
-      <div v-if="verifyPermission('voir-un-outcome')" class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
+    <div v-for="(item, index) in paginatedAndFilteredData" :key="index" class="col-span-12 p-2 sm:p-4 sm:col-span-6 lg:col-span-4 _xl:col-span-3">
+      <div v-if="verifyPermission('voir-un-outcome')" class="p-3 sm:p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
         <!-- En-tête avec sigle et titre -->
-        <div class="relative flex items-start pt-5">
-          <div class="relative flex flex-col items-center w-full pt-5 lg:flex-row lg:items-start">
+        <div class="relative flex items-start pt-2 sm:pt-5">
+          <div class="relative flex flex-col items-center w-full pt-2 sm:pt-5 md:flex-row md:items-start">
             <!-- Circle with initial or image -->
-            <div class="flex items-center justify-center w-[90px] h-[90px] text-white rounded-full shadow-md bg-primary flex-shrink-0">
+            <div class="flex items-center justify-center w-16 h-16 sm:w-[70px] sm:h-[70px] md:w-[90px] md:h-[90px] text-sm sm:text-base text-white rounded-full shadow-md bg-primary flex-shrink-0">
               {{ item.codePta }}
             </div>
             <!-- Item details -->
-            <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0 flex-1">
-              <a href="" class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary _truncate text-center lg:text-left"> {{ item.nom }}</a>
+            <div class="mt-2 sm:mt-3 text-center md:ml-4 md:text-left md:mt-0 flex-1">
+              <a href="" class="text-sm sm:text-lg font-semibold text-gray-800 transition-colors hover:text-primary _truncate text-center md:text-left block"> {{ item.nom }} </a>
             </div>
           </div>
           <!-- Dropdown for actions -->
-          <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
+          <Dropdown class="absolute top-0 right-0 mt-1 sm:mt-2 mr-1 sm:mr-2">
             <DropdownToggle tag="a" class="block w-5 h-5 cursor-pointer">
               <MoreVerticalIcon class="w-5 h-5 text-gray-400 transition-colors hover:text-gray-600" />
             </DropdownToggle>
@@ -352,29 +342,46 @@ export default {
         </div>
 
         <!-- Description section with distinct styling -->
-        <div class="mt-5 text-center lg:text-left">
-          <p class="mb-3 text-lg font-semibold text-primary">Description</p>
-          <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description == null ? "Aucune description" : item.description }}</p>
+        <div class="mt-3 sm:mt-5 text-center md:text-left">
+          <p class="mb-2 sm:mb-3 text-base sm:text-lg font-semibold text-primary">Description</p>
+          <p class="p-2 sm:p-3 text-sm sm:text-base text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description == null ? "Aucune description" : item.description }}</p>
 
           <!-- Other details with iconized section headers -->
-          <div class="mt-5 space-y-3 text-gray-600">
-            <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.budgetNational == 0 ? 0 : $h.formatCurrency(item.budgetNational) }}
-              <div class="ml-2 italic font-bold">Fcfa</div>
+          <div class="mt-3 sm:mt-5 space-y-2 sm:space-y-3 text-sm sm:text-base text-gray-600">
+            <div class="flex flex-col sm:flex-row sm:items-center">
+              <div class="flex items-center">
+                <LinkIcon class="w-4 h-4 mr-2 flex-shrink-0" />
+                <span class="font-medium">Fonds propre:</span>
+              </div>
+              <div class="ml-6 sm:ml-2 font-bold">
+                {{ item.budgetNational == 0 ? 0 : $h.formatCurrency(item.budgetNational) }}
+                <span class="italic">Fcfa</span>
+              </div>
             </div>
 
-            <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Subvention: {{ item.pret == 0 ? 0 : $h.formatCurrency(item.pret) }}
-              <div class="ml-2 italic font-bold">Fcfa</div>
+            <div class="flex flex-col sm:flex-row sm:items-center">
+              <div class="flex items-center">
+                <LinkIcon class="w-4 h-4 mr-2 flex-shrink-0" />
+                <span class="font-medium">Subvention:</span>
+              </div>
+              <div class="ml-6 sm:ml-2 font-bold">
+                {{ item.pret == 0 ? 0 : $h.formatCurrency(item.pret) }}
+                <span class="italic">Fcfa</span>
+              </div>
             </div>
 
-            <div class="flex items-center text-sm font-medium text-gray-700">
-              <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" /> Statut:
-              <span v-if="item.statut == -2" class="ml-2 text-gray-900">Non validé</span>
-              <span v-else-if="item.statut == -1" class="ml-2 text-gray-900">Validé</span>
-              <span v-else-if="item.statut == 0" class="ml-2 text-gray-900">En cours</span>
-              <span v-else-if="item.statut == 1" class="ml-2 text-gray-900">En retard</span>
-              <span v-else-if="item.statut == 2" class="ml-2 text-gray-900">Terminé</span>
+            <div class="flex flex-col sm:flex-row sm:items-center text-sm font-medium text-gray-700">
+              <div class="flex items-center">
+                <CheckSquareIcon class="w-4 h-4 mr-2 text-primary flex-shrink-0" />
+                <span>Statut:</span>
+              </div>
+              <div class="ml-6 sm:ml-2">
+                <span v-if="item.statut == -2" class="text-gray-900">Non validé</span>
+                <span v-else-if="item.statut == -1" class="text-gray-900">Validé</span>
+                <span v-else-if="item.statut == 0" class="text-gray-900">En cours</span>
+                <span v-else-if="item.statut == 1" class="text-gray-900">En retard</span>
+                <span v-else-if="item.statut == 2" class="text-gray-900">Terminé</span>
+              </div>
             </div>
           </div>
         </div>
@@ -403,7 +410,7 @@ export default {
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
         <div class="col-span-12 md:col-span-6">
           <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
+          <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
         </div>
 
         <div class="input-form _mt-3 col-span-12 md:col-span-6">
@@ -413,12 +420,12 @@ export default {
 
         <div class="col-span-12 md:col-span-6">
           <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
+          <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
         </div>
 
         <div class="col-span-12 md:col-span-6">
           <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
+          <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
         </div>
 
         <div v-if="getPlageProjet" class="flex items-center mt-2 col-span-12">

@@ -167,7 +167,7 @@
 
               <!-- Solde -->
               <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-                <span class="font-bold text-black"> {{ pta.pret + pta.bn - pta.depenses == null || pta.pret + pta.bn - pta.depenses == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn - pta.depenses) }} {{ pta.pret + pta.bn - pta.depenses == null || pta.pret + pta.bn - pta.depenses == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn - pta.depenses) }}</span>
+                <span class="font-bold text-black"> {{ pta.pret + pta.bn - pta.depenses == null || pta.pret + pta.bn - pta.depenses == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn - pta.depenses) }}</span>
               </td>
 
               <!-- tef -->
@@ -449,7 +449,7 @@
         <td v-if="pta.pret + pta.bn > 0 && !pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
           <span class="font-bold text-yellow-500"> {{ ((pta.depenses / (pta.pret + pta.bn)) * 100).toFixed(2) }} %</span>
         </td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">Non disponible</td>
+        <!-- <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">Non disponible</td> -->
 
         <!-- total budgetaire-->
         <!-- v-if="pta.pret != '' || pta.bn != ''" -->
