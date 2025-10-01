@@ -54,6 +54,7 @@ const currentMember = ref({
   prenom: "",
   contact: null,
 });
+const tempMembers = ref([]);
 const sources = ref([]);
 const errors = ref({});
 const memberFormErrors = ref({});
@@ -207,18 +208,36 @@ const submitData = async () => {
       }
     } catch (e) {
       console.error(e);
-      toast.error(e.response.data.message);
-      if (isValidate.value) {
-        if (e.response && e.response.status === 422) {
-          errors.value = e.response.data.errors;
 
-          if (errors.value["factuel.response_data"]) {
-            showModalPreview.value = false;
-            toast.error(getAllErrorMessages(e));
-          }
-        } else {
-          toast.error(getAllErrorMessages(e));
+      // Gestion des erreurs avec la structure d'objet erreur
+      if (e.response && e.response.data) {
+        const errorData = e.response.data;
+
+        // Afficher le message d'erreur principal
+        if (errorData.message) {
+          toast.error(errorData.message);
         }
+
+        // Afficher les erreurs supplémentaires si elles existent dans le tableau
+        if (Array.isArray(errorData.errors) && errorData.errors.length > 0) {
+          errorData.errors.forEach((error) => {
+            toast.error(error);
+          });
+        }
+
+        // Gérer les erreurs de validation (422) avec objet d'erreurs
+        if (e.response.status === 422 && typeof errorData.errors === 'object' && !Array.isArray(errorData.errors)) {
+          errors.value = errorData.errors;
+
+          if (isValidate.value) {
+            if (errors.value["factuel.response_data"]) {
+              showModalPreview.value = false;
+            }
+          }
+        }
+      } else {
+        // Erreur générique si pas de structure de réponse
+        toast.error("Une erreur est survenue lors de la soumission.");
       }
     } finally {
       isLoading.value = false;
@@ -353,7 +372,7 @@ function addMembers() {
     return;
   }
 
-  payload.factuel.comite_members.push({ ...currentMember.value });
+  tempMembers.value.push({ ...currentMember.value });
   currentMember.value = { nom: "", prenom: "", contact: "" };
   memberFormErrors.value = {}; // Réinitialiser les erreurs après ajout réussi
   toast.success("Membre ajouté avec succès !");
@@ -366,11 +385,24 @@ function addMemberAndClose() {
     return;
   }
 
-  payload.factuel.comite_members.push({ ...currentMember.value });
+  tempMembers.value.push({ ...currentMember.value });
+  saveAllMembers();
   showModal.value = false;
   currentMember.value = { nom: "", prenom: "", contact: "" };
   memberFormErrors.value = {}; // Réinitialiser les erreurs
-  toast.success("Membre ajouté avec succès !");
+  toast.success("Membres ajoutés avec succès !");
+}
+
+function saveAllMembers() {
+  if (tempMembers.value.length > 0) {
+    payload.factuel.comite_members.push(...tempMembers.value);
+    tempMembers.value = [];
+  }
+}
+
+function removeTempMember(index) {
+  tempMembers.value.splice(index, 1);
+  toast.info("Membre retiré de la liste temporaire.");
 }
 
 function saveMembers() {
@@ -385,7 +417,15 @@ function openMemberModal() {
   memberFormErrors.value = {}; // Réinitialiser les erreurs
   isEdit.value = false;
   currentMember.value = { nom: "", prenom: "", contact: "" };
+  tempMembers.value = [];
   showModal.value = true;
+}
+
+function closeModalWithoutSaving() {
+  showModal.value = false;
+  tempMembers.value = [];
+  currentMember.value = { nom: "", prenom: "", contact: "" };
+  memberFormErrors.value = {};
 }
 
 function editMember(member, index) {
@@ -535,37 +575,8 @@ const submitAnsweredQuestionsOnly = async () => {
 
   console.log();
 
-  // Étape 2 : Validation des réponses complètes selon les règles métier
-  const completeAnswers = answeredQuestions.filter((response) => {
-    const responseSlug = findResponse2(response.optionDeReponseId);
-
-    if (responseSlug === "oui") {
-      // Validation preuves (obligatoire) - nouvelles preuves OU preuves existantes
-      const hasProofs = (Array.isArray(response.preuves) && response.preuves.length > 0) || (Array.isArray(response.existingProofs) && response.existingProofs.length > 0);
-
-      // Validation source (obligatoire - soit officielle soit personnalisée)
-      let hasValidSource = false;
-      if (response.sourceDeVerificationId === "autre") {
-        hasValidSource = response.sourceDeVerification && response.sourceDeVerification.trim() !== "" && response.sourceDeVerification !== " ";
-      } else {
-        hasValidSource = response.sourceDeVerificationId && response.sourceDeVerificationId !== "" && response.sourceDeVerificationId !== "autre";
-      }
-
-      const isComplete = hasProofs && hasValidSource;
-      return isComplete;
-    }
-
-    if (responseSlug === "partiellement") {
-      const hasDescription = response.description && response.description.trim() !== "";
-      return hasDescription;
-    }
-
-    if (responseSlug === "non") {
-      return true;
-    }
-
-    return false;
-  });
+  // Étape 2 : Prendre toutes les réponses sans validation des règles métier
+  const completeAnswers = answeredQuestions;
 
   // Étape 3 : Préparation du payload - exclure existingProofs
   payload.factuel.response_data = completeAnswers.map((answer) => {
@@ -1174,10 +1185,10 @@ const toggle = (id) => {
     </div>
   </div>
   <!-- BEGIN: Modal Content -->
-  <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
+  <Modal backdrop="static" :show="showModal" @hidden="closeModalWithoutSaving">
     <div class="mb-5">
       <ModalHeader>
-        <h2 class="mr-auto text-base font-medium">Ajouter un membre</h2>
+        <h2 class="mr-auto text-base font-medium">{{ isEdit ? 'Modifier un membre' : 'Ajouter des membres' }}</h2>
       </ModalHeader>
 
       <ModalBody class="space-y-5">
@@ -1196,13 +1207,26 @@ const toggle = (id) => {
             required
           />
         </div>
+
+        <!-- Liste des membres ajoutés temporairement -->
+        <div v-if="!isEdit && tempMembers.length > 0" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">Membres à ajouter ({{ tempMembers.length }})</h3>
+          <ul class="space-y-2">
+            <li v-for="(member, index) in tempMembers" :key="index" class="flex items-center justify-between p-2 bg-white rounded border border-gray-200">
+              <span class="text-sm text-gray-700">{{ member.nom }} {{ member.prenom }} - {{ member.contact }}</span>
+              <button @click="removeTempMember(index)" class="text-red-600 hover:text-red-800 transition-colors">
+                <i class="fas fa-times"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
       </ModalBody>
     </div>
     <ModalFooter>
       <div class="flex gap-2">
-        <button type="button" @click="showModal = false" class="w-full px-2 py-2 my-3 btn btn-outline-secondary">Annuler</button>
-        <button v-if="!isEdit" type="button" @click="addMembers" class="w-full px-2 py-2 my-3 btn btn-outline-primary">Ajouter et continuer</button>
-        <button type="button" @click="saveMembers" class="w-full px-2 py-2 my-3 btn btn-primary">{{ isEdit ? 'Modifier' : 'Ajouter et fermer' }}</button>
+        <button type="button" @click="closeModalWithoutSaving" class="w-full px-2 py-2 my-3 btn btn-outline-secondary">Annuler</button>
+        <button v-if="!isEdit" type="button" @click="addMembers" class="w-full px-2 py-2 my-3 btn btn-outline-primary">Ajouter un autre membre</button>
+        <button type="button" @click="saveMembers" class="w-full px-2 py-2 my-3 btn btn-primary">{{ isEdit ? 'Modifier' : 'Enregistrer' }}</button>
       </div>
     </ModalFooter>
   </Modal>

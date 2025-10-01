@@ -249,23 +249,19 @@ export default {
                 } else {
                   this.$router.push("dashboard/enquetes");
                 }
-
-                //  if (response.data.utilisateur.type == "administrateur") {
-                //    // this.$toast.success("Connexion réussie")
-                //    this.$router.push("/dashboard/programme");
-                //  } else {
-                //    // this.$toast.success("Connexion réussie")
-                //    this.$router.push("/dashboard/gfa");
-                //  }
               }
             })
             .catch((error) => {
               console.log(error);
-              if (error.response.status == 422) {
+
+              // Afficher le message d'erreur du serveur
+              const errorMessage = error.response?.data?.message || "Identifiants incorrects !!!";
+
+              if (error.response?.status == 422) {
                 this.showAlert = true;
-                toast.error("Email ou mot de passe incorrect reesayer !!!");
+                toast.error(errorMessage);
               } else {
-                toast.error("Identifiants incorrect !!!");
+                toast.error(errorMessage);
               }
               this.chargement = false;
             });
