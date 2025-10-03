@@ -92,7 +92,7 @@ const createData = async () => {
       isLoading.value = false;
       getDatas();
       resetForm();
-      toast.success("Soumission créer.");
+      toast.success("Soumission créée.");
     })
     .catch((e) => {
       isLoading.value = false;
@@ -189,7 +189,7 @@ const deleteData = async () => {
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;
-      toast.success("Soumission supprimé");
+      toast.success("Soumission supprimée");
       getDatas();
     })
     .catch((e) => {
@@ -817,7 +817,7 @@ onMounted(async () => {
   <!-- Modal Register & Update -->
   <Modal backdrop="static" :show="showModalCreate" @hidden="showModalCreate = false">
     <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">{{ mode }} une soummission</h2>
+      <h2 class="mr-auto text-base font-medium">{{ mode }} une soumission</h2>
     </ModalHeader>
     <form @submit.prevent="submitData">
       <ModalBody>

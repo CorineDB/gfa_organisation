@@ -41,6 +41,9 @@ const EvaluationService = {
   getSource() {
     return ApiService.get(`gfa/sources-de-verification`);
   },
+  getEnqueteSource() {
+    return ApiService.get(`gfa/enquete-de-gouvernance/sources-de-verification`);
+  },
   getSoumissionsEvaluation(id) {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${id}/soumissions`);
   },
@@ -172,6 +175,10 @@ const EvaluationService = {
   
   getFeuilleDeRouteEvaluation(idEvaluation) {
     return ApiService.get(`gfa/enquete-de-gouvernance/evaluations-de-gouvernance/${idEvaluation}/feuille-de-route`);
+  },
+
+  deleteProof(soumissionId, proofId) {
+    return ApiService.delete(`gfa/enquete-de-gouvernance/soumissions-factuel/${soumissionId}/preuves/${proofId}`);
   },
 };
 

@@ -13,7 +13,7 @@
     <tbody>
       <tr :style="{ 'background-color': getColorForValue(indicegouvernace) }">
         <td colspan="4" class="font-semibold text-center">INDICE FACTUEL DE GOUVERNANCE</td>
-        <td class="text-right">{{ indicegouvernace }}</td>
+        <td class="text-right"> {{ indicegouvernace }} </td>
         <td class=""></td>
       </tr>
       <template v-for="gouvernance in data" :key="gouvernance.id">

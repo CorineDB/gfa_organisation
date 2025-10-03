@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref } from "vue";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
 import SourceService from "@/services/modules/source.verifaction.service";
+import { EnqueteSourceService } from "@/services/modules/source.verifaction.service";
 import Tabulator from "tabulator-tables";
 import DeleteButton from "@/components/news/DeleteButton.vue";
 import { toast } from "vue3-toastify";
@@ -24,7 +25,7 @@ const datas = ref([]);
 
 const createData = async () => {
   isLoading.value = true;
-  await SourceService.create(payload)
+  await EnqueteSourceService.create(payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
@@ -39,7 +40,7 @@ const createData = async () => {
 };
 const getDatas = async () => {
   isLoadingData.value = true;
-  await SourceService.get()
+  await EnqueteSourceService.get()
     .then((result) => {
       datas.value = result.data.data;
       isLoadingData.value = false;
@@ -53,7 +54,7 @@ const getDatas = async () => {
 };
 const updateData = async () => {
   isLoading.value = true;
-  await SourceService.update(idSelect.value, payload)
+  await EnqueteSourceService.update(idSelect.value, payload)
     .then(() => {
       isLoading.value = false;
       getDatas();
@@ -69,7 +70,7 @@ const updateData = async () => {
 const submitData = () => (isCreate.value ? createData() : updateData());
 const deleteData = async () => {
   isLoading.value = true;
-  await SourceService.destroy(idSelect.value)
+  await EnqueteSourceService.destroy(idSelect.value)
     .then(() => {
       deleteModalPreview.value = false;
       isLoading.value = false;

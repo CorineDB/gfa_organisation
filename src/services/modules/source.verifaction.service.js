@@ -25,3 +25,31 @@ const SourceService = {
 };
 
 export default SourceService;
+
+
+const EnqueteSourceService = {
+  query(type, params) {
+    return ApiService.query("gfa/sources-de-verification", {
+      params: params,
+    });
+  },
+
+  get(slug) {
+    return ApiService.get("gfa/enquete-de-gouvernance/sources-de-verification", slug);
+  },
+
+  create(params) {
+    return ApiService.post("gfa/enquete-de-gouvernance/sources-de-verification", params);
+  },
+
+  update(slug, params) {
+    return ApiService.update("gfa/enquete-de-gouvernance/sources-de-verification", slug, params);
+  },
+
+  destroy(slug) {
+    return ApiService.delete(`gfa/enquete-de-gouvernance/sources-de-verification/${slug}`);
+  },
+};
+
+export { EnqueteSourceService };
+

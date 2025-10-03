@@ -243,6 +243,9 @@ const getcurrentUserAndFetchOrganization = async () => {
 };
 
 const submitData = async () => {
+
+  console.log("Je suis ici");
+
   isLoading.value = true;
   filterFormData();
   const response = {

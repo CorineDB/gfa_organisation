@@ -121,7 +121,7 @@ onMounted(async () => {
                 </tr>
                 <tr class="border-b border-slate-300">
                   <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td class="pl-2">{{ currentPerception?.evaluatedAt }}</td>
+                  <td class="pl-2">{{ currentFactuel?.evaluatedAt }}</td>
                 </tr>
               </tbody>
             </table>
@@ -170,7 +170,7 @@ onMounted(async () => {
               </tbody>
             </table>
             <!-- Tableau de synthese Perception -->
-            <TabulatorSynthesePerception :data="currentPerception?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" v-if="!isLoadingData && currentPerception?.synthese" />
+            <TabulatorSynthesePerception :data="currentPerception?.synthese" :indicegouvernace="currentPerception?.indice_de_gouvernance" v-if="!isLoadingData && currentPerception?.synthese" />
           </TabPanel>
         </TabPanels>
         <LoaderSnipper v-if="isLoadingData" />
