@@ -52,6 +52,25 @@
           <span class="pl-1 shadow-md p-1 rounded-md bg-red-500 text-white" v-else-if="projet.statut == 1"> En retard </span>
           <span class="pl-2" v-else-if="projet.statut == 2">Terminé</span>
         </div>
+
+        <!-- Budget restant -->
+        <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+          <h4 class="text-xs font-semibold text-gray-700 mb-2">Budget disponible</h4>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="text-center">
+              <p class="text-xs text-gray-500">Fond propre restant</p>
+              <p class="text-sm font-bold" :class="getFondRestant(projet) >= 0 ? 'text-green-600' : 'text-red-600'">
+                {{ getFondRestant(projet) === 0 ? '0' : $h.formatCurrency(getFondRestant(projet)) }} FCFA
+              </p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-gray-500">Subvention restante</p>
+              <p class="text-sm font-bold" :class="getSubventionRestant(projet) >= 0 ? 'text-green-600' : 'text-red-600'">
+                {{ getSubventionRestant(projet) === 0 ? '0' : $h.formatCurrency(getSubventionRestant(projet)) }} FCFA
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="flex items-center justify-center p-5 border-t lg:justify-end border-slate-200/60 dark:border-darkmode-400">
@@ -120,16 +139,9 @@ export default {
   },
 
   computed: {
-    //importation des variables du module auths
-    ...mapState({
-      identifiant: (state) => state.auths.identifiant,
-      projet: (state) => state.projets.projet,
-      loading: (state) => state.loading,
-      errors: (state) => state.errors,
-    }),
-
+    
     ...mapGetters({
-      projet: "getProjet",
+      // projet: "getProjet",
       currentUser: "auths/GET_AUTHENTICATE_USER",
     }),
   },
@@ -138,6 +150,26 @@ export default {
     goToDetail(projet) {
       console.log(projet);
       this.$router.push({ name: "projets_id_details", params: { id: projet.id, projet: projet } });
+    },
+
+    getFondRestant(projet) {
+      let totalFondUtilise = 0;
+      if (projet.composantes && projet.composantes.length > 0) {
+        projet.composantes.forEach((item) => {
+          totalFondUtilise += item.budgetNational ? item.budgetNational : 0;
+        });
+      }
+      return (projet.budgetNational || 0) - totalFondUtilise;
+    },
+
+    getSubventionRestant(projet) {
+      let totalSubventionUtilise = 0;
+      if (projet.composantes && projet.composantes.length > 0) {
+        projet.composantes.forEach((item) => {
+          totalSubventionUtilise += item.pret ? item.pret : 0;
+        });
+      }
+      return (projet.pret || 0) - totalSubventionUtilise;
     },
 
     verifyPermission, // Étape 1 : Préparation des données - transformer sites en coordonnées
@@ -152,6 +184,18 @@ export default {
         label: `${site.nom}<br>Quartier: ${site.quartier}<br>Commune: ${site.commune}`,
       }));
     },
+     detailProjet(){
+      ProjetService.getDetailProjet(this.projetId)
+      .then((response) => {
+        this.projet = response.data.data;
+        this.sites = this.projet.sites || [];
+        // console.log(this.projet);
+      }).catch((error) => {
+        console.error("Erreur lors de la récupération des détails du projet:", error);
+        toast.error("Erreur lors de la récupération des détails du projet.");
+      });
+    }
+
   },
   mounted() {
     // Initialiser la carte lorsque le composant est monté
@@ -199,6 +243,7 @@ export default {
     if (this.currentUser) {
       this.programmeId = this.currentUser.programme.id;
       this.projetId = this.currentUser.projet?.id;
+      this.detailProjet();
     }
   },
 };

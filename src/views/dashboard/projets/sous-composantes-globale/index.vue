@@ -54,6 +54,15 @@ export default {
       labels: "Ajouter",
       showDeleteModal: false,
       deleteLoader: false,
+      fondPropreOutcome: 0,
+      SubventionOutcome: 0,
+      composantData: [],
+      fondTotalOutcome: 0,
+      subventionTotalOutcome: 0,
+      fondAttribuerOutcome: 0,
+      subventionAttribuerOutcome: 0,
+      fondRestantOutcome: 0,
+      subventionRestantOutcome: 0,
     };
   },
   computed: {
@@ -358,6 +367,43 @@ export default {
       try {
         const response = await ComposantesService.detailComposant(this.selectedIds.composantId);
         const composantData = response.data.data;
+
+        this.composantData = composantData;
+        this.fondPropreOutcome = this.composantData.budgetNational || 0;
+        this.SubventionOutcome = this.composantData.pret || 0;
+
+        // Étape 1 : Récupérer fondTotalOutcome et subventionTotalOutcome
+        this.fondTotalOutcome = this.composantData.budgetNational || 0;
+        this.subventionTotalOutcome = this.composantData.pret || 0;
+
+        // Étape 2 : Calculer fondAttribuerOutcome (somme fondActivite + somme fondOutput)
+        const sommeFondActivite = (this.composantData.activites || []).reduce((total, activite) => {
+          return total + (activite.budgetNational || 0);
+        }, 0);
+
+        const sommeFondOutput = (this.composantData.souscomposantes || []).reduce((total, output) => {
+          return total + (output.budgetNational || 0);
+        }, 0);
+
+        this.fondAttribuerOutcome = sommeFondActivite + sommeFondOutput;
+
+        // Étape 3 : Calculer subventionAttribuerOutcome (somme subventionActivite + somme subventionOutput)
+        const sommeSubventionActivite = (this.composantData.activites || []).reduce((total, activite) => {
+          return total + (activite.pret || 0);
+        }, 0);
+
+        const sommeSubventionOutput = (this.composantData.souscomposantes || []).reduce((total, output) => {
+          return total + (output.pret || 0);
+        }, 0);
+
+        this.subventionAttribuerOutcome = sommeSubventionActivite + sommeSubventionOutput;
+
+        // Étape 4 : Calculer fondRestantOutcome (fondTotalOutcome - fondAttribuerOutcome)
+        this.fondRestantOutcome = this.fondTotalOutcome - this.fondAttribuerOutcome;
+
+        // Étape 5 : Calculer subventionRestantOutcome (subventionTotalOutcome - subventionAttribuerOutcome)
+        this.subventionRestantOutcome = this.subventionTotalOutcome - this.subventionAttribuerOutcome;
+
         this.isLoadingData = false;
         // Mettre à jour les sous-composants et activités du composant
         this.sousComposants = composantData.souscomposantes || [];
@@ -471,15 +517,23 @@ export default {
       <div v-if="verifyPermission('voir-un-output')" class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
         <!-- En-tête avec sigle et titre -->
         <div class="relative flex items-start pt-5">
-          <div class="relative flex flex-col items-center w-full pt-5 lg:flex-row lg:items-start">
-            <!-- Circle with initial or image -->
-            <div class="flex items-center justify-center w-20 h-20 text-white rounded-full shadow-md bg-primary flex-shrink-0">
-              {{ item.codePta }}
+          <div class="relative flex flex-col md:flex-row items-center w-full pt-5 justify-between">
+            <div class="flex items-center">
+              <!-- Circle with initial or image -->
+              <div class="flex items-center justify-center w-20 h-20 text-white rounded-full shadow-md bg-primary flex-shrink-0">
+                {{ item.codePta }}
+              </div>
+              <!-- Item details -->
+              <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0">
+                <a href="" class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary _truncate text-center lg:text-left"> {{ item.nom }} </a>
+              </div>
             </div>
-            <!-- Item details -->
-            <div class="mt-3 text-center lg:ml-4 lg:text-left lg:mt-0">
-              <a href="" class="text-lg font-semibold text-gray-800 transition-colors hover:text-primary _truncate text-center lg:text-left"> {{ item.nom }} </a>
-            </div>
+            <!-- Bouton Voir Activités -->
+            <button
+              class="btn btn-primary mt-3 md:mt-0"
+            >
+              Voir activités
+            </button>
           </div>
           <!-- Dropdown for actions -->
           <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
@@ -592,7 +646,20 @@ export default {
           </div>
         </div>
 
-        
+        <!-- Affiche fondRestantOutcome et subventionRestantOutcome-->
+        <div class="col-span-12 mt-4 p-4 bg-gray-50 rounded-lg">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">Budget disponible (Outcome)</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center">
+              <p class="text-xs text-gray-500">Fond propre restant</p>
+              <p class="text-lg font-bold" :class="fondRestantOutcome >= 0 ? 'text-green-600' : 'text-red-600'">{{ fondRestantOutcome === 0 ? "0" : $h.formatCurrency(fondRestantOutcome) }} FCFA</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-gray-500">Subvention restante</p>
+              <p class="text-lg font-bold" :class="subventionRestantOutcome >= 0 ? 'text-green-600' : 'text-red-600'">{{ subventionRestantOutcome === 0 ? "0" : $h.formatCurrency(subventionRestantOutcome) }} FCFA</p>
+            </div>
+          </div>
+        </div>
       </ModalBody>
       <ModalFooter>
         <div class="flex items-center justify-center">

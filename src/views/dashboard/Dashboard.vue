@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="">
-        <h1 class="text-xl font-semibold text-gray-800">{{ graphiqueData?.nom }}</h1>
+        <h1 class="text-xl font-semibold text-gray-800">{{ graphiqueData?.nom }} </h1>
         <p class="text-sm text-gray-600" v-if="graphiqueData?.description">{{ graphiqueData?.description }}.</p>
       </div>
       <div class="">
@@ -174,6 +174,7 @@
                   <th class="px-4 py-2">Latitudes</th>
                 </tr>
               </thead>
+              
               <tbody v-for="(item, index) in graphiqueData.sites" :key="index">
                 <tr>
                   <td class="px-4 py-2">{{ item.nom }}</td>
@@ -229,12 +230,18 @@
         <p v-else>Pas de suivi disponible pour l'instant</p> -->
       </div>
     </section>
+
+    <!-- Nouvelle section pour la carte -->
+    <section class="p-6 mt-6 bg-white rounded-md shadow-md">
+      <h2 class="mb-4 text-lg font-semibold text-gray-700">Carte des Sites</h2>
+      <div id="mapOrganisation" style="height: 50vh" class="rounded-md"></div>
+    </section>
   </div>
   <!-- fin new sample -->
 </template>
 
 <script setup>
-import { ref, onMounted, computed, reactive, watch } from "vue";
+import { ref, onMounted, computed, reactive, watch, nextTick } from "vue";
 import ProjetService from "@/services/modules/projet.service.js";
 import ReportDonutChart2 from "@/components/report-donut-chart-2/Main.vue";
 import { toast } from "vue3-toastify";
@@ -477,6 +484,7 @@ const polygon = ref({
 
 const myIcon = ref(null);
 const initialMap = ref(null);
+const mapOrganisation = ref(null);
 const markerLatLng = ref([47.31322, -1.319482]);
 
 //console.log("projetId", route.params.id);
@@ -485,7 +493,7 @@ const loadingOption = ref(true);
 const graphiqueData = ref([]);
 const getStat = function () {
   //console.log(JSON.parse(localStorage.getItem("authenticateUser")).projet.id);
-  console.log(localStorage.getItem("authenticateUser"));
+  
 
   if (localStorage.getItem("authenticateUser")) {
     const user = JSON.parse(localStorage.getItem("authenticateUser"));
@@ -496,7 +504,9 @@ const getStat = function () {
       ProjetService.statistiques(ongId)
         .then((data) => {
           graphiqueData.value = data.data.data;
+          console.log("Données chargées:", graphiqueData.value);
           initTabulator();
+
           // Initialiser l'icône
           myIcon.value = L.icon({
             iconUrl: icon,
@@ -508,36 +518,131 @@ const getStat = function () {
             shadowAnchor: [22, 94],
           });
 
-          // Initialiser la carte
-          initialMap.value = L.map("map", {
-            zoomControl: true,
-            zoom: 1,
-            zoomAnimation: false,
-            fadeAnimation: true,
-            markerZoomAnimation: true,
-          }).setView([6.8041, 2.4152], 6);
+          // Initialiser la carte après le rendu du DOM
+          nextTick(() => {
+            // Vérifier que l'élément DOM existe
+            const mapContainer = document.getElementById("map");
+            if (!mapContainer) {
+              console.error("L'élément #map n'existe pas dans le DOM");
+              return;
+            }
+            initialMap.value = L.map("map", {
+              zoomControl: true,
+              zoom: 1,
+              zoomAnimation: false,
+              fadeAnimation: true,
+              markerZoomAnimation: true,
+            }).setView([6.8041, 2.4152], 10);
 
-          L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-          }).addTo(initialMap.value);
+            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+              maxZoom: 19,
+              attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            }).addTo(initialMap.value);
 
-          // Ajouter des marqueurs seulement si des sites existent
-          if (graphiqueData.value?.sites?.length > 0) {
+            // Utiliser MarkerCluster pour afficher tous les sites
             const markers = L.markerClusterGroup();
+            if (graphiqueData.value?.sites && graphiqueData.value.sites.length > 0) {
+              graphiqueData.value.sites.forEach((site) => {
+                const lat = parseFloat(site.latitude);
+                const lng = parseFloat(site.longitude);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                  const marker = L.marker([lat, lng], { icon: myIcon.value })
+                    .bindPopup(`
+                      <strong>${site.nom}</strong><br>
+                      Quartier: ${site.quartier || 'N/A'}<br>
+                      Commune: ${site.commune || 'N/A'}<br>
+                      Département: ${site.departement || 'N/A'}<br>
+                      <em>Lat: ${lat}, Lng: ${lng}</em>
+                    `);
+                  markers.addLayer(marker);
+                }
 
-            graphiqueData.value.sites.forEach((site) => {
-              const marker = new L.marker([parseFloat(site.latitude), parseFloat(site.longitude)], { icon: myIcon.value });
+              });
+
+            } 
+            else {
+              // Aucun site, afficher un marqueur par défaut
+              const marker = L.marker([6.8041, 2.4152], { icon: myIcon.value })
+                .bindPopup("<strong>Aucun site disponible</strong><br>Position par défaut: Cotonou, Bénin");
               markers.addLayer(marker);
-            });
-
+            }
             initialMap.value.addLayer(markers);
-          }
+
+            // Initialiser la nouvelle carte organisation après le chargement des données
+            initMapOrganisation();
+          });
         })
         .catch((error) => {
           console.log(error);
         });
     }
+  }
+};
+
+// Fonction pour initialiser la nouvelle carte organisation
+const initMapOrganisation = () => {
+  // Vérifier que l'élément DOM existe
+  const mapContainer = document.getElementById("mapOrganisation");
+  if (!mapContainer) {
+    console.error("L'élément #mapOrganisation n'existe pas dans le DOM");
+    return;
+  }
+
+  // Initialiser l'icône si elle n'existe pas encore
+  if (!myIcon.value) {
+    myIcon.value = L.icon({
+      iconUrl: icon,
+      iconSize: [30, 30],
+      iconAnchor: [22, 94],
+      popupAnchor: [-3, -76],
+      shadowUrl: markerShadow,
+      shadowSize: [60, 30],
+      shadowAnchor: [22, 94],
+    });
+  }
+
+  // Initialiser la carte organisation
+  mapOrganisation.value = L.map("mapOrganisation", {
+    zoomControl: true,
+    zoom: 1,
+    zoomAnimation: false,
+    fadeAnimation: true,
+    markerZoomAnimation: true,
+  }).setView([6.8041, 2.4152], 8);
+
+  // Ajouter la couche de tuiles OpenStreetMap
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(mapOrganisation.value);
+
+  // Récupérer et afficher tous les sites
+  if (graphiqueData.value?.sites && graphiqueData.value.sites.length > 0) {
+    console.log("Nombre de sites trouvés:", graphiqueData.value.sites.length);
+
+    graphiqueData.value.sites.forEach((site) => {
+      const lat = parseFloat(site.latitude);
+      const lng = parseFloat(site.longitude);
+
+      // Vérifier que les coordonnées sont valides
+      if (!isNaN(lat) && !isNaN(lng)) {
+        const marker = L.marker([lat, lng], { icon: myIcon.value })
+          .addTo(mapOrganisation.value)
+          .bindPopup(`
+            <strong>${site.nom}</strong><br>
+            Quartier: ${site.quartier || 'N/A'}<br>
+            Commune: ${site.commune || 'N/A'}<br>
+            Département: ${site.departement || 'N/A'}<br>
+            <em>Lat: ${lat}, Lng: ${lng}</em>
+          `);
+      }
+    });
+  } else {
+    console.log("Aucun site disponible dans graphiqueData.sites");
+    // Afficher un marqueur par défaut si pas de sites
+    L.marker([6.8041, 2.4152], { icon: myIcon.value })
+      .addTo(mapOrganisation.value)
+      .bindPopup("<strong>Aucun site disponible</strong><br>Position par défaut: Cotonou, Bénin");
   }
 };
 
