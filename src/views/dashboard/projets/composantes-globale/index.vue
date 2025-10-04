@@ -48,6 +48,14 @@ export default {
       labels: "Ajouter",
       showDeleteModal: false,
       deleteLoader: false,
+      fondPropreProjet: 0,
+      SubventionProjet: 0,
+      fondTotalOutcome: 0,
+      subventionTotalOutcome: 0,
+      fondAttribuerOutcome: 0,
+      subventionAttribuerOutcome: 0,
+      fondRestantOutcome: 0,
+      subventionRestantOutcome: 0,
     };
   },
   computed: {
@@ -272,6 +280,29 @@ export default {
       ProjetService.getDetailProjet(this.projetId)
         .then((data) => {
           this.composants = data.data.data.composantes;
+          this.fondPropreProjet = data.data.data.budgetNational || 0;
+          this.SubventionProjet = data.data.data.pret || 0;
+
+          // Récupérer fondTotalOutcome et subventionTotalOutcome
+          this.fondTotalOutcome = this.fondPropreProjet;
+          this.subventionTotalOutcome = this.SubventionProjet;
+
+          // Calculer fondAttribuerOutcome (somme des budgets des outcomes)
+          this.fondAttribuerOutcome = this.composants.reduce((total, outcome) => {
+            return total + (outcome.budgetNational || 0);
+          }, 0);
+
+          // Calculer subventionAttribuerOutcome (somme des subventions des outcomes)
+          this.subventionAttribuerOutcome = this.composants.reduce((total, outcome) => {
+            return total + (outcome.pret || 0);
+          }, 0);
+
+          // Calculer fondRestantOutcome
+          this.fondRestantOutcome = this.fondTotalOutcome - this.fondAttribuerOutcome;
+
+          // Calculer subventionRestantOutcome
+          this.subventionRestantOutcome = this.subventionTotalOutcome - this.subventionAttribuerOutcome;
+
           this.isLoadingOutcome = false;
         })
         .catch((error) => {
@@ -432,6 +463,20 @@ export default {
           <ClockIcon class="w-4 h-4 mr-2" />
           <div>
             Durée du projet : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(getPlageProjet.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(getPlageProjet.fin) }}</span>
+          </div>
+        </div>
+
+        <div class="col-span-12 mt-4 p-4 bg-gray-50 rounded-lg">
+          <h3 class="text-sm font-semibold text-gray-700 mb-3">Budget disponible</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center">
+              <p class="text-xs text-gray-500">Fond propre restant</p>
+              <p class="text-lg font-bold" :class="fondRestantOutcome >= 0 ? 'text-green-600' : 'text-red-600'">{{ fondRestantOutcome === 0 ? "0" : $h.formatCurrency(fondRestantOutcome) }} FCFA</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-gray-500">Subvention restante</p>
+              <p class="text-lg font-bold" :class="subventionRestantOutcome >= 0 ? 'text-green-600' : 'text-red-600'">{{ subventionRestantOutcome === 0 ? "0" : $h.formatCurrency(subventionRestantOutcome) }} FCFA</p>
+            </div>
           </div>
         </div>
       </ModalBody>

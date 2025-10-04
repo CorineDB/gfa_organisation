@@ -1,83 +1,484 @@
-<div class="p-6">
-    <!-- Nom du Projet -->
-    <h2 class="text-2xl font-semibold text-gray-800">Nom du Projet</h2>
-
-    <!-- Résumé du Projet -->
-    <p class="mt-2 text-gray-600">
-      Ce projet vise à améliorer l'accès à l'éducation dans les zones rurales en construisant des écoles et en fournissant des ressources éducatives essentielles.
-    </p>
-
-    <!-- Objectifs du Projet -->
-    <div class="mt-4">
-      <h3 class="text-lg font-medium text-gray-800">Objectifs</h3>
-      <ul class="list-disc list-inside text-gray-600">
-        <li>Construction de 10 écoles</li>
-        <li>Distribution de 5000 manuels scolaires</li>
-        <li>Formation de 100 enseignants</li>
-      </ul>
-    </div>
-
-    <!-- Bénéficiaires -->
-    <div class="mt-4">
-      <h3 class="text-lg font-medium text-gray-800">Bénéficiaires</h3>
-      <p class="text-gray-600">Les communautés rurales dans la région du nord, touchant 10 000 enfants.</p>
-    </div>
-
-    <!-- Partenaires et Sponsors -->
-    <div class="mt-4">
-      <h3 class="text-lg font-medium text-gray-800">Partenaires</h3>
-      <p class="text-gray-600">Sponsorisé par ABC Foundation et en partenariat avec XYZ Organization.</p>
-    </div>
-
-    <!-- Durée du Projet -->
-    <div class="mt-4">
-      <h3 class="text-lg font-medium text-gray-800">Durée</h3>
-      <p class="text-gray-600">Lancement : Janvier 2024 | Fin prévue : Décembre 2025</p>
-    </div>
-
-    <!-- Impact -->
-    <div class="mt-4">
-      <h3 class="text-lg font-medium text-gray-800">Impact</h3>
-      <p class="text-gray-600">Amélioration de la qualité de l'éducation et augmentation du taux de scolarisation de 20% dans les zones ciblées.</p>
-    </div>
-
-    <!-- Lien vers plus d'infos -->
-    <div class="mt-4">
-      <a href="#" class="text-indigo-600 hover:text-indigo-800 font-semibold">Voir plus de détails</a>
-    </div>
-  </div>
-
-  <!-- Contact -->
-  <div class="px-6 py-4 bg-gray-100">
-    <h3 class="text-sm font-medium text-gray-800">Contact</h3>
-    <p class="text-gray-600">John Doe, Responsable du Projet</p>
-    <p class="text-gray-600">Email : john.doe@example.com</p>
-  </div>
-
-
-
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-    <!-- Autres projets (copie le div ci-dessus pour chaque projet) -->
-    <div v-for="(projet, index) in projets" :key="index" class="bg-white shadow-lg rounded-lg p-4 relative zoom-in">
-      <h3 class="text-xl font-bold mb-2">{{ projet.nom }}</h3>
-      <p class="text-gray-700 mb-4">{{ projet.description }}</p>
-      <div class="flex justify-between items-center">
-        <span v-if="-2" class="text-red-600 font-semibold"> Non validé </span>
-        <span v-else-if="-1" class="text-green-600 font-semibold"> Validé </span>
-        <span v-else-if="0" class="text-pending font-semibold"> En cours </span>
-        <span v-else-if="1" class="text-red-600 font-semibold"> En retard </span>
-        <span v-else-if="2" class="text-primary font-semibold">Terminé</span>
-        <div class="space-x-3">
-          <button class="btn btn-secondary mr-1 mb-2" title="voir détail projet">
-            <EyeIcon class="w-4 h-4" />
-          </button>
-          <button class="btn btn-primary mr-1 mb-2" title="modifier le projet" @click="modifierProjet(projet)">
-            <EditIcon class="w-4 h-4" />
-          </button>
-          <button class="btn btn-danger mr-1 mb-2" title="supprimer le projet" >
-            <TrashIcon class="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+{
+    "id": "OgAdaenJejJZmLEavXgN7qRyz41d5kod4oblp69M8OxrB2GY0KwVA3QnRkbXNx27",
+    "nom": "Projet 1 Phase 3",
+    "codePta": "4.31",
+    "debut": "2025-09-17",
+    "fin": "2026-06-30",
+    "couleur": "#000000",
+    "nombreEmploie": null,
+    "budgetNational": 3000000,
+    "pret": 3000000,
+    "depenses": 0,
+    "objectifGlobaux": null,
+    "pays": "Bénin",
+    "tauxEngagement": null,
+    "secteurActivite": "Environnement",
+    "dateAprobation": "2025-06-02",
+    "description": null,
+    "owner": {
+        "id": "JAV2bRpWRmY8yBN4kazbeGAg5vxDoV7YR31EJOjd6nPrZlWX9LK0w2pMyNKa80mL",
+        "sigle": "PH-ORG-1",
+        "code": 31,
+        "created_at": "2025-09-25",
+        "nom_point_focal": "MOUSSA",
+        "prenom_point_focal": "Mouhamed",
+        "contact_point_focal": "22962004867",
+        "pays": "Bénin",
+        "departement": "LITTORAL",
+        "commune": "COTONOU",
+        "arrondissement": "2EME ARRONDISSEMENT",
+        "quartier": "SENANDE",
+        "secteurActivite": "Secteur 1",
+        "longitude": 2.9,
+        "latitude": 6.9,
+        "programmeId": 3,
+        "addresse": "995R+2F, Cotonou",
+        "type": "osc_partenaire",
+        "user": {
+            "id": "e52DEjVxzqLQo1WnDpAB6MZdG9Xm4vOXmaJY07jbKxErNkwPl5ReaV2gy4PaAGYZ",
+            "nom": "Phase 3 - Org 1",
+            "prenom": null,
+            "email": "wonof67441@hiepth.com",
+            "contact": "22962004867",
+            "poste": null,
+            "type": "organisation",
+            "emailVerifiedAt": "2025-09-25T23:41:06.000000Z",
+            "code": 0,
+            "created_at": "2025-09-25",
+            "first_connexion": 1,
+            "statut": 1,
+            "account_verification_request_sent_at": "2025-09-26 13:01:02",
+            "password_update_at": "2025-09-26 05:31:10",
+            "last_password_remember": "$2y$10$cDlSf53ARzqAhwazVirNZeGVl78wH6A09ZvfQ7nA.9HuLF0AQ8F/q",
+            "link_is_valide": 1,
+            "lastRequest": "2025-10-02 08:08:07",
+            "roles": [
+                {
+                    "id": "d3PmjWzyj5x1z86yZDn0lGvq7pBebYLqDkO9g2NV3KoaRrPdQEWXAwmMblXZY26g",
+                    "nom": "Organisation",
+                    "description": "Organisation",
+                    "roleable_type": null,
+                    "roleable_id": null,
+                    "created_at": "2025-06-02T20:03:28.000000Z",
+                    "programmeId": null
+                }
+            ]
+        }
+    },
+    "statut": -1,
+    "tep": 0,
+    "tef": 0,
+    "tepByAnnee": 0,
+    "image": {
+        "id": "EYp8b9DRx8Lmab4zko5qP71BdGE0VYQPVYKARwOnelJZ6rX3gWNpv9yD2zZOW70a",
+        "nom": "1758865883-whatsapp-image-2024-09-16-at-07.43.32-(1).jpeg",
+        "url": "https://dms-redevabilite.com:8443/storage/upload/projets/preview/1758865883-whatsapp-image-2024-09-16-at-07.43.32-(1).jpeg",
+        "auteur": {
+            "id": "4EVRXB2ZlDjvq2YVak1w97exmbP5Qn3MqD3rRBLz0doG4AEKZMyWX6pNgQnj7d1g",
+            "nom": "UG - Phase 3",
+            "prenom": null,
+            "contact": "13462127336",
+            "email": "hosecis316@auslank.com",
+            "type": "unitee-de-gestion",
+            "programmeId": "yejGX8Dq1adr7B8oegyv9x5w0jmZqnEWnJkb6GXKPzRYD2lOAL4pMWQ3YPpOLx57",
+            "poste": null,
+            "created_at": "2025-09-25 11:12:38"
+        },
+        "extension": "jpeg"
+    },
+    "fichiers": [
+        {
+            "id": "lgL5RO1ppv5rlWXde4A8wgPBa3V1RDjnv6j6bJq790xyYo2ZkzONGmLnEzywJNBa",
+            "nom": "1758865883-outil-factuel.docx",
+            "url": "https://dms-redevabilite.com:8443/storage/upload/projets/pieces_jointes/1758865883-outil-factuel.docx",
+            "auteur": {
+                "id": "4EVRXB2ZlDjvq2YVak1w97exmbP5Qn3MqD3rRBLz0doG4AEKZMyWX6pNgQnj7d1g",
+                "nom": "UG - Phase 3",
+                "prenom": null,
+                "contact": "13462127336",
+                "email": "hosecis316@auslank.com",
+                "type": "unitee-de-gestion",
+                "programmeId": "yejGX8Dq1adr7B8oegyv9x5w0jmZqnEWnJkb6GXKPzRYD2lOAL4pMWQ3YPpOLx57",
+                "poste": null,
+                "created_at": "2025-09-25 11:12:38"
+            },
+            "extension": "docx"
+        },
+        {
+            "id": "BEkrv8odoaP36vEX78NJxOVw5pqG0yM7PbKmg4dLDZAenbklr2BYz9R1WZeOzW4L",
+            "nom": "1758865883-outil-de-perception.docx",
+            "url": "https://dms-redevabilite.com:8443/storage/upload/projets/pieces_jointes/1758865883-outil-de-perception.docx",
+            "auteur": {
+                "id": "4EVRXB2ZlDjvq2YVak1w97exmbP5Qn3MqD3rRBLz0doG4AEKZMyWX6pNgQnj7d1g",
+                "nom": "UG - Phase 3",
+                "prenom": null,
+                "contact": "13462127336",
+                "email": "hosecis316@auslank.com",
+                "type": "unitee-de-gestion",
+                "programmeId": "yejGX8Dq1adr7B8oegyv9x5w0jmZqnEWnJkb6GXKPzRYD2lOAL4pMWQ3YPpOLx57",
+                "poste": null,
+                "created_at": "2025-09-25 11:12:38"
+            },
+            "extension": "docx"
+        }
+    ],
+    "programme": {
+        "id": "yejGX8Dq1adr7B8oegyv9x5w0jmZqnEWnJkb6GXKPzRYD2lOAL4pMWQ3YPpOLx57",
+        "nom": "Programme Redevabilite Phase 3",
+        "code": "4",
+        "budgetNational": null,
+        "debut": "2025-09",
+        "fin": "2029-03",
+        "description": "Programme Redevabilite Phase 3",
+        "objectifGlobaux": "Objectifs Programme Redevabilite Phase 3",
+        "created_at": "2025-09-25T23:10:14.000000Z",
+        "organismeDeTutelle": "Ministère"
+    },
+    "link": "upload/projets/pieces_jointes/1758865883-outil-de-perception.docx",
+    "composantes": [
+        {
+            "id": "Qzn1Mkwoy36lKZnGe1VY4vjOR7E2qp50BxBJMogwQPmkLWr8Nz9bdA0DKbWPDrl7",
+            "nom": "Outcome 1 : Les citoyens bénéficient des services publics de meilleure qualité dans les quatre secteurs prioritaires (eau, éducation, état civil et santé)",
+            "codePta": "4.31.1",
+            "poids": 0,
+            "description": "Outcome 1 : Les citoyens bénéficient des services publics de meilleure qualité dans les quatre secteurs prioritaires (eau, éducation, état civil et santé)",
+            "statut": -1,
+            "budgetNational": 900000,
+            "pret": 800000,
+            "depenses": 0,
+            "tep": 0,
+            "sigle": "2SF",
+            "projetId": "OgAdaenJejJZmLEavXgN7qRyz41d5kod4oblp69M8OxrB2GY0KwVA3QnRkbXNx27",
+            "composanteId": null,
+            "souscomposantes": [],
+            "activites": [
+                {
+                    "id": "byX5JeEojENo2RGkXZqr5AB8l9KPYemPJ7xbWnda4OJzvQ0gLD61Vywpw8jRkZWv",
+                    "nom": "Activite 1 hjezhze",
+                    "codePta": "4.31.1.1",
+                    "poids": 0,
+                    "poidsActuel": 0,
+                    "type": "pta",
+                    "pret": 200000,
+                    "position": 1,
+                    "budgetNational": 200000,
+                    "depenses": 0,
+                    "description": null,
+                    "statut": -1,
+                    "tep": 0,
+                    "tef": 0,
+                    "durees": [
+                        {
+                            "id": "RN4Pgk9VZMJj2n79vQ0pzg3OYyxPAGBxny5VLle46dq1rak8wbDmNRXWKwAr1dx0",
+                            "debut": "2025-09-18",
+                            "fin": "2026-05-31",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-09-29T15:23:16.000000Z",
+                            "updated_at": "2025-09-29T15:23:16.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "24Md3vGV6yKkPYbZ81RxAOnGQwNg2lEe1WEVeJaL7pdrv0j9qXD4M3mzWeOwr8kR",
+                            "debut": "2026-06-01",
+                            "fin": "2026-06-02",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-09-30T08:19:08.000000Z",
+                            "updated_at": "2025-09-30T08:36:01.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "n39jarbmOmqlw68vYexZk30Gp9nAWboAKwELNDJ1rQKjyXRVadPMgz427VGM7OWX",
+                            "debut": "2026-06-03",
+                            "fin": "2026-06-04",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-09-30T08:37:50.000000Z",
+                            "updated_at": "2025-09-30T08:37:50.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "O30wdZ1agGkqMnd96DzK0bXN87mRVyEGXV53e14lwZr2xWJpOPAajvQYL89Lkqvn",
+                            "debut": "2026-06-05",
+                            "fin": "2026-06-06",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-10-02T14:05:33.000000Z",
+                            "updated_at": "2025-10-02T14:05:33.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "eDklaOZdG0NlQVvga6D8x1WbLKd97qo0zaEjMPz4XAeJZkRyw2prOmn3Yp8YyM2L",
+                            "debut": "2026-06-07",
+                            "fin": "2026-06-08",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-10-02T14:16:24.000000Z",
+                            "updated_at": "2025-10-02T14:16:24.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "jJdn3O0VrPwLJ8WkAjNnKXG0Rlvm7d56dvBVebgqYz4Myp92D3ZO1Q6ax1zXxAe7",
+                            "debut": "2026-06-09",
+                            "fin": "2026-06-10",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-10-02T14:17:58.000000Z",
+                            "updated_at": "2025-10-02T14:17:58.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "O4nQlYbpzyWv476X2wGkMJNVAdpZe1ovKGBjP8gQnKq9ral0YRbOLxD3mWk1J360",
+                            "debut": "2026-06-11",
+                            "fin": "2026-06-12",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-10-02T14:29:23.000000Z",
+                            "updated_at": "2025-10-02T14:29:23.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "2LXYa6pZZrWz9jelXavJG7mqDKM3gOoY9Mo6V4N1wRxAQ82ynPkLpbd0Yr7ew38O",
+                            "debut": "2026-06-13",
+                            "fin": "2026-06-14",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-10-02T14:32:12.000000Z",
+                            "updated_at": "2025-10-02T14:32:12.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "PD13zwAv67DyqzgQR8W1ALx2ZlNkrjoDGb5YwP0JKvnpmeXGOVab4M93dNRgpZGQ",
+                            "debut": "2026-06-15",
+                            "fin": "2026-06-16",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 31,
+                            "created_at": "2025-10-02T14:36:17.000000Z",
+                            "updated_at": "2025-10-02T14:36:17.000000Z",
+                            "deleted_at": null
+                        }
+                    ],
+                    "composanteId": "Qzn1Mkwoy36lKZnGe1VY4vjOR7E2qp50BxBJMogwQPmkLWr8Nz9bdA0DKbWPDrl7",
+                    "projet_owner": {
+                        "id": 43,
+                        "sigle": "PH-ORG-1",
+                        "code": 31,
+                        "nom": "Phase 3 - Org 1"
+                    },
+                    "bailleur": null,
+                    "debut": "2025-09-18",
+                    "fin": "2026-05-31",
+                    "taches": [],
+                    "created_at": "2025-09-29 03:23:16"
+                },
+                {
+                    "id": "ZEebqdzJ1LonxZgjVaKwA0zv5kXDQE3d2MGBR4WYq6leO8PJprd9yNb2nlOgNvGV",
+                    "nom": "iuiyiez",
+                    "codePta": "4.31.1.2",
+                    "poids": 0,
+                    "poidsActuel": 0,
+                    "type": "pta",
+                    "pret": 1762,
+                    "position": 2,
+                    "budgetNational": 17862,
+                    "depenses": 0,
+                    "description": null,
+                    "statut": 0,
+                    "tep": 0,
+                    "tef": 0,
+                    "durees": [
+                        {
+                            "id": "wMq01PVaYgQa19m8AnGzlWNx43ZbjKEWMGoML6XpeqkD7OrJvwy0PR2VdzXkNQO9",
+                            "debut": "2025-09-18",
+                            "fin": "2026-05-30",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 32,
+                            "created_at": "2025-09-29T20:14:07.000000Z",
+                            "updated_at": "2025-09-29T20:14:07.000000Z",
+                            "deleted_at": null
+                        },
+                        {
+                            "id": "KR8rOaqQ4DmNv8PzQyrXK0Z7Agq9wxBwl4EeJaVlRMOp1dGjW6Ynb3Lk24wlGJ6p",
+                            "debut": "2026-06-01",
+                            "fin": "2026-06-30",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 32,
+                            "created_at": "2025-09-30T08:30:39.000000Z",
+                            "updated_at": "2025-09-30T08:30:39.000000Z",
+                            "deleted_at": null
+                        }
+                    ],
+                    "composanteId": "Qzn1Mkwoy36lKZnGe1VY4vjOR7E2qp50BxBJMogwQPmkLWr8Nz9bdA0DKbWPDrl7",
+                    "projet_owner": {
+                        "id": 43,
+                        "sigle": "PH-ORG-1",
+                        "code": 31,
+                        "nom": "Phase 3 - Org 1"
+                    },
+                    "bailleur": null,
+                    "debut": "2025-09-18",
+                    "fin": "2026-05-30",
+                    "taches": [],
+                    "created_at": "2025-09-29 08:14:07"
+                },
+                {
+                    "id": "BaGpzRqdQqvrla2BxyWZ0b8XNkPVpoMeP74E1OwA5JYG6zgeLDR9djnKyXVYJO05",
+                    "nom": "kjdskjd",
+                    "codePta": "4.31.1.3",
+                    "poids": 0,
+                    "poidsActuel": 0,
+                    "type": "pta",
+                    "pret": 6756,
+                    "position": 3,
+                    "budgetNational": 546546,
+                    "depenses": 0,
+                    "description": null,
+                    "statut": -1,
+                    "tep": 0,
+                    "tef": 0,
+                    "durees": [
+                        {
+                            "id": "02j1elW8W20b1Q38Pgma7RnDkNZ4KpBmmPBOL6xdqYGw9yXeAjJVvMlrzKmbg37A",
+                            "debut": "2025-09-18",
+                            "fin": "2026-05-22",
+                            "dureeable_type": "App\\Models\\Activite",
+                            "dureeable_id": 33,
+                            "created_at": "2025-09-29T20:15:19.000000Z",
+                            "updated_at": "2025-09-29T20:15:19.000000Z",
+                            "deleted_at": null
+                        }
+                    ],
+                    "composanteId": "Qzn1Mkwoy36lKZnGe1VY4vjOR7E2qp50BxBJMogwQPmkLWr8Nz9bdA0DKbWPDrl7",
+                    "projet_owner": {
+                        "id": 43,
+                        "sigle": "PH-ORG-1",
+                        "code": 31,
+                        "nom": "Phase 3 - Org 1"
+                    },
+                    "bailleur": null,
+                    "debut": "2025-09-18",
+                    "fin": "2026-05-22",
+                    "taches": [],
+                    "created_at": "2025-09-29 08:15:19"
+                }
+            ],
+            "position": 1,
+            "created_at": "2025-09-26 06:19:43"
+        },
+        {
+            "id": "POz2LGJVG0lNE2L1QPo83vdnWmpYzeaNE75B74VMwqjkJ9byZKg6ARrDO3ZygAkE",
+            "nom": "Outcome 2",
+            "codePta": "4.31.2",
+            "poids": 0,
+            "description": "tejrh",
+            "statut": -1,
+            "budgetNational": 600000,
+            "pret": 700000,
+            "depenses": 0,
+            "tep": 0,
+            "sigle": "2SF",
+            "projetId": "OgAdaenJejJZmLEavXgN7qRyz41d5kod4oblp69M8OxrB2GY0KwVA3QnRkbXNx27",
+            "composanteId": null,
+            "souscomposantes": [],
+            "activites": [],
+            "position": 2,
+            "created_at": "2025-09-29 02:52:28"
+        },
+        {
+            "id": "EYbpWGZ0ygDvG3Q0knAeKbqNz2YJw9xBNPxO418PB6mjVpdLElWZoMr7Rd1y42Rn",
+            "nom": "Outcome 3",
+            "codePta": "4.31.3",
+            "poids": 0,
+            "description": "jgdhkfj",
+            "statut": -1,
+            "budgetNational": 1000000,
+            "pret": 700000,
+            "depenses": 0,
+            "tep": 0,
+            "sigle": "2SF",
+            "projetId": "OgAdaenJejJZmLEavXgN7qRyz41d5kod4oblp69M8OxrB2GY0KwVA3QnRkbXNx27",
+            "composanteId": null,
+            "souscomposantes": [],
+            "activites": [],
+            "position": 3,
+            "created_at": "2025-09-29 02:53:25"
+        }
+    ],
+    "sites": [
+        {
+            "id": "PrAJaL1KZ0ADkN61X43ovVY7aPKBeE5aL3WjlQ2RdJMpLxgyzmrnwqG98g0lzdm6",
+            "nom": "site a projet 1",
+            "quartier": "HAKOUE",
+            "arrondissement": "AVLO",
+            "commune": "GRAND-POPO",
+            "departement": "MONO",
+            "longitude": 2.402229,
+            "latitude": 6.367676
+        },
+        {
+            "id": "Xrg9QoRBAgMGyv0dPRjnZm4XD6JKE35RZe5lBVr2xNwYp9Qek17zLqao8EG8ednV",
+            "nom": "site c projet 1",
+            "quartier": "ATAN-OCHOUKPA",
+            "arrondissement": "ODOMETA",
+            "commune": "KETOU",
+            "departement": "PLATEAU",
+            "longitude": 2.402229,
+            "latitude": 6.367676
+        },
+        {
+            "id": "yVRkL7vnJB2QMe3Pl9Ky1xpdGon64kbzxwWjw8RqzrYLvD7gmN0AEVXZaE0mqJp8",
+            "nom": "Site d",
+            "quartier": null,
+            "arrondissement": null,
+            "commune": null,
+            "departement": null,
+            "longitude": 2.329445,
+            "latitude": 6.38013
+        },
+        {
+            "id": "pxPoBkq806AaqnyQ9w3lGdVemRDJ87OJXL5kjvgMZYox4LrPX1NKz2pBEjDZYLQV",
+            "nom": "Enquete de scolarisation",
+            "quartier": null,
+            "arrondissement": null,
+            "commune": null,
+            "departement": null,
+            "longitude": 2.326999,
+            "latitude": 6.359402
+        },
+        {
+            "id": "6pxAok7r9p0P4xrVgKAej2wqB18RvQ5kJ9Wd76yz3ZaMYNGEXolmDnkLJzGdDBm2",
+            "nom": "Ad doloribus id adip",
+            "quartier": "Molestiae est enim c",
+            "arrondissement": "Et laborum sit temp",
+            "commune": "Enim cupidatat totam",
+            "departement": "Consequat Ea aut se",
+            "longitude": 90,
+            "latitude": 14
+        },
+        {
+            "id": "4gq62kweZelAYE20qPMyQzBK7nGXdw5D4v5L9xj84k6oRJmvVDNrpa13gMrXnDm3",
+            "nom": "Djsuee eiueze",
+            "quartier": "dsjkseiouez",
+            "arrondissement": "dskjdss",
+            "commune": "jkdjsds",
+            "departement": "jhhgj",
+            "longitude": 0.015139,
+            "latitude": 0.048305
+        }
+    ],
+    "audit": {
+        "id": "DPLG9aq6P7JAdrk6DQam9je2b3vEM15L05zpgWlLoBYOyqx840NVXZGw3ZrONmlA",
+        "annee": "2024",
+        "entreprise": "guiui",
+        "entrepriseContact": "22953818589",
+        "dateDeTransmission": "2025-03-18",
+        "etat": "Termine",
+        "statut": 1,
+        "projetId": 17,
+        "created_at": "2025-09-27T01:41:59.000000Z",
+        "updated_at": "2025-09-27T01:42:31.000000Z",
+        "categorie": "Audit de conformité environnementale et social",
+        "programmeId": 3
+    }
+}

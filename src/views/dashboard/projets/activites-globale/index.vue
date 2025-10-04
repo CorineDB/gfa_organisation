@@ -355,12 +355,48 @@ export default {
       console.log("this.selectedIds.activiteId", this.selectedIds.activiteId);
     },
     getInfoActivite(id) {
-      if (id !== null || id !== "") {
+      if (id !== null && id !== "") {
         ActiviteService.get(id)
           .then((response) => {
             console.log(response.data.data);
             this.activiteTep = response.data.data.tep;
             this.activiteTef = response.data.data.tef;
+
+            this.dureeActivite = {
+              debut: response.data.data.debut,
+              fin: response.data.data.fin,
+            };
+
+            //recuprer les trimestes de la duree de l'activité
+            this.trimestres = this.getQuartersInDuration(response.data.data.debut, response.data.data.fin);
+
+            if (response.data.data.durees && response.data.data.durees.length) {
+              this.plageDureeActivite = response.data.data.durees;
+
+              //parcour plageDureeActivite
+              this.plageDureeActivite.forEach((duree) => {
+                const quartersInDuree = this.getQuartersInDuration(duree.debut, duree.fin);
+
+                quartersInDuree.forEach((quarter) => {
+                  // si le trimestre n'existe pas dans this.trimestres on l'ajoute
+                  const exists = this.trimestres.some((t) => t.trimestre === quarter.trimestre);
+                  if (!exists) {
+                    this.trimestres.push(quarter);
+                  }
+                });
+              });
+
+              // Trier les trimestres par ordre croissant
+              this.trimestres.sort((a, b) => a.trimestre - b.trimestre);
+            }
+
+            //créer etat global : trimestreYears a partie des trimestres
+            const anneesUniques = [...new Set(this.trimestres.map((t) => t.annee))];
+            this.trimestreYears = anneesUniques.sort((a, b) => a - b);
+
+            //recuperer montantADecaisser
+            this.montantADecaisser = response.data.data.pret + response.data.data.budgetNational;
+
             console.log("this.activiteTep ", this.activiteTep);
             console.log("this.activiteTef ", this.activiteTef);
           })
@@ -407,14 +443,16 @@ export default {
       if (state == 3) {
         this.activites = [...this.allActivite];
       } else {
-        console.log("state", state);
-
         this.activites = this.allActivite.filter((item) => item.statut == state);
-
-        console.log("activites", this.activites);
       }
     },
-
+    // Ajout des méthodes pour recevoir les valeurs du composant PlanDecaissementComponent
+    receiveSommeDesPlanDeDecaissement(val) {
+      this.sommeDesPlanDeDecaissement = val;
+    },
+    receiveMontantRestantADecaisser(val) {
+      this.montantRestantADecaisser = val;
+    },
     getInitialFormData() {
       return {
         nom: "",
@@ -725,9 +763,11 @@ export default {
 
       this.prolongerDureeActivite({ dates: payLoad, id: this.activiteId })
         .then((response) => {
+           this.loadingProlonger = false;
           if (response.status == 200 || response.status == 201) {
             this.showModalProlongement = false;
-            this.loadingProlonger = false;
+             this.loadingProlonger = false;
+           
 
             this.dateDebut = "";
             this.dateDebutOld = "";
@@ -737,6 +777,7 @@ export default {
             toast.success("Prolongation éffectuée avec succès");
 
             this.loadSousComposantDetails();
+            this.loadComposantDetails();
             //this.fetchProjets(this.programmeId);
           }
         })
@@ -775,7 +816,9 @@ export default {
 
             toast.success("Duree modifiée avec succès");
 
-            this.loadSousComposantDetails();
+            this.loadComposantDetails();
+
+            this.loadSousComposantDetails
             //this.fetchProjets(this.programmeId);
           }
         })
@@ -908,6 +951,8 @@ export default {
 
       console.log(this.planDeDecaissement);
 
+      let errorIndex = [];
+
       for (let index = 0; index < this.planDeDecaissement.length; index++) {
         let plan = this.listePlanDeDecaissement.filter((plan) => plan.annee == this.planDeDecaissement[index].annee && plan.trimestre == this.planDeDecaissement[index].trimestre);
 
@@ -917,6 +962,7 @@ export default {
           await action;
 
           toast.success(`Plan de décaissement n° ${index + 1} enregistré avec succès`);
+          errorIndex.push(index);
 
           if (index === this.planDeDecaissement.length - 1) {
             this.showModalPlanDeDecaissement = false;
@@ -930,14 +976,39 @@ export default {
         } catch (error) {
           this.loadingPlanDeDecaissement = false;
 
-          if (error.response && error.response.data && error.response.data.errors.length > 0) {
-            this.erreurPlanDeDecaissement = error.response.data.errors;
-            toast.error("Une erreur s'est produite dans votre formulaire");
-          } else {
+          // Mettre à jour les messages d'erreurs dynamiquement
+          if (error.response && error.response.data && error.response.data.errors) {
+            // Transformer l'objet errors en format compatible avec l'affichage
+            const formattedErrors = {};
+            Object.keys(error.response.data.errors).forEach(key => {
+              formattedErrors[key] = Array.isArray(error.response.data.errors[key])
+                ? error.response.data.errors[key][0]
+                : error.response.data.errors[key];
+            });
+
+            // Assigner les erreurs à l'index correspondant
+            if (!this.erreurPlanDeDecaissement) {
+              this.erreurPlanDeDecaissement = [];
+            }
+            this.erreurPlanDeDecaissement[index] = formattedErrors;
+
             toast.error(`Plan ${index + 1} : ${error.response.data.message}`);
+          } else {
+            toast.error(`Plan ${index + 1} : ${error.response?.data?.message || "Une erreur s'est produite"}`);
           }
         } finally {
           this.loadingPlanDeDecaissement = false;
+        }
+      }
+
+      if (this.planDeDecaissement.length > 0) {
+        console.log("this.planDeDecaissement", this.planDeDecaissement);
+
+        if (errorIndex.length > 0) {
+          console.log("errorIndex", errorIndex);
+          errorIndex.forEach((item) => {
+            this.removePlan(item);
+          });
         }
       }
     },
@@ -979,21 +1050,7 @@ export default {
       <h2 class="mb-4 text-base font-bold">Filtre</h2>
 
       <div class="grid grid-cols-2 gap-4">
-        <!-- <div class="flex col-span-6">
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
-          <TomSelect
-            v-model="projetId"
-            :options="{
-              placeholder: 'Choisir un Output',
-              create: false,
-              onOptionAdd: text(),
-            }"
-            class="w-full"
-          >
-            <option value="">Choisir un projet</option>
-            <option v-for="(element, index) in projets" :key="index" :value="element.id">{{ element.codePta }} - {{ element.nom }}</option>
-          </TomSelect>
-        </div> -->
+       
         <!--  v-if="composants.length > 0" -->
         <div class="flex col-span-6">
           <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Outcomes</label>
@@ -1204,7 +1261,18 @@ export default {
     </pagination>
   </div>
 
-  <PlanDecaissementComponent v-if="seePlan" :activiteId="selectedIds.activiteId" :activites="activites" @send-activiteId="changeActiviteId" :getPlageActivites="getPlageActivite" />
+  <PlanDecaissementComponent
+    v-if="seePlan"
+    :activiteId="selectedIds.activiteId"
+    :activites="activites"
+    @send-activiteId="changeActiviteId"
+    :getPlageActivites="getPlageActivite"
+    :montantADecaisser="montantADecaisser"
+    :trimestres="trimestres"
+    :reciveYearsFromParent="trimestreYears"
+    @send-sommeDesPlanDeDecaissement="receiveSommeDesPlanDeDecaissement"
+    @send-montantRestantADecaisser="receiveMontantRestantADecaisser"
+  />
 
   <div v-if="seeStatistique" class="flex flex-col sm:flex-row justify-evenly mt-4">
     <div class="flex flex-col items-center p-6 mb-3 bg-white rounded-md shadow">
@@ -1229,7 +1297,7 @@ export default {
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
         <div class="col-span-12 md:col-span-6">
           <InputForm v-model="formData.nom" class="col-span-12 mt-4" type="text" required="required" placeHolder="Nom de l'activité*" label="Nom" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
+          <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
         </div>
         <div class="input-form mt-3 col-span-12 md:col-span-6">
           <label for="validation-form-6" class="form-label w-full"> Description </label>
@@ -1237,11 +1305,11 @@ export default {
         </div>
         <div class="col-span-12 md:col-span-6">
           <InputForm v-model="formData.pret" class="col-span-12 mt-4" type="number" required="required" placeHolder="Subvention*" label="Subvention" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
+          <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
         </div>
         <div class="col-span-12 md:col-span-6">
           <InputForm v-model="formData.budgetNational" class="col-span-12 mt-4" type="number" required="required" placeHolder="Ex : 2" label="Fond Propre" />
-          <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
+          <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
         </div>
 
         <div v-if="!isUpdate" class="flex flex-col col-span-12 md:col-span-6 mt-4">

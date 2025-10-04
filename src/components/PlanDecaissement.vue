@@ -10,12 +10,13 @@ import VButton from "@/components/news/VButton.vue";
 import pagination from "@/components/news/pagination.vue";
 import ActiviteService from "@/services/modules/activite.service";
 import NoRecordsMessage from "@/components/NoRecordsMessage.vue";
+import AuthService from "@/services/modules/auth.service";
 
 import { helper as $h } from "@/utils/helper";
 
 import { toast } from "vue3-toastify";
 export default {
-  emits: ["send-activiteId"],
+  emits: ["send-activiteId", "send-sommeDesPlanDeDecaissement", "send-montantRestantADecaisser"],
   props: {
     activiteId: {
       type: String, // Type attendu (String, Number, Boolean, Array, Object, etc.)
@@ -32,6 +33,21 @@ export default {
       required: false, // Indique si la prop est obligatoire
       default: [], // Définit une valeur par défaut
     },
+    montantADecaisser: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    trimestres: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    reciveYearsFromParent: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
   },
   components: {
     InputForm,
@@ -43,6 +59,8 @@ export default {
     return {
       activiteIdLocal: this.activiteId,
 
+      debutProgramme: "",
+      finProgramme: "",
       search: "",
       isLoading: false,
       itemsPerPage: 3, // Nombre d'éléments par page
@@ -55,7 +73,6 @@ export default {
       showModal: false,
       isUpdate: false,
       isLoading: false,
-      years: [2024, 2025, 2026],
       formData: {
         annee: "",
         trimestre: "",
@@ -68,6 +85,7 @@ export default {
       labels: "Ajouter",
       showDeleteModal: false,
       deleteLoader: false,
+      sommeDesPlanDeDecaissement: 0,
     };
   },
   computed: {
@@ -86,9 +104,43 @@ export default {
 
       return paginatedData;
     },
+
+    years() {
+      let anneeDebut = parseInt(`${this.debutProgramme.split("-")[0]}`);
+      let anneeFin = parseInt(`${this.finProgramme.split("-")[0]}`);
+      let annees = [];
+      for (let annee = anneeDebut; annee <= anneeFin; annee++) {
+        if (annee <= new Date().getFullYear()) {
+          annees.push(annee);
+        }
+      }
+      return annees;
+    },
+
+    filteredTrimestres() {
+      if (!this.formData.annee) {
+        return this.trimestres;
+      }
+
+      return this.trimestres.filter((trimestre) => {
+        return trimestre.annee == this.formData.annee;
+      });
+    },
   },
 
   methods: {
+    text() {},
+    async getcurrentUser() {
+      await AuthService.getCurrentUser()
+        .then((result) => {
+          this.debutProgramme = result.data.data.programme.debut;
+          this.finProgramme = result.data.data.programme.fin;
+        })
+        .catch((e) => {
+          console.error(e);
+          toast.error("Une erreur est survenue: Utilisateur connecté .");
+        });
+    },
     obtenirDate(annee) {
       // Convertir l'année en chaîne et concaténer avec "-01-01"
       let myDate = `${annee}-01-01`;
@@ -177,6 +229,7 @@ export default {
     },
     sendForm() {
       if (this.update) {
+         this.isLoading = true;
         PlanDeCaissement.update(this.planDeDecaissementId, this.formData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
@@ -200,6 +253,7 @@ export default {
               Object.keys(this.messageErreur).forEach((key) => {
                 this.messageErreur[key] = $h.extractContentFromArray(this.messageErreur[key]);
               });
+              toast.error("Une erreur s'est produite.Vérifier le formulaire de soumission");
             } else {
               toast.error(error.message);
               //
@@ -210,6 +264,8 @@ export default {
         this.isLoading = true;
         this.formData.budgetNational = parseInt(this.formData.budgetNational);
         this.formData.pret = parseInt(this.formData.pret);
+
+        console.log("this.formData.annee", this.formData.annee);
 
         PlanDeCaissement.create(this.formData)
           .then((response) => {
@@ -251,8 +307,22 @@ export default {
       ActiviteService.plansDeDecaissement(id)
         .then((data) => {
           this.planDeDecaissement = data.data.data;
+
+          //faire sommeDesPanDeDecaissement
+          if (this.planDeDecaissement.length > 0) {
+            this.sommeDesPlanDeDecaissement = this.planDeDecaissement.reduce((total, item) => {
+              return total + (item.budgetNational || 0) + (item.pret || 0);
+            }, 0);
+
+            this.$emit("send-sommeDesPlanDeDecaissement", this.sommeDesPlanDeDecaissement);
+          } else {
+            this.sommeDesPlanDeDecaissement = 0;
+            this.$emit("send-sommeDesPlanDeDecaissement", 0);
+          }
         })
-        .catch((error) => {});
+        .catch((error) => {
+          this.loaderListePlan = false;
+        });
     },
 
     filter() {},
@@ -271,6 +341,7 @@ export default {
     if (this.activiteId !== "") {
       this.getListePlanDeDecaissement(this.activiteId);
     }
+    this.getcurrentUser();
   },
 };
 </script>
@@ -327,7 +398,7 @@ export default {
           <!-- Other details with iconized section headers -->
           <div class="mt-5 space-y-3 text-gray-600">
             <div class="flex items-center">
-              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.pret ? $h.formatCurrency(item.budgetNational) : 0 }}
+              <LinkIcon class="w-4 h-4 mr-2" /> Fonds propre: {{ item.budgetNational ? $h.formatCurrency(item.budgetNational) : 0 }}
               <div class="ml-2 italic font-bold">Fcfa</div>
             </div>
 
@@ -361,74 +432,107 @@ export default {
   <!-- END: Users Layout -->
   <LoaderSnipper v-if="isLoadingData" />
 
-  <Modal backdrop="static" :show="showModal" @hidden="showModal = false">
+  <Modal size="modal-lg" backdrop="static" :show="showModal" @hidden="showModal = false">
     <ModalHeader>
       <h2 v-if="!update" class="mr-auto text-base font-medium">Ajouter un Plan de décaissement</h2>
       <h2 v-else class="mr-auto text-base font-medium">Modifier un Plan de décaissement</h2>
     </ModalHeader>
     <form @submit.prevent="sendForm">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-        <div v-if="!update" class="flex col-span-12">
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activités</label>
-          <TomSelect
-            v-model="formData.activiteId"
-            :options="{
-              placeholder: 'Choisir une activité',
-              create: false,
-              onOptionAdd: text(),
-            }"
-            @change="updateActiviteId(formData.activiteId)"
-            class="w-full"
-            title="Veuillez sélectionner une activité pour afficher son plan de décaissement"
-          >
-            <option value="">Choisir une activité</option>
+        <!-- Formulaire en deux colonnes -->
+        <div class="col-span-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Activité -->
+          <div v-if="!update" class="col-span-2">
+            <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activités</label>
+            <TomSelect
+              v-model="formData.activiteId"
+              :options="{
+                placeholder: 'Choisir une activité',
+                create: false,
+                onOptionAdd: text(),
+              }"
+              @change="updateActiviteId(formData.activiteId)"
+              class="w-full"
+              title="Veuillez sélectionner une activité pour afficher son plan de décaissement"
+            >
+              <option value="">Choisir une activité</option>
+              <option v-for="(element, index) in activites" :key="index" :value="element.id">{{ element.nom }}</option>
+            </TomSelect>
+            <p class="text-red-500 text-[12px] mt-1" v-if="messageErreur.activiteId">{{ messageErreur.activiteId }}</p>
+          </div>
 
-            <option v-for="(element, index) in activites" :key="index" :value="element.id">{{ element.nom }}</option>
-          </TomSelect>
+          <!-- Année -->
+          <div>
+            <label class="form-label">Sélectionnner l'année de décaissement</label>
+            <TomSelect v-model="formData.annee" :options="{ placeholder: 'Selectionez une année', create: false, onOptionAdd: text() }" class="w-full">
+              <option v-for="(year, index) in reciveYearsFromParent" :key="index" :value="year">{{ year }}</option>
+            </TomSelect>
+            <p class="text-red-500 text-[12px] mt-1" v-if="messageErreur.annee">{{ messageErreur.annee }}</p>
+          </div>
+
+          <!-- Trimestre -->
+          <div v-if="!update">
+            <label class="form-label">Sélectionner le trimestre</label>
+            <TomSelect
+              v-model="formData.trimestre"
+              :options="{
+                placeholder: 'Choisir un trimestre',
+                create: false,
+              }"
+              class="w-full"
+            >
+              <option value="">Choisir un trimestre</option>
+              <option v-for="trimestre in filteredTrimestres" :key="trimestre.value" :value="trimestre.value">Trimestre {{ trimestre.trimestre }} ({{ trimestre.annee}}) </option>
+            </TomSelect>
+            <p class="text-red-500 text-[12px] mt-1" v-if="messageErreur.trimestre">{{ messageErreur.trimestre }}</p>
+          </div>
+
+          <!-- Fond propre -->
+          <div>
+            <InputForm v-model="formData.budgetNational" class="no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
+            <p class="text-red-500 text-[12px] mt-1" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
+          </div>
+
+          <!-- Subvention -->
+          <div>
+            <InputForm v-model="formData.pret" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
+            <p class="text-red-500 text-[12px] mt-1" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
+          </div>
         </div>
 
-        <div class="col-span-12 mt-3">
-          <label class="form-label">Saisissez l'année de décaissement</label>
-          <TomSelect v-model="formData.annee" :options="{ placeholder: 'Selectionez  l\'année de décaissement' }" class="w-full">
-            <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
-          </TomSelect>
-        </div>
-        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur?.annee">
-          {{ messageErreur.annee }}
-        </p>
+        <!-- Section informations contextuelles en bas -->
+        <div class="col-span-12 space-y-4 mt-4">
+          <!-- Plages de date -->
+          <div v-if="getPlageActivites" class="p-3 bg-gray-50 rounded-lg">
+            <h4 class="text-sm font-semibold mb-2 text-gray-700">Plages de date :</h4>
+            <div v-for="(plage, t) in getPlageActivites.durees" :key="t" class="flex items-start mt-2">
+              <ClockIcon class="w-4 h-4 mr-2 mt-0.5 text-primary flex-shrink-0" />
+              <div class="text-xs text-gray-600">
+                <span class="font-medium">Plage {{ t + 1 }} :</span><br />
+                Du <span class="font-bold"> {{ $h.reformatDate(plage.debut) }}</span> au
+                <span class="font-bold"> {{ $h.reformatDate(plage.fin) }}</span>
+              </div>
+            </div>
+          </div>
 
-        <div v-if="!update" class="flex col-span-12 mt-4">
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Trimestre</label>
-          <TomSelect
-            v-model="formData.trimestre"
-            :options="{
-              placeholder: 'Choisir un trimestre',
-              create: false,
-            }"
-            class="w-full"
-          >
-            <option value="">Choisir un trimestre</option>
-            <option value="1">Trimestre 1</option>
-            <option value="2">Trimestre 2</option>
-            <option value="3">Trimestre 3</option>
-            <option value="4">Trimestre 4</option>
-          </TomSelect>
-        </div>
-        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.trimestre">{{ messageErreur.trimestre }}</p>
+          <!-- Résumé financier -->
+          <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h3 class="text-lg font-semibold mb-3 text-blue-800">Résumé financier</h3>
+            <div class="grid grid-cols-1 gap-3">
+              <div class="flex justify-between items-center">
+                <p class="text-sm text-gray-600">Montant total à décaisser:</p>
+                <p class="text-lg font-bold text-gray-900">{{ montantADecaisser ? $h.formatCurrency(montantADecaisser) : 0 }} FCFA</p>
+              </div>
 
-        <!-- <InputForm v-model="formData.annee" class="col-span-12" type="date" required="required" placeHolder="Annee de base" label="Année de base" /> -->
+              <div class="flex justify-between items-center">
+                <p class="text-sm text-gray-600">Somme des plans de décaissement:</p>
+                <p class="text-lg font-bold text-gray-900">{{ sommeDesPlanDeDecaissement ? $h.formatCurrency(sommeDesPlanDeDecaissement) : 0 }} FCFA</p>
+              </div>
 
-        <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
-        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
-
-        <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
-        <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
-
-        <div class="col-span-12" v-if="getPlageActivites">
-          <div class="flex items-center mt-2" v-for="(plage, t) in getPlageActivites.durees" :key="t">
-            <ClockIcon class="w-4 h-4 mr-2" />
-            <div>
-              Plage de date {{ t + 1 }} : Du <span class="pr-1 font-bold"> {{ $h.reformatDate(plage.debut) }}</span> au <span class="font-bold"> {{ $h.reformatDate(plage.fin) }}</span>
+              <div class="flex justify-between items-center pt-3 border-t border-blue-300">
+                <p class="text-sm font-semibold text-gray-700">Montant restant à décaisser:</p>
+                <p class="text-xl font-bold" :class="montantADecaisser - sommeDesPlanDeDecaissement >= 0 ? 'text-green-600' : 'text-red-600'">{{ $h.formatCurrency(montantADecaisser - sommeDesPlanDeDecaissement) }} FCFA</p>
+              </div>
             </div>
           </div>
         </div>
