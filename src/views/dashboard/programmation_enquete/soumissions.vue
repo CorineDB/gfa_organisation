@@ -223,8 +223,12 @@ const goToDetailSoumission = (idSoumission, type = "factuel") => {
   router.push({ name: "DetailSoumission", params: { e: idEvaluation, s: idSoumission }, query: { type: type } });
 };
 
-const goToPageSynthese = () => {
-  router.push({ name: "FicheSynthese", params: { e: idEvaluation } });
+const goToPageSynthese = (table = null) => {
+  const route = { name: "FicheSynthese", params: { e: idEvaluation } };
+  if (table) {
+    route.query = { table };
+  }
+  router.push(route);
 };
 
 const goToPageMarqueur = () => {
@@ -476,6 +480,17 @@ const opendAddParticipant = () => {
 
 const openPerceptionModal = () => {
   router.push({ name: "ToolsPerception", params: { id: idEvaluation } });
+};
+
+const copyPerceptionLink = async () => {
+  try {
+    const link = `${window.location.origin}/tools-perception/${statistiques.value.formulaire_de_perception_de_gouvernance?.token || idEvaluation}`;
+    await navigator.clipboard.writeText(link);
+    toast.success("Lien de soumission copié !");
+  } catch (error) {
+    console.error("Erreur lors de la copie:", error);
+    toast.error("Impossible de copier le lien");
+  }
 };
 
 const mode = computed(() => (isCreate.value ? "Ajouter" : "Modifier"));
@@ -752,26 +767,30 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <div v-if="datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception >= 100" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                <button @click.self="goToPageMarqueur" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+              <div class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+                <!-- Bouton Fiche de synthèse: affiché si pourcentage >= 100 -->
+                <button v-if="datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception >= 100" @click.self="goToPageSynthese('perception')" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
                   Voir Fiche de synthese
                   <ArrowRightIcon class="ml-2 size-5" />
                 </button>
-              </div>
 
-              <div v-else-if="!datas.perception?.length || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
-                  <button v-if="(!datas.perception?.length && statistiques.statut === 0) || (datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100 && statistiques.statut === 0)" @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                <!-- Boutons d'action: affichés si statut === 0 (en cours) -->
+                <div v-if="statistiques.statut === 0" class="flex flex-col w-full">
+                  <button @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary border-t border-slate-200/60">
                     Envoyer une invitation
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
 
-                  <button v-else class="w-full gap-2 py-[22px]"></button>
+                  <button v-if="statistiques.formulaire_de_perception_de_gouvernance" @click="copyPerceptionLink" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-success">
+                    Copier le lien de soumission
+                    <CopyIcon class="ml-2 size-5" />
+                  </button>
+
+                  <button v-if="datas.perception?.length" @click="sendReminder" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
+                    Envoyer un rappel
+                    <ExternalLinkIcon class="ml-2 size-5" />
+                  </button>
                 </div>
-                <button v-if="datas.perception?.length && statistiques.pourcentage_evolution_des_soumissions_de_perception < 100" @click="sendReminder" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium text-white bg-primary">
-                  Envoyer un rappel
-                  <ExternalLinkIcon class="ml-2 size-5" />
-                </button>
               </div>
 
               <div class="absolute top-0 flex w-full">
@@ -786,7 +805,7 @@ onMounted(async () => {
         </div>
 
         <!-- Ranking Section -->
-        <div v-if="statistiques.pourcentage_evolution < 100" class="col-span-4 p-6 bg-white rounded-md shadow-lg">
+        <div v-if="statistiques.statut !== 1" class="col-span-4 p-6 bg-white rounded-md shadow-lg">
           <h2 class="mb-4 text-lg font-bold">Classement des soumissions</h2>
 
           <div class="">
