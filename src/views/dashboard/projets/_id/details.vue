@@ -125,30 +125,7 @@
           </div>
         </div>
       </div>
-
-      <!-- <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
-        <div class="report-box zoom-in">
-          <div class="p-5 text-center box">
-            <div class="flex items-center justify-between">
-              <PercentIcon class="size-10 text-warning" />
-              <div class="mt-2 text-lg font-medium leading-8">Évolution</div>
-            </div>
-            <div class="flex items-center justify-around mt-4">
-              <div class="flex gap-2 text-lg text-left">
-                <div class="mt-1 text-primary">
-                  TEP:
-                  <span class="font-semibold"> {{ graphiqueData?.tep ?? 0 }} % </span>
-                </div>
-                <div class="w-px h-8 bg-slate-400"></div>
-                <div class="mt-1 text-primary">
-                  TEF:
-                  <span class="font-semibold"> {{ graphiqueData?.tef ?? 0 }} % </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
+ 
     </div>
 
     <!-- Content Grid -->
@@ -187,16 +164,16 @@
         <ChartJauge label="TEF" :temperature="graphiqueData?.tef * 100 ?? 0" />
       </div>
       <!-- Map and Data -->
-      <div class="col-span-2 p-6 bg-white rounded-md shadow" v-if="graphiqueData?.sites?.length > 0">
+      <div class="col-span-12 p-6 bg-white rounded-md shadow" v-if="graphiqueData?.sites?.length > 0">
         <h2 class="mb-4 text-lg font-semibold text-gray-700">Cartes géographiques</h2>
         <div class="grid grid-cols-2 gap-4">
           <!-- Map -->
           <!-- <div  style="height: 40vh"></div> -->
-          <div>
-            <div id="map" class="h-48 mb-4 bg-gray-200 rounded-md"></div>
+          <div class="col-span-8">
+            <div id="map" class="mb-4 bg-gray-200 rounded-md" style="height: 400px;"></div>
           </div>
           <!-- Data Table -->
-          <div>
+          <div class="col-span-4 overflow-x-auto">
             <table class="w-full text-sm text-gray-600">
               <thead>
                 <tr class="text-left bg-gray-100">
@@ -515,10 +492,90 @@ const getStat = function () {
     .then((data) => {
       graphiqueData.value = data.data.data;
       initTabulator();
+      initMap();
     })
     .catch((error) => {
       console.log(error);
     });
+};
+
+const initMap = () => {
+  if (graphiqueData.value?.sites?.length > 0) {
+    // Attendre que le DOM soit mis à jour
+    setTimeout(() => {
+      const mapElement = document.getElementById("map");
+      if (!mapElement) return;
+
+      // Initialiser la carte si elle n'existe pas
+      if (!initialMap.value) {
+        // Créer l'icône personnalisée
+        myIcon.value = L.icon({
+          iconUrl: icon,
+          shadowUrl: markerShadow,
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41],
+        });
+
+        // Calculer le centre et le zoom pour afficher tous les marqueurs
+        const bounds = [];
+
+        graphiqueData.value.sites.forEach(site => {
+          const lat = parseFloat(site.latitude);
+          const lng = parseFloat(site.longitude);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            bounds.push([lat, lng]);
+          }
+        });
+
+        // Prendre le premier site comme centre par défaut
+        const firstSite = graphiqueData.value.sites[0];
+        const centerLat = parseFloat(firstSite.latitude);
+        const centerLng = parseFloat(firstSite.longitude);
+
+        initialMap.value = L.map("map").setView([centerLat, centerLng], 8);
+
+        // Ajouter les tuiles
+        L.tileLayer(url.value, {
+          attribution: attribution.value,
+        }).addTo(initialMap.value);
+
+        // Créer un groupe de marqueurs avec MarkerCluster
+        const markers = L.markerClusterGroup();
+
+        // Parcourir tous les sites et ajouter les marqueurs au cluster
+        graphiqueData.value.sites.forEach(site => {
+          const lat = parseFloat(site.latitude);
+          const lng = parseFloat(site.longitude);
+
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const popupContent = `
+              <b>${site.nom}</b><br>
+              ${site.quartier ? `Quartier: ${site.quartier}<br>` : ''}
+              ${site.commune ? `Commune: ${site.commune}<br>` : ''}
+              ${site.departement ? `Département: ${site.departement}<br>` : ''}
+              Lat: ${lat}<br>
+              Lng: ${lng}
+            `;
+
+            const marker = L.marker([lat, lng], { icon: myIcon.value })
+              .bindPopup(popupContent);
+
+            markers.addLayer(marker);
+          }
+        });
+
+        // Ajouter le groupe de marqueurs à la carte
+        initialMap.value.addLayer(markers);
+
+        // Ajuster la vue pour afficher tous les marqueurs
+        if (bounds.length > 1) {
+          initialMap.value.fitBounds(bounds, { padding: [50, 50] });
+        }
+      }
+    }, 300);
+  }
 };
 
 onMounted(() => {

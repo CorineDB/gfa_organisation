@@ -189,55 +189,94 @@ export default {
       .then((response) => {
         this.projet = response.data.data;
         this.sites = this.projet.sites || [];
-        // console.log(this.projet);
+        // Initialiser la carte après avoir récupéré les sites
+        this.$nextTick(() => {
+          this.initMap();
+        });
       }).catch((error) => {
         console.error("Erreur lors de la récupération des détails du projet:", error);
         toast.error("Erreur lors de la récupération des détails du projet.");
       });
+    },
+
+    initMap() {
+      if (this.sites && this.sites.length > 0) {
+        // Configurer l'icône
+        this.myIcon = L.icon({
+          iconUrl: icon,
+          shadowUrl: markerShadow,
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41],
+        });
+
+        // Calculer les bounds pour tous les sites
+        const bounds = [];
+        this.sites.forEach(site => {
+          const lat = parseFloat(site.latitude);
+          const lng = parseFloat(site.longitude);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            bounds.push([lat, lng]);
+          }
+        });
+
+        // Centre par défaut (Bénin)
+        const centerLat = bounds.length > 0 ? bounds[0][0] : 6.8041;
+        const centerLng = bounds.length > 0 ? bounds[0][1] : 2.4152;
+
+        // Initialiser la carte
+        this.initialMap = L.map("map", {
+          zoomControl: true,
+          zoom: 8,
+          zoomAnimation: false,
+          fadeAnimation: true,
+          markerZoomAnimation: true,
+        }).setView([centerLat, centerLng], 8);
+
+        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(this.initialMap);
+
+        // Créer un groupe de marqueurs avec MarkerCluster
+        const markers = L.markerClusterGroup();
+
+        // Parcourir tous les sites et ajouter les marqueurs au cluster
+        this.sites.forEach(site => {
+          const lat = parseFloat(site.latitude);
+          const lng = parseFloat(site.longitude);
+
+          if (!isNaN(lat) && !isNaN(lng)) {
+            const popupContent = `
+              <b>${site.nom}</b><br>
+              ${site.quartier ? `Quartier: ${site.quartier}<br>` : ''}
+              ${site.commune ? `Commune: ${site.commune}<br>` : ''}
+              ${site.departement ? `Département: ${site.departement}<br>` : ''}
+              Lat: ${lat}<br>
+              Lng: ${lng}
+            `;
+
+            const marker = L.marker([lat, lng], { icon: this.myIcon })
+              .bindPopup(popupContent);
+
+            markers.addLayer(marker);
+          }
+        });
+
+        // Ajouter le groupe de marqueurs à la carte
+        this.initialMap.addLayer(markers);
+
+        // Ajuster la vue pour afficher tous les marqueurs
+        if (bounds.length > 1) {
+          this.initialMap.fitBounds(bounds, { padding: [50, 50] });
+        }
+      }
     }
 
   },
   mounted() {
-    // Initialiser la carte lorsque le composant est monté
-    // Configurer l'icône
-    this.myIcon = L.icon({
-      iconUrl: icon,
-      iconSize: [30, 30],
-      iconAnchor: [22, 94],
-      popupAnchor: [-3, -76],
-      shadowUrl: markerShadow,
-      shadowSize: [60, 30],
-      shadowAnchor: [22, 94],
-    });
-
-    // Initialiser la carte
-    this.initialMap = L.map("map", {
-      zoomControl: true,
-      zoom: 1,
-      zoomAnimation: false,
-      fadeAnimation: true,
-      markerZoomAnimation: true,
-    }).setView([6.8041, 2.4152], 6);
-
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(this.initialMap);
-
-    // Ajouter des marqueurs individuels
-    L.marker([6.3746, 2.6004], { icon: this.myIcon }).addTo(this.initialMap);
-    L.marker([6.3752, 2.8349], { icon: this.myIcon }).addTo(this.initialMap);
-
-    // Créer un groupe de marqueurs
-    const markers = L.markerClusterGroup();
-
-    // Ajouter des marqueurs à partir de `addressPoints`
-    addressPoints.forEach((element, index) => {
-      const each_marker = new L.marker([element.latitude, element.longitude], { icon: this.myIcon }).bindPopup(`<strong> Hello Bangladesh! </strong> <br> I am a popup number ${index}`);
-      markers.addLayer(each_marker);
-    });
-
-    this.initialMap.addLayer(markers);
+    // La carte sera initialisée après le chargement des données
   },
   created() {
     if (this.currentUser) {
