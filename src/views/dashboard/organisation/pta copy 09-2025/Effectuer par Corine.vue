@@ -10,12 +10,6 @@
       </div>
       <div class="flex">
         <button class="mr-2 shadow-md btn btn-primary" @click="showModalFiltre = true"><FilterIcon class="w-4 h-4 mr-3" />Filtrer le PA</button>
-        <!-- v-if="!isLoadingData && currentOrganisation?.profile_de_gouvernance" :org="currentOrganisation?.nom" :pointfocal="`${currentOrganisation?.nom_point_focal}  ${currentOrganisation?.prenom_point_focal}`" :dateevaluation="currentFactuel?.evaluatedAt" -->
-        <!-- <ExportationResultatSynthese :datas="dataNew" class="mr-3" /> -->
-        <!-- <download-excel :data="json_data" class="btn btn-primary">
-          Télécharger Excel
-          <DownloadIcon class="w-4 h-4" />
-        </download-excel> -->
 
         <button @click="exportToExcel" class="mr-2 btn btn-primary">
           <DownloadIcon class="w-4 h-4 mr-2" />
@@ -23,6 +17,10 @@
         </button>
 
         <DownloadPDFButton :tableIds="['ptaTable34']" pageName="Plan d'action" format="a0" />
+
+        <button class="ml-2 btn btn-primary" title="Retour" @click="$router.go(-1)">
+          <CornerDownLeftIcon class="w-5 h-5" />
+        </button>
       </div>
     </div>
   </div>
@@ -169,14 +167,14 @@
 
               <!-- Solde -->
               <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-                <span class="font-bold text-black"> {{ pta.pret + pta.bn - pta.depenses == null || pta.pret + pta.bn - pta.depenses == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn - pta.depenses) }}</span>
+                <span class="font-bold text-black"> {{ pta.pret + pta.bn - pta.depenses == null || pta.pret + pta.bn - pta.depenses == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn - pta.depenses) }} </span>
               </td>
 
               <!-- tef -->
               <td v-if="pta.pret + pta.bn > 0 && !pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
                 <span class="font-bold text-black"> {{ ((pta.depenses / (pta.pret + pta.bn)) * 100).toFixed(2) }} %</span>
               </td>
-              <!-- <td v-else class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">Non disponible</td> -->
+              <td v-else class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">Non disponible</td>
 
               <!-- total budgetaire-->
               <!-- v-if="pta.pret != '' || pta.bn != ''" -->
@@ -405,7 +403,7 @@
     <tbody>
       <tr v-for="pta in filteredDataNew" :key="pta.id" class="bg-white border-b dark:bg-gray-800 dark:border-gray-300">
         <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span v-if="pta.isProjet" class="text-sm text-blue-500">{{ pta.code }}</span>
+          <span v-if="pta.isProjet" class="text-lg font-bold"> {{ pta.code }}</span>
           <span v-if="pta.isComposante" class="text-sm text-blue-500"> {{ pta.code }}</span>
           <span v-if="pta.isSC && pta.code != 0" class="text-sm text-yellow-600"> {{ pta.code }}</span>
           <span v-if="pta.isActivite" class="text-sm text-green-600">
@@ -415,7 +413,7 @@
           <span v-if="pta.isTache" class="text-sm text-red-600"> {{ pta.code }}</span>
         </td>
         <td class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300 uppercase">
-          <span v-if="pta.isProjet" class="text-sm text-blue-500">Projet: {{ pta.nom }}</span>
+          <span v-if="pta.isProjet" class="text-lg font-bold">projet: {{ pta.nom }}</span>
           <span v-if="pta.isComposante" class="text-sm text-blue-500">OutCome: {{ pta.nom }}</span>
           <span v-if="pta.isSC" class="text-sm text-yellow-600"> <span class="text-sm text-yellow-600" v-if="pta.code != 0">OutPut:</span> {{ pta.nom }}</span>
           <span v-if="pta.isActivite" class="text-sm text-green-600 shadow bg-gradient-to-br from-yellow-400 to-yellow-600">Activite: {{ pta.nom }}</span>
@@ -424,54 +422,54 @@
         <!-- Fond propre -->
         <!-- v-if="pta.bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black">{{ pta.bn == null || pta.bn == 0 ? 0 : $h.formatCurrency(pta.bn) }} </span>
+          <span class="font-bold">{{ pta.bn == null || pta.bn == 0 ? 0 : $h.formatCurrency(pta.bn) }} </span>
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300 font-bold" v-else>0</td> -->
 
         <!-- Subvention -->
         <!-- v-if="pta.pret" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.pret == null || pta.pret == 0 ? 0 : $h.formatCurrency(pta.pret) }}</span>
+          <span class="font-bold"> {{ pta.pret == null || pta.pret == 0 ? 0 : $h.formatCurrency(pta.pret) }}</span>
         </td>
         <!-- <td v-else class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300 font-bold">0</td> -->
 
         <!-- Dépenses -->
         <!-- v-if="pta.depenses" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.depenses == null || pta.depenses == 0 ? 0 : $h.formatCurrency(pta.depenses) }}</span>
+          <span class="font-bold"> {{ pta.depenses == null || pta.depenses == 0 ? 0 : $h.formatCurrency(pta.depenses) }}</span>
         </td>
         <!-- <td v-else class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300 font-bold">0</td> -->
 
         <!-- Solde -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.pret + pta.bn - pta.depenses == null || pta.pret + pta.bn - pta.depenses == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn - pta.depenses) }} </span>
+          <span class="font-bold text-yellow-500"> {{ pta.pret + pta.bn - pta.depenses == null || pta.pret + pta.bn - pta.depenses == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn - pta.depenses) }} {{ pta.pret + pta.bn - pta.depenses == null || pta.pret + pta.bn - pta.depenses == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn - pta.depenses) }}</span>
         </td>
 
         <!-- tef -->
         <td v-if="pta.pret + pta.bn > 0 && !pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ ((pta.depenses / (pta.pret + pta.bn)) * 100).toFixed(2) }} %</span>
+          <span class="font-bold text-yellow-500"> {{ ((pta.depenses / (pta.pret + pta.bn)) * 100).toFixed(2) }} %</span>
         </td>
-        <!-- <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">Non disponible</td> -->
+        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">Non disponible</td>
 
         <!-- total budgetaire-->
         <!-- v-if="pta.pret != '' || pta.bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.pret + pta.bn == null || pta.pret + pta.bn == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn) }}</span>
+          <span class="font-bold text-yellow-500"> {{ pta.pret + pta.bn == null || pta.pret + pta.bn == 0 ? 0 : $h.formatCurrency(pta.pret + pta.bn) }}</span>
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span v-if="pta.poids != undefined" class="font-bold text-black"> {{ pta.poids }} </span>
+          <span v-if="pta.poids != undefined" class="font-bold"> {{ pta.poids }} </span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
 
         <td v-if="statutActuel && !pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span v-if="pta.poidsActuel != undefined" class="font-bold text-black"> {{ pta.poidsActuel }} </span>
+          <span v-if="pta.poidsActuel != undefined" class="font-bold text-green-500"> {{ pta.poidsActuel }} </span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
 
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span v-if="pta.structureResponsable != undefined" class="font-bold text-black"> {{ pta.structureResponsable }} </span>
+          <span v-if="pta.structureResponsable != undefined" class="font-bold"> {{ pta.structureResponsable }} </span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
 
@@ -479,121 +477,121 @@
 
         <td v-if="pta.planing != undefined && pta.planing.janvier != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.janvier != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border shadow whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border shadow whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.fevrier != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.fevrier != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.mars != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.mars != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.avril != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.avril != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.mai != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.mai != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.juin != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.juin != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.juillet != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.juillet != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
 
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-yellow-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-yellow-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.aout != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.aout != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.septembre != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.septembre != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.octobre != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.octobre != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.novembre != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-blue-400 to-blue-600"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.novembre != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <td v-if="pta.planing != undefined && pta.planing.decembre != '' && !pta.isProjet" class="p-2 bg-blue-500 border border-l-0 border-r-0"></td>
         <td v-else-if="pta.planingt != undefined && pta.planingt.decembre != '' && !pta.isProjet" class="p-2 border border-l-0 border-r-0 shadow bg-gradient-to-br from-red-400 to-red-600"></td>
-        <td v-else-if="!pta.isProjet" class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300"></td>
+        <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else-if="!pta.isProjet"></td>
 
         <!-- fin planing -->
 
         <!-- v-if="pta.t1Bn != undefined && pta.t1Bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t1Bn == null || pta.t1Bn == 0 ? 0 : $h.formatCurrency(pta.t1Bn) }}</span>
+          <span class="font-bold"> {{ pta.t1Bn == null || pta.t1Bn == 0 ? 0 : $h.formatCurrency(pta.t1Bn) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!-- v-if="pta.t1Pret != undefined && pta.t1Pret != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t1Pret == null || pta.t1Pret == 0 ? 0 : $h.formatCurrency(pta.t1Pret) }}</span>
+          <span class="font-bold"> {{ pta.t1Pret == null || pta.t1Pret == 0 ? 0 : $h.formatCurrency(pta.t1Pret) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!-- v-if="pta.t1Pret != '' || pta.t1Bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t1Pret + pta.t1Bn == null || pta.t1Pret + pta.t1Bn == 0 ? 0 : $h.formatCurrency(pta.t1Pret + pta.t1Bn) }}</span>
+          <span class="font-bold"> {{ pta.t1Pret + pta.t1Bn == null || pta.t1Pret + pta.t1Bn == 0 ? 0 : $h.formatCurrency(pta.t1Pret + pta.t1Bn) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA </span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!-- v-if="pta.t2Bn != undefined && pta.t2Bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t2Bn == null || pta.t2Bn == 0 ? 0 : $h.formatCurrency(pta.t2Bn) }}</span>
+          <span class="font-bold"> {{ pta.t2Bn == null || pta.t2Bn == 0 ? 0 : $h.formatCurrency(pta.t2Bn) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!-- v-if="pta.t2Pret != undefined && pta.t2Pret != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t2Pret == null || pta.t2Pret == 0 ? 0 : $h.formatCurrency(pta.t2Pret) }}</span>
+          <span class="font-bold"> {{ pta.t2Pret == null || pta.t2Pret == 0 ? 0 : $h.formatCurrency(pta.t2Pret) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA </span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!--  v-if="pta.t2Pret != '' || pta.t2Bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t2Pret + pta.t2Bn == null || pta.t2Pret + pta.t2Bn == 0 ? 0 : $h.formatCurrency(pta.t2Pret + pta.t2Bn) }}</span>
+          <span class="font-bold"> {{ pta.t2Pret + pta.t2Bn == null || pta.t2Pret + pta.t2Bn == 0 ? 0 : $h.formatCurrency(pta.t2Pret + pta.t2Bn) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA </span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!-- v-if="pta.t3Bn != undefined && pta.t3Bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t3Bn == null || pta.t3Bn == 0 ? 0 : $h.formatCurrency(pta.t3Bn) }}</span>
+          <span class="font-bold"> {{ pta.t3Bn == null || pta.t3Bn == 0 ? 0 : $h.formatCurrency(pta.t3Bn) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!--  v-if="pta.t3Pret != undefined && pta.t3Pret != ''"  -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t3Pret == null || pta.t3Pret == 0 ? 0 : $h.formatCurrency(pta.t3Pret) }}</span>
+          <span class="font-bold"> {{ pta.t3Pret == null || pta.t3Pret == 0 ? 0 : $h.formatCurrency(pta.t3Pret) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!-- v-if="pta.t3Pret != '' || pta.t3Bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ $h.formatCurrency(pta.t3Pret + pta.t3Bn) }} {{ pta.t3Pret + pta.t3Bn == null || pta.t3Pret + pta.t3Bn == 0 ? 0 : $h.formatCurrency(pta.t3Pret + pta.t3Bn) }}</span>
+          <span class="font-bold"> {{ $h.formatCurrency(pta.t3Pret + pta.t3Bn) }} {{ pta.t3Pret + pta.t3Bn == null || pta.t3Pret + pta.t3Bn == 0 ? 0 : $h.formatCurrency(pta.t3Pret + pta.t3Bn) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA </span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!-- v-if="pta.t4Bn != undefined && pta.t4Bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t4Bn == null || pta.t4Bn == 0 ? 0 : $h.formatCurrency(pta.t4Bn) }}</span>
+          <span class="font-bold"> {{ pta.t4Bn == null || pta.t4Bn == 0 ? 0 : $h.formatCurrency(pta.t4Bn) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
 
@@ -601,14 +599,14 @@
 
         <!--  -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span class="font-bold text-black"> {{ pta.t4Pret == null || pta.t4Pret == 0 ? 0 : $h.formatCurrency(pta.t4Pret) }}</span>
+          <span class="font-bold"> {{ pta.t4Pret == null || pta.t4Pret == 0 ? 0 : $h.formatCurrency(pta.t4Pret) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA</span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
 
         <!-- v-if="pta.t4Pret != '' || pta.t4Bn != ''" -->
         <td v-if="!pta.isProjet" class="p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300">
-          <span v-if="pta.t4Pret != undefined && pta.t4Bn != undefined" class="font-bold text-black"> {{ pta.t4Pret + pta.t4Bn == null || pta.t4Pret + pta.t4Bn == 0 ? 0 : $h.formatCurrency(pta.t4Pret + pta.t4Bn) }}</span>
+          <span v-if="pta.t4Pret != undefined && pta.t4Bn != undefined" class="font-bold"> {{ pta.t4Pret + pta.t4Bn == null || pta.t4Pret + pta.t4Bn == 0 ? 0 : $h.formatCurrency(pta.t4Pret + pta.t4Bn) }}</span>
           <!--  <span v-else class="font-bold" >0 FCFA </span> -->
         </td>
         <!-- <td class="relative p-2 border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300" v-else></td> -->
@@ -657,7 +655,7 @@
       <h2 class="mr-auto text-base font-medium">{{ isCreate ? "Ajouter" : "Modifier" }} un Suivi Financier</h2>
     </ModalHeader>
 
-    <form @submit.prevent="suiviFinancierActivite">
+    <form @submit.prevent="submitData">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
         <div v-for="(suivi, index) in suiviFinancier" :key="suivi.id" class="col-span-12 border-b pb-4 mb-4">
           <!-- <pre>{{ suivi }}</pre> -->
@@ -671,22 +669,15 @@
               {{ erreurSuiviFinancier[index].consommer }}
             </p>
           </div>
-          <!-- 
-          <div class="w-full mt-3">
-            <label class="form-label">Sources</label>
-            <TomSelect v-model="suivi.type" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
-              <option value="0">Fond propre</option>
-              <option value="1">Budget Alloue</option>
-            </TomSelect>
-          </div> -->
 
           <div class="w-full mt-3">
             <label class="form-label">Sélectionnez le trimestre</label>
-            <TomSelect v-model="suivi.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full" @change="miseAjourTabSuivi(suivi.trimestre, index)">
-              <option value="1">Trimestre 1</option>
-              <option value="2">Trimestre 2</option>
-              <option value="3">Trimestre 3</option>
-              <option value="4">Trimestre 4</option>
+            <TomSelect v-model="suivi.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full">
+              <!-- <option :value="1">Trimestre 1</option>
+              <option :value="2">Trimestre 2</option>
+              <option :value="3">Trimestre 3</option>
+              <option :value="4">Trimestre 4</option> -->
+              <option v-for="(trimestre, index) in 4" :key="index" :value="trimestre">Trimestre {{ trimestre }}</option>
             </TomSelect>
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
               {{ erreurSuiviFinancier[index].trimestre }}
@@ -695,11 +686,11 @@
 
           <div class="col-span-12 mt-3">
             <label class="form-label">Année</label>
-            <TomSelect v-model="suivi.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full" @change="miseAjourTabSuivi(suivi.annee, index)">
+            <TomSelect v-model="suivi.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
-            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
-              {{ erreurSuiviFinancier[index].trimestre }}
+            <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.annee">
+              {{ erreurSuiviFinancier[index].annee }}
             </p>
           </div>
 
@@ -727,7 +718,7 @@
       <ModalFooter>
         <div class="flex items-center justify-center">
           <button type="button" @click="resetModalSuiviFinancierActivite" class="w-full mr-1 btn btn-outline-secondary">Annuler</button>
-          <VButton class="inline-block" label="Enregistrer" :loading="loadingSuiviFinancier" :type="submit" :disabled="loaderListeSuivi" />
+          <VButton class="inline-block" label="Enregistrer" :loading="loadingSuiviFinancier" :type="submit" :disabled="loadingSuiviFinancier == true" />
         </div>
       </ModalFooter>
     </form>
@@ -772,141 +763,25 @@
 
     <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
       <div class="_p-5 _mt-5 col-span-12 intro-y box">
-        <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-          <div></div>
+        <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
           <div class="flex mt-5 sm:mt-0">
             <button class="mr-2 shadow-md btn btn-primary" @click="openFilterModalSuiviFinancier"><FilterIcon class="w-4 h-4 mr-3" />Filtrer le suivi financier</button>
 
-            <button class="btn btn-primary" title="Réinitialiser le filtre" @click="resetFilters()">
+            <button class="btn btn-primary" title="Réinitialiser le filtre" @click="resetSuivisFinancierFilter">
               <RefreshCwIcon class="w-5 h-5" />
             </button>
           </div>
-        </div>
 
-        <div class="col-span-12">
-          
-          <!-- Table -->
-          <div class="border my-4 rounded-lg border-gray-300 shadow-md">
-            <!-- suivi budgetaire  current -->
-            <div class="current">
-              <div class="overflow-x-auto relative shadow-md sm:rounded-lg">
-                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                  <thead class="text-xs text-gray-700 uppercase bg-blue-100 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                      <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Activités</th>
-                      <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Année</th>
-                      <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Trimestre</th>
-                      <th scope="col" colspan="4" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Période</th>
-                      <th scope="col" colspan="4" class="py-3 px-6 text-center border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Exercice</th>
-                      <th scope="col" colspan="4" class="py-3 px-6 text-center border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap">Cumul</th>
-                      <th scope="col" rowspan="2" class="py-3 px-6 border bg-blue-200 dark:bg-gray-800 dark:border-gray-700 whitespace-nowrap text-center">Actions</th>
-                    </tr>
-                    <tr>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Budget</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Consommé</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">Disponible</th>
-                      <th scope="col" class="py-3 px-6 border bg-blue-100 dark:bg-gray-800 dark:border-gray-700 text-center whitespace-nowrap">TEF</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- Loader pendant le chargement -->
-                    <tr v-if="loadListeSuivi || loaderListeSuivi">
-                      <td colspan="9" class="text-center py-12 border-gray-300">
-                        <div class="flex justify-center items-center">
-                          <LoaderSnipper />
-                          <span class="ml-3 text-gray-600">Chargement des suivis financiers...</span>
-                        </div>
-                      </td>
-                    </tr>
-
-                    <!-- Données du tableau -->
-                    <tr v-else v-for="(suivi, index) in listeSuivi.suiviFinanciers" :key="index" class="bg-white border-b hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi?.activite?.codePta }}-{{ suivi?.activite?.nom }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.annee }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.trimestre }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.periode.budget == null || suivi.periode.budget == 0 ? 0 : $h.formatCurrency(suivi.periode.budget) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.periode.consommer == null || suivi.periode.consommer == 0 ? 0 : $h.formatCurrency(suivi.periode.consommer) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.periode.disponible == null || suivi.periode.disponible == 0 ? 0 : $h.formatCurrency(suivi.periode.disponible) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.periode.pourcentage }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.exercice.budget == null || suivi.exercice.budget == 0 ? 0 : $h.formatCurrency(suivi.exercice.budget) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.exercice.consommer == null || suivi.exercice.consommer == 0 ? 0 : $h.formatCurrency(suivi.exercice.consommer) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.exercice.disponible == null || suivi.exercice.disponible == 0 ? 0 : $h.formatCurrency(suivi.exercice.disponible) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.exercice.pourcentage }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.cumul.budget == null || suivi.cumul.budget == 0 ? 0 : $h.formatCurrency(suivi.cumul.budget) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.cumul.consommer == null || suivi.cumul.consommer == 0 ? 0 : $h.formatCurrency(suivi.cumul.consommer) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.cumul.disponible == null || suivi.cumul.disponible == 0 ? 0 : $h.formatCurrency(suivi.cumul.disponible) }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700">
-                        <span class="font-bold">{{ suivi.cumul.pourcentage }}</span>
-                      </td>
-                      <td class="p-2 whitespace-nowrap border bg-blue-50 dark:bg-gray-800 dark:border-gray-700 text-center">
-                        <button @click="ouvrirModalSuiviFinancierActivite(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Suivre</button>
-
-                        <button @click="handleDetail(suivi)" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs px-4 py-2 mr-2">Voir détail</button>
-
-                        <!-- <button @click="handleDelete(suivi)" class="text-white bg-red-500 hover:bg-red-600 font-medium rounded-lg text-xs px-4 py-2">Supprimer</button> -->
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Message si aucune donnée - en bas du tableau -->
-          <div v-if="!loadListeSuivi && !loaderListeSuivi && (!listeSuivi.suiviFinanciers || listeSuivi.suiviFinanciers.length === 0)" class="text-center py-8 mt-4">
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun suivi financier trouvé</h3>
-              <p class="mt-1 text-sm text-gray-500">
-                Aucune donnée ne correspond aux critères de filtrage sélectionnés.
-              </p>
-              <div class="mt-6">
-                <button @click="resetFilters" class="btn btn-primary btn-sm">
-                  Réinitialiser les filtres
-                </button>
-              </div>
-            </div>
+          <div class="flex">
+            <button class="mr-2 shadow-md btn btn-primary" @click="ouvrirModalSuiviFinancierActivite"><PlusIcon class="w-4 h-4 mr-3" />Ajouter un suivi</button>
           </div>
         </div>
 
+        <div class="overflow-x-auto scrollbar-hidden" v-show="!isLoadingFilterSuiviFinancier">
+          <div id="tabulator" class="mt-5 table-report table-report--tabulator"></div>
+        </div>
+
+        <LoaderSnipper v-if="isLoadingFilterSuiviFinancier" />
       </div>
     </ModalBody>
     <ModalFooter>
@@ -924,7 +799,7 @@
         <div v-for="(plan, index) in planDeDecaissement" :key="plan.id" class="col-span-12 border-b pb-4 mb-4">
           <h3 class="text-sm font-medium mb-2">Plan {{ index + 1 }}</h3>
 
-          <div class="col-span-12 mt-4">
+          <div class="col-span-12 mt-3">
             <label class="form-label">Année</label>
             <TomSelect v-model="plan.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
@@ -939,7 +814,7 @@
             {{ erreurPlanDeDecaissement[index].annee }}
           </p> -->
 
-          <div class="w-full mt-4">
+          <div class="w-full mt-3">
             <label class="form-label">Sélectionnez le trimestre</label>
             <TomSelect v-model="plan.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full">
               <option value="1">Trimestre 1</option>
@@ -957,12 +832,12 @@
             {{ erreurPlanDeDecaissement[index].trimestre }}
           </p> -->
 
-          <InputForm v-model="plan.budgetNational" :min="0" class="col-span-12 mt-4" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Saisissez le fond propre" />
+          <InputForm v-model="plan.budgetNational" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Saisissez le fond propre" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.budgetNational">
             {{ erreurPlanDeDecaissement[index].budgetNational }}
           </p>
 
-          <InputForm v-model="plan.pret" :min="0" class="col-span-12 mt-4" type="number" :required="true" placeHolder="Saisissez la subvention" label="Saisissez la subvention" />
+          <InputForm v-model="plan.pret" :min="0" class="col-span-12" type="number" :required="true" placeHolder="Saisissez la subvention" label="Saisissez la subvention" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurPlanDeDecaissement?.[index]?.pret">
             {{ erreurPlanDeDecaissement[index].pret }}
           </p>
@@ -996,6 +871,21 @@
       </ModalFooter>
     </form>
   </Modal>
+
+  <!-- Modal Delete -->
+  <Modal :show="deleteModalPreview" @hidden="deleteModalPreview = false">
+    <ModalBody class="p-0">
+      <div class="p-5 text-center">
+        <XCircleIcon class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">Suppression</div>
+        <div class="mt-2 text-slate-500">Supprimer ce suivi financier?</div>
+      </div>
+      <div class="flex gap-2 px-5 pb-8 text-center justify-center w-full">
+        <button type="button" @click="deleteModalPreview = false" class="w-full my-3 mr-1 btn btn-outline-secondary">Annuler</button>
+        <VButton :loading="loadingSuiviFinancier" :color="'btn-danger'" label="Supprimer" @click="deleteData" />
+      </div>
+    </ModalBody>
+  </Modal>
 </template>
 
 <script>
@@ -1018,6 +908,8 @@ import PlanDecaissementComponent from "@/components/PlanDecaissement.vue";
 import PlanDeCaissement from "@/services/modules/plan.decaissement.service";
 import DownloadPDFButton from "../../../components/DownloadPDFButton.vue";
 import ExportationResultatSynthese from "@/components/news/ExportationResultatSynthese.vue";
+import Tabulator from "tabulator-tables";
+import { getAllErrorMessages } from "@/utils/gestion-error";
 
 export default {
   props: ["ppm"],
@@ -1039,16 +931,21 @@ export default {
       },
 
       filterPayloadSuiviFinancier: {
-        trimestre: new Date().getMonth() < 3 ? 1 : new Date().getMonth() < 6 ? 2 : new Date().getMonth() < 9 ? 3 : 4,
-        annee: new Date().getFullYear(),
+        activiteId: null,
+        trimestre: this.getCurrentQuarter(), // Trimestre actuel
+        annee: new Date().getFullYear(), // Set current year as default
       },
+      tabulator: null,
       showModalFiltreSuiviFinancier: false,
       loadListeSuivi: false,
       listeSuivi: [],
+      suivisFinancierActivite: [],
       isCreate: true,
+      deleteModalPreview: false,
       suiviFinancierPayload: {
+        id: null,
         activiteId: null,
-        trimestre: 1, // Trimestre actuel
+        trimestre: this.getCurrentQuarter(), // Trimestre actuel
         annee: new Date().getFullYear(), // Set current year as default
         consommer: 0,
         // type: 0,
@@ -2259,7 +2156,7 @@ export default {
           this.finProgramme = result.data.data.programme.fin;
         })
         .catch((e) => {
-          console.error(e);
+          console.log(e);
           toast.error("Une erreur est survenue: Utilisateur connecté .");
         });
     },
@@ -2267,37 +2164,18 @@ export default {
     async filterSuiviFinancierActivite() {
       this.isLoadingFilterSuiviFinancier = true;
 
-      // Validation des données avant envoi
-      const annee = parseInt(this.filterPayloadSuiviFinancier.annee);
-      const trimestre = parseInt(this.filterPayloadSuiviFinancier.trimestre);
+      // console.log(filterPayload.annee);
 
-      if (!annee || isNaN(annee)) {
-        toast.error("Veuillez sélectionner une année valide");
-        this.isLoadingFilterSuiviFinancier = false;
-        return;
-      }
+      this.filterPayloadSuiviFinancier.annee = parseInt(this.filterPayloadSuiviFinancier.annee);
+      this.filterPayloadSuiviFinancier.trimestre = parseInt(this.filterPayloadSuiviFinancier.trimestre);
 
-      if (!trimestre || isNaN(trimestre)) {
-        toast.error("Veuillez sélectionner un trimestre valide");
-        this.isLoadingFilterSuiviFinancier = false;
-        return;
-      }
-
-      const payload = {
-        annee: annee,
-        trimestre: trimestre
-      };
-
-      console.log("Payload du filtre:", payload);
-
-      await SuiviFinancierService.filtre(payload)
+      await SuiviFinancierService.filtre(this.filterPayloadSuiviFinancier)
         .then((result) => {
-          // Garder la même structure que getListeDataSuivi()
-          this.listeSuivi = result.data.data;
+          this.listeSuivi = result.data.data.suiviFinanciers;
           console.log("this.listeSuivi", this.listeSuivi);
           this.isLoadingFilterSuiviFinancier = false;
           this.resetFilterModalSuivi();
-          toast.success("Suivi Financier filtré.");
+          toast.success("Suivi Financier filtrer.");
         })
         .catch((e) => {
           console.log(e);
@@ -2332,14 +2210,19 @@ export default {
           this.loadListeSuivi = false;
         })
         .catch((e) => {
-          console.error(e);
+          console.log(e);
           this.loadListeSuivi = false;
           toast.error("Une erreur est survenue: Liste des type des options.");
         });
       // initTabulator();
     },
     voirSuiviActivite(data) {
-      this.getListeDataSuivi();
+      //this.getListeDataSuivi();
+      console.log(data);
+      this.filterPayloadSuiviFinancier.activiteId = data;
+      this.suiviFinancierPayload.activiteId = data;
+      console.log(this.filterPayloadSuiviFinancier);
+      this.getSuiviFinancierDatas(data);
       // this.getcurrentUser()
       this.voirSuiviModal = true;
       // this.$router.push({ name: "finances_suivi" });
@@ -2347,20 +2230,9 @@ export default {
     mode() {
       return this.isCreate ? "Ajouter" : "Modifier";
     },
-    resetModalSuiviFinancierActivite() {
-      this.suiviFinancier.splice(0); // Vider le tableau de manière réactive
-      this.erreurSuiviFinancier = null; // Reset des erreurs
-      this.loadingSuiviFinancier = false; // Reset du loading
+    resetModalSuiviFinancierActivite(item) {
+      this.suiviFinancier = [];
       this.showModalSuiviFinancier = false;
-    },
-
-    resetFilters() {
-      // Réinitialiser les filtres aux valeurs par défaut
-      this.filterPayloadSuiviFinancier.annee = new Date().getFullYear();
-      this.filterPayloadSuiviFinancier.trimestre = this.getCurrentQuarter();
-
-      // Recharger les données avec les filtres par défaut
-      this.getListeDataSuivi();
     },
 
     addSuivi() {
@@ -2384,11 +2256,10 @@ export default {
     async filterSuiviFinancierActiviteParAnnee(payload) {
       this.loaderListeSuivi = true;
 
-      SuiviFinancier.filtre(payload)
+      SuiviFinancierService.filtre(payload)
         .then((data) => {
           this.loaderListeSuivi = false;
-          // Garder la même structure que getListeDataSuivi()
-          this.listeSuivi = data.data.data;
+          this.listeSuivi = data.data.data.suiviFinanciers;
         })
         .catch((error) => {
           this.loaderListeSuivi = false;
@@ -2411,8 +2282,11 @@ export default {
           //console.log(error);
         });
     },
-    miseAjourTabSuivi(payLoad, index) {
-      let taille = payLoad.toString().length;
+    editSuivi(index, type = "consommer", value) {
+      this.suiviFinancier[index][type] = value;
+    },
+    miseAjourTabSuivi(payLoad) {
+      let taille = payLoad.length;
 
       let form = {
         trimestre: taille < 2 ? payLoad : this.suiviFinancier[index].trimestre,
@@ -2426,11 +2300,7 @@ export default {
 
     async suiviFinancierActivite() {
       this.loadingSuiviFinancier = true;
-
-      let errorIndex = [];
-
-      console.log("this.listeSuivi", this.listeSuivi);
-
+      this.erreurSuiviFinancier = [];
       for (let index = 0; index < this.suiviFinancier.length; index++) {
         // let suivi = this.listeSuivi.filter((suivi) => suivi.annee == this.suiviFinancier[index].annee && suivi.trimestre == this.suiviFinancier[index].trimestre && suivi.activite.id == this.suiviFinancier[index].activiteId);
 
@@ -2444,56 +2314,46 @@ export default {
 
         // const action = suivi.length > 0 ? SuiviFinancier.update(suivi[0]?.activite.id, this.suiviFinancier[index]) : SuiviFinancierService.create(payload);
 
-        const action = SuiviFinancierService.create(payload);
-
-        try {
-          await action;
-
-          toast.success(`Suivi financier n° ${index + 1} enrégistré avec succès`);
-
-          errorIndex.push(index);
-
-          console.log("index === this.suiviFinancier.length - 1", index === this.suiviFinancier.length - 1);
-
-          if (index === this.suiviFinancier.length - 1) {
+        SuiviFinancierService.create(payload)
+          .then(() => {
+            toast.success(`Suivi financier n° ${index + 1} enrégistré avec succès`);
+            this.resetModalSuiviFinancierActivite();
             this.showModalSuiviFinancier = false;
+          })
+          .catch((error) => {
+            console.log(error);
 
-            setTimeout(() => {
-              this.planDeDecaissement = [];
-            }, 500);
-          }
+            // Mettre à jour les messages d'erreurs dynamiquement
+            if (error.response && error.response.data && error.response.data.errors.length > 0) {
+              this.erreurSuiviFinancier.push(error.response.data.errors);
 
-          // getDatas();
-          // getDatasCadre();
-          // resetForm();
-        } catch (error) {
-          console.log("error", error);
-
-          this.loadingSuiviFinancier = false;
-
-          // Mettre à jour les messages d'erreurs dynamiquement
-          if (error.response && error.response.data && error.response.data.errors.length > 0) {
-            this.erreurSuiviFinancier = error.response.data.errors;
-            toast.error("Une erreur s'est produite dans votre formualaire");
-          } else {
-            toast.error(`Suivi ${index + 1} : ${error.response.data.message}`);
-          }
-        } finally {
-          this.loadingSuiviFinancier = false;
-          // this.getListePlanDeDecaissement(this.suiviFinancier[0].activiteId);
-        }
+              toast.error("Une erreur s'est produite dans votre formualaire");
+            } else {
+              toast.error(`Suivi ${index + 1} : ${error.response.data.message}`);
+            }
+          })
+          .finally(() => {
+            this.loadingSuiviFinancier = false;
+            // this.getListePlanDeDecaissement(this.suiviFinancier[0].activiteId);
+          });
 
         if (this.suiviFinancier.length > 0) {
-          console.log("this.suiviFinancier", this.suiviFinancier);
+          console.log("this.suiviFinancier", this.suiviFinancier); /* 
 
           if (errorIndex.length > 0) {
             console.log("errorIndex", errorIndex);
             errorIndex.forEach((item) => {
               this.removeSuivi(item);
             });
-          }
+          } */
         }
       }
+
+      const form = {
+        trimestre: this.getCurrentQuarter(),
+        annee: new Date().getFullYear(),
+      };
+      this.filterSuiviFinancierActiviteParAnnee(form);
     },
     getCurrentQuarter() {
       const month = new Date().getMonth() + 1; // Les mois sont indexés à partir de 0
@@ -2501,35 +2361,20 @@ export default {
     },
 
     ouvrirModalSuiviFinancierActivite(item) {
-      this.suiviFinancier.splice(0); // Vider le tableau de manière réactive
-
-      // Gérer les deux cas : pta (avec activiteId) ou suivi (avec activite.id)
-      const activiteId = item.activiteId || item.activite?.id || item.id;
-
-      if (!activiteId) {
-        console.error("Impossible de récupérer l'ID de l'activité", item);
-        return;
-      }
+      this.suiviFinancier = [];
 
       const newItem = {
-        activiteId: activiteId,
+        activiteId: item.activiteId,
         trimestre: this.getCurrentQuarter(),
         annee: new Date().getFullYear(),
         consommer: 0,
         id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
       };
 
-      let payLoad = {
-        trimestre: this.getCurrentQuarter(),
-        annee: new Date().getFullYear(),
-      };
-
-      console.log("activiteId trouvé:", activiteId);
-
-      this.filterSuiviFinancierActiviteParAnnee(payLoad);
-
-      this.suiviFinancierPayload.activiteId = activiteId;
+      this.suiviFinancierPayload.activiteId = item.activiteId;
       this.suiviFinancierPayload.trimestre = this.getCurrentQuarter();
+      this.suiviFinancierPayload.annee = new Date().getFullYear();
+      this.suiviFinancierPayload.consommer = 0;
       this.suiviFinancier.push(newItem);
       this.showModalSuiviFinancier = true;
       this.isCreate = true;
@@ -2560,13 +2405,13 @@ export default {
       TacheService.suiviTache(form)
         .then((data) => {
           // this.doSuiviOld = false
-          toast.success("Operation éffectué avec succès");
+          //this.$toast.success('Operation éffectué avec succès')
         })
         .catch((error) => {
           if (error.response) {
             // Requête effectuée mais le serveur a répondu par une erreur.
             const message = error.response.data.message;
-            toast.error(message);
+            this.$toast.error(message);
           } else if (error.request) {
             // Demande effectuée mais aucune réponse n'est reçue du serveur.
             //console.log(error.request);
@@ -2593,20 +2438,61 @@ export default {
       }
     },
     togglesuivie(pta) {
+      //this.dataNew;
+
+      /* this.redtoggle = false;
+      this.graytoggle = false;
+      //this.greentoggle=true;
+      this.translatetoggle = false;
+
+      //console.log(this.tabletoggle[id]);
+
+      this.chargement = true;
+
+      //  console.log(id)
+      /* if (pta.poidsActuel > 0) {
+        this.tabletoggle[pta.id] = 0;
+        TacheService.deleteSuivis(pta.id)
+          .then((data) => {
+            // this.doSuiviOld = false
+            // this.dataNew;
+            this.$toast.success("suivie supprimé avec succès");
+            // window.location.reload();
+          })
+          .catch((error) => {
+            if (error.response) {
+              // Requête effectuée mais le serveur a répondu par une erreur.
+              const message = error.response.data.message;
+              this.$toast.error(message);
+            } else if (error.request) {
+              // Demande effectuée mais aucune réponse n'est reçue du serveur.
+              //console.log(error.request);
+            } else {
+              // Une erreur s'est produite lors de la configuration de la demande
+              //console.log('dernier message', error.message);
+            }
+          });
+      } else { */
+
       var form = {
         tacheId: pta.id,
         poidsActuel: this.tabletoggle[pta.id],
       };
 
+      //this.tabletoggle[pta.id] = 1;
+
       TacheService.suiviTache(form)
         .then((data) => {
-          toast.success("suivie éffectué avec succès");
+          // this.doSuiviOld = false
+          // this.dataNew;
+          this.$toast.success("suivie éffectué avec succès");
+          // window.location.reload();
         })
         .catch((error) => {
           if (error.response) {
             // Requête effectuée mais le serveur a répondu par une erreur.
             const message = error.response.data.message;
-            toast.error(message);
+            this.$toast.error(message);
           } else if (error.request) {
             // Demande effectuée mais aucune réponse n'est reçue du serveur.
             console.log(error.request);
@@ -2745,7 +2631,7 @@ export default {
           this.disabled();
         })
         .catch((e) => {
-          toast.error(e);
+          this.$toast.error(e);
           this.disabled();
         });
     },
@@ -2772,7 +2658,7 @@ export default {
           this.disabled();
         })
         .catch((e) => {
-          toast.error(e);
+          this.$toast.error(e);
           this.disabled();
         });
     },
@@ -2810,7 +2696,7 @@ export default {
         })
         .catch((e) => {
           this.chargement = false;
-          toast.error(e);
+          this.$toast.error(e);
           this.disabled();
         });
     },
@@ -2821,10 +2707,161 @@ export default {
           this.bailleurs = data.data.data;
         })
         .catch((e) => {
-          toast.error(e);
+          this.$toast.error(e);
+        });
+    },
+    initTabulator() {
+      this.tabulator = new Tabulator("#tabulator", {
+        data: this.suivisFinancierActivite,
+        placeholder: "Aucune donnée disponible.",
+        layout: "fitColumns",
+        responsiveLayout: "hide",
+        pagination: "local",
+        paginationSize: 10,
+        columns: [
+          {
+            title: "Code Pta",
+            field: "codePta",
+          },
+          {
+            title: "Nom de l'activité",
+            field: "nom",
+          },
+          {
+            title: "Montant Consommer",
+            field: "consommer",
+          },
+          {
+            title: "Trimestre",
+            field: "trimestre",
+          },
+          {
+            title: "Date de suivi",
+            field: "dateDeSuivi",
+          },
+          {
+            title: "Actions",
+            field: "actions",
+            formatter: (cell) => {
+              const container = document.createElement("div");
+              container.className = "flex items-center justify-center gap-3";
+
+              const createButton = (label, className, onClick) => {
+                const button = document.createElement("button");
+                button.className = className;
+                button.innerText = label;
+                button.addEventListener("click", onClick);
+                return button;
+              };
+
+              const modifyButton = createButton("Modifier", "btn btn-primary", () => {
+                this.handleEditSuivi(cell.getData());
+              });
+
+              const deleteButton = createButton("Supprimer", "btn btn-danger", () => {
+                this.handleDeleteSuivi(cell.getData());
+              });
+
+              container.append(modifyButton, deleteButton);
+
+              return container;
+            },
+          },
+        ],
+      });
+    },
+    async getSuiviFinancierDatas(activiteId) {
+      this.isLoadingFilterSuiviFinancier = false;
+      console.log(this.filterPayloadSuiviFinancier);
+      await SuiviFinancier.getSuiviByActivite(activiteId, this.filterPayloadSuiviFinancier)
+        .then((result) => {
+          this.suivisFinancierActivite = result.data.data;
+          console.log(activiteId);
+          console.log(this.suivisFinancierActivite);
+          this.isLoadingFilterSuiviFinancier = false;
+          this.resetSuivisFinancierFilter();
+        })
+        .catch((e) => {
+          console.log(e);
+          toast.error(e.response.data.message);
+          this.isLoadingFilterSuiviFinancier = false;
+          //toast.error("Une erreur est survenue: Liste de sources.");
+        });
+      this.initTabulator();
+    },
+
+    resetSuivisFinancierFilter() {
+      this.filterPayloadSuiviFinancier.trimestre = this.getCurrentQuarter();
+      this.filterPayloadSuiviFinancier.annee = new Date().getFullYear();
+    },
+
+    handleEditSuivi(params) {
+      this.isCreate = false;
+      this.suiviFinancierPayload.id = params.id;
+      //this.suiviFinancierPayload.activiteId = params.activiteId;
+      this.suiviFinancierPayload.trimestre = params.trimestre;
+      this.suiviFinancierPayload.annee = params.annee;
+      this.suiviFinancierPayload.consommer = params.consommer;
+
+      this.showModalSuiviFinancier = true;
+
+      this.suiviFinancier = [];
+      this.suiviFinancier.push(this.suiviFinancierPayload);
+    },
+    handleDeleteSuivi(params) {
+      this.suiviFinancierPayload.id = params.id;
+      this.deleteModalPreview = true;
+    },
+
+    submitData() {
+      this.isCreate ? this.suiviFinancierActivite() : this.updateSuiviActivite();
+    },
+
+    async deleteData() {
+      this.loadingSuiviFinancier = true;
+      await SuiviFinancier.destroy(this.suiviFinancierPayload.id)
+        .then(() => {
+          this.deleteModalPreview = false;
+          this.loadingSuiviFinancier = false;
+          toast.success("Suivi financier supprimé");
+          this.getSuiviFinancierDatas(this.suiviFinancierPayload.activiteId);
+        })
+        .catch((e) => {
+          this.loadingSuiviFinancier = false;
+          console.error(e.response.data.message);
+          toast.error("Une erreur est survenue, ressayer");
+        });
+    },
+
+    async updateSuiviActivite() {
+      this.loadingSuiviFinancier = true;
+
+      const payload = this.suiviFinancier[0];
+      this.erreurSuiviFinancier = [];
+
+      console.log(payload);
+
+      await SuiviFinancier.update(this.suiviFinancierPayload.id, payload)
+        .then(() => {
+          this.loadingSuiviFinancier = false;
+          this.resetModalSuiviFinancierActivite();
+          this.showModalSuiviFinancier = false;
+          this.getSuiviFinancierDatas(this.suiviFinancierPayload.activiteId);
+
+          toast.success("Suivi modifiée.");
+        })
+        .catch((e) => {
+          this.loadingSuiviFinancier = false;
+          console.log(e);
+          toast.error(getAllErrorMessages(e));
+
+          if (e.response && e.response.data && e.response.data.errors) {
+            this.erreurSuiviFinancier.push(e.response.data.errors);
+          }
         });
     },
   },
+
   mounted() {
     this.getcurrentUser();
     this.getPermission();

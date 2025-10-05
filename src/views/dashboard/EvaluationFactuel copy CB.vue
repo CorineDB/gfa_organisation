@@ -75,10 +75,14 @@ const getDataFormFactuel = async () => {
     if (!showAlertValidate.value) {
       formDataFactuel.value = data.data;
 
+      console.log("formDataFactuel.value.formulaire_de_gouvernance.soumissionId", formDataFactuel.value.formulaire_de_gouvernance.soumissionId);
+
       formulaireFactuel.value = formDataFactuel.value.formulaire_de_gouvernance;
       //payload.formulaireDeGouvernanceId = formDataFactuel.value.formulaire_de_gouvernance.soumissionId;
       payload.formulaireDeGouvernanceId = formulaireFactuel.value.id;
       payload.soumissionId = formDataFactuel.value.formulaire_de_gouvernance.soumissionId;
+
+      console.log("payload.soumissionId", payload);
       idEvaluation.value = formDataFactuel.value.id;
       initializeFormData();
       getFilesFormData();
@@ -96,7 +100,7 @@ const getDataFormFactuel = async () => {
 
 const getSource = async () => {
   try {
-    const { data } = await EvaluationService.getEnqueteSource();
+    const { data } = await EvaluationService.getSource();
     sources.value = data.data;
   } catch (e) {
     toast.error("Erreur lors de la récupération des sources.");
@@ -140,15 +144,13 @@ const finalSubmit = () => {
 
   isValidate.value = true;
   submitAnsweredQuestionsOnly();
-  //submitData();
+  // submitData();
 };
 
 const submitData = async () => {
-  // Ne réinitialiser les erreurs que lors de la validation finale
-  if (isValidate.value) {
-    errors.value = {}; // Réinitialiser complètement lors de la validation finale
-  }
-  // Pour les soumissions partielles, les erreurs seront mergées dans le catch
+  errors.value = {}; // Réinitialiser les erreurs avant chaque soumission
+
+  console.log("payload", payload);
 
   if (payload.factuel.response_data.length > 0) {
     const formData = new FormData();
@@ -225,20 +227,10 @@ const submitData = async () => {
 
         // Gérer les erreurs de validation (422) avec objet d'erreurs
         if (e.response.status === 422 && typeof errorData.errors === 'object' && !Array.isArray(errorData.errors)) {
-          // VERSION ORIGINALE : errors.value = errorData.errors;
-          // NOUVELLE LOGIQUE : Merger les erreurs pour les soumissions partielles
-          if (isValidate.value) {
-            // Validation finale : remplacer toutes les erreurs
-            errors.value = errorData.errors;
-          } else {
-            // Soumission partielle : merger les nouvelles erreurs avec les anciennes
-            errors.value = { ...errors.value, ...errorData.errors };
-          }
+          errors.value = errorData.errors;
 
-          // Cacher le preview si les erreurs concernent response_data
           if (isValidate.value) {
-            const hasFormErrors = Object.keys(errors.value).some(key => key.startsWith('factuel.response_data'));
-            if (hasFormErrors) {
+            if (errors.value["factuel.response_data"]) {
               showModalPreview.value = false;
             }
           }
@@ -272,7 +264,7 @@ const initializeFormData = () => {
             optionDeReponseId: existingResponse?.optionDeReponseId ?? null,
             sourceDeVerificationId: normalizedSources.sourceDeVerificationId,
             sourceDeVerification: normalizedSources.sourceDeVerification,
-            description: existingResponse?.description ?? (findResponse2(existingResponse?.optionDeReponseId) === "partiellement" ? "" : ""),
+            description: existingResponse?.description ?? (findResponse2(existingResponse?.optionDeReponseId) === "partiellement" ? "" : undefined),
             preuves: [], // Nouvelles preuves ajoutées par l'utilisateur
             existingProofs: existingResponse?.preuves ?? [], // Preuves existantes du chargement
           };
@@ -572,24 +564,16 @@ const hasValidSource = (data) => {
 };
 
 const submitAnsweredQuestionsOnly = async () => {
-  // VERSION ORIGINALE : errors.value = {}; // Réinitialiser les erreurs avant chaque soumission
-  // NOUVELLE LOGIQUE : Ne réinitialiser les erreurs que lors de la validation finale
-  if (isValidate.value) {
-    errors.value = {}; // Réinitialiser complètement lors de la validation finale
-  }
-  // Pour les soumissions partielles, les erreurs seront mergées dans le catch
-
+  errors.value = {}; // Réinitialiser les erreurs avant chaque soumission
   // Étape 1 : Filtrage initial des réponses (réponses non-null et non-vides)
 
-  // Si c'est une validation finale, soumettre toutes les questions
-  const allQuestions = Object.values(responses);
+  const answeredQuestions = Object.values(responses).filter((response) => {
+    const hasAnswer = response.optionDeReponseId !== null && response.optionDeReponseId !== "" && response.optionDeReponseId !== "null" && response.optionDeReponseId !== undefined;
 
-  const answeredQuestions = isValidate.value
-    ? allQuestions
-    : allQuestions.filter((response) => {
-        const hasAnswer = response.optionDeReponseId !== null && response.optionDeReponseId !== "" && response.optionDeReponseId !== "null" && response.optionDeReponseId !== undefined;
-        return hasAnswer;
-      });
+    return hasAnswer;
+  });
+
+  console.log();
 
   // Étape 2 : Prendre toutes les réponses sans validation des règles métier
   const completeAnswers = answeredQuestions;
@@ -599,6 +583,8 @@ const submitAnsweredQuestionsOnly = async () => {
     const { existingProofs, ...cleanedAnswer } = answer;
     return cleanedAnswer;
   });
+
+  console.log("payload.factuel.response_data", payload.factuel.response_data);
 
   // Étape 4 : Sauvegarde conditionnelle
   if (payload.factuel.response_data.length > 0) {
@@ -610,14 +596,14 @@ const submitAnsweredQuestionsOnly = async () => {
         const validatedResponse = { ...response };
 
         if (response.sourceDeVerificationId === "autre") {
-          if (response.sourceDeVerification && response.sourceDeVerification.trim() !== "" && response.sourceDeVerification !== " ") {
+          //if (response.sourceDeVerification && response.sourceDeVerification.trim() !== "" && response.sourceDeVerification !== " ") {
             validatedResponse.sourceDeVerificationId = null;
-          }
+          //}
         } else if (response.sourceDeVerificationId && response.sourceDeVerificationId !== "" && response.sourceDeVerificationId !== "autre") {
           validatedResponse.sourceDeVerification = null;
-        } /* else if (!response.sourceDeVerificationId || response.sourceDeVerificationId === "") {
+        } else if (!response.sourceDeVerificationId || response.sourceDeVerificationId === "") {
           validatedResponse.sourceDeVerificationId = null;
-        } */
+        }
 
         return validatedResponse;
       }
@@ -657,6 +643,8 @@ const invalidResponses = computed(() => {
     if (isInvalid) {
       acc.push({ index, questionId: data.questionId });
     }
+
+    console.log("acc", acc);
 
     return acc;
   }, []);
@@ -742,112 +730,6 @@ const openAccordions = reactive({});
 const toggle = (id) => {
   openAccordions[id] = !openAccordions[id];
 };
-
-// Fonction pour trouver l'index réel d'une question dans response_data soumis
-const getQuestionErrorIndex = (questionId) => {
-  return payload.factuel.response_data.findIndex(response => response.questionId === questionId);
-};
-
-// Computed pour filtrer les erreurs générales (sans factuel.response_data)
-const generalErrors = computed(() => {
-  const filtered = {};
-  Object.keys(errors.value).forEach(key => {
-    if (!key.startsWith('factuel.response_data')) {
-      filtered[key] = errors.value[key];
-    }
-  });
-  return filtered;
-});
-
-// Fonction pour modifier une preuve existante
-const editExistingProof = (questionId, index) => {
-  // Créer un input file temporaire pour sélectionner le nouveau fichier
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
-
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Ajouter le nouveau fichier aux preuves à uploader
-      if (!responses[questionId].preuves) {
-        responses[questionId].preuves = [];
-      }
-      responses[questionId].preuves.push(file);
-
-      // Supprimer l'ancienne preuve de la liste existante
-      responses[questionId].existingProofs.splice(index, 1);
-
-      toast.success('Fichier remplacé avec succès');
-    }
-  };
-
-  input.click();
-};
-
-// Fonction pour supprimer une preuve existante
-const deleteExistingProof = async (questionId, index) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer cette preuve ?')) {
-    const file = responses[questionId].existingProofs[index];
-
-    // Vérifier si le fichier a un ID pour la suppression côté serveur
-    if (file.id) {
-      try {
-        isLoading.value = true;
-        // Appel API pour supprimer le fichier côté serveur
-        await EvaluationService.deleteProof(payload.soumissionId, file.id);
-
-        // Supprimer de la liste locale après succès
-        responses[questionId].existingProofs.splice(index, 1);
-        toast.success('Preuve supprimée avec succès');
-      } catch (error) {
-        console.error('Erreur lors de la suppression de la preuve:', error);
-        toast.error('Erreur lors de la suppression de la preuve');
-      } finally {
-        isLoading.value = false;
-      }
-    } else {
-      // Si pas d'ID, suppression locale uniquement
-      responses[questionId].existingProofs.splice(index, 1);
-      toast.info('Preuve supprimée');
-    }
-  }
-};
-
-// Fonction pour modifier un nouveau fichier uploadé
-const editNewProof = (questionId, index) => {
-  // Créer un input file temporaire pour sélectionner le nouveau fichier
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.pdf,.doc,.docx,.jpg,.jpeg,.png';
-
-  input.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Remplacer le fichier à l'index spécifié
-      responses[questionId].preuves[index] = file;
-      toast.success('Fichier remplacé avec succès');
-    }
-  };
-
-  input.click();
-};
-
-// Fonction pour supprimer un nouveau fichier uploadé
-const deleteNewProof = (questionId, index) => {
-  if (confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) {
-    responses[questionId].preuves.splice(index, 1);
-    toast.info('Fichier supprimé');
-  }
-};
-
-// Fonction pour visualiser un nouveau fichier uploadé
-const viewNewProof = (file) => {
-  // Créer une URL temporaire pour le fichier
-  const fileURL = URL.createObjectURL(file);
-  // Ouvrir dans un nouvel onglet
-  window.open(fileURL, '_blank');
-};
 </script>
 <template>
   <div v-if="findQuestionDetails" class="p-4 bg-white shadow-lg rounded-lg border border-gray-200 my-3">
@@ -862,7 +744,7 @@ const viewNewProof = (file) => {
   </div>
 
   <!-- Section d'affichage des erreurs -->
-  <div v-if="Object.keys(generalErrors).length > 0" class="p-4 bg-red-50 border border-red-200 rounded-lg my-3">
+  <div v-if="Object.keys(errors).length > 0" class="p-4 bg-red-50 border border-red-200 rounded-lg my-3">
     <div class="flex items-start gap-3">
       <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mt-1">
         <i class="fas fa-exclamation-triangle text-red-600 text-sm"></i>
@@ -870,7 +752,7 @@ const viewNewProof = (file) => {
       <div class="flex-1">
         <h3 class="text-lg font-semibold text-red-800 mb-2">Erreurs de validation</h3>
         <div class="space-y-2">
-          <div v-for="(errorList, field) in generalErrors" :key="field" class="bg-white border border-red-100 rounded-lg p-3">
+          <div v-for="(errorList, field) in errors" :key="field" class="bg-white border border-red-100 rounded-lg p-3">
             <!-- <h4 class="font-medium text-red-700 mb-1">{{ field }}</h4> -->
             <ul class="space-y-1">
               <li v-for="(error, index) in errorList" :key="index" class="text-sm text-red-600 flex items-start gap-2">
@@ -967,8 +849,8 @@ const viewNewProof = (file) => {
                                         </div>
                                       </div>
 
-                                      <div v-if="errors['factuel.response_data.' + getQuestionErrorIndex(question.id) + '.optionDeReponseId']" class="my-2 text-danger text-center">
-                                        {{ getFieldErrors(errors["factuel.response_data." + getQuestionErrorIndex(question.id) + ".optionDeReponseId"]) }}
+                                      <div v-if="errors['factuel.response_data.' + questionIndex + 'optionDeReponseId']" class="my-2 text-danger">
+                                        {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "optionDeReponseId"]) }}
                                       </div>
                                     </div>
 
@@ -992,12 +874,8 @@ const viewNewProof = (file) => {
                                           </TomSelect>
                                         </div>
 
-                                        <!-- <div v-if="errors['factuel.response_data.' + getQuestionErrorIndex(question.id) + '.sourceDeVerificationId']" class="my-2 text-danger">
-                                          {{ getFieldErrors(errors["factuel.response_data." + getQuestionErrorIndex(question.id) + ".sourceDeVerificationId"]) }}
-                                        </div> -->
-                                        <div v-if="errors['factuel.response_data.' + getQuestionErrorIndex(question.id) + '.sourceDeVerificationId']" class="flex items-center gap-2 mt-2 text-red-600">
-                                          <i class="fas fa-exclamation-circle"></i>
-                                          <span class="text-sm">{{ getFieldErrors(errors["factuel.response_data." + getQuestionErrorIndex(question.id) + ".sourceDeVerificationId"]) }}</span>
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerificationId']" class="my-2 text-danger">
+                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "sourceDeVerificationId"]) }}
                                         </div>
                                       </div>
 
@@ -1006,9 +884,8 @@ const viewNewProof = (file) => {
                                         <label class="block text-sm font-semibold text-gray-700"> <i class="fas fa-edit mr-2 text-orange-500"></i>Précisez la source </label>
                                         <input type="text" required class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200" v-model="responses[question.id].sourceDeVerification" placeholder="Saisissez votre source personnalisée..." />
 
-                                        <div v-if="errors['factuel.response_data.' + getQuestionErrorIndex(question.id) + '.sourceDeVerification']" class="flex items-center gap-2 mt-2 text-red-600">
-                                          <i class="fas fa-exclamation-circle"></i>
-                                          <span class="text-sm">{{ getFieldErrors(errors["factuel.response_data." + getQuestionErrorIndex(question.id) + ".sourceDeVerification"]) }}</span>
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'sourceDeVerification']" class="my-2 text-danger">
+                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "sourceDeVerification"]) }}
                                         </div>
                                       </div>
 
@@ -1022,8 +899,8 @@ const viewNewProof = (file) => {
                                           <label :for="question.id" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg cursor-pointer transition-colors duration-200"> Parcourir les fichiers </label>
                                           <p class="text-xs text-gray-500 mt-2">PDF, DOC, JPG, PNG - Max 10MB par fichier</p>
                                         </div>
-                                        <div v-if="errors['factuel.response_data.' + getQuestionErrorIndex(question.id) + '.preuves']" class="my-2 text-danger">
-                                          {{ getFieldErrors(errors["factuel.response_data." + getQuestionErrorIndex(question.id) + ".preuves"]) }}
+                                        <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves']" class="my-2 text-danger">
+                                          {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "preuves"]) }}
                                         </div>
                                       </div>
 
@@ -1036,7 +913,7 @@ const viewNewProof = (file) => {
 
                                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                           <div v-for="(file, index) in responses[question.id]?.existingProofs" :key="`existing-${index}`" class="bg-white border border-green-200 rounded-lg p-3 hover:shadow-md transition-shadow duration-200">
-                                            <div class="flex items-center gap-3 mb-3">
+                                            <div class="flex items-center gap-3">
                                               <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                                                 <i class="fas fa-file text-green-600"></i>
                                               </div>
@@ -1044,20 +921,7 @@ const viewNewProof = (file) => {
                                                 <p class="text-sm font-medium text-gray-900 truncate">{{ file.nom }}</p>
                                                 <p class="text-xs text-gray-500">Fichier existant</p>
                                               </div>
-                                            </div>
-                                            <div class="flex items-center gap-2 flex-wrap">
-                                              <a v-if="file.url" :href="file.url" target="_blank" class="text-blue-600 hover:text-blue-800 transition-colors duration-200 text-sm">
-                                                <i class="fas fa-eye"></i> Voir
-                                              </a>
-                                              <a v-if="file.url" :href="file.url" :download="file.nom" class="text-green-600 hover:text-green-800 transition-colors duration-200 text-sm">
-                                                <i class="fas fa-download"></i> Télécharger
-                                              </a>
-                                              <button @click="editExistingProof(question.id, index)" class="text-orange-600 hover:text-orange-800 transition-colors duration-200 text-sm">
-                                                <i class="fas fa-edit"></i> Modifier
-                                              </button>
-                                              <button @click="deleteExistingProof(question.id, index)" class="text-red-600 hover:text-red-800 transition-colors duration-200 text-sm">
-                                                <i class="fas fa-trash"></i> Supprimer
-                                              </button>
+                                              <a v-if="file.url" :href="file.url" :download="file.nom" target="_blank" class="text-green-600 hover:text-green-800 transition-colors duration-200"> Télécharger </a>
                                             </div>
                                           </div>
                                         </div>
@@ -1072,7 +936,7 @@ const viewNewProof = (file) => {
 
                                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                                           <div v-for="(file, index) in responses[question.id]?.preuves" :key="`new-${index}`" class="bg-white border border-blue-200 rounded-lg p-3 hover:shadow-md transition-shadow duration-200">
-                                            <div class="flex items-center gap-3 mb-3">
+                                            <div class="flex items-center gap-3">
                                               <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                                                 <i class="fas fa-file text-blue-600"></i>
                                               </div>
@@ -1080,20 +944,9 @@ const viewNewProof = (file) => {
                                                 <p class="text-sm font-medium text-gray-900 truncate">{{ file.name }}</p>
                                                 <p class="text-xs text-gray-500">{{ formatFileSize(file.size) }}</p>
                                               </div>
-                                            </div>
-                                            <div class="flex items-center gap-2 flex-wrap">
-                                              <button @click="viewNewProof(file)" class="text-blue-600 hover:text-blue-800 transition-colors duration-200 text-sm">
-                                                <i class="fas fa-eye"></i> Voir
-                                              </button>
-                                              <button @click="editNewProof(question.id, index)" class="text-orange-600 hover:text-orange-800 transition-colors duration-200 text-sm">
-                                                <i class="fas fa-edit"></i> Modifier
-                                              </button>
-                                              <button @click="deleteNewProof(question.id, index)" class="text-red-600 hover:text-red-800 transition-colors duration-200 text-sm">
-                                                <i class="fas fa-trash"></i> Supprimer
-                                              </button>
-                                            </div>
-                                            <div v-if="errors['factuel.response_data.' + getQuestionErrorIndex(question.id) + '.preuves.' + index]" class="mt-2 text-danger text-xs">
-                                              {{ getFieldErrors(errors["factuel.response_data." + getQuestionErrorIndex(question.id) + ".preuves." + index]) }}
+                                              <div v-if="errors['factuel.response_data.' + questionIndex + 'preuves.' + index]" class="my-2 text-danger">
+                                                {{ getFieldErrors(errors["factuel.response_data." + questionIndex + "preuves." + index]) }}
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
@@ -1110,9 +963,9 @@ const viewNewProof = (file) => {
                                       <div class="space-y-3">
                                         <label class="block text-sm font-semibold text-gray-700" for="description"> <i class="fas fa-comment-alt mr-2 text-blue-500"></i>Description détaillée </label>
                                         <textarea name="description" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 resize-none" id="description" v-model="responses[question.id].description" cols="30" rows="4" placeholder="Veuillez préciser les détails de votre réponse..."></textarea>
-                                        <div v-if="errors['factuel.response_data.' + getQuestionErrorIndex(question.id) + '.description']" class="flex items-center gap-2 mt-2 text-red-600">
+                                        <div v-if="errors.description" class="flex items-center gap-2 mt-2 text-red-600">
                                           <i class="fas fa-exclamation-circle"></i>
-                                          <span class="text-sm">{{ getFieldErrors(errors["factuel.response_data." + getQuestionErrorIndex(question.id) + ".description"]) }}</span>
+                                          <span class="text-sm">{{ getFieldErrors(errors.description) }}</span>
                                         </div>
                                       </div>
                                     </div>
@@ -1214,7 +1067,7 @@ const viewNewProof = (file) => {
                               <!-- Contenu principal -->
                               <div class="p-6 space-y-6">
                                 <!-- Section Réponse -->
-                                <div v-if="findResponse(responses[question.id]?.optionDeReponseId)" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                   <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                                       <i class="fas fa-check text-white text-sm"></i>
@@ -1223,21 +1076,6 @@ const viewNewProof = (file) => {
                                       <p class="text-sm font-medium text-gray-600">Réponse sélectionnée</p>
                                       <p class="text-lg font-semibold text-blue-700">
                                         {{ findResponse(responses[question.id]?.optionDeReponseId) }}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <!-- Section Question non répondue -->
-                                <div v-else class="bg-gray-50 border border-gray-300 rounded-lg p-4">
-                                  <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
-                                      <i class="fas fa-question text-white text-sm"></i>
-                                    </div>
-                                    <div>
-                                      <p class="text-sm font-medium text-gray-600">Statut</p>
-                                      <p class="text-lg font-semibold text-gray-700">
-                                        Question non répondue
                                       </p>
                                     </div>
                                   </div>
@@ -1257,12 +1095,12 @@ const viewNewProof = (file) => {
                                     <div class="ml-11">
                                       <p v-if="responses[question.id].sourceDeVerificationId == 'autre'" class="text-base text-gray-700">
                                         <span class="font-medium">Source personnalisée :</span>
-                                        <span class="text-green-700 font-semibold ml-2">{{ responses[question.id].sourceDeVerification || "Source de vérification non renseignée" }}</span>
+                                        <span class="text-green-700 font-semibold ml-2">{{ responses[question.id].sourceDeVerification }}</span>
                                       </p>
 
                                       <p v-else class="text-base text-gray-700">
                                         <span class="font-medium">Source officielle :</span>
-                                        <span class="text-green-700 font-semibold ml-2">{{ findSource(responses[question.id]?.sourceDeVerificationId) || "Aucune source spécifiée" }}</span>
+                                        <span class="text-green-700 font-semibold ml-2">{{ findSource(responses[question.id]?.sourceDeVerificationId) }}</span>
                                       </p>
                                     </div>
                                   </div>
@@ -1284,14 +1122,7 @@ const viewNewProof = (file) => {
                                         <p class="text-sm font-medium text-gray-900">{{ file.nom }}</p>
                                         <p class="text-xs text-gray-500">Fichier existant</p>
                                       </div>
-                                      <div v-if="file.url" class="flex items-center gap-2">
-                                        <a :href="file.url" target="_blank" class="text-blue-600 hover:text-blue-800 transition-colors duration-200 text-sm">
-                                          <i class="fas fa-eye"></i> Voir
-                                        </a>
-                                        <a :href="file.url" :download="file.nom" class="text-green-600 hover:text-green-800 transition-colors duration-200 text-sm">
-                                          <i class="fas fa-download"></i> Télécharger
-                                        </a>
-                                      </div>
+                                      <a v-if="file.url" :href="file.url" :download="file.nom" target="_blank" class="text-green-600 hover:text-green-800 transition-colors duration-200"> Télécharger </a>
                                     </div>
                                   </div>
 
@@ -1311,11 +1142,6 @@ const viewNewProof = (file) => {
                                       <div class="flex-1">
                                         <p class="text-sm font-medium text-gray-900">{{ file.name }}</p>
                                         <p class="text-xs text-gray-500">{{ file.size ? formatFileSize(file.size) : "Taille inconnue" }}</p>
-                                      </div>
-                                      <div class="flex items-center gap-2">
-                                        <button @click="viewNewProof(file)" class="text-blue-600 hover:text-blue-800 transition-colors duration-200 text-sm">
-                                          <i class="fas fa-eye"></i> Voir
-                                        </button>
                                       </div>
                                     </div>
                                   </div>

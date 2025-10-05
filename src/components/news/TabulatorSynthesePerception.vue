@@ -3,7 +3,7 @@
     <thead class="text-left bg-gray-400">
       <tr class="py-3 border-b-8 border-white" :style="{ 'background-color': getColorForValue(indicegouvernace) }">
         <td colspan="2" class="font-semibold text-center">Indice de perception de gouvernance</td>
-        <td class="text-left">{{ indicegouvernace }}</td>
+        <td class="text-left"> {{ indicegouvernace }} </td>
       </tr>
       <tr class="font-semibold text-white bg-blue-900">
         <th class="py-2 text-center border border-slate-600">Principes</th>
@@ -26,7 +26,7 @@
       <!-- Dernière ligne pour afficher l'indice de perception du principe -->
       <tr class="font-semibold text-black">
         <td class="py-2 text-right border border-slate-600">Indice de perception du principe</td>
-        <td class="py-2 text-left border border-slate-600">{{ principe.indice_de_perception }}</td>
+        <td class="py-2 text-centern border border-slate-600">{{ principe.indice_de_perception }}</td>
       </tr>
     </tbody>
   </table>

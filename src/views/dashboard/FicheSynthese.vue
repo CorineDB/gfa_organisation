@@ -33,6 +33,7 @@ const isLoadingData = ref(false);
 const currentFactuel = ref("");
 const currentPerception = ref("");
 const currentProfileGouvernance = ref("");
+const selectedTabIndex = ref(0);
 
 const getDataCollection = async () => {
   isLoadingData.value = true;
@@ -80,6 +81,12 @@ onMounted(async () => {
   //idSelectStructure.value = dataForAllOrganisation.value[0].id;
 
   authUser.value = JSON.parse(localStorage.getItem("authenticateUser"));
+
+  // Ouvrir automatiquement l'onglet perception si le paramètre query est défini
+  if (route.query.table === 'perception') {
+    // Si Factuel existe, Perception est à l'index 1, sinon à l'index 0
+    selectedTabIndex.value = currentFactuel.value?.synthese ? 1 : 0;
+  }
 });
 </script>
 
@@ -90,7 +97,7 @@ onMounted(async () => {
   </div>
   <PreviewComponent class="mt-5 intro-y _box">
     <Preview>
-      <TabGroup>
+      <TabGroup :selectedIndex="selectedTabIndex" @change="selectedTabIndex = $event">
         <TabList class="space-x-4 font-bold uppercase nav-boxed-tabs">
           <Tab class="w-full py-2 bg-white" tag="button" v-if="!isLoadingData && currentFactuel?.synthese">Outil Factuel</Tab>
           <Tab class="w-full py-2 bg-white" tag="button" v-if="!isLoadingData && currentPerception?.synthese">Outil de Perception</Tab>
@@ -121,7 +128,7 @@ onMounted(async () => {
                 </tr>
                 <tr class="border-b border-slate-300">
                   <td class="p-2 font-medium">Date d’auto-évaluation :</td>
-                  <td class="pl-2">{{ currentPerception?.evaluatedAt }}</td>
+                  <td class="pl-2">{{ currentFactuel?.evaluatedAt }}</td>
                 </tr>
               </tbody>
             </table>
@@ -170,7 +177,7 @@ onMounted(async () => {
               </tbody>
             </table>
             <!-- Tableau de synthese Perception -->
-            <TabulatorSynthesePerception :data="currentPerception?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" v-if="!isLoadingData && currentPerception?.synthese" />
+            <TabulatorSynthesePerception :data="currentPerception?.synthese" :indicegouvernace="currentPerception?.indice_de_gouvernance" v-if="!isLoadingData && currentPerception?.synthese" />
           </TabPanel>
         </TabPanels>
         <LoaderSnipper v-if="isLoadingData" />

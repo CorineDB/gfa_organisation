@@ -18,9 +18,11 @@ const soumission = ref({});
 const filterSoumission = ref([]);
 
 const getSoumission = async () => {
-  await EvaluationService.getOneSoumissionsEvaluation(idEvaluation, idSoumission, type)
+  //await EvaluationService.getOneSoumissionsEvaluation(idEvaluation, idSoumission, type)
+  await EvaluationService.getSoumissionsFactuelEvaluation(idEvaluation)
     .then((result) => {
-      soumission.value = result.data.data;
+      soumission.value = result.data.data.factuel;
+      // console.log("Soumission factuel : ", result.data.data);
       filterSoumission.value = soumission.value?.categories_de_gouvernance;
       isLoading.value = false;
     })
@@ -28,6 +30,30 @@ const getSoumission = async () => {
       console.error(e);
       isLoading.value = false;
       toast.error("Une erreur est survenue: Détail soumission.");
+    });
+};
+
+
+const getSoumissions = async () => {
+  isLoading.value = true;
+  await EvaluationService.getSoumissionsEvaluation(idEvaluation)
+    .then((result) => {
+      //datas.value = result.data.data;
+      soumission.value = result.data.data.factuel;
+      filterSoumission.value = soumission.value?.categories_de_gouvernance;
+
+     console.log("getDatas", soumission.value);
+
+      /* if (datas.value.factuel?.comite_members) {
+        localStorage.setItem("member", JSON.stringify(datas.value.factuel.comite_members));
+      } */
+
+      isLoading.value = false;
+    })
+    .catch((e) => {
+      console.error(e);
+      isLoading.value = false;
+      toast.error("Une erreur est survenue: Liste des enquêtes.");
     });
 };
 
@@ -42,7 +68,7 @@ const goBack = () => {
 
 const filterOptions = computed(() => soumission.value?.options_de_reponse);
 
-onMounted(() => getSoumission());
+onMounted(() => { getSoumission(); });
 </script>
 <template>
   <div>
@@ -64,6 +90,7 @@ onMounted(() => getSoumission());
           </tr>
         </thead>
         <tbody>
+
           <template v-for="gouvernance in filterSoumission" :key="gouvernance.id">
             <tr class="bg-green-100">
               <td colspan="6" class="font-semibold">{{ gouvernance.nom }}</td>
@@ -86,25 +113,62 @@ onMounted(() => getSoumission());
                     </td>
                     <td>{{ question.nom }}</td>
                     <td class="text-center">{{ question.reponse_de_la_collecte?.nom }}</td>
-                    <td class="text-right">{{ question.reponse_de_la_collecte?.point }}</td>
-                    <td class="text-center">
-                      {{ question.reponse_de_la_collecte?.sourceDeVerification }}
+                    <td class="text-center">{{ question.reponse_de_la_collecte?.point }}</td>
+                    <td class="p-3">
+                      <div class="space-y-3">
+                        <!-- Source de vérification (si sourceIsRequired est true) -->
+                        <div v-if="soumission.options_de_reponse.find((option) => option.id == question.reponse_de_la_collecte.optionDeReponseId)?.sourceIsRequired" class="mb-3">
+                          <div class="text-xs font-semibold text-gray-600 uppercase mb-1">Source de vérification</div>
+                          <div v-if="question.reponse_de_la_collecte?.sourceDeVerification" class="text-sm text-gray-800 bg-blue-50 p-2 rounded">
+                            {{ question.reponse_de_la_collecte?.sourceDeVerification }}
+                          </div>
+                          <div v-else class="text-sm text-red-600 italic bg-red-50 p-2 rounded">
+                            Aucune source de vérification n'a été renseignée
+                          </div>
+                        </div>
 
-                      <div class="p-4 bg-gray-100 rounded-lg shadow-md w-72">
-                        <h2 class="text-lg font-semibold mb-3">Preuves</h2>
-                        <ul>
-                          <li v-for="(doc, index) in question.reponse_de_la_collecte?.preuves" :key="index" class="p-2 bg-white rounded-md shadow-sm mb-2 hover:bg-gray-200 transition">
-                            <a :href="doc.url" download class="text-blue-500 hover:underline">
-                              {{ doc.nom }}
-                            </a>
-                          </li>
-                        </ul>
-                        <!-- <ul>
-                          <li v-for="(doc, index) in question.reponse_de_la_collecte.preuves" :key="index" class="flex justify-between items-center p-2 bg-white rounded-md shadow-sm mb-2">
-                            <span class="text-gray-700">{{ doc.nom }}</span>
-                            <a :href="doc.url" download class="px-3 py-1 bg-blue-500 text-black text-sm rounded hover:bg-blue-600 transition"> Télécharger </a>
-                          </li>
-                        </ul> -->
+                        <!-- Description (si descriptionIsRequired est true) -->
+                        <div v-if="soumission.options_de_reponse.find((option) => option.id == question.reponse_de_la_collecte.optionDeReponseId)?.descriptionIsRequired" class="mb-3">
+                          <div class="text-xs font-semibold text-gray-600 uppercase mb-1">Description</div>
+                          <div v-if="question.reponse_de_la_collecte?.description" class="text-sm text-gray-800 bg-gray-50 p-2 rounded">
+                            {{ question.reponse_de_la_collecte?.description }}
+                          </div>
+                          <div v-else class="text-sm text-red-600 italic bg-red-50 p-2 rounded">
+                            Aucune description n'a été renseignée
+                          </div>
+                        </div>
+
+                        <!-- Preuves (si preuveIsRequired est true) -->
+                        <div v-if="soumission.options_de_reponse.find((option) => option.id == question.reponse_de_la_collecte.optionDeReponseId)?.preuveIsRequired">
+                          <!-- Instruction de la preuve -->
+                          <!-- <div v-if="soumission.options_de_reponse.find((option) => option.id == question.reponse_de_la_collecte.optionDeReponseId)?.instructionPreuve" class="mb-2">
+                            <div class="text-xs font-semibold text-gray-600 uppercase mb-1">Instruction</div>
+                            <div class="text-sm text-gray-700 bg-yellow-50 p-2 rounded border-l-4 border-yellow-400">
+                              {{ soumission.options_de_reponse.find((option) => option.id == question.reponse_de_la_collecte.optionDeReponseId)?.instructionPreuve }}
+                            </div>
+                          </div> -->
+
+                          <!-- Liste des preuves -->
+                          <div v-if="question.reponse_de_la_collecte?.preuves && question.reponse_de_la_collecte.preuves.length > 0">
+                            <div class="text-xs font-semibold text-gray-600 uppercase mb-2">Preuves ({{ question.reponse_de_la_collecte.preuves.length }})</div>
+                            <ul class="space-y-1">
+                              <li v-for="(doc, docIndex) in question.reponse_de_la_collecte.preuves" :key="docIndex" class="flex items-center gap-2 p-2 bg-green-50 rounded hover:bg-green-100 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <a :href="doc.url" download class="text-sm text-blue-600 hover:text-blue-800 hover:underline flex-1 truncate" :title="doc.nom">
+                                  {{ doc.nom }}
+                                </a>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                              </li>
+                            </ul>
+                          </div>
+                          <div v-else class="text-sm text-red-600 italic bg-red-50 p-2 rounded">
+                            Aucune preuve n'a été renseignée
+                          </div>
+                        </div>
                       </div>
                     </td>
 
