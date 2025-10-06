@@ -1,11 +1,9 @@
 <template>
-  <Chart
-    type="doughnut"
-    :width="width"
-    :height="height"
-    :data="data"
-    :options="options"
-  />
+  <div>
+     <!-- <pre>{{ activite }}</pre> -->
+    <Chart type="doughnut" :width="width" :height="height" :data="data" :activite="activite" :options="options" />
+  </div>
+ 
 </template>
 
 <script setup>
@@ -23,6 +21,10 @@ const props = defineProps({
     type: [Number, String],
     default: "auto",
   },
+  activite: {
+    type: Array,
+    default: [15, 10, 65],
+  },
 });
 
 const darkMode = computed(() => useDarkModeStore().darkMode);
@@ -30,23 +32,27 @@ const colorScheme = computed(() => useColorSchemeStore().colorScheme);
 
 const chartData = [15, 10, 65];
 const chartColors = () => [
-  colors.pending(0.9),
-  colors.warning(0.9),
-  colors.primary(0.9),
+  colors.primary(0.9),      // Terminé
+  colors.pending(0.9),     // En cours
+  colors.warning(0.9),     // En retard
+  colors.slate[400](0.9),  // Non démarrée
 ];
 
 const data = computed(() => {
   return {
-    labels: ["Yellow", "Dark"],
+    labels: [
+      "Terminé",
+      "En cours",
+      "En retard",
+      "Non démarrée"
+    ],
     datasets: [
       {
-        data: chartData,
+        data: props.activite,
         backgroundColor: colorScheme.value ? chartColors() : "",
         hoverBackgroundColor: colorScheme.value ? chartColors() : "",
         borderWidth: 5,
-        borderColor: darkMode.value
-          ? colors.darkmode[700]()
-          : colors.slate[200](),
+        borderColor: darkMode.value ? colors.darkmode[700]() : colors.slate[200](),
       },
     ],
   };

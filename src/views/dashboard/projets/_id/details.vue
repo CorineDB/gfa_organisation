@@ -371,10 +371,23 @@ const getStringValueOfStatutCode = (statut) => {
   return data;
 };
 
-function extractProperties(array, properties) {
-  if (array.length) {
-    return array.map((item) => properties.map((prop) => item[prop])).flat();
+// function extractProperties(array, properties) {
+//   if (array.length) {
+//     return array.map((item) => properties.map((prop) => item[prop])).flat();
+//   }
+// }
+
+const extractProperties = (data) => {
+  if (!data || typeof data !== 'object') {
+    return [0, 0, 0]; // valeurs par défaut
   }
+  
+  // Retourner dans l'ordre : effectue, enRetard, enCours
+  return [
+    data.effectue || 0,
+    data.enCours || 0 ,
+    data.enRetard || 0, 
+  ];
 }
 
 const annees = computed(() => {
