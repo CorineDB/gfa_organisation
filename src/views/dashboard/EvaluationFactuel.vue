@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch , getCurrentInstance } from "vue";
 import { reactive } from "vue";
 //import EvaluationService from "@/services/modules/evaluation.gouvernance.service";
 import EvaluationService from "@/services/modules/enquetes_de_gouvernance/evaluation.gouvernance.service";
@@ -13,6 +13,14 @@ import { computed } from "vue";
 import { getAllErrorMessages } from "@/utils/gestion-error";
 import { generateUniqueId, generatevalidateKey, getvalidateKey } from "../../utils/helpers";
 import { getFieldErrors } from "@/utils/helpers.js";
+
+//vérifier numéro de téléphone
+const { proxy } = getCurrentInstance();
+
+const isValid = computed(() => {
+  return proxy.$isValidPhoneNumber(currentMember.value.contact, "BJ");
+});
+
 
 const TYPE_ORGANISATION = "organisation";
 
@@ -52,7 +60,7 @@ const idEvaluation = ref("");
 const currentMember = ref({
   nom: "",
   prenom: "",
-  contact: null,
+  contact: "",
 });
 const tempMembers = ref([]);
 const sources = ref([]);
@@ -446,6 +454,13 @@ function editMember(member, index) {
     prenom: member.prenom,
     contact: member.contact,
   };
+}
+
+// Fonction pour supprimer un membre
+const deleteMember = (index) => {
+  if (confirm('Êtes-vous sûr de vouloir supprimer ce membre ?')) {
+    payload.factuel.comite_members.splice(index, 1)
+  }
 }
 
 function updateMember() {
@@ -1130,10 +1145,51 @@ const viewNewProof = (file) => {
             </div>
 
             <div class="flex justify-center gap-3 my-8">
-              <button @click="prevPage()" :disabled="currentPage === 0" class="px-4 py-3 btn btn-outline-primary">Précedent</button>
-              <button v-for="(item, index) in totalPages" @click="changePage(index)" :class="index === currentPage ? 'btn-primary' : 'btn-outline-primary'" class="px-4 py-3 btn" :key="index">{{ index + 1 }}</button>
-              <button v-if="!isPreview" @click="nextPage()" class="px-4 py-3 btn btn-outline-primary" :disabled="currentPage === totalPages - 1">Suivant</button>
-              <button v-if="isPreview" @click="openPreview" class="px-4 py-3 btn btn-outline-primary">Prévisualiser</button>
+               <button 
+  @click="prevPage()" 
+  :disabled="currentPage === 0 || isLoading" 
+  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
+  :class="{ 'opacity-50 cursor-not-allowed': currentPage === 0 || isLoading }"
+>
+  <span v-if="isLoading" class="animate-spin mr-2">⟳</span>
+  Précédent
+</button>
+
+<button 
+  v-for="(item, index) in totalPages" 
+  @click="changePage(index)" 
+  :class="[
+    index === currentPage ? 'btn-primary' : 'btn-outline-primary',
+    { 'opacity-50 cursor-not-allowed': isLoading }
+  ]" 
+  :disabled="isLoading"
+  class="px-4 py-3 btn transition-all duration-200" 
+  :key="index"
+>
+  {{ index + 1 }}
+</button>
+
+<button 
+  v-if="!isPreview" 
+  @click="nextPage()" 
+  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
+  :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages - 1 || isLoading }"
+  :disabled="currentPage === totalPages - 1 || isLoading"
+>
+  Suivant
+  <span v-if="isLoading" class="animate-spin ml-2">⟳</span>
+</button>
+
+<button 
+  :disabled="isLoading" 
+  v-if="isPreview" 
+  @click="openPreview" 
+  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
+  :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
+>
+  <span v-if="isLoading" class="animate-spin mr-2">⟳</span>
+  Prévisualiser
+</button>
             </div>
           </div>
         </div>
@@ -1163,10 +1219,23 @@ const viewNewProof = (file) => {
           <button class="btn btn-primary" @click="openMemberModal">Ajouter membres</button>
           <div v-if="payload.factuel.comite_members?.length > 0" class="mt-3 space-y-1">
             <label class="text-lg form-label">Membres</label>
-            <ul class="space-y-2">
-              <li class="text-base text-primary" v-for="(member, index) in payload.factuel?.comite_members" :key="index">
-                <span class="mr-2"> {{ member.nom }} {{ member.prenom }} - {{ member.contact }} </span>
-                <button class="btn btn-primary btn-sm" @click="editMember(member, index)">Modifier</button>
+            <ul class="space-y-3">
+              <li 
+                class="flex flex-wrap items-center justify-between gap-2 p-3 bg-gray-50 rounded-lg"
+                v-for="(member, index) in payload.factuel?.comite_members" 
+                :key="index"
+              >
+                <!-- Informations du membre -->
+                <div class="flex-1 min-w-[200px]">
+                  <span class="font-medium text-gray-800">{{ member.nom }} {{ member.prenom }}</span>
+                  <span class="text-gray-600 ml-2">- {{ member.contact }}</span>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="flex gap-2">
+                  <button class="btn btn-primary btn-sm" @click="editMember(member, index)">Modifier</button>
+                  <button class="btn btn-danger btn-sm" @click="deleteMember(index)">Supprimer</button>
+                </div>
               </li>
             </ul>
           </div>
@@ -1351,10 +1420,10 @@ const viewNewProof = (file) => {
         </div>
       </div>
     </div>
-    <div class="w-full">
-      <div class="flex gap-2">
-        <button type="button" @click="resetValidation" class="w-full px-2 py-2 my-3 btn btn-outline-secondary">Annuler</button>
-        <VButton label="Valider" class="w-full px-2 py-2 my-3" :loading="isLoading" @click="finalSubmit()" />
+   <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 p-4 shadow-lg z-50 rounded-lg">
+      <div class="flex gap-2" style="width: fit-content;">
+        <button type="button" @click="resetValidation" class="px-2 py-2 my-3 align-top btn">Annuler</button>
+        <VButton label="Valider" class="px-6 py-2" :loading="isLoading" @click="finalSubmit()" />
       </div>
     </div>
   </div>
@@ -1371,7 +1440,7 @@ const viewNewProof = (file) => {
           <InputForm label="Prénom" v-model="currentMember.prenom" :control="memberFormErrors.prenom && memberFormErrors.prenom.join(', ')" />
         </div>
         <div class="w-full">
-          <InputForm
+          <!-- <InputForm
             label="Contact"
             type="text"
             pattern="\d*"
@@ -1379,7 +1448,26 @@ const viewNewProof = (file) => {
             v-model="currentMember.contact"
             :control="memberFormErrors.contact && memberFormErrors.contact.join(', ')"
             required
-          />
+          /> -->
+           <InputForm class="" type="text" label="Numéro de téléphone" maxlength="13" v-model="currentMember.contact" />
+          <p class="text-xs text-primary mt-3">Ecrivez le numéro directement sans espace ni de signe + (Ex : 22977887787)</p>
+        </div>
+        <div class="col-span-12">
+          <!-- Message de validation avec animation -->
+          <div class="mt-4 _min-h-[1.5rem]">
+            <p v-if="isValid" class="flex items-center text-green-600 font-medium text-sm animate-pulse">
+              <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+              Numéro valide
+            </p>
+            <p v-else-if="currentMember.contact && currentMember.contact.length > 0" class="flex items-center text-red-500 font-medium text-sm">
+              <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              Numéro invalide
+            </p>
+          </div>
         </div>
 
         <!-- Liste des membres ajoutés temporairement -->

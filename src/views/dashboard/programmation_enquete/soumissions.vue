@@ -68,6 +68,25 @@ const getStatusText2 = (param) => {
   }
 };
 
+const formatDate = (dateString, defaultText = 'Non spécifié') => {
+  if (!dateString) return defaultText
+  
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return defaultText
+    
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch {
+    return defaultText
+  }
+}
+
 const options = [
   { label: "Adresse Email", id: "email" },
   { label: "Numéro de téléphone", id: "contact" },
@@ -484,7 +503,7 @@ const openPerceptionModal = () => {
 
 const copyPerceptionLink = async () => {
   try {
-    const link = `${window.location.origin}/tools-perception/${statistiques.value.formulaire_de_perception_de_gouvernance?.token || idEvaluation}`;
+    const link = `${window.location.origin}/tools-perception/${formulaireFactuel.value?.token }`;
     await navigator.clipboard.writeText(link);
     toast.success("Lien de soumission copié !");
   } catch (error) {
@@ -676,23 +695,20 @@ onMounted(async () => {
               <div class="m-5 text-slate-600 dark:text-slate-500">
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Démarré le :
-                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel.created_at : "Pas démarré" }}</div>
+                  <div class="ml-2 font-bold">{{ formatDate(datas.factuel?.created_at, "Pas démarré") }}</div>
                 </div>
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Soumis le :
-                  <div class="ml-2 font-bold">{{ datas.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Pas soumis") : "Pas soumis" }}</div>
+                  <div class="ml-2 font-bold">{{ formatDate(datas.factuel?.submitted_at, "Pas soumis") }}</div>
                 </div>
-                <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total questions répondues :
-                  <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.reponses_de_la_collecte?.length : 0 }}</div>
-                </div>
+                
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total membres du comité :
                   <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
                 </div>
                 <div class="mt-4">
                   <!-- <pre>{{ datas.factuel.pourcentage_evolution }}</pre> -->
-                  <p>Évolution soumissions</p>
+                  <p>Évolution des soumissions</p>
                   <ProgressBar :percent="datas.factuel ? datas.factuel.pourcentage_evolution : 0" />
                 </div>
               </div>
@@ -752,17 +768,22 @@ onMounted(async () => {
                   <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception.created_at : "Pas démarré" }}</div>
                 </div>
                 <div class="flex items-center">
-                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total participants :
+                  <BarChart2Icon class="w-4 h-4 mr-2" /> Total participants ayant répondu :
 
                   <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.length : 0 }}</div>
                 </div>
-                <div class="flex items-center">
+                <!-- <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total questions répondues :
                   <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
-                </div>
+                </div> -->
 
-                <div class="mt-4">
-                  <p>Évolution soumissions</p>
+               <div class="mt-4">
+                  <!-- <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-semibold text-primary">
+                      {{ datas.perception?.length ? statistiques?.pourcentage_evolution_des_soumissions_de_perception : 0 }}%
+                    </span>
+                  </div> -->
+                  <p class="text-sm font-medium text-gray-700">Évolution des soumissions</p>
                   <ProgressBar :percent="datas.perception?.length ? statistiques?.pourcentage_evolution_des_soumissions_de_perception : 0" />
                 </div>
               </div>
@@ -972,7 +993,7 @@ onMounted(async () => {
       <ModalFooter>
         <div class="flex gap-2">
           <button type="button" @click="resetInvitationForm" class="w-full px-2 py-2 my-3 align-top btn btn-outline-secondary">Annuler</button>
-          <VButton :loading="isLoading" label="Envoyer l'invitation" />
+          <VButton :disabled="!invitationPayload.participants.length" :loading="isLoading" label="Envoyer l'invitation" />
         </div>
       </ModalFooter>
     </form>

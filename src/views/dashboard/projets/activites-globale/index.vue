@@ -1243,9 +1243,9 @@ export default {
               </div>
 
               <!-- Corps avec scroll interne -->
-              <div class="flex flex-col justify-between flex-grow p-4 border-t">
+              <div class="flex flex-col _justify-between flex-grow p-4 border-t">
                 <!-- Section avec scroll: Description + Plages horaires -->
-                <div class="overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
+                
                   <!-- Description -->
                   <div class="mb-4">
                     <p class="text-primary font-semibold mb-2">Description</p>
@@ -1253,7 +1253,55 @@ export default {
                       {{ item.description || "Aucune description" }}
                     </p>
                   </div>
+                   <!-- Section fixe en bas: Budget et dates -->
+                <div class="mt-4 pt-4 border-t space-y-2 text-gray-700 text-sm flex-shrink-0">
+                  <div class="flex items-center">
+                    <LinkIcon class="w-4 h-4 mr-2 text-primary" />
+                    Fonds propre :
+                    <span class="font-semibold ml-1">{{
+                      $h.formatCurrency(item.budgetNational || 0)
+                    }}</span>
+                    <span class="italic ml-1">Fcfa</span>
+                  </div>
 
+                  <div class="flex items-center">
+                    <LinkIcon class="w-4 h-4 mr-2 text-primary" />
+                    Subvention :
+                    <span class="font-semibold ml-1">{{
+                      $h.formatCurrency(item.pret || 0)
+                    }}</span>
+                    <span class="italic ml-1">Fcfa</span>
+                  </div>
+
+                  <div class="flex items-center">
+                    <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" />
+                    Statut :
+                    <span class="ml-1 font-semibold">{{
+                      item.statut == -2
+                        ? "Non validé"
+                        : item.statut == -1
+                        ? "Pas démarré"
+                        : item.statut == 0
+                        ? "En cours"
+                        : item.statut == 1
+                        ? "En retard"
+                        : "Terminé"
+                    }}</span>
+                  </div>
+
+                  <div class="flex items-center">
+                    <ClockIcon class="w-4 h-4 mr-2 text-primary" />
+                    Date :
+                    <span class="ml-1 font-semibold">{{
+                      $h.reformatDate(item.debut)
+                    }}</span>
+                    au
+                    <span class="ml-1 font-semibold">{{
+                      $h.reformatDate(item.fin)
+                    }}</span>
+                  </div>
+                </div>
+                <div class="overflow-y-auto max-h-[300px] pr-2 custom-scrollbar">
                   <!-- Plages horaires -->
                   <div class="space-y-2 text-gray-700 text-sm">
                     <!-- Si une seule plage, on affiche directement -->
@@ -1312,54 +1360,7 @@ export default {
                   </div>
                 </div>
 
-                <!-- Section fixe en bas: Budget et dates -->
-                <div class="mt-4 pt-4 border-t space-y-2 text-gray-700 text-sm flex-shrink-0">
-                  <div class="flex items-center">
-                    <LinkIcon class="w-4 h-4 mr-2 text-primary" />
-                    Fonds propre :
-                    <span class="font-semibold ml-1">{{
-                      $h.formatCurrency(item.budgetNational || 0)
-                    }}</span>
-                    <span class="italic ml-1">Fcfa</span>
-                  </div>
-
-                  <div class="flex items-center">
-                    <LinkIcon class="w-4 h-4 mr-2 text-primary" />
-                    Subvention :
-                    <span class="font-semibold ml-1">{{
-                      $h.formatCurrency(item.pret || 0)
-                    }}</span>
-                    <span class="italic ml-1">Fcfa</span>
-                  </div>
-
-                  <div class="flex items-center">
-                    <CheckSquareIcon class="w-4 h-4 mr-2 text-primary" />
-                    Statut :
-                    <span class="ml-1 font-semibold">{{
-                      item.statut == -2
-                        ? "Non validé"
-                        : item.statut == -1
-                        ? "Pas démarré"
-                        : item.statut == 0
-                        ? "En cours"
-                        : item.statut == 1
-                        ? "En retard"
-                        : "Terminé"
-                    }}</span>
-                  </div>
-
-                  <div class="flex items-center">
-                    <ClockIcon class="w-4 h-4 mr-2 text-primary" />
-                    Date :
-                    <span class="ml-1 font-semibold">{{
-                      $h.reformatDate(item.debut)
-                    }}</span>
-                    au
-                    <span class="ml-1 font-semibold">{{
-                      $h.reformatDate(item.fin)
-                    }}</span>
-                  </div>
-                </div>
+               
               </div>
             </div>
           </div>
