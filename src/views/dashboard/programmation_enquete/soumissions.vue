@@ -503,7 +503,12 @@ const openPerceptionModal = () => {
 
 const copyPerceptionLink = async () => {
   try {
-    const link = `${window.location.origin}/tools-perception/${formulaireFactuel.value?.token }`;
+    //const link = `${window.location.origin}/tools-perception/${statistiques.value.formulaire_de_perception_de_gouvernance?.token || idEvaluation}`;
+
+    const link = `${window.location.origin}/tools-perception/${datas.value.lien_perception_token}`;
+
+    console.log("Data : ", datas);
+
     await navigator.clipboard.writeText(link);
     toast.success("Lien de soumission copié !");
   } catch (error) {
