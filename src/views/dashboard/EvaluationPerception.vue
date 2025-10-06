@@ -15,6 +15,7 @@ import { ages, categorieDeParticipant, sexes } from "../../utils/constants";
 import { generateUniqueId, generatevalidateKey, getvalidateKey } from "../../utils/helpers";
 import { getFieldErrors } from "@/utils/helpers.js";
 
+
 // Instance axios spécifique pour EvaluationPerception (sans token)
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "https://dms-redevabilite.com:8443/api/",
@@ -134,11 +135,11 @@ function removeObjectWithOptionResponseEmpty() {
 
 const submitData = async () => {
   payload.perception.response_data = Object.values(responses);
-
-  console.log(payload);
+  // Debug : afficher le payload avant soumission
+  console.log('Payload envoyé :', payload);
   removeObjectWithOptionResponseEmpty();
-
-  console.log(payload);
+  // Debug : afficher le payload après filtrage
+  console.log('Payload filtré :', payload);
 
   if (payload.perception.response_data.length > 0) {
     isLoading.value = true;
@@ -151,19 +152,31 @@ const submitData = async () => {
         showAlertValidate.value = result.data.terminer;
       }
 
+      if (result.statutCode == 422) {
+        // Erreur métier, afficher les erreurs
+        errors.value = result.data.errors;
+        toast.error("Erreur de validation");
+        return;
+      }
+       
       if (isValidate.value) {
         toast.success(`${result.data.message}`);
         generatevalidateKey("perception");
         showAlertValidate.value = true;
         showModalPreview.value = false;
       }
+
       errors.value = {};
     } catch (e) {
-      console.error(e);
+      console.error('Erreur soumission :', e);
       if (isValidate.value) {
         if (e.response && e.response.status === 422) {
+          // Mapping des erreurs reçues
           errors.value = e.response.data.errors;
-
+          // Debug : afficher toutes les clés d'erreur
+          Object.keys(errors.value).forEach(key => {
+            console.log('Erreur pour le champ :', key, errors.value[key]);
+          });
           if (errors.value["perception.response_data"]) {
             showModalPreview.value = false;
             toast.error(getAllErrorMessages(e));
@@ -180,6 +193,7 @@ const submitData = async () => {
     return;
   }
 };
+
 const initializeFormData = () => {
   // Initialisation des réponses
   console.log(formulairePerception.value);
@@ -302,6 +316,7 @@ onMounted(async () => {
   }
 });
 </script>
+
 <template>
   <div class="min-h-screen bg-white">
     <!-- Header de la page -->
@@ -339,6 +354,12 @@ onMounted(async () => {
 
         <!-- Contenu principal du formulaire -->
         <div v-if="formDataPerception.id" class="bg-white">
+          <!-- Erreurs globales du formulaire (questions non répondues) -->
+          <div v-if="errors['perception.response_data']" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p v-for="err in errors['perception.response_data']" :key="err" class="text-red-600 text-sm font-medium">
+              {{ err }}
+            </p>
+          </div>
           <div class="space-y-6">
             <AccordionGroup class="space-y-4">
               <AccordionItem v-for="(principe, principeIndex) in paginatedData" :key="principeIndex" class="!px-0 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
@@ -374,7 +395,12 @@ onMounted(async () => {
                             </label>
                           </div>
 
-                          <!-- Erreurs -->
+                          <!-- Erreur spécifique à la question manquante -->
+                          <div v-if="errors[`perception.response_data.missing.${question.id}.optionDeReponseId`]" class="my-2 text-danger">
+                            <span v-for="err in errors[`perception.response_data.missing.${question.id}.optionDeReponseId`]" :key="err">{{ err }}</span>
+                          </div>
+
+                          <!-- Erreurs indexées (si besoin) -->
                           <div v-if="errors['perception.response_data.' + questionIndex]" class="p-3 bg-red-50 border border-red-200 rounded-lg">
                             <p class="text-red-600 text-sm font-medium">
                               {{ getFieldErrors(errors["perception.response_data." + questionIndex]) }}

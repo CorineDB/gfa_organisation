@@ -4,7 +4,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div class="">
-        <h1 class="text-xl font-semibold text-gray-800">{{ graphiqueData?.nom }} </h1>
+        <h1 class="text-xl font-semibold text-gray-800">{{ graphiqueData?.nom }}</h1>
         <p class="text-sm text-gray-600" v-if="graphiqueData?.description">{{ graphiqueData?.description }}.</p>
       </div>
       <div class="">
@@ -138,7 +138,7 @@
             <div class="text-slate-500 mt-0.5">Total Activités</div>
           </div>
         </div>
-        <div class="flex items-center justify-center w-full gap-2 mx-auto mt-8">
+        <div class="flex items-center justify-center flex-wrap w-full gap-2 mx-auto mt-8">
           <div class="flex items-center">
             <div class="w-2 h-2 mr-3 rounded-full bg-primary"></div>
             <span class="truncate">Terminer : {{ graphiqueData?.statistiqueActivite?.effectue }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
@@ -150,6 +150,10 @@
           <div class="flex items-center">
             <div class="w-2 h-2 mr-3 rounded-full bg-warning"></div>
             <span class="truncate">En retard : {{ graphiqueData?.statistiqueActivite?.enRetard }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-2 h-2 mr-3 rounded-full bg-secondary"></div>
+            <span class="truncate">Non démarrer : {{ graphiqueData?.statistiqueActivite?.nonDemarree }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
           </div>
         </div>
       </div>
@@ -372,10 +376,24 @@ const getStringValueOfStatutCode = (statut) => {
   return data;
 };
 
-function extractProperties(array, properties) {
-  if (array.length) {
-    return array.map((item) => properties.map((prop) => item[prop])).flat();
+// function extractProperties(array, properties) {
+//   if (array.length) {
+//     return array.map((item) => properties.map((prop) => item[prop])).flat();
+//   }
+// }
+
+const extractProperties = (data) => {
+  if (!data || typeof data !== 'object') {
+    return [0, 0, 0 ,0]; // valeurs par défaut
   }
+  
+  // Retourner dans l'ordre : effectue, enRetard, enCours
+  return [
+    data.effectue || 0,
+    data.enCours || 0 ,
+    data.enRetard || 0, 
+    data.nonDemarree || 0, 
+  ];
 }
 
 const annees = computed(() => {
@@ -504,6 +522,8 @@ const getStat = function () {
       ProjetService.statistiques(ongId)
         .then((data) => {
           graphiqueData.value = data.data.data;
+          graphiqueData.value.statistiqueActivite.nonDemarree = graphiqueData.value.statistiqueActivite.total - (graphiqueData.value.statistiqueActivite.effectue + graphiqueData.value.statistiqueActivite.enCours + graphiqueData.value.statistiqueActivite.enRetard);
+
           console.log("Données chargées:", graphiqueData.value);
           initTabulator();
 
