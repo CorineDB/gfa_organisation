@@ -484,7 +484,12 @@ const openPerceptionModal = () => {
 
 const copyPerceptionLink = async () => {
   try {
-    const link = `${window.location.origin}/tools-perception/${statistiques.value.formulaire_de_perception_de_gouvernance?.token || idEvaluation}`;
+    //const link = `${window.location.origin}/tools-perception/${statistiques.value.formulaire_de_perception_de_gouvernance?.token || idEvaluation}`;
+
+    const link = `${window.location.origin}/tools-perception/${datas.value.lien_perception_token}`;
+
+    console.log("Data : ", datas);
+
     await navigator.clipboard.writeText(link);
     toast.success("Lien de soumission copié !");
   } catch (error) {
@@ -681,11 +686,11 @@ onMounted(async () => {
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Soumis le :
                   <div class="ml-2 font-bold">{{ datas.factuel ? (datas.factuel.submitted_at != null ? datas.factuel.submitted_at : "Pas soumis") : "Pas soumis" }}</div>
-                </div>
+                </div><!-- 
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total questions répondues :
                   <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.reponses_de_la_collecte?.length : 0 }}</div>
-                </div>
+                </div> -->
                 <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total membres du comité :
                   <div class="ml-2 font-bold">{{ datas.factuel ? datas.factuel?.comite_members?.length : 0 }}</div>
@@ -756,10 +761,10 @@ onMounted(async () => {
 
                   <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.length : 0 }}</div>
                 </div>
-                <div class="flex items-center">
+                <!-- <div class="flex items-center">
                   <BarChart2Icon class="w-4 h-4 mr-2" /> Total questions répondues :
                   <div class="ml-2 font-bold">{{ datas.perception?.length ? datas.perception?.reponses_de_la_collecte?.length : 0 }}</div>
-                </div>
+                </div> -->
 
                 <div class="mt-4">
                   <p>Évolution soumissions</p>
