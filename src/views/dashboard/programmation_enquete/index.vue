@@ -283,27 +283,11 @@ onMounted(async () => {
     <TabPanels class="mt-5">
       <TabPanel>
         <div class="p-5 mt-5 intro-y">
-          <!-- <div class="overflow-x-auto scrollbar-hidden" v-if="!isLoadingData">
-      <div id="tabulator" class="mt-5 table-report table-report--tabulator"></div>
-    </div> -->
-          <LoaderSnipper v-if="isLoadingData" />
-          <div v-else class="grid grid-cols-12 gap-6 mt-5">
+          
+          <div v-if="!isLoadingData"  class="grid grid-cols-12 gap-6 mt-5">
             <div v-for="(item, index) in datas" :key="index" class="col-span-12 p-4 md:col-span-12 lg:col-span-4">
               <div class="p-5 transition-transform transform bg-white border-l-4 rounded-lg shadow-lg box border-primary hover:scale-105 hover:bg-gray-50">
-                <!-- En-tête avec sigle et titre -->
-                <!-- <div class="relative flex items-start pt-2">
-                  <Dropdown class="absolute top-0 right-0 mt-2 mr-2">
-                    <DropdownToggle tag="a" class="block w-5 h-5 cursor-pointer">
-                      <MoreVerticalIcon class="w-5 h-5 text-gray-400 transition-colors hover:text-gray-600" />
-                    </DropdownToggle>
-                    <DropdownMenu class="w-40 bg-white rounded-md shadow-lg">
-                      <DropdownContent>
-                        <DropdownItem @click="handleEdit(item)"> <Edit2Icon class="w-4 h-4 mr-2 text-gray-600" /> Modifier </DropdownItem>
-                        <DropdownItem @click="handleDelete(item)"> <TrashIcon class="w-4 h-4 mr-2 text-red-500" /> Supprimer </DropdownItem>
-                      </DropdownContent>
-                    </DropdownMenu>
-                  </Dropdown>
-                </div> -->
+                
 
                 <div @click="gotoSoumissions(item)" class="_flex _flex-col _items-start w-full gap-2 mt-2 cursor-pointer">
                   <!-- Item details -->
@@ -314,10 +298,7 @@ onMounted(async () => {
 
                 <!-- Description section with distinct styling -->
                 <div @click="gotoSoumissions(item)" class="w-full mt-5 text-center cursor-pointer lg:text-left">
-                  <!-- <div class="" v-if="item.description">
-              <p class="mb-3 text-base font-semibold text-primary">Description</p>
-              <p class="p-3 text-gray-600 rounded-lg shadow-sm bg-gray-50">{{ item.description }}</p>
-            </div> -->
+                  
 
                   <!-- Other details with iconized section headers -->
                   <div class="mt-5 space-y-4 text-gray-600">
@@ -328,10 +309,7 @@ onMounted(async () => {
                       <div class="mb-2 flex items-center"><CalendarIcon class="w-4 h-4 mr-2 text-primary" /> Période:</div>
                       <span class="ml-2 font-semibold text-gray-900">{{ item.debut }} <span class="font-normal">au</span> {{ item.fin }}</span>
                     </div>
-                    <!-- <div class="flex items-center text-sm font-medium text-gray-700">
-                      <TargetIcon class="w-4 h-4 mr-2 text-primary" /> Objectif attendu:
-                      <span class="ml-2 font-semibold text-gray-900">{{ item.objectif_attendu }}</span>
-                    </div> -->
+                    
                     <div class="flex items-center text-sm font-medium text-gray-700">
                       <BarChart2Icon class="w-4 h-4 mr-2 text-primary" /> Total soumissions:
                       <span class="ml-2 font-semibold text-gray-900">{{ item.total_soumissions_de_perception + item.total_soumissions_factuel }}</span>
@@ -344,6 +322,10 @@ onMounted(async () => {
               </div>
             </div>
           </div>
+            <div v-else class="flex items-center justify-center py-8">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          <!-- <LoaderSnipper  /> -->
         </div>
       </TabPanel>
       <TabPanel>
@@ -352,19 +334,15 @@ onMounted(async () => {
             <div class="flex justify-center w-full p-3 bg-white">
               <div class="w-full max-w-screen-lg">
                 <p class="p-3 text-lg font-medium">Résultats synthetique par année</p>
-                <!-- <div class="!w-[250px] p-3">
-                  <label for="ongs" class="form-label">Organisation</label>
-                  <TomSelect name="organisations" v-model="ongSelectedScore" @change="changeOrganisationScore" :options="{ placeholder: 'Selectionez une organisation' }">
-                    <option value=""></option>
-                    <option v-for="organisation in organisations" :key="organisation.id" :value="organisation.id">{{ organisation.nom }}</option>
-                  </TomSelect>
-                </div> -->
+                
                 <ChartProgressionByTime :chartData="currentScore" v-if="ongSelectedScore && !isLoadingDataScore" />
                 <div class="h-[600px] flex justify-center items-center" v-if="!ongSelectedScore && !isLoadingDataScore">
                   <p class="text-xl font-medium text-slate-600">Veuillez choisir une organisation pour afficher le graphique</p>
                 </div>
                 <div class="h-[600px] flex justify-center items-center" v-if="isLoadingDataScore">
-                  <LoaderSnipper />
+                     <div  class="flex items-center justify-center py-8">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                      </div>
                 </div>
               </div>
             </div>

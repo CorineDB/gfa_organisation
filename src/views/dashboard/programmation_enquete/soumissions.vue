@@ -856,7 +856,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    <LoaderSnipper v-if="isLoadingData" />
+    <LoaderSnipper v-if="isLodingData" />
   </div>
 
   <!-- Modal Register & Update -->

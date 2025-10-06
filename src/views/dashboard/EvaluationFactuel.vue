@@ -1145,51 +1145,51 @@ const viewNewProof = (file) => {
             </div>
 
             <div class="flex justify-center gap-3 my-8">
-               <button 
-  @click="prevPage()" 
-  :disabled="currentPage === 0 || isLoading" 
-  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
-  :class="{ 'opacity-50 cursor-not-allowed': currentPage === 0 || isLoading }"
->
-  <span v-if="isLoading" class="animate-spin mr-2">⟳</span>
-  Précédent
-</button>
+                              <button 
+                  @click="prevPage()" 
+                  :disabled="currentPage === 0 || isLoading" 
+                  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
+                  :class="{ 'opacity-50 cursor-not-allowed': currentPage === 0 || isLoading }"
+                >
+                  <span v-if="isLoading" class="animate-spin mr-2">⟳</span>
+                  Précédent
+                </button>
 
-<button 
-  v-for="(item, index) in totalPages" 
-  @click="changePage(index)" 
-  :class="[
-    index === currentPage ? 'btn-primary' : 'btn-outline-primary',
-    { 'opacity-50 cursor-not-allowed': isLoading }
-  ]" 
-  :disabled="isLoading"
-  class="px-4 py-3 btn transition-all duration-200" 
-  :key="index"
->
-  {{ index + 1 }}
-</button>
+                <button 
+                  v-for="(item, index) in totalPages" 
+                  @click="changePage(index)" 
+                  :class="[
+                    index === currentPage ? 'btn-primary' : 'btn-outline-primary',
+                    { 'opacity-50 cursor-not-allowed': isLoading }
+                  ]" 
+                  :disabled="isLoading"
+                  class="px-4 py-3 btn transition-all duration-200" 
+                  :key="index"
+                >
+                  {{ index + 1 }}
+                </button>
 
-<button 
-  v-if="!isPreview" 
-  @click="nextPage()" 
-  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
-  :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages - 1 || isLoading }"
-  :disabled="currentPage === totalPages - 1 || isLoading"
->
-  Suivant
-  <span v-if="isLoading" class="animate-spin ml-2">⟳</span>
-</button>
+                <button 
+                  v-if="!isPreview" 
+                  @click="nextPage()" 
+                  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
+                  :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages - 1 || isLoading }"
+                  :disabled="currentPage === totalPages - 1 || isLoading"
+                >
+                  Suivant
+                  <span v-if="isLoading" class="animate-spin ml-2">⟳</span>
+                </button>
 
-<button 
-  :disabled="isLoading" 
-  v-if="isPreview" 
-  @click="openPreview" 
-  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
-  :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
->
-  <span v-if="isLoading" class="animate-spin mr-2">⟳</span>
-  Prévisualiser
-</button>
+                <button 
+                  :disabled="isLoading" 
+                  v-if="isPreview" 
+                  @click="openPreview" 
+                  class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
+                  :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
+                >
+                  <span v-if="isLoading" class="animate-spin mr-2">⟳</span>
+                  Prévisualiser
+                </button>
             </div>
           </div>
         </div>
