@@ -34,8 +34,7 @@
                     <th rowspan="2" class="py-3 sticky-header !z-[1] border !border-slate-800 min-w-[150px]">Hypothèses et risques</th>
                     <th rowspan="2" class="py-3 sticky-header !z-[1] border !border-slate-800 min-w-[150px]">Méthode de collecte des données</th>
                     <th rowspan="2" class="py-3 sticky-header !z-[1] border !border-slate-800 min-w-[150px]">Fréquence de la collecte de données</th>
-                    <th rowspan="2" class="py-3 sticky-header !z-[1] border !border-slate-800 min-w-[150px]">Responsable</th>
-                    <th rowspan="2" class="py-3 sticky-header !z-[1] border !border-slate-800 min-w-[450px]">Actions</th>
+                    <th rowspan="2" class="py-3 sticky-header !z-[1] border !border-slate-800 min-w-[150px]">Actions</th>
                   </tr>
                   <tr>
                     <th v-for="(year, index) in years" :key="index" class="py-3 !z-[1] sticky top-0 sticky-header border !border-slate-800 min-w-[70px]">{{ year }}</th>
@@ -47,7 +46,7 @@
                 <tbody>
                   <template v-for="(result, i) in data" :key="result.id">
                     <tr class="uppercase" v-if="result.indicateurs && result.indicateurs.length > 0" :class="[result.type == 'produit' ? 'text-black' : 'text-white']" :style="{ 'background-color': findColorCadreMesure(result.type) }">
-                      <td :colspan="14 + years.length * 2" class="font-semibold">{{ result.type }} {{ result.indice }}</td>
+                      <td :colspan="13 + years.length * 2" class="font-semibold sticky-column">{{ result.type }} {{ result.indice }}</td>
                     </tr>
                     <template v-for="(indicateur, j) in result.indicateurs" :key="indicateur.id">
                       <tr>
@@ -80,24 +79,17 @@
                           <td>{{ indicateur.hypothese }}</td>
                         <td>{{ indicateur.methode_de_la_collecte }}</td>
                         <td>{{ indicateur.frequence_de_la_collecte }}</td>
-                        <td>
-                          <span v-html="formatResponsable(indicateur.organisations_responsable)"></span><br />
-                          {{ indicateur.ug_responsable?.nom ?? "" }}
-                          {{}}
-                        </td>
-                        <td class="space-x-1">
+                        <!-- 
+                        <td class="space-x-1"> -->
+                        <td class="space-x-3 p-2 text-center">
                           <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary"><CornerUpLeftIcon class="size-5" /></button>
                           <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary"><EyeIcon class="size-5" /></button>
-                          <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Ajouter Structure" @click="handleStructure(indicateur.id)" class="btn text-primary"><PlusIcon class="size-5" />structure</button>
-                          <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Ajouter Structure" @click="handleYearCible(indicateur)" class="btn text-primary"><PlusIcon class="size-5" />année cible</button>
-                          <button v-if="verifyPermission('supprimer-un-suivi-indicateur')" title="Modifier" @click="handleEdit(indicateur)" class="btn text-pending"><Edit3Icon class="size-5" /></button>
-                          <button v-if="verifyPermission('supprimer-un-suivi-indicateur')" title="Supprimer" @click="handleDelete(indicateur)" class="btn text-danger"><TrashIcon class="size-5" /></button>
                         </td>
                       </tr>
                     </template>
                     <template v-for="(result, i) in result.categories" :key="result.id">
                       <tr class="uppercase" v-if="result.indicateurs && result.indicateurs.length > 0" :class="[result.type == 'produit' ? 'text-black' : 'text-white']" :style="{ 'background-color': findColorCadreMesure(result.type) }">
-                        <td :colspan="14 + years.length * 2" class="font-semibold">{{ result.type }} {{ result.indice }}</td>
+                        <td :colspan="13 + years.length * 2" class="font-semibold">{{ result.type }} {{ result.indice }}</td>
                       </tr>
                       <template v-for="(indicateur, j) in result.indicateurs" :key="indicateur.id">
                         <tr>
@@ -130,24 +122,15 @@
                           <td>{{ indicateur.hypothese }}</td>
                           <td>{{ indicateur.methode_de_la_collecte }}</td>
                           <td>{{ indicateur.frequence_de_la_collecte }}</td>
-                          <td>
-                            <span v-html="formatResponsable(indicateur.organisations_responsable)"></span><br />
-                            {{ indicateur.ug_responsable?.nom ?? "" }}
-                            {{}}
-                          </td>
-                          <td class="space-x-1">
+                          <td class="space-x-3 p-2 text-center">
                             <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary"><CornerUpLeftIcon class="size-5" /></button>
                             <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary"><EyeIcon class="size-5" /></button>
-                            <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Ajouter Structure" @click="handleStructure(indicateur.id)" class="btn text-primary"><PlusIcon class="size-5" />structure</button>
-                            <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Ajouter Structure" @click="handleYearCible(indicateur)" class="btn text-primary"><PlusIcon class="size-5" />année cible</button>
-                            <button v-if="verifyPermission('supprimer-un-suivi-indicateur')" title="Modifier" @click="handleEdit(indicateur)" class="btn text-pending"><Edit3Icon class="size-5" /></button>
-                            <button v-if="verifyPermission('supprimer-un-suivi-indicateur')" title="Supprimer" @click="handleDelete(indicateur)" class="btn text-danger"><TrashIcon class="size-5" /></button>
                           </td>
                         </tr>
                       </template>
                       <template v-for="(result, i) in result.categories" :key="result.id">
                         <tr class="uppercase" v-if="result.indicateurs && result.indicateurs.length > 0" :class="[result.type == 'produit' ? 'text-black' : 'text-white']" :style="{ 'background-color': findColorCadreMesure(result.type) }">
-                          <td :colspan="14 + years.length * 2" class="font-semibold">{{ result.type }} {{ result.indice }}</td>
+                          <td :colspan="13 + years.length * 2" class="font-semibold">{{ result.type }} {{ result.indice }}</td>
                         </tr>
                         <template v-for="(indicateur, j) in result.indicateurs" :key="indicateur.id">
                           <tr>
@@ -180,18 +163,9 @@
                             <td>{{ indicateur.hypothese }}</td>
                             <td>{{ indicateur.methode_de_la_collecte }}</td>
                             <td>{{ indicateur.frequence_de_la_collecte }}</td>
-                            <td>
-                              <span v-html="formatResponsable(indicateur.organisations_responsable)"></span><br />
-                              {{ indicateur.ug_responsable?.nom ?? "" }}
-                              {{}}
-                            </td>
-                            <td class="space-x-1">
+                            <td class="space-x-3 p-2 text-center">
                               <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary"><CornerUpLeftIcon class="size-5" /></button>
                               <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary"><EyeIcon class="size-5" /></button>
-                              <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Ajouter Structure" @click="handleStructure(indicateur.id)" class="btn text-primary"><PlusIcon class="size-5" />structure</button>
-                              <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Ajouter Structure" @click="handleYearCible(indicateur)" class="btn text-primary"><PlusIcon class="size-5" />année cible</button>
-                              <button v-if="verifyPermission('supprimer-un-suivi-indicateur')" title="Modifier" @click="handleEdit(indicateur)" class="btn text-pending"><Edit3Icon class="size-5" /></button>
-                              <button v-if="verifyPermission('supprimer-un-suivi-indicateur')" title="Supprimer" @click="handleDelete(indicateur)" class="btn text-danger"><TrashIcon class="size-5" /></button>
                             </td>
                           </tr>
                         </template>
@@ -889,7 +863,7 @@ const valeurRealise = ref([]);
 
 const goToDetailSuivi = (id) => {
   router.push({
-    name: "Détail du suivi",
+    name: "detail_indicateur",
     params: { id },
   });
 };
