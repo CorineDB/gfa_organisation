@@ -315,7 +315,7 @@ onMounted(async () => {
                       <span class="ml-2 font-semibold text-gray-900">{{ item.total_soumissions_de_perception + item.total_soumissions_factuel }}</span>
                     </div>
                     <div class="flex items-center text-sm font-medium text-gray-700">
-                      <ProgressBar :percent="item.pourcentage_evolution" />
+                      <ProgressBar :percent="item.pourcentage_evolution_organisations" />
                     </div>
                   </div>
                 </div>
