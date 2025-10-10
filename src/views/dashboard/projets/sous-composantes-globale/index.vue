@@ -529,11 +529,11 @@ export default {
               </div>
             </div>
             <!-- Bouton Voir Activités -->
-            <button
+            <!-- <button
               class="btn btn-primary mt-3 md:mt-0"
             >
               Voir activités
-            </button>
+            </button> -->
           </div>
           <!-- Dropdown for actions -->
           <Dropdown class="absolute top-0 right-0 mt-2 mr-2">

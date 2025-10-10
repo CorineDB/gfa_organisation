@@ -1179,27 +1179,7 @@ export default {
                     >
                       {{ item.nom }}
                     </h3>
-                    <button
-                      @click.stop="navigateToTasks(item.id, item.nom)"
-                      class="mt-2 px-3 py-1.5 bg-primary text-white rounded-md text-xs flex items-center gap-2 hover:bg-primary/90 shadow"
-                      title="Voir les tâches de cette activité"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                        />
-                      </svg>
-                      Tâches
-                    </button>
+                   
                   </div>
                 </div>
 
