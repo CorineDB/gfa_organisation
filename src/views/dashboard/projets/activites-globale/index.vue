@@ -1210,33 +1210,18 @@ export default {
                   </DropdownToggle>
                   <DropdownMenu class="w-40">
                     <DropdownContent>
-                      <DropdownItem
-                        v-if="verifyPermission('modifier-une-activite')"
-                        @click="modifierActivite(item)"
-                      >
-                        <Edit2Icon class="w-4 h-4 mr-2" /> Modifier
-                      </DropdownItem>
+                      <DropdownItem v-if="verifyPermission('modifier-une-activite')" @click="modifierActivite(item)"> <Edit2Icon class="w-4 h-4 mr-2" /> Modifier </DropdownItem>
+                      <DropdownItem v-if="verifyPermission('prolonger-une-activite')" @click="ouvrirModalProlongerActivite(item)"> <CalendarIcon class="w-4 h-4 mr-2" /> Prolonger </DropdownItem>
+                      <DropdownItem title="cliquer pour marquer l'activité comme terminer" v-if="verifyPermission('modifier-une-activite') && item.statut == 0" @click="changerStatut(item, 2)"> <CalendarIcon class="w-4 h-4 mr-2" /> Terminer </DropdownItem>
+                      <DropdownItem title="cliquer pour marquer l'activité comme pas démarré" v-if="verifyPermission('modifier-une-activite') && item.statut == 0" @click="changerStatut(item, -1)"> <CalendarIcon class="w-4 h-4 mr-2" /> Pas Démarrer </DropdownItem>
 
-                      <DropdownItem
-                        v-if="verifyPermission('prolonger-une-activite')"
-                        @click="ouvrirModalProlongerActivite(item)"
-                      >
-                        <CalendarIcon class="w-4 h-4 mr-2" /> Prolonger
-                      </DropdownItem>
+                      <DropdownItem title="cliquer pour démarré l'activité" v-else-if="verifyPermission('modifier-une-activite') && item.statut !== 0" @click="changerStatut(item, 0)"> <CalendarIcon class="w-4 h-4 mr-2" /> Démarrer </DropdownItem>
 
-                      <DropdownItem
-                        v-if="verifyPermission('creer-un-plan-de-decaissement')"
-                        @click="ouvrirModalPlanDeDecaissementActivite(item)"
-                      >
-                        <CalendarIcon class="w-4 h-4 mr-2" /> Plan de décaissement
-                      </DropdownItem>
+                      <DropdownItem v-if="verifyPermission('creer-un-plan-de-decaissement')" @click="ouvrirModalPlanDeDecaissementActivite(item)"> <CalendarIcon class="w-4 h-4 mr-2" /> Plan de decaissement </DropdownItem>
 
-                      <DropdownItem
-                        v-if="verifyPermission('supprimer-une-activite')"
-                        @click="supprimerComposant(item)"
-                      >
-                        <TrashIcon class="w-4 h-4 mr-2" /> Supprimer
-                      </DropdownItem>
+                      <!-- <a v-if="verifyPermission('prolonger-un-projet')" class="flex items-center mr-auto text-primary" href="javascript:;" @click="ouvrirModalProlongerProjet(item)" title="Prolonger la date du projet"> <CalendarIcon class="w-4 h-4 mr-1" /><span class="hidden sm:block"> Étendre </span></a> -->
+
+                      <DropdownItem v-if="verifyPermission('supprimer-une-activite')" @click="supprimerComposant(item)"> <TrashIcon class="w-4 h-4 mr-2" /> Supprimer </DropdownItem>
                     </DropdownContent>
                   </DropdownMenu>
                 </Dropdown>
