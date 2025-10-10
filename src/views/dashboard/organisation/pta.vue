@@ -63,14 +63,16 @@
               </td>
               <td class="border whitespace-nowrap dark:bg-gray-800 dark:border-gray-300 text-center">
                 <button v-if="pta.isActivite" @click="ouvrirModalPlanDeDecaissementActivite(pta)" title="Ajouter un plan de décaissement" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs p-1 mr-2">
-                  <DollarSignIcon class="w-4 h-4" />
+                  <!-- <DollarSignIcon class="w-4 h-4" /> --> Ajouter un plan de décaissement
                 </button>
                 <button v-if="pta.isActivite" @click="ouvrirModalSuiviFinancierActivite(pta)" title="suivre" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs p-1 mr-2">
-                  <TrendingUpIcon class="w-4 h-4" />
+                  <!-- <TrendingUpIcon class="w-4 h-4" /> -->
+                   Suivre
                 </button>
 
                 <button v-if="pta.isActivite" @click="voirSuiviActivite()" title="Voir les suivis" class="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-xs p-1 mr-2">
-                  <EyeIcon class="w-4 h-4" />
+                  <!-- <EyeIcon class="w-4 h-4" /> -->
+                   Voir les suivis
                 </button>
 
                 <!-- <button v-if="pta.isActivite" @click="handleDelete(pta)" class="text-white bg-red-500 hover:bg-red-600 font-medium rounded-lg text-xs px-4 py-2">Supprimer</button> -->
@@ -80,7 +82,12 @@
         </table>
       </div>
 
-      <div class="absolute shadow-md left-[23rem] sm:rounded-lg">
+     <div  :class="[
+            'absolute shadow-md',
+            'sm:rounded-lg',
+            'transition-all duration-300 ease-in-out',
+            (filteredDataNew.length > 0 && hasActivities) ? 'left-[38rem]' : 'left-[23rem]'
+          ]">
         <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
           <thead class="sticky top-0 text-xs border bg-blue-200 text-gray-700 uppercase _z-20 _bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr class="">
@@ -1125,6 +1132,9 @@ export default {
 
         return annees;
       },
+      hasActivities(){
+        return this.filteredDataNew.some(item => item.isActivite === true)
+      }
     }),
     dataNew() {
       const programme = [];

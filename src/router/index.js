@@ -398,17 +398,18 @@ const routes = [
         name: "Recommandation",
         component: Recommandation,
       },
-      {
-        path: "form-individuel/:id",
-        name: "view_survey",
-        component: SurveyFormView,
-      },
+      
       {
         path: "evaluation-individuel/:id",
         name: "detail_evaluation_individuel",
         component: DetailEvaluationIndividuel,
       },
     ],
+  },
+  {
+        path: "/form-individuel/:id",
+        name: "view_survey",
+        component: SurveyFormView,
   },
 
   {

@@ -82,8 +82,8 @@
                         <!-- 
                         <td class="space-x-1"> -->
                         <td class="space-x-3 p-2 text-center">
-                          <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary"><CornerUpLeftIcon class="size-5" /></button>
-                          <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary"><EyeIcon class="size-5" /></button>
+                          <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary">Suivre</button>
+                          <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary">Voir</button>
                         </td>
                       </tr>
                     </template>
@@ -123,8 +123,8 @@
                           <td>{{ indicateur.methode_de_la_collecte }}</td>
                           <td>{{ indicateur.frequence_de_la_collecte }}</td>
                           <td class="space-x-3 p-2 text-center">
-                            <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary"><CornerUpLeftIcon class="size-5" /></button>
-                            <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary"><EyeIcon class="size-5" /></button>
+                            <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary">Suivre</button>
+                            <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary">Voir</button>
                           </td>
                         </tr>
                       </template>
@@ -164,8 +164,8 @@
                             <td>{{ indicateur.methode_de_la_collecte }}</td>
                             <td>{{ indicateur.frequence_de_la_collecte }}</td>
                             <td class="space-x-3 p-2 text-center">
-                              <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary"><CornerUpLeftIcon class="size-5" /></button>
-                              <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary"><EyeIcon class="size-5" /></button>
+                              <button v-if="verifyPermission('creer-un-suivi-indicateur')" title="Suivre" @click="handleSuivi(indicateur)" class="btn text-primary">Suivre</button>
+                              <button v-if="verifyPermission('voir-un-suivi-indicateur')" title="Voir" @click="goToDetailSuivi(indicateur.id)" class="btn text-primary">Voir</button>
                             </td>
                           </tr>
                         </template>
