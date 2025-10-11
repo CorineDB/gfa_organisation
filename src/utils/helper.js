@@ -2,6 +2,8 @@ import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import html2canvas from "html2canvas";
+
 
 dayjs.extend(duration);
 
@@ -34,6 +36,120 @@ const helpers = {
         },
       });
     });
+
+    doc.save(`${pageName}.pdf`);
+  },
+   async generatePDFWithStyles(tableIds, pageName, format = "a4") {
+    const doc = new jsPDF({ orientation: "landscape", format });
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    // Header background with program colors
+    doc.setFillColor(41, 71, 111); // #29476F - Bleu principal
+    doc.rect(0, 0, pageWidth, 35, 'F');
+
+    // Load and add logo
+    try {
+      const logoPath = '/src/assets/images/logo3.webp';
+      const logoImg = await this.loadImage(logoPath);
+      doc.addImage(logoImg, 'WEBP', 10, 5, 25, 25); // Logo à gauche
+    } catch (error) {
+      console.warn('Logo non chargé:', error);
+    }
+
+    // Program title - "Programme redevabilité phase 3"
+    doc.setTextColor(222, 160, 37); // #DEA025 - Doré
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    const programTitle = 'Programme Redevabilité Phase 3';
+    const programTitleWidth = doc.getTextWidth(programTitle);
+    doc.text(programTitle, (pageWidth - programTitleWidth) / 2, 15);
+
+    // Document title (page name)
+    doc.setTextColor(255, 255, 255); // Blanc
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'normal');
+    const docTitle = pageName;
+    const docTitleWidth = doc.getTextWidth(docTitle);
+    doc.text(docTitle, (pageWidth - docTitleWidth) / 2, 27);
+
+    // Add date/time in top right
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('fr-FR');
+    const timeStr = now.toLocaleTimeString('fr-FR');
+    const dateTimeStr = `Généré le: ${dateStr} à ${timeStr}`;
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
+    const textXOffset = pageWidth - doc.getTextWidth(dateTimeStr) - 10;
+    doc.text(dateTimeStr, textXOffset, 32);
+
+    let currentY = 45; // Initial Y position for the first table (after header)
+
+    // Process each table
+    for (const tableId of tableIds) {
+      const tableElement = document.getElementById(tableId);
+
+      if (!tableElement) {
+        console.warn(`Table with id "${tableId}" not found`);
+        continue;
+      }
+
+      try {
+        // Make table visible temporarily if hidden
+        const originalDisplay = tableElement.style.display;
+        const wasHidden = originalDisplay === 'none' || window.getComputedStyle(tableElement).display === 'none';
+
+        if (wasHidden) {
+          tableElement.style.display = 'block';
+          tableElement.style.position = 'absolute';
+          tableElement.style.left = '-9999px';
+        }
+
+        // Capture table with html2canvas to preserve CSS styles (gradients, colors, etc.)
+        const canvas = await html2canvas(tableElement, {
+          scale: 2, // Higher quality
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          windowWidth: tableElement.scrollWidth,
+          windowHeight: tableElement.scrollHeight
+        });
+
+        // Restore original display state
+        if (wasHidden) {
+          tableElement.style.display = originalDisplay;
+          tableElement.style.position = '';
+          tableElement.style.left = '';
+        }
+
+        // Convert canvas to image
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = pageWidth - 20; // 10px margin on each side
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        // Check if image fits on current page
+        if (currentY + imgHeight > pageHeight - 10) {
+          doc.addPage();
+          currentY = 20;
+        }
+
+        // Add image to PDF
+        doc.addImage(imgData, 'PNG', 10, currentY, imgWidth, imgHeight);
+        currentY += imgHeight + 10;
+
+      } catch (error) {
+        console.error(`Error capturing table "${tableId}":`, error);
+
+        // Fallback to autoTable if html2canvas fails
+        autoTable(doc, {
+          html: `#${tableId}`,
+          startY: currentY,
+          didDrawPage: (data) => {
+            currentY = data.cursor.y + 10;
+          },
+        });
+      }
+    }
 
     doc.save(`${pageName}.pdf`);
   },

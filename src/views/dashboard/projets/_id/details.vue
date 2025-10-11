@@ -157,11 +157,11 @@
       </div>
       <div class="flex flex-col items-center p-6 mb-3 bg-white rounded-md shadow">
         <p class="text-xl font-bold text-center">TEP</p>
-        <ChartJauge label="TEP" :temperature="graphiqueData?.tep * 100 ?? 0" />
+        <ChartJauge label="TEP" :temperature="graphiqueData?.tep ?? 0" />
       </div>
       <div class="flex flex-col items-center p-6 mb-3 bg-white rounded-md shadow">
         <p class="text-xl font-bold text-center">TEF</p>
-        <ChartJauge label="TEF" :temperature="graphiqueData?.tef * 100 ?? 0" />
+        <ChartJauge label="TEF" :temperature="graphiqueData?.tef ?? 0" />
       </div>
       <!-- Map and Data -->
       <div class="col-span-12 p-6 bg-white rounded-md shadow" v-if="graphiqueData?.sites?.length > 0">
@@ -371,23 +371,10 @@ const getStringValueOfStatutCode = (statut) => {
   return data;
 };
 
-// function extractProperties(array, properties) {
-//   if (array.length) {
-//     return array.map((item) => properties.map((prop) => item[prop])).flat();
-//   }
-// }
-
-const extractProperties = (data) => {
-  if (!data || typeof data !== 'object') {
-    return [0, 0, 0]; // valeurs par défaut
+function extractProperties(array, properties) {
+  if (array.length) {
+    return array.map((item) => properties.map((prop) => item[prop])).flat();
   }
-  
-  // Retourner dans l'ordre : effectue, enRetard, enCours
-  return [
-    data.effectue || 0,
-    data.enCours || 0 ,
-    data.enRetard || 0, 
-  ];
 }
 
 const annees = computed(() => {

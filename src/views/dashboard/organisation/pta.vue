@@ -22,7 +22,9 @@
           Export Excel (XLSX)
         </button>
 
-        <DownloadPDFButton :tableIds="['ptaTable34']" pageName="Plan d'action" format="a0" />
+        <!-- <DownloadPDFButton :tableIds="['ptaTable34']" pageName="Plan d'action" format="a0" /> -->
+        <DownloadPDFWithStylesButton :tableIds="['ptaTable34']" pageName="Plan d'action" format="a0" />
+
       </div>
     </div>
   </div>
@@ -652,7 +654,14 @@
           >
             Annuler
           </button>
-          <VButton :loading="isLoading" label="Filtrer" />
+          <button
+            type="submit"
+            class="w-full px-2 py-2 my-3 align-top btn btn-primary"
+            :disabled="isLoading"
+          >
+            <span v-if="isLoading">Chargement...</span>
+            <span v-else>Filtrer</span>
+          </button>
         </div>
       </ModalFooter>
     </form>
@@ -1024,11 +1033,12 @@ import ActiviteService from "@/services/modules/activite.service";
 import PlanDecaissementComponent from "@/components/PlanDecaissement.vue";
 import PlanDeCaissement from "@/services/modules/plan.decaissement.service";
 import DownloadPDFButton from "../../../components/DownloadPDFButton.vue";
+import DownloadPDFWithStylesButton from "../../../components/DownloadPDFWithStylesButton.vue";
 import ExportationResultatSynthese from "@/components/news/ExportationResultatSynthese.vue";
 
 export default {
   props: ["ppm"],
-  components: { VButton, NoRecordsMessage, InputForm, DownloadPDFButton, ExportationResultatSynthese },
+  components: { VButton, NoRecordsMessage, InputForm, DownloadPDFButton, ExportationResultatSynthese , DownloadPDFWithStylesButton },
   data() {
     return {
       searchs: "",
@@ -1110,6 +1120,7 @@ export default {
       listeSuivi: [],
       loaderListePlan: false,
       loaderListeSuivi: false,
+      isLoading : false
     };
   },
   computed: {
@@ -1123,9 +1134,9 @@ export default {
         let anneeFin = parseInt(`${this.finProgramme.split("-")[0]}`);
         let annees = [];
         for (let annee = anneeDebut; annee <= anneeFin; annee++) {
-          if (annee <= new Date().getFullYear()) {
+          // if (annee <= new Date().getFullYear()) {
             annees.push(annee);
-          }
+          // }
         }
 
         console.log("annees", annees);
@@ -2720,17 +2731,21 @@ export default {
     },
     getPta(data) {
       this.active();
+      this.isLoading = true
       PtabService.getOrganisationPta(data)
         .then((data) => {
+           this.isLoading = false
           this.showModalFiltre = false;
           this.ptab = data.data.data;
           this.disabled();
           toast.success("Filtre éffectuer avec succès");
         })
         .catch((e) => {
+           this.isLoading = false
           toast.error("Erreur lors du filtrage des informations");
           this.disabled();
         });
+         
     },
     getPtaRevise() {
       let data = {};
