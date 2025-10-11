@@ -129,77 +129,74 @@
     </div>
 
     <!-- Content Grid -->
-    <div class="grid grid-cols-1 gap-6 my-6 md:grid-cols-2 lg:grid-cols-3">
-      <div class="p-6 mb-3 bg-white rounded-md shadow">
-        <p class="text-xl font-bold text-center">Activités</p>
-        <div class="relative mt-8">
-          <!-- v-if="graphiqueData?.statistiqueActivite > 0" -->
+    <div class="grid grid-cols-1 gap-4 my-6 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <!-- Card Activités -->
+      <div class="p-4 bg-white rounded-md shadow sm:p-6">
+        <p class="text-lg font-bold text-center sm:text-xl">Activités</p>
+        <div class="relative mt-6 sm:mt-8">
           <ReportDonutChart2 v-if="graphiqueData?.statistiqueActivite" :activite="extractProperties(graphiqueData?.statistiqueActivite || [0, 0, 0])" :height="215" />
           <div class="absolute top-0 left-0 flex flex-col items-center justify-center w-full h-full">
-            <div class="text-xl font-medium 2xl:text-2xl">{{ graphiqueData?.statistiqueActivite?.total }}</div>
-            <div class="text-slate-500 mt-0.5">Total Activités</div>
+            <div class="text-xl font-medium sm:text-2xl">{{ graphiqueData?.statistiqueActivite?.total }}</div>
+            <div class="text-xs text-slate-500 mt-0.5 sm:text-sm">Total Activités</div>
           </div>
         </div>
-        <div class="flex items-center justify-center w-full gap-2 mx-auto mt-8">
-          <div class="flex items-center">
-            <div class="w-2 h-2 mr-3 rounded-full bg-primary"></div>
-            <span class="truncate">Terminer : {{ graphiqueData?.statistiqueActivite?.effectue }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
+        <div class="flex flex-col gap-2 mx-auto mt-6 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-3 sm:mt-8">
+          <div class="flex items-center min-w-0">
+            <div class="flex-shrink-0 w-2 h-2 mr-2 rounded-full bg-primary"></div>
+            <span class="text-xs truncate sm:text-sm">Terminé : {{ graphiqueData?.statistiqueActivite?.effectue }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
           </div>
-          <div class="flex items-center">
-            <div class="w-2 h-2 mr-3 rounded-full bg-pending"></div>
-            <span class="truncate">En cours {{ graphiqueData?.statistiqueActivite?.enCours }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
+          <div class="flex items-center min-w-0">
+            <div class="flex-shrink-0 w-2 h-2 mr-2 rounded-full bg-pending"></div>
+            <span class="text-xs truncate sm:text-sm">En cours : {{ graphiqueData?.statistiqueActivite?.enCours }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
           </div>
-          <div class="flex items-center">
-            <div class="w-2 h-2 mr-3 rounded-full bg-warning"></div>
-            <span class="truncate">En retard : {{ graphiqueData?.statistiqueActivite?.enRetard }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
+          <div class="flex items-center min-w-0">
+            <div class="flex-shrink-0 w-2 h-2 mr-2 rounded-full bg-warning"></div>
+            <span class="text-xs truncate sm:text-sm">En retard : {{ graphiqueData?.statistiqueActivite?.enRetard }}/{{ graphiqueData?.statistiqueActivite?.total }}</span>
           </div>
         </div>
       </div>
-      <div class="flex flex-col items-center p-6 mb-3 bg-white rounded-md shadow">
-        <p class="text-xl font-bold text-center">TEP</p>
+
+      <!-- Card TEP -->
+      <div class="flex flex-col items-center p-4 bg-white rounded-md shadow sm:p-6">
+        <p class="text-lg font-bold text-center sm:text-xl">TEP</p>
         <ChartJauge label="TEP" :temperature="graphiqueData?.tep ?? 0" />
       </div>
-      <div class="flex flex-col items-center p-6 mb-3 bg-white rounded-md shadow">
-        <p class="text-xl font-bold text-center">TEF</p>
+
+      <!-- Card TEF -->
+      <div class="flex flex-col items-center p-4 bg-white rounded-md shadow sm:p-6">
+        <p class="text-lg font-bold text-center sm:text-xl">TEF</p>
         <ChartJauge label="TEF" :temperature="graphiqueData?.tef ?? 0" />
       </div>
+
       <!-- Map and Data -->
-      <div class="col-span-12 p-6 bg-white rounded-md shadow" v-if="graphiqueData?.sites?.length > 0">
-        <h2 class="mb-4 text-lg font-semibold text-gray-700">Cartes géographiques</h2>
-        <div class="grid grid-cols-2 gap-4">
+      <div class="col-span-1 p-4 bg-white rounded-md shadow md:col-span-2 xl:col-span-3 sm:p-6" v-if="graphiqueData?.sites?.length > 0">
+        <h2 class="mb-4 text-base font-semibold text-gray-700 sm:text-lg">Cartes géographiques</h2>
+        <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
           <!-- Map -->
-          <!-- <div  style="height: 40vh"></div> -->
-          <div class="col-span-8">
-            <div id="map" class="mb-4 bg-gray-200 rounded-md" style="height: 400px;"></div>
+          <div class="lg:col-span-8">
+            <div id="map" class="mb-4 bg-gray-200 rounded-md" style="height: 350px; min-height: 300px;"></div>
           </div>
           <!-- Data Table -->
-          <div class="col-span-4 overflow-x-auto">
-            <table class="w-full text-sm text-gray-600">
+          <div class="overflow-x-auto lg:col-span-4">
+            <table class="w-full text-xs text-gray-600 sm:text-sm">
               <thead>
                 <tr class="text-left bg-gray-100">
-                  <th class="px-4 py-2">Sites</th>
-                  <th class="px-4 py-2">Longitudes</th>
-                  <th class="px-4 py-2">Latitudes</th>
+                  <th class="px-2 py-2 sm:px-4">Sites</th>
+                  <th class="px-2 py-2 sm:px-4">Longitudes</th>
+                  <th class="px-2 py-2 sm:px-4">Latitudes</th>
                 </tr>
               </thead>
               <tbody v-for="(item, index) in graphiqueData.sites" :key="index">
-                <tr>
-                  <td class="px-4 py-2">{{ item.nom }}</td>
-                  <td class="px-4 py-2">{{ item.latitude }}</td>
-                  <td class="px-4 py-2 text-red-500">{{ item.longitude }}</td>
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="px-2 py-2 sm:px-4">{{ item.nom }}</td>
+                  <td class="px-2 py-2 sm:px-4">{{ item.latitude }}</td>
+                  <td class="px-2 py-2 text-red-500 sm:px-4">{{ item.longitude }}</td>
                 </tr>
-                <!-- <tr>
-                  <td class="px-4 py-2">Seoul</td>
-                  <td class="px-4 py-2">454</td>
-                  <td class="px-4 py-2 text-green-500">+5.64%</td>
-                </tr> -->
-                <!-- Add more rows as needed -->
               </tbody>
             </table>
           </div>
         </div>
       </div>
-      <!-- </section> -->
     </div>
 
     <!-- Activities Section -->
