@@ -31,6 +31,9 @@ const TachesService = {
   deleteSuivis(slug) {
     return ApiService.get(`gfa/taches/${slug}/changeStatut`);
   },
+   suiviTache(params) {
+    return ApiService.post(`gfa/suivis`, params);
+  },
   getSuivi() {
     const params = {
       type: "tache",

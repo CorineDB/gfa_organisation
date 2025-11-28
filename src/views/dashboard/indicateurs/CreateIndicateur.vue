@@ -71,7 +71,7 @@
             <ModalBody>
               <div class="grid grid-cols-1 gap-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                  <InputForm class="flex-1" label="Nom" v-model="payload.nom" />
+                  <InputForm class="flex-1" id="nom" name="nom" label="Nom" v-model="payload.nom" />
                   <div class="flex-1">
                     <label class="form-label" for="description">Description</label>
                     <div class="">
@@ -81,18 +81,18 @@
                 </div>
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <div class="flex-1 form-check">
-                    <input id="agreer" class="form-check-input" type="checkbox" v-model="payload.agreger" />
+                    <input id="agreer" name="agreer" class="form-check-input" type="checkbox" v-model="payload.agreger" />
                     <label class="form-check-label" for="agreer">Indicateur Agréger</label>
                   </div>
-                  <InputForm class="flex-1" label="Année de base" v-model.number="payload.anneeDeBase" type="number" />
+                  <InputForm class="flex-1" id="anneeDeBase" name="anneeDeBase" label="Année de base" v-model.number="payload.anneeDeBase" type="number" />
                 </div>
 
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <div class="w-full" v-if="!payload.agreger">
                     <p class="form-label">Année cible</p>
                     <div class="flex gap-1 place-items-end">
-                      <input type="number" class="form-control" id="anne_cible" placeholder="Année" v-model="currentAnneeCibleNotAgreger.annee" />
-                      <input type="number" class="form-control" id="valeur_cible" placeholder="Valeur cible" v-model="currentAnneeCibleNotAgreger.valeurCible" />
+                      <input type="number" class="form-control" id="anne_cible" name="anne_cible" placeholder="Année" v-model="currentAnneeCibleNotAgreger.annee" />
+                      <input type="number" class="form-control" id="valeur_cible" name="valeur_cible" placeholder="Valeur cible" v-model="currentAnneeCibleNotAgreger.valeurCible" />
                       <button @click.prevent="addAnneeCibleNotAgreger" class="btn btn-primary h-9"><PlusIcon class="mr-1 size-3" /></button>
                     </div>
                   </div>
@@ -106,21 +106,21 @@
                 </div>
 
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                  <InputForm class="flex-1" label="Indice" v-model="payload.indice" type="number" />
+                  <InputForm class="flex-1" id="indice" name="indice" label="Indice" v-model="payload.indice" type="number" />
                   <div v-if="payload.agreger" class="flex-1">
-                    <label class="form-label">Clé valeur</label>
-                    <TomSelect v-model="array_value_keys" name="keys" multiple :options="{ placeholder: 'Selectionez les clés valeur' }" class="w-full">
+                    <label class="form-label" for="keys">Clé valeur</label>
+                    <TomSelect v-model="array_value_keys" id="keys" name="keys" multiple :options="{ placeholder: 'Selectionez les clés valeur' }" class="w-full">
                       <option v-for="(key, index) in keys" :key="index" :value="key.id">{{ key.libelle }}</option>
                     </TomSelect>
                   </div>
-                  <InputForm v-else class="flex-1" label="Valeur de base" v-model="payloadNotAgreger.valeurDeBase" type="number" />
+                  <InputForm v-else class="flex-1" id="valeurDeBase" name="valeurDeBase" label="Valeur de base" v-model="payloadNotAgreger.valeurDeBase" type="number" />
                 </div>
                 <div v-if="array_value_keys.length > 0 && payload.agreger" class="">
                   <label class="form-label">Valeur de base</label>
                   <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(350px,_1fr))]">
                     <div v-for="(base, index) in filterValueKeys" :key="index" class="input-group">
                       <div class="flex items-center justify-center text-sm input-group-text">{{ base.libelle }}</div>
-                      <input type="number" v-model="valeur[base.id]" class="form-control" placeholder="valeur" aria-label="valeur" aria-describedby="input-group-valeur" />
+                      <input type="number" v-model="valeur[base.id]" :id="`valeur-${base.id}`" :name="`valeur-${base.id}`" class="form-control" placeholder="valeur" aria-label="valeur" aria-describedby="input-group-valeur" />
                     </div>
                   </div>
                 </div>
@@ -136,15 +136,15 @@
                 </div>
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <div class="flex-1">
-                    <label class="form-label">Catégorie</label>
-                    <TomSelect v-model="payload.categorieId" name="category" :options="{ placeholder: 'Selectionez une catégorie' }" class="w-full">
+                    <label class="form-label" for="category">Catégorie</label>
+                    <TomSelect v-model="payload.categorieId" id="category" name="category" :options="{ placeholder: 'Selectionez une catégorie' }" class="w-full">
                       <option value=""></option>
                       <option v-for="(categorie, index) in categories" :key="categorie.id" :value="categorie.id">{{ categorie.type }} {{ categorie.indice }} {{ categorie.nom }}</option>
                     </TomSelect>
                   </div>
                   <div class="flex-1">
-                    <label class="form-label">Type de variables</label>
-                    <TomSelect v-model="payload.type_de_variable" name="type_variable" :options="{ placeholder: 'Selectionez un type de variable' }" class="w-full">
+                    <label class="form-label" for="type_variable">Type de variables</label>
+                    <TomSelect v-model="payload.type_de_variable" id="type_variable" name="type_variable" :options="{ placeholder: 'Selectionez un type de variable' }" class="w-full">
                       <option value=""></option>
                       <option v-for="(variable, index) in payload.agreger ? type_variablees : type_variablees_agreger" :key="index" :value="variable.id">{{ variable.label }}</option>
                     </TomSelect>
@@ -156,38 +156,38 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <div class="flex-1">
-                    <label class="form-label">Méthode de la collecte des données</label>
-                    <TomSelect v-model="payload.methode_de_la_collecte" name="method" :options="{ placeholder: 'Selectionez une methode' }" class="w-full">
+                    <label class="form-label" for="method">Méthode de la collecte des données</label>
+                    <TomSelect v-model="payload.methode_de_la_collecte" id="method" name="method" :options="{ placeholder: 'Selectionez une methode' }" class="w-full">
                       <option value=""></option>
                       <option v-for="(methode, index) in methodeCollecte" :key="index" :value="methode">{{ methode }}</option>
                     </TomSelect>
                   </div>
                   <div class="flex-1">
-                    <label class="form-label">Fréquence de la collecte de données</label>
-                    <TomSelect v-model="payload.frequence_de_la_collecte" :options="{ placeholder: 'Selectionez une fréquence' }" class="w-full">
+                    <label class="form-label" for="frequence">Fréquence de la collecte de données</label>
+                    <TomSelect v-model="payload.frequence_de_la_collecte" id="frequence" name="frequence" :options="{ placeholder: 'Selectionez une fréquence' }" class="w-full">
                       <option value=""></option>
                       <option v-for="(frequence, index) in frequenceCollecte" :key="index" :value="frequence">{{ frequence }}</option>
                     </TomSelect>
                   </div>
                 </div>
                 <div class="flex-1">
-                  <label class="form-label">UG</label>
-                  <TomSelect v-model="responsablesForm.ug" name="ug" :options="{ placeholder: 'Selectionez un UG' }" class="w-full">
+                  <label class="form-label" for="ug">UG</label>
+                  <TomSelect v-model="responsablesForm.ug" id="ug" name="ug" :options="{ placeholder: 'Selectionez un UG' }" class="w-full">
                     <option value=""></option>
                     <option v-for="(ug, index) in ugs" :key="index" :value="ug.id">{{ ug.nom }}</option>
                   </TomSelect>
                 </div>
                 <div class="flex flex-wrap items-center justify-between gap-3">
                   <div class="flex-1">
-                    <label class="form-label">Responsables</label>
-                    <TomSelect v-model="responsablesForm.organisations" name="responsable" multiple :options="{ placeholder: 'Selectionez un responsable' }" class="w-full">
+                    <label class="form-label" for="responsable">Responsables</label>
+                    <TomSelect v-model="responsablesForm.organisations" id="responsable" name="responsable" multiple :options="{ placeholder: 'Selectionez un responsable' }" class="w-full">
                       <option value=""></option>
                       <option v-for="(responsable, index) in responsables" :key="index" :value="responsable.id">{{ responsable.nom }}</option>
                     </TomSelect>
                   </div>
                   <div class="flex-1">
-                    <label class="form-label">Unité de mesure</label>
-                    <TomSelect v-model="payload.uniteeMesureId" name="unite" :options="{ placeholder: 'Selectionez une unité de mesure' }" class="w-full">
+                    <label class="form-label" for="unite">Unité de mesure</label>
+                    <TomSelect v-model="payload.uniteeMesureId" id="unite" name="unite" :options="{ placeholder: 'Selectionez une unité de mesure' }" class="w-full">
                       <option value=""></option>
                       <option v-for="(unite, index) in unites" :key="index" :value="unite.id">{{ unite.nom }}</option>
                     </TomSelect>
@@ -195,15 +195,15 @@
                 </div>
                 <div class="flex flex-wrap items-center justify-between w-full gap-3">
                   <div class="flex-1">
-                    <label class="form-label">Sites</label>
-                    <TomSelect v-model="payload.sites" multiple name="site" :options="{ placeholder: 'Selectionez les sites' }" class="w-full">
+                    <label class="form-label" for="site">Sites</label>
+                    <TomSelect v-model="payload.sites" id="site" multiple name="site" :options="{ placeholder: 'Selectionez les sites' }" class="w-full">
                       <option value=""></option>
                       <option v-for="(site, index) in sites" :key="index" :value="site.id">{{ site.nom }}</option>
                     </TomSelect>
                   </div>
                   <div class="flex-1">
-                    <label class="form-label">Source de données</label>
-                    <TomSelect v-model="payload.sources_de_donnee" name="source" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
+                    <label class="form-label" for="source">Source de données</label>
+                    <TomSelect v-model="payload.sources_de_donnee" id="source" name="source" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
                       <option value=""></option>
                       <option v-for="(source, index) in sourcesDonnees" :key="index" :value="source">{{ source }}</option>
                     </TomSelect>
@@ -229,7 +229,7 @@
             <ModalBody>
               <div class="grid grid-cols-1 gap-4">
                 <!-- Champ pour l'année -->
-                <InputForm label="Année" v-model="currentAnneeCible.annee" type="number" placeholder="Entrez l'année" />
+                <InputForm id="annee" name="annee" label="Année" v-model="currentAnneeCible.annee" type="number" placeholder="Entrez l'année" />
 
                 <!-- Champs dynamiques pour les valeurs -->
                 <div v-if="array_value_keys.length > 0" class="">
@@ -238,7 +238,7 @@
                       <div class="flex items-center justify-center text-sm input-group-text">
                         {{ key.libelle }}
                       </div>
-                      <input type="number" v-model="currentAnneeCible.valeurCible[index].value" class="form-control" placeholder="valeur" aria-label="valeur" />
+                      <input type="number" v-model="currentAnneeCible.valeurCible[index].value" :id="`valeur-cible-${key.id}`" :name="`valeur-cible-${key.id}`" class="form-control" placeholder="valeur" aria-label="valeur" />
                     </div>
                   </div>
                 </div>

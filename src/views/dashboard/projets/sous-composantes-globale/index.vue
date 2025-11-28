@@ -605,25 +605,27 @@ export default {
     </ModalHeader>
     <form @submit.prevent="sendForm">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-        <InputForm v-model="formData.nom" class="col-span-12 mt-4" type="text" required="required" label="Nom" />
+        <InputForm v-model="formData.nom" id="nom" name="nom" class="col-span-12 mt-4" type="text" required="required" label="Nom" />
         <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
 
         <div class="input-form mt-3 col-span-12">
-          <label for="validation-form-6" class="form-label w-full"> Description </label>
-          <textarea v-model="formData.description" class="form-control w-full" name="comment" placeholder="Ajouter une description"></textarea>
+          <label for="description" class="form-label w-full"> Description </label>
+          <textarea v-model="formData.description" id="description" name="description" class="form-control w-full" placeholder="Ajouter une description"></textarea>
         </div>
 
-        <InputForm v-model="formData.budgetNational" class="col-span-12 mt-4 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
+        <InputForm v-model="formData.budgetNational" id="budgetNational" name="budgetNational" class="col-span-12 mt-4 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
         <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
 
-        <InputForm v-model="formData.pret" class="col-span-12 mt-4 no-spin" type="number" required="required" placeHolder="Fond propre" label="Subvention" />
+        <InputForm v-model="formData.pret" id="pret" name="pret" class="col-span-12 mt-4 no-spin" type="number" required="required" placeHolder="Fond propre" label="Subvention" />
         <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
 
-       
+
         <div class="flex col-span-12 mt-4">
           <TomSelect
             @change="mettreAjoutOutcome(formData.composanteId)"
             v-model="formData.composanteId"
+            id="composanteId"
+            name="composanteId"
             :options="{
               placeholder: 'Choisir un Outcome',
               create: false,
@@ -635,7 +637,7 @@ export default {
             <option v-for="(element, index) in composants" :key="index" :value="element.id">{{ element.codePta }} {{ element.nom }}</option>
           </TomSelect>
 
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
+          <label for="composanteId" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">OutComes</label>
         </div>
         <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.composanteId">{{ messageErreur.composanteId }}</p>
 

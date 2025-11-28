@@ -69,15 +69,15 @@
       <ModalBody>
         <div class="grid grid-cols-1 gap-5">
           <div class="flex-1">
-            <label class="form-label">Année de suivi</label>
-            <TomSelect v-model="payloadSuivi.annee" name="annee_suivi" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
+            <label class="form-label" for="annee_suivi">Année de suivi</label>
+            <TomSelect v-model="payloadSuivi.annee" id="annee_suivi" name="annee_suivi" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
               <option v-for="annee in years" :key="annee" :value="annee">{{ annee }}</option>
             </TomSelect>
           </div>
           <!-- <InputForm label="Année de suivi" class="flex-1" v-model="payloadSuivi.annee" type="number" /> -->
           <div v-if="!isAgregerCurrentIndicateur" class="flex flex-wrap items-center justify-between gap-3">
-            <InputForm label="Valeur cible" class="flex-1" v-model="payloadSuivi.valeurCible" type="number" />
-            <InputForm label="Valeur réalisée" class="flex-1" v-model="payloadSuivi.valeurRealise" type="number" />
+            <InputForm id="valeurCible" name="valeurCible" label="Valeur cible" class="flex-1" v-model="payloadSuivi.valeurCible" type="number" />
+            <InputForm id="valeurRealise" name="valeurRealise" label="Valeur réalisée" class="flex-1" v-model="payloadSuivi.valeurRealise" type="number" />
           </div>
 
           <div v-if="valueKeysIndicateurSuivi.length > 0 && isAgregerCurrentIndicateur" class="">
@@ -85,7 +85,7 @@
             <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]">
               <div v-for="(base, index) in valueKeysIndicateurSuivi" :key="index" class="input-group">
                 <div class="flex items-center justify-center text-sm truncate input-group-text">{{ base.libelle }}</div>
-                <input type="number" class="form-control" v-model="valeurCible.find((item) => item.keyId === base.id).value" @input="updateValueCible(base.id, $event.target.value)" placeholder="valeur cible" aria-label="valeur" aria-describedby="input-group-valeur" />
+                <input type="number" class="form-control" v-model="valeurCible.find((item) => item.keyId === base.id).value" :id="`valeur-cible-${base.id}`" :name="`valeur-cible-${base.id}`" @input="updateValueCible(base.id, $event.target.value)" placeholder="valeur cible" aria-label="valeur" aria-describedby="input-group-valeur" />
               </div>
             </div>
           </div>
@@ -94,7 +94,7 @@
             <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]">
               <div v-for="(base, index) in valueKeysIndicateurSuivi" :key="index" class="input-group">
                 <div class="flex items-center justify-center text-sm truncate input-group-text">{{ base.libelle }}</div>
-                <input type="number" class="form-control" v-model="valeurRealise.find((item) => item.keyId === base.id).value" @input="updateValueRealiser(base.id, $event.target.value)" placeholder="valeur réalisée" aria-label="valeur" aria-describedby="input-group-valeur" />
+                <input type="number" class="form-control" v-model="valeurRealise.find((item) => item.keyId === base.id).value" :id="`valeur-realise-${base.id}`" :name="`valeur-realise-${base.id}`" @input="updateValueRealiser(base.id, $event.target.value)" placeholder="valeur réalisée" aria-label="valeur" aria-describedby="input-group-valeur" />
               </div>
             </div>
           </div>
@@ -109,25 +109,25 @@
             </div>
           </div>
           <div v-if="suiviOption == 'trimestre'" class="flex-1">
-            <label class="form-label">Trimestre</label>
-            <TomSelect v-model="payloadSuivi.trimestre" name="trimestre_suivi" :options="{ placeholder: 'Selectionez un trimestre' }" class="w-full">
+            <label class="form-label" for="trimestre_suivi">Trimestre</label>
+            <TomSelect v-model="payloadSuivi.trimestre" id="trimestre_suivi" name="trimestre_suivi" :options="{ placeholder: 'Selectionez un trimestre' }" class="w-full">
               <option value=""></option>
               <option v-for="trimestre in trimestres" :key="trimestre" :value="trimestre">Trimestre {{ trimestre }}</option>
             </TomSelect>
           </div>
 
-          <InputForm v-else label="Date de suivi" class="flex-1" v-model="payloadSuivi.dateSuivie" type="date" />
+          <InputForm v-else id="dateSuivie" name="dateSuivie" label="Date de suivi" class="flex-1" v-model="payloadSuivi.dateSuivie" type="date" />
           <div class="flex-1">
-            <label class="form-label">Source de données</label>
-            <TomSelect v-model="payloadSuivi.sources_de_donnee" name="source" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
+            <label class="form-label" for="source">Source de données</label>
+            <TomSelect v-model="payloadSuivi.sources_de_donnee" id="source" name="source" :options="{ placeholder: 'Selectionez une source' }" class="w-full">
               <option value=""></option>
               <option v-for="(source, index) in sourcesDonnees" :key="index" :value="source">{{ source }}</option>
             </TomSelect>
           </div>
           <div class="flex-1">
-            <label class="form-label" for="description">Commentaire</label>
+            <label class="form-label" for="commentaire">Commentaire</label>
             <div class="">
-              <textarea name="description" class="form-control" id="description" v-model="payloadSuivi.commentaire" cols="30" rows="2"></textarea>
+              <textarea name="commentaire" class="form-control" id="commentaire" v-model="payloadSuivi.commentaire" cols="30" rows="2"></textarea>
             </div>
           </div>
         </div>

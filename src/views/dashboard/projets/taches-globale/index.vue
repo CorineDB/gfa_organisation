@@ -56,6 +56,7 @@ export default {
       deleteLoader: false,
       taches: [],
       tacheId: "",
+      update : false,
     };
   },
   computed: {
@@ -100,6 +101,32 @@ export default {
   },
 
   methods: {
+     togglesuivie(pta) {
+      var form = {
+        tacheId: pta.id,
+        poidsActuel: pta.poids,
+      };
+
+      TachesService.suiviTache(form)
+        .then((data) => {
+          toast.success("suivie éffectué avec succès");
+             this.getActiviteById(this.activitesId);
+
+        })
+        .catch((error) => {
+          if (error.response) {
+            // Requête effectuée mais le serveur a répondu par une erreur.
+            const message = error.response.data.message;
+            toast.error(message);
+          } else if (error.request) {
+            // Demande effectuée mais aucune réponse n'est reçue du serveur.
+          } else {
+            // Une erreur s'est produite lors de la configuration de la demande
+          }
+        });
+      //}
+      this.chargement = false;
+    },
     getActiviteById(data) {
       ActiviteService.get(data)
         .then((response) => {
@@ -522,6 +549,14 @@ export default {
               <span class="px-2 py-1 m-5 text-xs text-white rounded bg-danger/80" v-else-if="item.statut == 1"> En retard </span>
               <span class="pl-2" v-else-if="item.statut == 2">Terminé</span>
             </div>
+              <!-- <div class="suivi-container">
+              <span class="suivi-label">Suivre</span>
+              <select v-model="item.poids" :id="'suivi-tache-' + item.id" :name="'suivi-tache-' + item.id" class="suivi-select" aria-label="Niveau de suivi" @change="togglesuivie(item)">
+                <option :value="0">0%</option>
+                <option :value="50">50%</option>
+                <option :value="100">100%</option>
+              </select>
+            </div> -->
             <div class="h-20 overflow-y-scroll">
               <div class="flex items-center mt-2">
                 <ClockIcon class="w-4 h-4 mr-2" />
@@ -562,37 +597,22 @@ export default {
     </ModalHeader>
     <form>
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-        <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de la tache" label="Nom" />
+        <InputForm v-model="formData.nom" id="nom" name="nom" class="col-span-12" type="text" required="required" placeHolder="Nom de la tache" label="Nom" />
         <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
 
         <div class="input-form mt-3 col-span-12">
-          <label for="validation-form-6" class="form-label w-full"> Description </label>
-          <textarea v-model="formData.description" class="form-control w-full" name="comment" placeholder="Ajouter une description"></textarea>
+          <label for="description" class="form-label w-full"> Description </label>
+          <textarea v-model="formData.description" id="description" name="description" class="form-control w-full" placeholder="Ajouter une description"></textarea>
         </div>
 
-        <!-- <div class="col-span-12 mt-4">
-          <div class="flex col-span-12" v-if="!update">
-            <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Projets</label>
-            <TomSelect
-              v-model="projetId"
-              :options="{
-                placeholder: 'Choisir un Output',
-                create: false,
-                onOptionAdd: text(),
-              }"
-              class="w-full"
-            >
-              <option value="">Choisir un projet</option>
 
-              <option v-for="(element, index) in projets" :key="index" :value="element.id">{{ element.codePta }}-{{ element.nom }}</option>
-            </TomSelect>
-          </div>
-        </div> -->
 
         <div class="flex col-span-12 mt-4" v-if="!update">
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Outcomes</label>
+          <label for="composantId" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Outcomes</label>
           <TomSelect
             v-model="selectedIds.composantId"
+            id="composantId"
+            name="composantId"
             :options="{
               placeholder: 'Choisir un Outcome',
               create: false,
@@ -605,9 +625,11 @@ export default {
         </div>
 
         <div class="flex col-span-12 mt-4" v-if="!update">
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Output</label>
+          <label for="sousComposantId" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Output</label>
           <TomSelect
             v-model="selectedIds.sousComposantId"
+            id="sousComposantId"
+            name="sousComposantId"
             :options="{
               placeholder: 'Choisir un Output',
               create: false,
@@ -622,9 +644,11 @@ export default {
         </div>
 
         <div class="flex col-span-12 mt-4" v-if="!update">
-          <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activités</label>
+          <label for="activiteId" class="absolute z-10 px-3 ml-1 text-sm font-medium duration-100 ease-linear -translate-y-3 bg-white form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activités</label>
           <TomSelect
             v-model="formData.activiteId"
+            id="activiteId"
+            name="activiteId"
             :options="{
               placeholder: 'Choisir une activité',
               create: false,
@@ -647,10 +671,10 @@ export default {
           <!-- <label for="_input-wizard-10" class="absolute z-10 px-3 ml-1 text-sm font-bold duration-100 ease-linear -translate-y-3 bg-white _font-medium form-label peer-placeholder-shown:translate-y-2 peer-placeholder-shown:px-0 peer-placeholder-shown:text-slate-400 peer-focus:ml-1 peer-focus:-translate-y-3 peer-focus:px-1 peer-focus:font-medium peer-focus:text-primary peer-focus:text-sm">Activites</label> -->
         </div>
 
-        <InputForm v-model="formData.debut" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de début" label="Début de la tâche" />
+        <InputForm v-model="formData.debut" id="debut" name="debut" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de début" label="Début de la tâche" />
         <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.debut">{{ messageErreur.debut }}</p>
 
-        <InputForm v-model="formData.fin" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de fin " label="Fin de la tâche " />
+        <InputForm v-model="formData.fin" id="fin" name="fin" class="col-span-12" type="date" required="required" placeHolder="Entrer la date de fin " label="Fin de la tâche " />
         <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.fin">{{ messageErreur.fin }}</p>
 
         <!-- <pre>{{ getPlageActivite }}</pre> -->
@@ -689,4 +713,74 @@ export default {
   </Modal>
 </template>
 
-<style></style>
+<style scoped>
+.suivi-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.suivi-container:hover {
+  background: #ffffff;
+  border-color: #0F3460;
+  box-shadow: 0 0 0 2px rgba(15, 52, 96, 0.1);
+}
+
+.suivi-label {
+  font-weight: 600;
+  color: #0F3460;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.suivi-select {
+  padding: 6px 32px 6px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230F3460' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") no-repeat right 8px center;
+  background-size: 16px;
+  font-size: 14px;
+  color: #0F3460;
+  cursor: pointer;
+  appearance: none;
+  min-width: 80px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.suivi-select:focus {
+  outline: none;
+  border-color: #0F3460;
+  box-shadow: 0 0 0 2px rgba(15, 52, 96, 0.15);
+}
+
+.suivi-select:hover {
+  border-color: #0F3460;
+  background-color: #f8fafc;
+}
+
+/* Style pour les options */
+.suivi-select option {
+  padding: 8px;
+  background: #ffffff;
+  color: #0F3460;
+}
+
+/* Style pour l'option sélectionnée */
+.suivi-select option:checked {
+  background: #0F3460 linear-gradient(0deg, #0F3460 0%, #0F3460 100%);
+  color: #ffffff;
+}
+
+/* Style au focus pour accessibilité */
+.suivi-select:focus-visible {
+  outline: 2px solid #0F3460;
+  outline-offset: 1px;
+}
+
+</style>

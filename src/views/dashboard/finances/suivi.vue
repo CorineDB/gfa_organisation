@@ -882,7 +882,8 @@ onMounted(() => {
               </table>
             </div>
 
-            <div class="absolute shadow-md perso left-40 sm:rounded-lg">
+            <!-- je veux que le left-40 quand datas.suiviFinanciers.length > 0 et left-28 quand c'est zero   -->
+            <div class="absolute shadow-md perso sm:rounded-lg" :class="{'left-40': datas.suiviFinanciers.length > 0, 'left-28': datas.suiviFinanciers.length === 0} ">
               <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="sticky top-0 text-xs text-gray-700 uppercase _z-20 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
@@ -966,6 +967,10 @@ onMounted(() => {
               </table>
             </div>
           </div>
+        </div>
+        <!-- Met un message dans le cas datas.suiviFinanciers est vide -->
+        <div v-if="!datas.suiviFinanciers || datas.suiviFinanciers.length === 0" class="text-center py-8">
+          <p class="text-gray-500 text-lg">Aucun suivi financier disponible pour le moment.</p>
         </div>
       </div>
     </div>

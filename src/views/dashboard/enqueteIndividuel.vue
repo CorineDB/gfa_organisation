@@ -427,7 +427,7 @@
     <form @submit.prevent="submitData">
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
-          <InputForm label="Libelle" v-model="payload.libelle" :control="getFieldErrors(errors.libelle)" />
+          <InputForm id="libelle" name="libelle" label="Libelle" v-model="payload.libelle" :control="getFieldErrors(errors.libelle)" />
           <div class="flex-1">
             <label class="form-label" for="description">Description</label>
             <div class="">
@@ -436,7 +436,7 @@
             </div>
           </div>
           <div class="flex-1">
-            <label class="form-label" for="description">Structure Formulaire <span class="text-danger">*</span> </label>
+            <label class="form-label" for="form_data">Structure Formulaire <span class="text-danger">*</span> </label>
             <div class="">
               <div class="flex gap-2 mb-2">
                 <button type="button" @click="updateFormDataFromBuilder" class="btn btn-secondary btn-sm">Récupérer depuis le créateur</button>
@@ -506,7 +506,7 @@
                     <div v-if="['text', 'email', 'password', 'number', 'date', 'time', 'datetime-local', 'tel', 'url'].includes(field.type_champ)">
                       <div class="flex items-center gap-2 mb-2">
                         <div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                        <label class="form-label font-medium text-gray-700 mb-0">
+                        <label :for="`field_${field.id}`" class="form-label font-medium text-gray-700 mb-0">
                           {{ field.label }}
                           <span v-if="field.is_required" class="text-red-500 ml-1 font-bold">*</span>
                         </label>
@@ -514,7 +514,7 @@
                           {{ field.type_champ }}
                         </div>
                       </div>
-                      <input :type="field.type_champ" :placeholder="field.placeholder" :required="field.is_required" class="form-control border-gray-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20" readonly />
+                      <input :id="`field_${field.id}`" :name="`field_${field.id}`" :type="field.type_champ" :placeholder="field.placeholder" :required="field.is_required" class="form-control border-gray-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20" readonly />
                       <small v-if="field.info" class="form-help text-blue-600 mt-2 flex items-center gap-1">
                         <i class="fas fa-info-circle text-xs"></i>
                         {{ field.info }}
@@ -522,20 +522,20 @@
                     </div>
 
                     <div v-else-if="field.type_champ === 'textarea'">
-                      <label class="form-label">
+                      <label :for="`field_${field.id}`" class="form-label">
                         {{ field.label }}
                         <span v-if="field.is_required" class="text-red-500 ml-1">*</span>
                       </label>
-                      <textarea :placeholder="field.placeholder" :required="field.is_required" :rows="field.rows || 3" class="form-control" readonly></textarea>
+                      <textarea :id="`field_${field.id}`" :name="`field_${field.id}`" :placeholder="field.placeholder" :required="field.is_required" :rows="field.rows || 3" class="form-control" readonly></textarea>
                       <small v-if="field.info" class="form-help">{{ field.info }}</small>
                     </div>
 
                     <div v-else-if="field.type_champ === 'select'">
-                      <label class="form-label">
+                      <label :for="`field_${field.id}`" class="form-label">
                         {{ field.label }}
                         <span v-if="field.is_required" class="text-red-500 ml-1">*</span>
                       </label>
-                      <select :required="field.is_required" class="form-control" disabled>
+                      <select :id="`field_${field.id}`" :name="`field_${field.id}`" :required="field.is_required" class="form-control" disabled>
                         <option value="">{{ field.placeholder || "Sélectionner..." }}</option>
                         <option v-for="option in field.meta_options?.options || []" :key="option.value" :value="option.value">
                           {{ option.label }}
@@ -566,14 +566,14 @@
 
                     <div v-else-if="field.type_champ === 'file'" class="bg-white rounded-lg border border-gray-200 p-4 hover:border-pink-300 transition-all duration-200">
                       <div class="flex items-center justify-between mb-3">
-                        <label class="form-label font-medium text-gray-700">
+                        <label :for="`field_${field.id}`" class="form-label font-medium text-gray-700">
                           {{ field.label }}
                           <span v-if="field.is_required" class="text-red-500 ml-1">*</span>
                         </label>
                         <span class="px-2 py-1 bg-pink-100 text-pink-700 text-xs font-medium rounded-full"> 📁 Fichier </span>
                       </div>
                       <div class="relative">
-                        <input type="file" :required="field.is_required" class="form-control border-gray-300 focus:border-pink-500 focus:ring-pink-200 transition-colors duration-200" disabled />
+                        <input :id="`field_${field.id}`" :name="`field_${field.id}`" type="file" :required="field.is_required" class="form-control border-gray-300 focus:border-pink-500 focus:ring-pink-200 transition-colors duration-200" disabled />
                         <div class="mt-2 text-xs text-gray-500 flex items-center">
                           <i class="fas fa-info-circle mr-1"></i>
                           Aperçu uniquement - fonctionnalité désactivée

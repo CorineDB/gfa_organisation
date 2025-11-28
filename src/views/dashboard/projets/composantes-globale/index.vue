@@ -440,22 +440,22 @@ export default {
     <form @submit.prevent="sendForm">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
         <div class="col-span-12 md:col-span-6">
-          <InputForm v-model="formData.nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
+          <InputForm v-model="formData.nom" id="nom" name="nom" class="col-span-12" type="text" required="required" placeHolder="Nom de l'organisation" label="Nom" />
           <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
         </div>
 
         <div class="input-form _mt-3 col-span-12 md:col-span-6">
-          <label for="validation-form-6" class="form-label w-full"> Description </label>
-          <textarea v-model="formData.description" class="form-control w-full" name="comment" placeholder="Ajouter une description"></textarea>
+          <label for="description" class="form-label w-full"> Description </label>
+          <textarea v-model="formData.description" id="description" name="description" class="form-control w-full" placeholder="Ajouter une description"></textarea>
         </div>
 
         <div class="col-span-12 md:col-span-6">
-          <InputForm v-model="formData.budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
+          <InputForm v-model="formData.budgetNational" id="budgetNational" name="budgetNational" class="col-span-12 no-spin" type="number" required="required" placeHolder="Ex : 2" label="Fond propre" />
           <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
         </div>
 
         <div class="col-span-12 md:col-span-6">
-          <InputForm v-model="formData.pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
+          <InputForm v-model="formData.pret" id="pret" name="pret" class="col-span-12" type="number" required="required" placeHolder="Ex : 2" label="Subvention" />
           <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
         </div>
 

@@ -34,6 +34,7 @@ const init = (el, { props, emit }) => {
     });
 
     el.addEventListener("hidden.tw.modal", () => {
+      document.activeElement.blur();
       emit("hidden");
     });
   }

@@ -1377,26 +1377,28 @@ export default {
     <form @submit.prevent="sendForm">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
         <div class="col-span-12 md:col-span-6">
-          <InputForm v-model="formData.nom" class="col-span-12 mt-4" type="text" required="required" placeHolder="Nom de l'activité*" label="Nom" />
+          <InputForm v-model="formData.nom" id="nom" name="nom" class="col-span-12 mt-4" type="text" required="required" placeHolder="Nom de l'activité*" label="Nom" />
           <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.nom">{{ messageErreur.nom }}</p>
         </div>
         <div class="input-form mt-3 col-span-12 md:col-span-6">
-          <label for="validation-form-6" class="form-label w-full"> Description </label>
-          <textarea v-model="formData.description" class="form-control w-full" name="comment" placeholder="Ajouter une description"></textarea>
+          <label for="description" class="form-label w-full"> Description </label>
+          <textarea v-model="formData.description" id="description" name="description" class="form-control w-full" placeholder="Ajouter une description"></textarea>
         </div>
         <div class="col-span-12 md:col-span-6">
-          <InputForm v-model="formData.pret" class="col-span-12 mt-4" type="number" required="required" placeHolder="Subvention*" label="Subvention" />
+          <InputForm v-model="formData.pret" id="pret" name="pret" class="col-span-12 mt-4" type="number" required="required" placeHolder="Subvention*" label="Subvention" />
           <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.pret">{{ messageErreur.pret }}</p>
         </div>
         <div class="col-span-12 md:col-span-6">
-          <InputForm v-model="formData.budgetNational" class="col-span-12 mt-4" type="number" required="required" placeHolder="Ex : 2" label="Fond Propre" />
+          <InputForm v-model="formData.budgetNational" id="budgetNational" name="budgetNational" class="col-span-12 mt-4" type="number" required="required" placeHolder="Ex : 2" label="Fond Propre" />
           <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.budgetNational">{{ messageErreur.budgetNational }}</p>
         </div>
 
         <div v-if="!isUpdate" class="flex flex-col col-span-12 md:col-span-6 mt-4">
-          <label for="_input-wizard-10" class="form-label">OutCome*</label>
+          <label for="composanteId" class="form-label">OutCome*</label>
           <TomSelect
             v-model="formData.composanteId"
+            id="composanteId"
+            name="composanteId"
             :options="{
               placeholder: 'Choisir un Outcome',
               create: false,
@@ -1412,10 +1414,12 @@ export default {
 
         <div class="flex col-span-12 md:col-span-6 mt-4" v-if="haveSousComposantes && !isUpdate">
           <div class="flex flex-col w-full">
-            <label for="_input-wizard-10" class="form-label">Output*</label>
+            <label for="sousComposantId" class="form-label">Output*</label>
             <div class="flex">
               <TomSelect
                 v-model="selectedIds.sousComposantId"
+                id="sousComposantId"
+                name="sousComposantId"
                 :options="{
                   placeholder: 'Choisir un Output',
                   create: false,
@@ -1438,12 +1442,12 @@ export default {
         </div>
 
         <div class="col-span-12 md:col-span-6">
-          <InputForm v-model="formData.debut" class="col-span-12 mt-4" type="date" required="required" placeHolder="Entrer la date de début*" label="Début de l'activité" />
+          <InputForm v-model="formData.debut" id="debut" name="debut" class="col-span-12 mt-4" type="date" required="required" placeHolder="Entrer la date de début*" label="Début de l'activité" :min="getPlageProjet?.debut" :max="getPlageProjet?.fin"/>
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.debut">{{ messageErreur.debut }}</p>
         </div>
 
         <div class="col-span-12 md:col-span-6">
-          <InputForm v-model="formData.fin" class="col-span-12 mt-4" type="date" required="required" placeHolder="Entrer la date de fin*" label="Fin de l'activité" />
+          <InputForm v-model="formData.fin" id="fin" name="fin" class="col-span-12 mt-4" type="date" required="required" placeHolder="Entrer la date de fin*" label="Fin de l'activité" :min="getPlageProjet?.debut" :max="getPlageProjet?.fin" />
           <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="messageErreur.fin">{{ messageErreur.fin }}</p>
         </div>
 
@@ -1519,10 +1523,10 @@ export default {
 
     <form @submit.prevent="submitDuree">
       <ModalBody class="grid grid-cols-12 gap-4 gap-y-3">
-        <InputForm v-model="dateDebut" :min="dateDebutOld" class="col-span-12" type="date" :required="true" placeHolder="Entrer la nouvelle date debut" label="Nouvelle date debut de l'activite" />
+        <InputForm v-model="dateDebut" id="dateDebut" name="dateDebut" :min="dateDebutOld" class="col-span-12" type="date" :required="true" placeHolder="Entrer la nouvelle date debut" label="Nouvelle date debut de l'activite" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurProlongation != null && erreurProlongation.debut">{{ erreurProlongation.debut }}</p>
 
-        <InputForm v-model="dateFin" :min="dateFinOld" class="col-span-12 mt-4" type="date" :required="true" placeHolder="Entrer la nouvelle date fin" label="Nouvelle date fin de l'activite" />
+        <InputForm v-model="dateFin" id="dateFin" name="dateFin" :min="dateFinOld" class="col-span-12 mt-4" type="date" :required="true" placeHolder="Entrer la nouvelle date fin" label="Nouvelle date fin de l'activite" />
         <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurProlongation != null && erreurProlongation.fin">
           {{ erreurProlongation.fin }}
         </p>
@@ -1573,8 +1577,8 @@ export default {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Année -->
             <div>
-              <label class="form-label">Sélectionner l'année de décaissement</label>
-              <TomSelect v-model="plan.annee" :options="{ placeholder: 'Sélectionnez une année' }" class="w-full">
+              <label :for="`plan-${index}-annee`" class="form-label">Sélectionner l'année de décaissement</label>
+              <TomSelect v-model="plan.annee" :id="`plan-${index}-annee`" :name="`plan-${index}-annee`" :options="{ placeholder: 'Sélectionnez une année' }" class="w-full">
                 <option v-for="(year, yearIndex) in trimestreYears" :key="yearIndex" :value="year">{{ year }}</option>
               </TomSelect>
               <p class="text-red-500 text-[12px] mt-1" v-if="erreurPlanDeDecaissement?.[index]?.annee">
@@ -1584,8 +1588,8 @@ export default {
 
             <!-- Trimestre -->
             <div>
-              <label class="form-label">Sélectionner le trimestre</label>
-              <TomSelect v-model="plan.trimestre" :options="{ placeholder: 'Sélectionnez le trimestre' }" class="w-full">
+              <label :for="`plan-${index}-trimestre`" class="form-label">Sélectionner le trimestre</label>
+              <TomSelect v-model="plan.trimestre" :id="`plan-${index}-trimestre`" :name="`plan-${index}-trimestre`" :options="{ placeholder: 'Sélectionnez le trimestre' }" class="w-full">
                 <option v-for="trimestre in filteredTrimestresForPlan(plan.annee)" :key="trimestre.value" :value="trimestre.value">Trimestre {{ trimestre.trimestre }} ({{ trimestre.annee }})</option>
               </TomSelect>
               <p class="text-red-500 text-[12px] mt-1" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
@@ -1595,7 +1599,7 @@ export default {
 
             <!-- Fond propre -->
             <div>
-              <InputForm v-model="plan.budgetNational" :min="0" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Fond propre" />
+              <InputForm v-model="plan.budgetNational" :id="`plan-${index}-budgetNational`" :name="`plan-${index}-budgetNational`" :min="0" type="number" :required="true" placeHolder="Saisissez le fond propre" label="Fond propre" />
               <p class="text-red-500 text-[12px] mt-1" v-if="erreurPlanDeDecaissement?.[index]?.budgetNational">
                 {{ erreurPlanDeDecaissement[index].budgetNational }}
               </p>
@@ -1603,7 +1607,7 @@ export default {
 
             <!-- Subvention -->
             <div>
-              <InputForm v-model="plan.pret" :min="0" type="number" :required="true" placeHolder="Saisissez la subvention" label="Subvention" />
+              <InputForm v-model="plan.pret" :id="`plan-${index}-pret`" :name="`plan-${index}-pret`" :min="0" type="number" :required="true" placeHolder="Saisissez la subvention" label="Subvention" />
               <p class="text-red-500 text-[12px] mt-1" v-if="erreurPlanDeDecaissement?.[index]?.pret">
                 {{ erreurPlanDeDecaissement[index].pret }}
               </p>

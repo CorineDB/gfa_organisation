@@ -62,7 +62,7 @@
     <form @submit.prevent="submitData">
       <ModalBody>
         <div class="grid grid-cols-1 gap-4">
-          <InputForm label="Intitule" v-model="payload.intitule" :control="getFieldErrors(errors.intitule)" />
+          <InputForm id="intitule" name="intitule" label="Intitule" v-model="payload.intitule" :control="getFieldErrors(errors.intitule)" />
           <div class="flex-1">
             <label class="form-label" for="description">Description</label>
             <div class="">
@@ -71,23 +71,23 @@
             </div>
           </div>
           <div class="flex-1 form-check">
-            <input id="agreer" class="form-check-input" type="checkbox" v-model="payload.prive" />
+            <input id="agreer" name="agreer" class="form-check-input" type="checkbox" v-model="payload.prive" />
             <label class="form-check-label" for="agreer">Privé?</label>
           </div>
           <div class="flex w-full gap-4">
             <div class="flex-1">
-              <label class="form-label">Formulaires <span class="text-danger">*</span> </label>
-              <TomSelect v-model="payload.surveyFormId" name="trimestre_suivi" :options="{ placeholder: 'Selectionez un formulaire' }" class="w-full">
+              <label class="form-label" for="surveyFormId">Formulaires <span class="text-danger">*</span> </label>
+              <TomSelect v-model="payload.surveyFormId" id="surveyFormId" name="surveyFormId" :options="{ placeholder: 'Selectionez un formulaire' }" class="w-full">
                 <option value=""></option>
                 <option v-for="form in formulaires" :key="form.id" :value="form.id">{{ form.libelle }}</option>
               </TomSelect>
               <div v-if="errors.surveyFormId" class="mt-2 text-danger">{{ getFieldErrors(errors.surveyFormId) }}</div>
             </div>
-            <InputForm label="Nombre participant" class="flex-1" v-model="payload.nbreParticipants" type="number" :control="getFieldErrors(errors.nbreParticipants)" />
+            <InputForm id="nbreParticipants" name="nbreParticipants" label="Nombre participant" class="flex-1" v-model="payload.nbreParticipants" type="number" :control="getFieldErrors(errors.nbreParticipants)" />
           </div>
           <div class="flex w-full gap-4">
-            <InputForm label="Début de l'évaluation " v-model="payload.debut" type="date" :control="getFieldErrors(errors.debut)" />
-            <InputForm label="Fin de l'évaluation " v-model="payload.fin" type="date" :control="getFieldErrors(errors.fin)" />
+            <InputForm id="debut" name="debut" label="Début de l'évaluation " v-model="payload.debut" type="date" :control="getFieldErrors(errors.debut)" />
+            <InputForm id="fin" name="fin" label="Fin de l'évaluation " v-model="payload.fin" type="date" :control="getFieldErrors(errors.fin)" />
           </div>
         </div>
       </ModalBody>
