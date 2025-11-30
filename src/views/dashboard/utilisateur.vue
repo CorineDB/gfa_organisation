@@ -22,7 +22,8 @@
         </div>
         <div class="px-5 pb-8 text-center">
           <button type="button" @click="deleteModalPreview = false" class="btn btn-outline-secondary w-24 mr-1">Annuler</button>
-          <button type="button" @click="deleteUser" class="btn btn-danger w-24">Supprimer</button>
+          <!-- <button type="button" @click="deleteUser" class="btn btn-danger w-24">Supprimer</button> -->
+          <VButton :loading="isLoading" label="Supprimer" class="btn btn-danger w-24" @click="deleteUser" />
         </div>
       </ModalBody>
     </Modal>
@@ -54,9 +55,27 @@
             </div>
 
             <div class="col-span-6">
-              <label for="contact" class="form-label">Contact</label>
-              <input id="contact" name="contact" type="text" required v-model="formData.contact" class="form-control" placeholder="Contact" />
-              <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.contact">{{ messageErreur.contact }}</p>
+              <!-- <label for="contact" class="form-label">Contact</label>
+              <input id="contact" name="contact" type="text" required v-model="formData.contact" class="form-control" placeholder="Contact" /> -->
+              <InputForm class="" type="text" label="Contact" maxlength="13" v-model="formData.contact" :control="messageErreur.contact && messageErreur.contact.join(', ')" />
+              <p class="text-xs text-primary mt-3">Ecrivez le numéro directement sans espace ni de signe + (Ex : 22977887787)</p>
+              
+              <!-- Message de validation avec animation -->
+              <div class="mt-2 _min-h-[1.5rem]">
+                <p v-if="isValidCreate" class="flex items-center text-green-600 font-medium text-sm animate-pulse">
+                  <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  Numéro valide
+                </p>
+                <p v-else-if="formData.contact && String(formData.contact).length > 0" class="flex items-center text-red-500 font-medium text-sm">
+                  <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  Numéro invalide
+                </p>
+              </div>
+              <!-- <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.contact">{{ messageErreur.contact }}</p> -->
             </div>
 
             <div class="col-span-6">
@@ -107,95 +126,131 @@
     </div>
     <!-- END: Modal Toggle -->
 
-    <div class="overflow-x-auto mt-5">
-      <table id="userOIN" class="table mt-5">
-        <thead class="table-light">
-          <tr>
-            <th class="whitespace-nowrap">#</th>
-            <th class="whitespace-nowrap">Nom</th>
-            <th class="whitespace-nowrap">Prenoms</th>
-            <th class="whitespace-nowrap">Email</th>
-            <th class="whitespace-nowrap">Contact</th>
-            <th class="whitespace-nowrap">Poste</th>
-            <th class="whitespace-nowrap">Type utilisateur</th>
-            <th class="whitespace-nowrap">Date creation</th>
-            <th class="whitespace-nowrap">Actions</th>
+    <div class="overflow-hidden rounded-lg border border-gray-200 shadow-sm mt-5 bg-white">
+      <table id="userOIN" class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold tracking-wider">
+            <th class="px-6 py-4 whitespace-nowrap">#</th>
+            <th class="px-6 py-4 whitespace-nowrap">Nom & Prénoms</th>
+            <th class="px-6 py-4 whitespace-nowrap">Contact</th>
+            <th class="px-6 py-4 whitespace-nowrap">Poste</th>
+            <th class="px-6 py-4 whitespace-nowrap">Rôles</th>
+            <th class="px-6 py-4 whitespace-nowrap">Date création</th>
+            <th class="px-6 py-4 whitespace-nowrap text-center">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="(data, index) in resultQuery" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ data.nom }}</td>
-            <td>{{ data.prenom }}</td>
-
-            <td>{{ data.email }}</td>
-            <td>{{ data.contact }}</td>
-            <td :class="data.poste ? 'text-black' : 'text-red-500'" :style="{ color: data.poste ? '#000000' : '#a9aaad', fontStyle: data.poste ? 'normal' : 'italic' }">{{ data.poste ?? "Non défini" }}</td>
-            <td>
-              <div class="flex flex-wrap gap-1">
-                <span v-for="(role, index) in data.roles" :key="index" class="bg-primary text-white rounded-md px-2 py-1 text-xs">
-                  {{ role.nom }}
-                </span>
+        <tbody class="divide-y divide-gray-100">
+          <tr v-for="(data, index) in resultQuery" :key="index" class="hover:bg-gray-50/80 transition-colors duration-200">
+            <td class="px-6 py-4 text-sm text-gray-500">{{ index + 1 }}</td>
+            <td class="px-6 py-4">
+              <div class="flex flex-col">
+                <span class="font-medium text-gray-900">{{ data.nom }} {{ data.prenom }}</span>
+                <span class="text-xs text-gray-500">{{ data.email }}</span>
               </div>
             </td>
-
-            <td>{{ data.created_at }}</td>
-            <!-- v-if="$h.getPermission('write.utilisateur')" -->
-            <td class="flex space-x-2 items-center">
-              <Tippy tag="a" href="javascript:;" class="tooltip" content="cliquez pour modifier">
-                <span @click="openUpdateModal(data)" class="text-blue-500 cursor-pointer">
-                  <EditIcon />
+            <td class="px-6 py-4 text-sm text-gray-600">{{ data.contact }}</td>
+            <td class="px-6 py-4">
+              <span 
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                :class="data.poste ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-500 italic'"
+              >
+                {{ data.poste ?? "Non défini" }}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <div class="flex flex-wrap gap-1">
+                <span v-for="(role, index) in data.roles" :key="index" class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
+                  {{ role.nom }}
                 </span>
-              </Tippy>
-
-              <Tippy tag="a" href="javascript:;" class="tooltip" content="cliquez pour modifier">
-                <Trash2Icon class="text-red-500 cursor-pointer" @click="supprimer(index, data)" />
-              </Tippy>
+                <span v-if="!data.roles || data.roles.length === 0" class="text-xs text-gray-400 italic">Aucun rôle</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">{{ new Date(data.created_at).toLocaleDateString() }}</td>
+            <td class="px-6 py-4">
+              <div class="flex items-center justify-center gap-3">
+                <Tippy tag="button" content="Modifier" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors focus:outline-none">
+                  <EditIcon class="w-4 h-4" @click="openUpdateModal(data)" />
+                </Tippy>
+                <Tippy tag="button" content="Supprimer" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:outline-none">
+                  <Trash2Icon class="w-4 h-4" @click="supprimer(index, data)" />
+                </Tippy>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="resultQuery.length === 0">
+            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+              <div class="flex flex-col items-center justify-center">
+                <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <p class="text-lg font-medium">Aucun utilisateur trouvé</p>
+                <p class="text-sm text-gray-400">Essayez d'ajouter un nouvel utilisateur</p>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
-      <div class="flex justify-center mt-4" v-if="totalPages() > 1">
-        <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-l-md px-4 py-2 m-1 focus:outline-none" :disabled="currentPage === 1" @click="currentPage--">Previous</button>
+    </div>
+
+    <!-- Pagination Moderne -->
+    <div class="flex items-center justify-between mt-6 px-2" v-if="totalPages() > 1">
+      <div class="text-sm text-gray-500">
+        Affichage de <span class="font-medium text-gray-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> à <span class="font-medium text-gray-900">{{ Math.min(currentPage * itemsPerPage, users.length) }}</span> sur <span class="font-medium text-gray-900">{{ users.length }}</span> résultats
+      </div>
+      
+      <div class="flex items-center gap-1">
+        <button 
+          class="p-2 rounded-md border border-gray-200 hover:bg-gray-50 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          :disabled="currentPage === 1" 
+          @click="currentPage--"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+
         <template v-if="totalPages() <= 7">
-          <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === currentPage }" v-for="pageNumber in totalPages()" :key="pageNumber" @click="goToPage(pageNumber)">
+          <button 
+            v-for="pageNumber in totalPages()" 
+            :key="pageNumber" 
+            @click="goToPage(pageNumber)"
+            class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium transition-colors"
+            :class="pageNumber === currentPage ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50 border border-transparent hover:border-gray-200'"
+          >
             {{ pageNumber }}
           </button>
         </template>
+        
         <template v-else>
+          <!-- Logique de pagination complexe (inchangée mais stylisée) -->
           <template v-if="currentPage <= 4">
-            <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === currentPage }" v-for="pageNumber in 5" :key="pageNumber" @click="goToPage(pageNumber)">
-              {{ pageNumber }}
-            </button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
-            <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === totalPages() }" @click="goToPage(totalPages())">
-              {{ totalPages() }}
-            </button>
+            <button v-for="pageNumber in 5" :key="pageNumber" @click="goToPage(pageNumber)" class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium transition-colors" :class="pageNumber === currentPage ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50'">{{ pageNumber }}</button>
+            <span class="px-2 text-gray-400">...</span>
+            <button @click="goToPage(totalPages())" class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50">{{ totalPages() }}</button>
           </template>
+          
           <template v-else-if="currentPage >= totalPages() - 3">
-            <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === 1 }" @click="goToPage(1)">1</button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
-            <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === currentPage }" v-for="pageNumber in 5" :key="pageNumber" @click="goToPage(pageNumber)">
-              {{ pageNumber }}
-            </button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
-            <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === currentPage }" v-for="pageNumber in [totalPages() - 3, totalPages() - 2, totalPages() - 1, totalPages()]" :key="pageNumber" @click="goToPage(pageNumber)">
-              {{ pageNumber }}
-            </button>
+            <button @click="goToPage(1)" class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50">1</button>
+            <span class="px-2 text-gray-400">...</span>
+            <button v-for="pageNumber in 5" :key="pageNumber" @click="goToPage(pageNumber)" class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium transition-colors" :class="pageNumber === currentPage ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50'">{{ pageNumber }}</button>
+            <span class="px-2 text-gray-400">...</span>
+            <button v-for="pageNumber in [totalPages() - 3, totalPages() - 2, totalPages() - 1, totalPages()]" :key="pageNumber" @click="goToPage(pageNumber)" class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium transition-colors" :class="pageNumber === currentPage ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50'">{{ pageNumber }}</button>
           </template>
+          
           <template v-else>
-            <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === 1 }" @click="goToPage(1)">1</button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
-            <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === currentPage }" v-for="pageNumber in [currentPage - 1, currentPage, currentPage + 1]" :key="pageNumber" @click="goToPage(pageNumber)">
-              {{ pageNumber }}
-            </button>
-            <span class="bg-gray-200 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1">...</span>
-            <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-md px-4 py-2 m-1 focus:outline-none" :class="{ 'bg-gray-400': pageNumber === totalPages() }" @click="goToPage(totalPages())">
-              {{ totalPages() }}
-            </button>
+            <button @click="goToPage(1)" class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50">1</button>
+            <span class="px-2 text-gray-400">...</span>
+            <button v-for="pageNumber in [currentPage - 1, currentPage, currentPage + 1]" :key="pageNumber" @click="goToPage(pageNumber)" class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium transition-colors" :class="pageNumber === currentPage ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50'">{{ pageNumber }}</button>
+            <span class="px-2 text-gray-400">...</span>
+            <button @click="goToPage(totalPages())" class="w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50">{{ totalPages() }}</button>
           </template>
         </template>
-        <button class="bg-gray-200 hover:bg-gray-300 border border-gray-300 text-gray-700 rounded-r-md px-4 py-2 m-1 focus:outline-none" :disabled="currentPage === totalPages()" @click="currentPage++">Next</button>
+
+        <button 
+          class="p-2 rounded-md border border-gray-200 hover:bg-gray-50 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          :disabled="currentPage === totalPages()" 
+          @click="currentPage++"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -265,9 +320,27 @@
           </div>
 
           <div>
-            <label for="edit_contact" class="form-label">Contact</label>
-            <input id="edit_contact" name="edit_contact" type="number" v-model="formEdit.contact" class="form-control" placeholder="Contact" />
-            <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.contact">{{ messageErreur.contact }}</p>
+            <!-- <label for="edit_contact" class="form-label">Contact</label>
+            <input id="edit_contact" name="edit_contact" type="number" v-model="formEdit.contact" class="form-control" placeholder="Contact" /> -->
+            <InputForm class="" type="text" label="Contact" maxlength="13" v-model="formEdit.contact" :control="messageErreur.contact && messageErreur.contact.join(', ')" />
+            <p class="text-xs text-primary mt-3">Ecrivez le numéro directement sans espace ni de signe + (Ex : 22977887787)</p>
+            
+            <!-- Message de validation avec animation -->
+            <div class="mt-2 _min-h-[1.5rem]">
+              <p v-if="isValidEdit" class="flex items-center text-green-600 font-medium text-sm animate-pulse">
+                <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Numéro valide
+              </p>
+              <p v-else-if="formEdit.contact && String(formEdit.contact).length > 0" class="flex items-center text-red-500 font-medium text-sm">
+                <svg class="w-4 h-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+                Numéro invalide
+              </p>
+            </div>
+            <!-- <p class="text-red-500 text-[12px] mt-2 col-span-12" v-if="messageErreur.contact">{{ messageErreur.contact }}</p> -->
           </div>
 
           <div>
@@ -297,7 +370,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, provide, computed } from "vue";
+import { ref, reactive, onMounted, provide, computed, getCurrentInstance } from "vue";
 import UsersService from "../../services/modules/user.service";
 import RoleService from "@/services/modules/roles.permissions.service";
 import { helper as $h } from "@/utils/helper";
@@ -305,6 +378,27 @@ import { toast } from "vue3-toastify";
 import VButton from "@/components/news/VButton.vue";
 import InputForm from "@/components/news/InputForm.vue";
 import DownloadPDFButton from "@/components/DownloadPDFButton.vue";
+
+// Validation du téléphone
+const { proxy } = getCurrentInstance();
+
+const isValidEdit = computed(() => {
+  // Convertir en chaîne et supprimer les espaces
+  const contactValue = formEdit.contact ? String(formEdit.contact).trim() : "";
+  
+  // Vérifier que le contact n'est pas vide
+  if (!contactValue) {
+    return false;
+  }
+  
+  // Vérifier que le contact contient entre 8 et 13 chiffres
+  if (!/^\d{8,13}$/.test(contactValue)) {
+    return false;
+  }
+  
+  // Vérifier avec libphonenumber-js pour le format du pays (BJ = Bénin)
+  return proxy.$isValidPhoneNumber(contactValue, "BJ");
+});
 
 // Modfier un utilisateur
 const updateModal = ref(false);
@@ -436,7 +530,7 @@ const users = ref([]);
 const roles = ref([]);
 const deleteData = reactive({});
 const saveUpdate = reactive({});
-const chargement = ref(false);
+// const chargement = ref(false); // Supprimé car remplacé par isLoading
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
 const isUpdate = ref(false);
@@ -570,9 +664,17 @@ const addUsers = function () {
   isUpdate.value = false;
 };
 
+// Validation du téléphone (Création)
+const isValidCreate = computed(() => {
+  const contactValue = formData.contact ? String(formData.contact).trim() : "";
+  if (!contactValue) return false;
+  if (!/^\d{8,13}$/.test(contactValue)) return false;
+  return proxy.$isValidPhoneNumber(contactValue, "BJ");
+});
+
 const storeUser = function () {
-  if (chargement.value == false) {
-    chargement.value = true;
+  if (isLoading.value == false) {
+    isLoading.value = true;
     console.log(formData);
     UsersService.addUsers(formData)
       .then((data) => {
@@ -581,11 +683,11 @@ const storeUser = function () {
         successNotificationToggle();
         close();
         getData();
-        chargement.value = false;
+        isLoading.value = false;
       })
       .catch((error) => {
         console.log(error);
-        chargement.value = false;
+        isLoading.value = false;
         toast.error("Vérifier les informations et ressayer.");
         if (error.response && error.response.data && error.response.data.errors) {
           messageErreur.value = error.response.data.errors;
@@ -608,27 +710,27 @@ const supprimer = function (index, data) {
 };
 
 const deleteUser = function () {
-  deleteModalPreview.value = false;
-  users.value.splice(users.value.indexOf(deleteData.index), 1);
+  // deleteModalPreview.value = false; // On garde le modal ouvert pendant le chargement
+  isLoading.value = true;
+  
+  // On ne supprime pas localement avant la confirmation du serveur pour éviter les désynchronisations
+  // users.value.splice(users.value.indexOf(deleteData.index), 1); <-- Cette ligne était incorrecte de toute façon
+
   UsersService.destroy(deleteData.id)
     .then((data) => {
-      message.type = "success";
-      message.message = "Operation éffectué avec success";
-      successNotificationToggle();
-      getData();
+      toast.success("Utilisateur supprimé avec succès");
+      getData(); // Rafraîchir la liste depuis le serveur
+      isLoading.value = false;
+      deleteModalPreview.value = false; // Fermer le modal après succès
     })
     .catch((error) => {
+      console.error(error);
+      isLoading.value = false;
+      deleteModalPreview.value = false; // Fermer le modal même en cas d'erreur ou le laisser ouvert ?
       if (error.response) {
-        // Requête effectuée mais le serveur a répondu par une erreur.
-        const erreurs = error.response.data.message;
-        message.type = "erreur";
-        message.message = erreurs;
-        successNotificationToggle();
-      } else if (error.request) {
-        // Demande effectuée mais aucune réponse n'est reçue du serveur.
-        //console.log(error.request);
+        toast.error(error.response.data.message || "Erreur lors de la suppression");
       } else {
-        // Une erreur s'est produite lors de la configuration de la demande
+        toast.error("Une erreur est survenue lors de la suppression");
       }
     });
 };

@@ -88,7 +88,7 @@
             'absolute shadow-md',
             'sm:rounded-lg',
             'transition-all duration-300 ease-in-out',
-            (filteredDataNew.length > 0 && hasActivities) ? 'left-[38rem]' : 'left-[23rem]'
+            (filteredDataNew.length > 0 && hasActivities) ? 'left-[38rem]' : 'left-[25rem]'
           ]">
         <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
           <thead class="sticky top-0 text-xs border bg-blue-200 text-gray-700 uppercase _z-20 _bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

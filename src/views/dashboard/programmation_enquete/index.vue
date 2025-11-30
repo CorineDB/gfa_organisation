@@ -325,6 +325,10 @@ onMounted(async () => {
             <div v-else class="flex items-center justify-center py-8">
               <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
+            <div v-if="!isLoadingData && datas.length === 0" class="flex items-center justify-center py-8">
+              <p class="text-xl font-medium text-slate-600">La liste des évaluations est vide.</p>
+            </div>
+
           <!-- <LoaderSnipper  /> -->
         </div>
       </TabPanel>

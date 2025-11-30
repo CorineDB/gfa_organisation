@@ -18,7 +18,21 @@ import { getFieldErrors } from "@/utils/helpers.js";
 const { proxy } = getCurrentInstance();
 
 const isValid = computed(() => {
-  return proxy.$isValidPhoneNumber(currentMember.value.contact, "BJ");
+  // Convertir en chaîne et supprimer les espaces
+  const contactValue = currentMember.value.contact ? String(currentMember.value.contact).trim() : "";
+  
+  // Vérifier que le contact n'est pas vide
+  if (!contactValue) {
+    return false;
+  }
+  
+  // Vérifier que le contact contient entre 8 et 13 chiffres
+  if (!/^\d{8,13}$/.test(contactValue)) {
+    return false;
+  }
+  
+  // Vérifier avec libphonenumber-js pour le format du pays (BJ = Bénin)
+  return proxy.$isValidPhoneNumber(contactValue, "BJ");
 });
 
 
@@ -373,9 +387,12 @@ function validateMemberForm() {
     memberFormErrors.value.prenom = ["Le prénom est requis."];
   }
 
-  if (!currentMember.value.contact || currentMember.value.contact === "") {
+  // Ensure contact is treated as a string for validation
+  const contactValue = currentMember.value.contact ? String(currentMember.value.contact).trim() : "";
+
+  if (!contactValue) {
     memberFormErrors.value.contact = ["Le contact est requis."];
-  } else if (!/^\d{8,13}$/.test(currentMember.value.contact.toString())) {
+  } else if (!/^\d{8,13}$/.test(contactValue)) {
     memberFormErrors.value.contact = ["Le contact doit contenir entre 8 et 13 chiffres."];
   }
 
@@ -425,7 +442,31 @@ function saveMembers() {
   if (isEdit.value) {
     updateMember();
   } else {
-    addMemberAndClose();
+    // Si des membres ont déjà été ajoutés à tempMembers, on peut enregistrer directement
+    if (tempMembers.value.length > 0) {
+      // Vérifier si le formulaire actuel est rempli
+      const currentFormFilled = currentMember.value.nom || currentMember.value.prenom || currentMember.value.contact;
+      
+      if (currentFormFilled) {
+        // Si le formulaire actuel est partiellement rempli, valider avant d'ajouter
+        if (!validateMemberForm()) {
+          toast.error("Veuillez corriger les erreurs dans le formulaire ou le vider avant d'enregistrer.");
+          return;
+        }
+        // Ajouter le membre actuel à la liste temporaire
+        tempMembers.value.push({ ...currentMember.value });
+      }
+      
+      // Enregistrer tous les membres temporaires
+      saveAllMembers();
+      showModal.value = false;
+      currentMember.value = { nom: "", prenom: "", contact: "" };
+      memberFormErrors.value = {};
+      toast.success("Membres ajoutés avec succès !");
+    } else {
+      // Aucun membre dans tempMembers, on doit valider le formulaire actuel
+      addMemberAndClose();
+    }
   }
 }
 
@@ -1449,7 +1490,7 @@ const viewNewProof = (file) => {
             :control="memberFormErrors.contact && memberFormErrors.contact.join(', ')"
             required
           /> -->
-           <InputForm class="" type="text" label="Numéro de téléphone" maxlength="13" v-model="currentMember.contact" />
+           <InputForm class="" type="text" label="Numéro de téléphone" maxlength="13" v-model="currentMember.contact" :control="memberFormErrors.contact && memberFormErrors.contact.join(', ')" />
           <p class="text-xs text-primary mt-3">Ecrivez le numéro directement sans espace ni de signe + (Ex : 22977887787)</p>
         </div>
         <div class="col-span-12">
