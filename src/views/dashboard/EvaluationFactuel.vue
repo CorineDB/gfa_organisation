@@ -70,6 +70,12 @@ const isLoadingDataFactuel = ref(true);
 const organisationSelected = ref(false);
 const currentPage = ref(0);
 const authUser = ref({});
+
+// Loaders spécifiques pour chaque bouton de navigation
+const isLoadingPrev = ref(false);
+const isLoadingNext = ref(false);
+const isLoadingPreview = ref(false);
+const loadingPageIndex = ref(null);
 const idEvaluation = ref("");
 const currentMember = ref({
   nom: "",
@@ -335,18 +341,22 @@ const handleFileUpload = (event, questionIndex) => {
 
   responses[questionIndex].preuves = files; // Store files directly as an array of File objects
 };
-const changePage = (pageNumber) => {
+const changePage = async (pageNumber) => {
+  loadingPageIndex.value = pageNumber;
   isValidate.value = false;
-  submitAnsweredQuestionsOnly();
+  await submitAnsweredQuestionsOnly();
   //submitData();
   currentPage.value = pageNumber;
+  loadingPageIndex.value = null;
 };
-const prevPage = () => {
+const prevPage = async () => {
   if (currentPage.value >= 1) {
+    isLoadingPrev.value = true;
     isValidate.value = false;
     currentPage.value--;
-    submitAnsweredQuestionsOnly();
+    await submitAnsweredQuestionsOnly();
     // submitData();
+    isLoadingPrev.value = false;
   }
 };
 
@@ -354,11 +364,13 @@ const getSourceName = (sourceId, sources) => {
   const source = sources.find((source) => source.id === sourceId);
   return source ? source.intitule : null;
 };
-const nextPage = () => {
+const nextPage = async () => {
   if (currentPage.value < totalPages.value - 1) {
+    isLoadingNext.value = true;
     currentPage.value++;
     // Utiliser la nouvelle fonction de sauvegarde sélective
-    submitAnsweredQuestionsOnly();
+    await submitAnsweredQuestionsOnly();
+    isLoadingNext.value = false;
   }
 };
 const saveFormData = () => {
@@ -737,10 +749,12 @@ const resetValidation = () => {
   errors.value = {};
 };
 
-const openPreview = () => {
-  // submitAnsweredQuestionsOnly()
+const openPreview = async () => {
+  isLoadingPreview.value = true;
+  await submitAnsweredQuestionsOnly();
   showModalPreview.value = true;
   isValidate.value = true;
+  isLoadingPreview.value = false;
 };
 
 const totalPages = computed(() => {
@@ -1188,11 +1202,11 @@ const viewNewProof = (file) => {
             <div class="flex justify-center gap-3 my-8">
                               <button 
                   @click="prevPage()" 
-                  :disabled="currentPage === 0 || isLoading" 
+                  :disabled="currentPage === 0 || isLoadingPrev" 
                   class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
-                  :class="{ 'opacity-50 cursor-not-allowed': currentPage === 0 || isLoading }"
+                  :class="{ 'opacity-50 cursor-not-allowed': currentPage === 0 || isLoadingPrev }"
                 >
-                  <span v-if="isLoading" class="animate-spin mr-2">⟳</span>
+                  <span v-if="isLoadingPrev" class="animate-spin mr-2">⟳</span>
                   Précédent
                 </button>
 
@@ -1201,34 +1215,35 @@ const viewNewProof = (file) => {
                   @click="changePage(index)" 
                   :class="[
                     index === currentPage ? 'btn-primary' : 'btn-outline-primary',
-                    { 'opacity-50 cursor-not-allowed': isLoading }
+                    { 'opacity-50 cursor-not-allowed': loadingPageIndex === index }
                   ]" 
-                  :disabled="isLoading"
+                  :disabled="loadingPageIndex === index"
                   class="px-4 py-3 btn transition-all duration-200" 
                   :key="index"
                 >
-                  {{ index + 1 }}
+                  <span v-if="loadingPageIndex === index" class="animate-spin">⟳</span>
+                  <span v-else>{{ index + 1 }}</span>
                 </button>
 
                 <button 
                   v-if="!isPreview" 
                   @click="nextPage()" 
                   class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
-                  :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages - 1 || isLoading }"
-                  :disabled="currentPage === totalPages - 1 || isLoading"
+                  :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages - 1 || isLoadingNext }"
+                  :disabled="currentPage === totalPages - 1 || isLoadingNext"
                 >
                   Suivant
-                  <span v-if="isLoading" class="animate-spin ml-2">⟳</span>
+                  <span v-if="isLoadingNext" class="animate-spin ml-2">⟳</span>
                 </button>
 
                 <button 
-                  :disabled="isLoading" 
+                  :disabled="isLoadingPreview" 
                   v-if="isPreview" 
                   @click="openPreview" 
                   class="px-4 py-3 btn btn-outline-primary transition-all duration-200"
-                  :class="{ 'opacity-50 cursor-not-allowed': isLoading }"
+                  :class="{ 'opacity-50 cursor-not-allowed': isLoadingPreview }"
                 >
-                  <span v-if="isLoading" class="animate-spin mr-2">⟳</span>
+                  <span v-if="isLoadingPreview" class="animate-spin mr-2">⟳</span>
                   Prévisualiser
                 </button>
             </div>

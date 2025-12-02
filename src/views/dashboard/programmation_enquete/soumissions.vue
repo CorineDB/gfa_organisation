@@ -683,7 +683,7 @@ onMounted(async () => {
         <!-- Factuel and Perception Tools Section -->
         <div class="col-span-8 p-6 bg-white rounded-md shadow-lg">
           <div class="flex flex-wrap items-center justify-between col-span-12 mt-2 intro-y sm:flex-nowrap">
-            <h2 class="mb-6 text-lg font-bold">Outils Auto-Evaluation</h2>
+            <h2 class="mb-6 text-lg font-bold">Outils Auto-Evaluation dsfsdsf</h2>
 
             <div v-if="statistiques?.statut" class="flex">
               <!-- <button class="text-sm btn btn-primary" @click="goToPageSynthese(soumission.id)">Fiche Synthèse</button> -->
@@ -735,20 +735,19 @@ onMounted(async () => {
                   <ArrowRightIcon class="ml-2 size-5" />
                 </button>
               </div>
-
-              <div v-if="!datas.factuel || (datas.factuel && !datas.factuel.statut) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
+             
+              <div v-if="!datas.factuel || (datas.factuel && !datas.factuel.statut)" class="flex flex-col items-end justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                 <div class="flex items-center justify-end w-full border-t border-slate-200/60 dark:border-darkmode-400">
                   <!-- <pre>{{ statistiques.statut }}</pre> -->
-                  <button v-if="(datas.factuel && !datas.factuel.statut == false) || (datas.factuel && datas.factuel.pourcentage_evolution < 100)" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
-                    Continuer
-                    <ArrowRightIcon class="ml-2 size-5" />
-                  </button>
-
-                  <button v-else-if="!datas.factuel && statistiques.statut === 0" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                  <button v-if="!datas.factuel" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
                     Demarrer
                     <ArrowRightIcon class="ml-2 size-5" />
                   </button>
-                  <button v-else class="w-full gap-2 py-[22px]"></button>
+                  <button v-else-if="datas.factuel && !datas.factuel.statut" @click.self="openFactuelModal" class="flex items-center justify-center w-full gap-2 py-2.5 flex-1 text-base font-medium bg-outline-primary">
+                    Continuer
+                    <ArrowRightIcon class="ml-2 size-5" />
+                  </button>
+                  
                   <!-- <button class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary">Marqueur de gouvernance <ArrowRightIcon class="ml-2 size-5" /></button> -->
                 </div>
               </div>
@@ -801,7 +800,7 @@ onMounted(async () => {
                 </button>
 
                 <!-- Boutons d'action: affichés si statut === 0 (en cours) -->
-                <div v-if="statistiques.statut === 0" class="flex flex-col w-full">
+                <div v-if="statistiques.statut === 0" class="flex flex-col items-center w-full">
                   <button @click.self="sendInvitationLink" class="flex items-center justify-center w-full gap-2 py-2.5 text-base font-medium bg-outline-primary border-t border-slate-200/60">
                     Envoyer une invitation
                     <ArrowRightIcon class="ml-2 size-5" />

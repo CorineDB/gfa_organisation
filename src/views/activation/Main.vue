@@ -1,74 +1,118 @@
 <template>
-  <div class="container px-6 mx-auto">
-    <div class="flex flex-col text-center md:text-left md:flex-row h-screen justify-evenly md:items-center w-full lg:w-10/12 mx-auto">
-      <div class="flex flex-col w-full">
-        <div>
-          <img alt="Midone Tailwind HTML Admin Template" class="w-48 p-4 bg-white rounded-xl mx-auto md:float-left" src="../../assets/images/GFA.png" />
+  <div class="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-primary/5">
+    <div class="container max-w-6xl mx-auto">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
+        
+        <!-- Section Information (Gauche/Haut) -->
+        <div class="w-full lg:w-5/12 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
+          <div class="bg-white p-4 rounded-2xl shadow-sm inline-block">
+            <img alt="GFA Logo" class="w-32 sm:w-40 md:w-48 object-contain" src="../../assets/images/GFA.png" />
+          </div>
+          
+          <div class="space-y-4">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white drop-shadow-md">
+              GFA Survey
+            </h1>
+            <p class="text-lg sm:text-xl text-white/90 font-medium max-w-lg mx-auto lg:mx-0 leading-relaxed">
+              Responsabilité partagée, Qualité améliorée : <br class="hidden sm:block"/>
+              Unis pour un meilleur service social.
+            </p>
+          </div>
         </div>
-        <h1 class="text-5xl text-white font-bold my-5">GFA Survey</h1>
-        <p class="w-full md:w-11/12 mx-auto md:mx-0 text-white mb-5">Responsabilité partagée, Qualité améliorée : Unis pour un meilleur service social.</p>
-      </div>
-      <div class="w-full md:w-full lg:w-9/12 mx-auto md:mx-0">
-        <div class="bg-white p-10 flex flex-col w-full shadow-xl rounded-xl">
-          <div v-if="!showActivate" class="flex flex-col items-center justify-center gap-4 bg-white">
-            <div v-if="errorMessage" class="">
-              <Alert class="flex items-center mb-2 alert-danger" v-slot="{ dismiss }">
-                <AlertOctagonIcon class="w-6 h-6 mr-2" />
-                <p class="text-lg">{{ errorMessage }}. <br /></p>
-                <button type="button" class="btn-close" aria-label="Close" @click="dismiss">
-                  <XIcon class="w-4 h-4" />
-                </button>
-              </Alert>
-              <form @submit.prevent="sendMailExp" class="flex items-center h-screen _py-5 _m-10 _bg-white xl:h-auto xl:py-0 sm:mx-auto xl:my-0">
-                <div class="w-full px-5 py-8 mx-auto my-auto bg-white rounded-md shadow-md dark:bg-darkmode-600 xl:bg-transparent sm:px-8 xl:p-0 xl:shadow-none sm:w-3/4 lg:w-2/4 xl:w-auto">
-                  <Alert v-if="showFormErrorExp" class="flex items-center mb-2 alert-pending" v-slot="{ dismiss }">
-                    <p>{{ errorMessageFormExp }}</p>
-                    <button type="button" class="btn-close" aria-label="Close" @click="dismiss">
-                      <XIcon class="w-4 h-4" />
-                    </button>
+
+        <!-- Section Formulaire (Droite/Bas) -->
+        <div class="w-full lg:w-6/12 xl:w-5/12">
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div class="p-6 sm:p-10">
+              
+              <!-- Cas 1: Activation (Lien expiré ou invalide) -->
+              <div v-if="!showActivate" class="flex flex-col gap-6">
+                <!-- Message d'erreur initial -->
+                <Alert v-if="errorMessage" class="alert-danger flex items-start gap-3" v-slot="{ dismiss }">
+                  <AlertOctagonIcon class="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <div class="flex-1">
+                    <p class="font-medium">{{ errorMessage }}</p>
+                  </div>
+                  <button type="button" class="text-current opacity-70 hover:opacity-100" aria-label="Close" @click="dismiss">
+                    <XIcon class="w-4 h-4" />
+                  </button>
+                </Alert>
+
+                <LoaderSnipper v-if="isLoading" class="mx-auto my-8" />
+
+                <!-- Formulaire demande nouveau lien -->
+                <form v-else @submit.prevent="sendMailExp" class="space-y-6">
+                  <div class="space-y-2 text-center lg:text-left">
+                    <h2 v-if="!showFormSuccessExp" class="text-2xl font-bold text-gray-800">Lien d'activation</h2>
+                    <p v-if="!showFormSuccessExp" class="text-gray-500">Entrez votre email pour recevoir un nouveau lien.</p>
+                  </div>
+
+                  <Alert v-if="showFormErrorExp" class="alert-danger flex items-center gap-3" v-slot="{ dismiss }">
+                    <AlertOctagonIcon class="w-5 h-5 flex-shrink-0" />
+                    <span class="flex-1">{{ errorMessageFormExp }}</span>
+                    <button type="button" @click="dismiss"><XIcon class="w-4 h-4" /></button>
                   </Alert>
-                  <Alert v-if="showFormSuccessExp" class="flex items-center mb-2 text-white alert-success"> <AlertCircleIcon class="w-6 h-6 mr-2" /> Consulter votre mail pour accéder au lien pour activer votre compte. </Alert>
-                  <h2 v-if="!showFormSuccessExp" class="text-2xl font-bold text-center intro-x xl:text-3xl xl:text-left">Demande du lien d'activation</h2>
-                  <div v-if="!showFormSuccessExp" class="mt-2 text-center intro-x text-slate-400 xl:hidden">Responsabilité partagée, Qualité améliorée : Unis pour un meilleur service social.</div>
-                  <div v-if="!showFormSuccessExp" class="mt-8 intro-x">
+
+                  <Alert v-if="showFormSuccessExp" class="alert-success flex items-start gap-3"> 
+                    <AlertCircleIcon class="w-5 h-5 mt-0.5 flex-shrink-0" /> 
+                    <span>Consultez votre boîte mail pour activer votre compte via le lien envoyé.</span> 
+                  </Alert>
+
+                  <div v-if="!showFormSuccessExp" class="space-y-4">
                     <div>
-                      <label for="email" class="form-label">Email</label>
-                      <input type="email" v-model.trim="emailExp" id="email" class="block px-4 py-3 intro-x login__input form-control" placeholder="Email pour activation" />
+                      <label for="emailExp" class="form-label font-medium text-gray-700">Email</label>
+                      <input 
+                        type="email" 
+                        v-model.trim="emailExp" 
+                        id="emailExp" 
+                        class="form-control w-full px-4 py-3 rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors" 
+                        placeholder="exemple@domaine.com" 
+                        required
+                      />
                     </div>
+                    <VButton :loading="chargement" label="Envoyer le lien" class="w-full py-3 text-lg font-medium shadow-md hover:shadow-lg transition-shadow" />
                   </div>
-                  <div class="mt-5 text-center intro-x xl:mt-8 xl:text-left">
-                    <VButton v-if="!showFormSuccessExp" :loading="chargement" label="Soumettre" class="py-3" />
+                </form>
+              </div>
+
+              <!-- Cas 2: Réinitialisation / Activation standard -->
+              <form v-else @submit.prevent="sendMail" class="space-y-6">
+                <div class="space-y-2 text-center lg:text-left">
+                  <h2 v-if="!emailSend" class="text-2xl font-bold text-gray-800">Réinitialisation</h2>
+                  <p v-if="!emailSend" class="text-gray-500">Entrez votre email pour définir votre mot de passe.</p>
+                </div>
+
+                <Alert v-if="showFormError && errorMessageForm" class="alert-danger flex items-center gap-3" v-slot="{ dismiss }">
+                  <AlertOctagonIcon class="w-5 h-5 flex-shrink-0" /> 
+                  <span class="flex-1">{{ errorMessageForm }}</span>
+                  <button type="button" @click="dismiss"><XIcon class="w-4 h-4" /></button>
+                </Alert>
+
+                <Alert v-if="showFormSuccess" class="alert-primary flex items-start gap-3"> 
+                  <AlertCircleIcon class="w-5 h-5 mt-0.5 flex-shrink-0" /> 
+                  <span>Consultez votre boîte mail pour accéder au lien de définition de mot de passe.</span> 
+                </Alert>
+
+                <div v-if="!emailSend" class="space-y-4">
+                  <div>
+                    <label for="email" class="form-label font-medium text-gray-700">Email</label>
+                    <input 
+                      type="email" 
+                      v-model.trim="email" 
+                      id="email" 
+                      class="form-control w-full px-4 py-3 rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors" 
+                      placeholder="exemple@domaine.com" 
+                      required
+                    />
                   </div>
+                  <VButton :loading="chargement" label="Envoyer" class="w-full py-3 text-lg font-medium shadow-md hover:shadow-lg transition-shadow" />
                 </div>
               </form>
-            </div>
 
-            <LoaderSnipper v-if="isLoading" />
+            </div>
           </div>
-
-          <form v-else @submit.prevent="sendMail" class="flex items-center h-screen _py-5 _m-10 _bg-white xl:h-auto xl:py-0 sm:mx-auto xl:my-0">
-            <div class="w-full px-5 py-8 mx-auto my-auto bg-white rounded-md shadow-md dark:bg-darkmode-600 xl:bg-transparent sm:px-8 xl:p-0 xl:shadow-none sm:w-3/4 lg:w-2/4 xl:w-auto">
-              <Alert v-if="showFormError && errorMessageForm" class="flex items-center mb-2 alert-danger" v-slot="{ dismiss }">
-                <AlertOctagonIcon class="w-6 h-6 mr-2" /> {{ errorMessageForm }}
-                <button type="button" class="btn-close" aria-label="Close" @click="dismiss">
-                  <XIcon class="w-4 h-4" />
-                </button>
-              </Alert>
-              <Alert v-if="showFormSuccess" class="flex items-center mb-2 alert-primary"> <AlertCircleIcon class="w-6 h-6 mr-2" /> Consulter votre mail pour accéder au lien pour definir votre mot de passe. </Alert>
-              <h2 v-if="!emailSend" class="text-2xl font-bold text-center intro-x xl:text-3xl xl:text-left">Demande du lien de réinitialisation</h2>
-              <div class="mt-2 text-center intro-x text-slate-400 xl:hidden">Responsabilité partagée, Qualité améliorée : Unis pour un meilleur service social.</div>
-              <div v-if="!emailSend" class="mt-8 intro-x">
-                <div>
-                  <label for="email" class="form-label">Email</label>
-                  <input type="email" v-model.trim="email" id="email" class="block px-4 py-3 intro-x login__input form-control" placeholder="Email pour recevoir le lien" />
-                </div>
-              </div>
-              <div v-if="!emailSend" class="mt-5 text-center intro-x xl:mt-8 xl:text-left">
-                <VButton :loading="chargement" label="Envoyer" class="py-3" />
-              </div>
-            </div>
-          </form>
         </div>
+
       </div>
     </div>
   </div>
