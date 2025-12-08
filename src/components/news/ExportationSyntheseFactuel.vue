@@ -118,7 +118,7 @@ export default {
         const gouvernanceColor = getColorForExcel(gouvernance.indice_factuel);
 
         gouvernanceRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-          if (colNumber < 6) {
+          if (colNumber <= 6) {
             cell.fill = {
               type: "pattern",
               pattern: "solid",
@@ -146,6 +146,7 @@ export default {
               row.getCell(3).fill = { type: "pattern", pattern: "solid", fgColor: { argb: indicatorColor } };
               row.getCell(4).fill = { type: "pattern", pattern: "solid", fgColor: { argb: indicatorColor } };
               row.getCell(5).fill = { type: "pattern", pattern: "solid", fgColor: { argb: indicatorColor } };
+              row.getCell(6).fill = { type: "pattern", pattern: "solid", fgColor: { argb: indicatorColor } };
 
               row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                 if (colNumber === 1) {
@@ -179,7 +180,7 @@ export default {
               };
               // Appliquer des bordures à toutes les cellules
               this.applyBorders(cell);
-            } else if (colNumber !== 6) {
+            } else {
               cell.fill = {
                 type: "pattern",
                 pattern: "solid",

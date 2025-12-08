@@ -18,7 +18,7 @@ import { computed } from "vue";
 import ExportationSynthesePerception from "../../components/news/ExportationSynthesePerception.vue";
 import TabulatorSynthesePerception from "../../components/news/TabulatorSynthesePerception.vue";
 import ExportationResultatSynthese from "../../components/news/ExportationResultatSynthese.vue";
-import DownloadPDFButton from "@/components/DownloadPDFButton.vue";
+import generateMultiTablePDF from '@/plugins/exportPdf.js';
 
 const router = useRouter();
 const route = useRoute();
@@ -34,6 +34,28 @@ const currentFactuel = ref("");
 const currentPerception = ref("");
 const currentProfileGouvernance = ref("");
 const selectedTabIndex = ref(0);
+
+const info1 = ref({
+  mainTitle: "FICHE SYNTHESE SCORE FACTUEL GOUVERNANCE",
+  tableTitles: {
+    'table2AZ': 'Tableau 1',
+    'tableKJI': 'Tableau 2',
+    'rpiper': 'Tableau 3'
+  },
+  orientation: "portrait", // Peut surcharger l'orientation
+  addDateTime: true
+})
+
+const info2 = ref({
+  mainTitle: "FICHE SYNTHESE SCORE DE PERCEPTION GOUVERNANCE",
+  tableTitles: {
+    'tableOPI': 'Tableau 1',
+    'TabulatorSynthesePerception': 'Tableau 2',
+     
+  },
+  orientation: "portrait", // Peut surcharger l'orientation
+  addDateTime: true
+})
 
 const getDataCollection = async () => {
   isLoadingData.value = true;
@@ -109,8 +131,8 @@ onMounted(async () => {
             <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE SYNTHESE FACTUELLE GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
-                <ExportationSyntheseFactuel v-if="!isLoadingData && currentFactuel" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentFactuel?.evaluatedAt" :datas="currentFactuel" />
-                <DownloadPDFButton :tableIds="['table2AZ', 'tableKJI' ,'rpiper']" pageName="Fiche de synthèse Outils Factuel" format="a4" />
+                <ExportationSyntheseFactuel v-if="!isLoadingData && currentFactuel" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal}  ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentFactuel?.evaluatedAt" :datas="currentFactuel" class="mr-3" />
+                <button @click="generateMultiTablePDF(['table2AZ' , 'tableKJI' ,'rpiper'] , 'FICHE_SYNTHESE_SCORE_FACTUEL_GOUVERNANCE' , 'A4' , info1)" class="btn btn-primary text-left">Télécharger PDF</button>
               </div>
             </div>
 
@@ -147,15 +169,15 @@ onMounted(async () => {
               </tbody>
             </table>
             <!-- Tableau de synthese Factuel -->
-            <TabulatorSyntheseFactuel v-if="!isLoadingData && currentFactuel?.synthese" :data="currentFactuel?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" />
+            <TabulatorSyntheseFactuel id="rpiper" v-if="!isLoadingData && currentFactuel?.synthese" :data="currentFactuel?.synthese" :indicegouvernace="currentFactuel?.indice_de_gouvernance" />
           </TabPanel>
           <!-- Perception-->
           <TabPanel class="leading-relaxed" v-if="!isLoadingData && currentPerception?.synthese">
             <div class="w-full py-2 font-bold text-center text-white rounded bg-primary">FICHE SYNTHESE DE PERCEPTION GOUVERNANCE</div>
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
-                <ExportationSynthesePerception v-if="!isLoadingData && currentPerception" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal} ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentPerception?.evaluatedAt" :current-perception="currentPerception" />
-                <DownloadPDFButton :tableIds="['tableOPI', 'TabulatorSynthesePerception']" pageName="Fiche de synthèse Outils de perception" format="a4" />
+                <ExportationSynthesePerception v-if="!isLoadingData && currentPerception" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal} ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentPerception?.evaluatedAt" :current-perception="currentPerception" class="mr-3" />
+                <button @click="generateMultiTablePDF(['tableOPI' , 'TabulatorSynthesePerception'] , 'FICHE_SYNTHESE_SCORE_DE_PERCEPTION_GOUVERNANCE' , 'A4' , info2)" class="btn btn-primary text-left">Télécharger PDF</button>
               </div>
             </div>
             <table id="tableOPI" class="w-full mt-12 text-sm border-collapse table-fixed">
@@ -177,7 +199,7 @@ onMounted(async () => {
               </tbody>
             </table>
             <!-- Tableau de synthese Perception -->
-            <TabulatorSynthesePerception :data="currentPerception?.synthese" :indicegouvernace="currentPerception?.indice_de_gouvernance" v-if="!isLoadingData && currentPerception?.synthese" />
+            <TabulatorSynthesePerception id="TabulatorSynthesePerception"  :data="currentPerception?.synthese" :indicegouvernace="currentPerception?.indice_de_gouvernance" />
           </TabPanel>
         </TabPanels>
         <LoaderSnipper v-if="isLoadingData" />

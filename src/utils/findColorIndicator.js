@@ -25,7 +25,7 @@ export function findColorCadreMesure(value) {
 
 export const colorsExcel = [
   { limit: 0.25, color: "EF4444" },
-  { limit: 0.5, color: "BA3030" },
+  { limit: 0.5, color: "FFC000" },
   { limit: 0.75, color: "EAB308" },
   { limit: 1, color: "16A34A" },
 ];

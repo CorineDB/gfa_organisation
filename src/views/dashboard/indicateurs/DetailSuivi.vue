@@ -1,12 +1,12 @@
 <script setup>
-import { computed, onMounted, ref, reactive } from "vue";
+import { computed, onMounted, ref, reactive, watch, nextTick } from "vue";
 import InputForm from "@/components/news/InputForm.vue";
 import IndicateursService from "@/services/modules/indicateur.service";
 import IndicateurSuivisService from "@/services/modules/indicateur.suivi.service";
 import Tabulator from "tabulator-tables";
 import { toast } from "vue3-toastify";
 import LoaderSnipper from "@/components/LoaderSnipper.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import VButton from "@/components/news/VButton.vue";
 import DeleteButton from "@/components/news/DeleteButton.vue";
 import AuthService from "@/services/modules/auth.service";
@@ -15,6 +15,7 @@ import { getAllErrorMessages } from "@/utils/gestion-error";
 import { parse } from "@vue/compiler-sfc";
 
 const route = useRoute();
+const router = useRouter();
 const isCreate = ref(true);
 const tabulator = ref();
 const idSelect = ref("");
@@ -23,101 +24,13 @@ const showModalValidate = ref(false);
 const isLoadingData = ref(true);
 const isLoading = ref(false);
 const datas = ref([]);
+const currentIndicateur = ref(null);
 const authUserType = ref("");
 
 const debutProgramme = ref("");
 const finProgramme = ref("");
 
-const getDatas = async () => {
-  isLoadingData.value = true;
-  await IndicateursService.detailSuivi(idIndicateur.value)
-    .then((result) => {
-      datas.value = result.data.data;
-      isLoadingData.value = false;
-    })
-    .catch((e) => {
-      console.error(e);
-      isLoadingData.value = false;
-      toast.error("Une erreur est survenue: Liste de sources.");
-    });
-  initTabulator();
-};
 
-const initTabulator = () => {
-  tabulator.value = new Tabulator("#tabulator", {
-    data: datas.value,
-    placeholder: "Aucune donnée disponible.",
-    layout: "fitColumns",
-    columns: [
-      {
-        title: "Valeur réalisée",
-        field: "valeurRealise",
-        hozAlign: "left",
-        vertAlign: "middle",
-        formatter(cell) {
-          return `${formatObject(cell.getData().valeurRealise)}`;
-        },
-      },
-      {
-        title: "Date de suivie",
-        field: "dateSuivie",
-        hozAlign: "center",
-        vertAlign: "middle",
-        formatter(cell) {
-          return `${formatDateOnly(cell.getData().dateSuivie)}`;
-        },
-      },
-      {
-        title: "Trimestre",
-        field: "trimestre",
-        hozAlign: "center",
-        vertAlign: "middle",
-      },
-      {
-        title: "Valeur cible",
-        field: "valeurCible",
-        hozAlign: "center",
-        vertAlign: "middle",
-
-        formatter(cell) {
-          return `${formatObject(cell.getData().valeurCible.valeurCible)} - ${cell.getData().valeurCible.annee}`;
-        },
-      },
-      {
-        title: "Actions",
-        field: "actions",
-        width: 316,
-        formatter: (cell) => {
-          const container = document.createElement("div");
-          container.className = "flex items-center justify-center gap-3";
-
-          const createButton = (label, className, onClick) => {
-            const button = document.createElement("button");
-            button.className = className;
-            button.innerText = label;
-            button.addEventListener("click", onClick);
-            return button;
-          };
-
-          const suiviButton = createButton("Suivi", "btn btn-primary", () => {
-            handleSuivi(cell.getData());
-          });
-          
-          const modifyButton = createButton("Modifier", "btn btn-primary", () => {
-            handleEditSuivi(cell.getData());
-          });
-
-          const deleteButton = createButton("Supprimer", "btn btn-danger", () => {
-            handleDelete(cell.getData());
-          });
-
-          container.append(suiviButton, modifyButton, deleteButton);
-          return container;
-        },
-      },
-    ],
-  });
-};
 
 const idIndicateur = computed(() => route.params.id);
 
@@ -266,6 +179,60 @@ const payloadSuivi = reactive({
   sources_de_donnee: ""
 });
 
+const shouldDisableAgregerFields = ref(false);
+const shouldDisableNonAgregerFields = ref(false);
+
+const shouldDisableValeurCible = computed(() => {
+  if (!currentIndicateur.value || !currentIndicateur.value.valeursCible) return false;
+  const year = Number(payloadSuivi.annee);
+  return currentIndicateur.value.valeursCible.some((v) => v.annee === year);
+});
+
+const updateValuesForYear = (year) => {
+  const indicateur = currentIndicateur.value;
+  if (!indicateur || !indicateur.valeursCible) return;
+
+  const targetData = indicateur.valeursCible.find((v) => v.annee === year);
+
+  if (targetData) {
+    if (isAgregerCurrentIndicateur.value) {
+      const rawValues = targetData.valeurCible;
+      valeurCible.value = valueKeysIndicateurSuivi.value.map((k) => ({
+        keyId: k.id,
+        value: rawValues ? rawValues[k.key] : "",
+      }));
+    } else {
+      const rawValues = targetData.valeurCible;
+      if (rawValues && typeof rawValues === "object") {
+        const keys = Object.keys(rawValues);
+        if (keys.length > 0) payloadSuivi.valeurCible = rawValues[keys[0]];
+      } else {
+        payloadSuivi.valeurCible = rawValues;
+      }
+    }
+  } else {
+    if (isAgregerCurrentIndicateur.value) {
+      valeurCible.value = valueKeysIndicateurSuivi.value.map((k) => ({
+        keyId: k.id,
+        value: "",
+      }));
+    } else {
+      payloadSuivi.valeurCible = "";
+    }
+  }
+};
+
+watch(
+  () => payloadSuivi.annee,
+  (newYear) => {
+    if (!newYear) return;
+    // Ne mettre à jour que si on est en mode création (pour ne pas écraser lors de l'édition)
+    if (isCreate.value) {
+      updateValuesForYear(Number(newYear));
+    }
+  }
+);
+
 const handleEditSuivi = (data) => {
   console.log(data);
   isCreate.value = false;
@@ -297,21 +264,7 @@ const handleEditSuivi = (data) => {
   console.log(payloadSuivi);
 };
 
-const handleSuivi = (data) => {
-  console.log(data);
-  valeurCible.value = data.valeurCible.valeurCible;
-  isAgregerCurrentIndicateur.value = data.valeurCible.indicateur.agreger;
-  if(isAgregerCurrentIndicateur.value == false){
-    Object.keys(valeurCible.value).forEach((key) => {
-      payloadSuivi.valeurCible = valeurCible.value[key];
-    });
-  }
 
-  payloadSuivi.indicateurId = data.valeurCible.indicateur.id;
-  valueKeysIndicateurSuivi.value = data.valeurCible.indicateur.value_keys;
-  resetValues();
-  showModalSuivi.value = true;
-};
 
 const updateValueCible = (keyId, newValue) => {
   const entry = valeurCible.value.find((item) => item.keyId === keyId);
@@ -367,14 +320,22 @@ const submitData = async () => {
 const submitSuivi = async () => {
   payloadSuivi.annee = Number(payloadSuivi.annee);
   payloadSuivi.trimestre = Number(payloadSuivi.trimestre);
+  // S'assurer que l'ID de l'indicateur est bien défini
+  payloadSuivi.indicateurId = idIndicateur.value;
+
   if (optionsSuivi[0].id == suiviOption.value) {
     delete payloadSuivi.trimestre;
   } else {
     delete payloadSuivi.dateSuivie;
   }
+  
+  // Inclure les valeurs cibles même si les champs sont désactivés
   if (isAgregerCurrentIndicateur.value) {
     payloadSuivi.valeurCible = valeurCible.value;
     payloadSuivi.valeurRealise = valeurRealise.value;
+  } else {
+    // Pour les indicateurs non agrégés, si le champ est désactivé, s'assurer que la valeur est bien dans le payload
+    // (Elle devrait déjà y être via le v-model ou updateValuesForYear, mais on s'assure)
   }
 
   console.log(payloadSuivi);
@@ -391,6 +352,8 @@ const submitSuivi = async () => {
   } catch (e) {
     console.log(e);
     toast.error(getAllErrorMessages(e));
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -458,6 +421,108 @@ const closeDeleteSuiviModal = () => (deleteSuiviModalPreview.value = false);
 
 /** */
 
+const getDatas = async () => {
+  isLoadingData.value = true;
+  try {
+    // Récupérer les suivis
+    const resultSuivis = await IndicateursService.detailSuivi(idIndicateur.value);
+    datas.value = resultSuivis.data.data;
+
+    // Récupérer les détails de l'indicateur pour avoir les valeurs cibles prévues
+    const resultIndicateur = await IndicateursService.get(idIndicateur.value);
+    currentIndicateur.value = resultIndicateur.data.data;
+    
+    // Initialiser valueKeysIndicateurSuivi si l'indicateur est agrégé
+    if (currentIndicateur.value.agreger) {
+      valueKeysIndicateurSuivi.value = currentIndicateur.value.value_keys;
+      isAgregerCurrentIndicateur.value = true;
+      resetValues(); // Initialiser le tableau valeurCible
+    } else {
+      isAgregerCurrentIndicateur.value = false;
+    }
+
+    isLoadingData.value = false;
+    await nextTick();
+    initTabulator();
+  } catch (e) {
+    console.error(e);
+    isLoadingData.value = false;
+    toast.error("Une erreur est survenue lors du chargement des données.");
+  }
+};
+
+const initTabulator = () => {
+  tabulator.value = new Tabulator("#tabulator", {
+    data: datas.value,
+    placeholder: "Aucune donnée disponible.",
+    layout: "fitColumns",
+    columns: [
+      {
+        title: "Valeur réalisée",
+        field: "valeurRealise",
+        hozAlign: "left",
+        vertAlign: "middle",
+        formatter(cell) {
+          return `${formatObject(cell.getData().valeurRealise)}`;
+        },
+      },
+      {
+        title: "Date de suivie",
+        field: "dateSuivie",
+        hozAlign: "center",
+        vertAlign: "middle",
+        formatter(cell) {
+          return `${formatDateOnly(cell.getData().dateSuivie)}`;
+        },
+      },
+      {
+        title: "Trimestre",
+        field: "trimestre",
+        hozAlign: "center",
+        vertAlign: "middle",
+      },
+      {
+        title: "Valeur cible",
+        field: "valeurCible",
+        hozAlign: "center",
+        vertAlign: "middle",
+
+        formatter(cell) {
+          return `${formatObject(cell.getData().valeurCible.valeurCible)} - ${cell.getData().valeurCible.annee}`;
+        },
+      },
+      {
+        title: "Actions",
+        field: "actions",
+        width: 316,
+        formatter: (cell) => {
+          const container = document.createElement("div");
+          container.className = "flex items-center justify-center gap-3";
+
+          const createButton = (label, className, onClick) => {
+            const button = document.createElement("button");
+            button.className = className;
+            button.innerText = label;
+            button.addEventListener("click", onClick);
+            return button;
+          };
+          
+          const modifyButton = createButton("Modifier", "btn btn-primary", () => {
+            handleEditSuivi(cell.getData());
+          });
+
+          const deleteButton = createButton("Supprimer", "btn btn-danger", () => {
+            handleDelete(cell.getData());
+          });
+
+          container.append(modifyButton, deleteButton);
+          return container;
+        },
+      },
+    ],
+  });
+};
+
 onMounted(() => {
   authUserType.value = JSON.parse(localStorage.getItem("authenticateUser")).type;
   getcurrentUser();
@@ -495,7 +560,15 @@ onMounted(() => {
             <SearchIcon class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3" />
           </div>
         </div>
-        <div class="flex">
+        <div class="flex gap-2">
+          <button class="btn btn-outline-secondary" @click="router.back()">
+            Retour
+          </button>
+          
+          <button class="shadow-md btn btn-primary" @click="showModalSuivi = true">
+            Ajouter un suivi
+          </button>
+
           <button class="mr-2 shadow-md btn btn-primary" @click="openFilterModal">
             <FilterIcon class="w-4 h-4 mr-3" />Filtre
           </button>
@@ -562,9 +635,23 @@ onMounted(() => {
               <option v-for="annee in years" :key="annee" :value="annee">{{ annee }}</option>
             </TomSelect>
           </div>
-          <!-- <InputForm label="Année de suivi" class="flex-1" v-model="payloadSuivi.annee" type="number" /> -->
+          
           <div v-if="!isAgregerCurrentIndicateur" class="flex flex-wrap items-center justify-between gap-3">
-            <InputForm label="Valeur cible" class="flex-1" v-model="payloadSuivi.valeurCible" type="number" />
+            <div class="flex-1">
+              <InputForm 
+                label="Valeur cible" 
+                v-model="payloadSuivi.valeurCible" 
+                type="number" 
+                :disabled="shouldDisableValeurCible || shouldDisableAgregerFields"
+                :class="{ 'opacity-60': shouldDisableValeurCible }"
+              />
+              <p v-if="shouldDisableValeurCible" class="mt-1 text-xs text-blue-600">
+                ℹ️ Valeur cible existante pour cette année (non modifiable)
+              </p>
+              <p v-else class="mt-1 text-xs text-gray-500">
+                ✏️ Aucune valeur cible pour cette année, vous pouvez en saisir une
+              </p>
+            </div>
             <InputForm label="Valeur réalisée" class="flex-1" v-model="payloadSuivi.valeurRealise" type="number" />
           </div>
 
@@ -573,10 +660,27 @@ onMounted(() => {
             <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]">
               <div v-for="(base, index) in valueKeysIndicateurSuivi" :key="index" class="input-group">
                 <div class="flex items-center justify-center text-sm truncate input-group-text">{{ base.libelle }}</div>
-                <input type="number" class="form-control" v-model="valeurCible.find((item) => item.keyId === base.id).value" @input="updateValueCible(base.id, $event.target.value)" placeholder="valeur cible" aria-label="valeur" aria-describedby="input-group-valeur" />
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  :disabled="shouldDisableValeurCible || shouldDisableNonAgregerFields" 
+                  :class="{ 'opacity-60': shouldDisableValeurCible }"
+                  v-model.number="valeurCible.find((item) => item.keyId === base.id).value" 
+                  @input="updateValueCible(base.id, $event.target.value)" 
+                  placeholder="valeur cible" 
+                  aria-label="valeur" 
+                  aria-describedby="input-group-valeur" 
+                />
               </div>
             </div>
+            <p v-if="shouldDisableValeurCible" class="mt-1 text-xs text-blue-600">
+              ℹ️ Valeurs cibles existantes pour cette année (non modifiables)
+            </p>
+            <p v-else class="mt-1 text-xs text-gray-500">
+              ✏️ Aucune valeur cible pour cette année, vous pouvez en saisir
+            </p>
           </div>
+          
           <div v-if="valueKeysIndicateurSuivi.length > 0 && isAgregerCurrentIndicateur" class="">
             <label class="form-label">Valeur Réalisée</label>
             <div class="grid gap-3 grid-cols-[repeat(auto-fill,_minmax(300px,_1fr))]">

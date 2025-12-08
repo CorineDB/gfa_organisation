@@ -470,7 +470,7 @@
   <!-- SUIVIE  -->
   <Modal size="modal-lg" backdrop="static" :show="showModalSuivi" @hidden="showModalSuivi = false">
     <ModalHeader>
-      <h2 class="mr-auto text-base font-medium">Enregistrer un suivi</h2>
+      <h2 class="mr-auto text-base font-medium">Enregistrer un suivi dfsf</h2>
     </ModalHeader>
     <form @submit.prevent="submitSuivi">
       <ModalBody>
@@ -1216,6 +1216,10 @@ const submitSuivi = async () => {
   if (isAgregerCurrentIndicateur.value) {
     payloadSuivi.valeurCible = valeurCible.value;
     payloadSuivi.valeurRealise = valeurRealise.value;
+    
+    // Log de débogage pour vérifier les valeurs
+    console.log('📊 Valeurs cibles avant soumission:', valeurCible.value);
+    console.log('📊 Payload complet:', JSON.stringify(payloadSuivi, null, 2));
   }
 
   const action = IndicateursService.createSuivi(payloadSuivi);
