@@ -260,14 +260,34 @@ export default {
             }
           });
       } else {
-        // alert("ok");
+        // Création d'un nouveau plan
         this.isLoading = true;
-        this.formData.budgetNational = parseInt(this.formData.budgetNational);
-        this.formData.pret = parseInt(this.formData.pret);
+        
+        // Extraire l'année et le trimestre de la valeur unique (format "année-trimestre")
+        const trimestreValue = this.formData.trimestre;
+        let annee, trimestre;
+        
+        if (typeof trimestreValue === 'string' && trimestreValue.includes('-')) {
+          // Nouveau format: "2026-1"
+          [annee, trimestre] = trimestreValue.split('-').map(Number);
+        } else {
+          // Ancien format (fallback): utiliser l'année séparée
+          annee = this.formData.annee;
+          trimestre = parseInt(trimestreValue);
+        }
 
-        console.log("this.formData.annee", this.formData.annee);
+        // Préparer les données à envoyer
+        const planData = {
+          activiteId: this.formData.activiteId,
+          annee: annee,
+          trimestre: trimestre,
+          budgetNational: parseInt(this.formData.budgetNational),
+          pret: parseInt(this.formData.pret)
+        };
 
-        PlanDeCaissement.create(this.formData)
+        console.log("Données envoyées au backend:", planData);
+
+        PlanDeCaissement.create(planData)
           .then((response) => {
             if (response.status == 200 || response.status == 201) {
               this.getListePlanDeDecaissement(this.formData.activiteId);

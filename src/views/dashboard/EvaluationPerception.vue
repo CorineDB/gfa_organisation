@@ -308,7 +308,12 @@ const goToPage = (page) => {
 const isLastPage = computed(() => currentPage.value === totalPages.value);
 
 onMounted(async () => {
-  payload.identifier_of_participant = generateUniqueId();
+  if (route.query.participantId) {
+    alert('ok')
+    payload.identifier_of_participant = route.query.participantId;
+  } else {
+    payload.identifier_of_participant = generateUniqueId();
+  }
   await getDataFormPerception();
 
   if (!showAlertValidate.value) {

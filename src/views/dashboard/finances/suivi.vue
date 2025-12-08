@@ -334,7 +334,7 @@ const suiviFinancierPayload = reactive({
 });
 
 const resetFilter = function () {
-  filterPayload.trimestre = 1;
+  filterPayload.trimestre = getCurrentQuarter();
   filterPayload.annee = new Date().getFullYear();
 
   filterSuiviFinancierActivite();
@@ -813,7 +813,6 @@ const resetFilterModal = () => {
 
 onMounted(() => {
   getDatas();
-
   getcurrentUser();
 });
 </script>
@@ -830,7 +829,6 @@ onMounted(() => {
       </div>
       <div class="flex">
         <button class="mr-2 shadow-md btn btn-primary" @click="openFilterModal"><FilterIcon class="w-4 h-4 mr-3" />Filtrer le suivi financier</button>
-
         <button class="btn btn-primary" title="Réinitialiser le filtre" @click="resetFilter()">
           <RefreshCwIcon class="w-5 h-5" />
         </button>
@@ -883,7 +881,7 @@ onMounted(() => {
             </div>
 
             <!-- je veux que le left-40 quand datas.suiviFinanciers.length > 0 et left-28 quand c'est zero   -->
-            <div class="absolute shadow-md perso sm:rounded-lg" :class="{'left-40': datas.suiviFinanciers.length > 0, 'left-28': datas.suiviFinanciers.length === 0} ">
+            <div class="absolute shadow-md perso sm:rounded-lg" :class="{'left-48': datas.suiviFinanciers.length > 0, 'left-28': datas.suiviFinanciers.length === 0} ">
               <table class="w-full overflow-auto text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="sticky top-0 text-xs text-gray-700 uppercase _z-20 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
@@ -1258,13 +1256,19 @@ onMounted(() => {
           <div class="">
             <label class="form-label">Année</label>
             <TomSelect v-model="filterPayload.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
+             <option value="">Selectionez une année</option>
               <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
             </TomSelect>
           </div>
           <div class="">
             <label class="form-label">Trimestre</label>
+           
             <TomSelect v-model="filterPayload.trimestre" :options="{ placeholder: 'Selectionez le trimestre' }" class="w-full">
-              <option v-for="(i, index2) in 4" :key="index2" :value="i">Trimestre {{ i }}</option>
+               <option value="">Selectionez un trimestre</option>
+              <option value="1">Trimestre 1</option>
+              <option value="2">Trimestre 2</option>
+              <option value="3">Trimestre 3</option>
+              <option value="4">Trimestre 4</option>
             </TomSelect>
           </div>
         </div>

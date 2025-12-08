@@ -308,7 +308,7 @@ export default {
         if (!quartersMap.has(key)) {
           quartersMap.set(key, {
             trimestre: quarter,
-            value: quarter,
+            value: `${year}-${quarter}`, // Valeur unique au format "année-trimestre"
             annee: year,
           });
         }
@@ -921,8 +921,8 @@ export default {
 
       const newItem = {
         activiteId: item.id,
-        trimestre: this.trimestres.length > 0 ? this.trimestres[0].value : 1,
-        annee: this.trimestreYears.length > 0 ? this.trimestreYears[0] : new Date().getFullYear(),
+        trimestre: this.trimestres.length > 0 ? this.trimestres[0].value : `${this.trimestreYears.length > 0 ? this.trimestreYears[0] : new Date().getFullYear()}-1`,
+        anneeFiltre: this.trimestreYears.length > 0 ? this.trimestreYears[0] : new Date().getFullYear(),
         budgetNational: 0,
         pret: 0,
         id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
@@ -936,10 +936,11 @@ export default {
     },
 
     addPlan() {
+      const currentYear = new Date().getFullYear();
       const newItem = {
         activiteId: this.planDeDecaissementPayload.activiteId,
-        trimestre: 1,
-        annee: new Date().getFullYear(),
+        trimestre: this.trimestres.length > 0 ? this.trimestres[0].value : `${currentYear}-1`,
+        anneeFiltre: this.trimestreYears.length > 0 ? this.trimestreYears[0] : currentYear,
         budgetNational: 0,
         pret: 0,
         id: Date.now() + "-" + Math.random().toString(36).substr(2, 9),
@@ -958,9 +959,31 @@ export default {
       let errorIndex = [];
 
       for (let index = 0; index < this.planDeDecaissement.length; index++) {
-        let plan = this.listePlanDeDecaissement.filter((plan) => plan.annee == this.planDeDecaissement[index].annee && plan.trimestre == this.planDeDecaissement[index].trimestre);
+        // Extraire l'année et le trimestre de la valeur unique (format "année-trimestre")
+        const trimestreValue = this.planDeDecaissement[index].trimestre;
+        let annee, trimestre;
+        
+        if (typeof trimestreValue === 'string' && trimestreValue.includes('-')) {
+          // Nouveau format: "2026-1"
+          [annee, trimestre] = trimestreValue.split('-').map(Number);
+        } else {
+          // Ancien format (fallback): utiliser l'année séparée
+          annee = this.planDeDecaissement[index].annee;
+          trimestre = trimestreValue;
+        }
 
-        const action = plan.length > 0 ? PlanDeCaissement.update(plan[0].id, this.planDeDecaissement[index]) : this.storePlanDecaissement(this.planDeDecaissement[index]);
+        // Préparer les données à envoyer avec année et trimestre séparés
+        // Exclure anneeFiltre qui sert uniquement au filtrage de l'interface
+        const { anneeFiltre, ...planDataWithoutFilter } = this.planDeDecaissement[index];
+        const planData = {
+          ...planDataWithoutFilter,
+          annee: annee,
+          trimestre: trimestre
+        };
+
+        let plan = this.listePlanDeDecaissement.filter((plan) => plan.annee == annee && plan.trimestre == trimestre);
+
+        const action = plan.length > 0 ? PlanDeCaissement.update(plan[0].id, planData) : this.storePlanDecaissement(planData);
 
         try {
           await action;
@@ -1039,7 +1062,7 @@ export default {
     <div>
       <button v-if="seeActivite && activiteAdd" @click="addActivite" title="ajouter une activite" class="px-4 py-2 flex overflow-hidden items-center text-xs font-semibold text-white uppercase bg-primary focus:outline-none focus:shadow-outline">
         <span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="fill: rgba(255, 255, 255, 1); transform: ; msfilter: ">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="fill: rgba(255, 255, 255, 1)">
             <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6z"></path></svg
         ></span>
         <span class="mx-2 text-xs font-semibold">ajouter </span>
@@ -1575,22 +1598,20 @@ export default {
 
           <!-- Formulaire en deux colonnes -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Année -->
+            <!-- Année (pour filtrage uniquement) -->
             <div>
-              <label :for="`plan-${index}-annee`" class="form-label">Sélectionner l'année de décaissement</label>
-              <TomSelect v-model="plan.annee" :id="`plan-${index}-annee`" :name="`plan-${index}-annee`" :options="{ placeholder: 'Sélectionnez une année' }" class="w-full">
+              <label :for="`plan-${index}-annee`" class="form-label">Sélectionner l'année</label>
+              <TomSelect v-model="plan.anneeFiltre" :id="`plan-${index}-annee`" :name="`plan-${index}-annee`" :options="{ placeholder: 'Sélectionnez une année' }" class="w-full">
                 <option v-for="(year, yearIndex) in trimestreYears" :key="yearIndex" :value="year">{{ year }}</option>
               </TomSelect>
-              <p class="text-red-500 text-[12px] mt-1" v-if="erreurPlanDeDecaissement?.[index]?.annee">
-                {{ erreurPlanDeDecaissement[index].annee }}
-              </p>
+              <p class="text-xs text-gray-500 mt-1">Filtrer les trimestres par année</p>
             </div>
 
             <!-- Trimestre -->
             <div>
               <label :for="`plan-${index}-trimestre`" class="form-label">Sélectionner le trimestre</label>
               <TomSelect v-model="plan.trimestre" :id="`plan-${index}-trimestre`" :name="`plan-${index}-trimestre`" :options="{ placeholder: 'Sélectionnez le trimestre' }" class="w-full">
-                <option v-for="trimestre in filteredTrimestresForPlan(plan.annee)" :key="trimestre.value" :value="trimestre.value">Trimestre {{ trimestre.trimestre }} ({{ trimestre.annee }})</option>
+                <option v-for="trimestre in filteredTrimestresForPlan(plan.anneeFiltre)" :key="trimestre.value" :value="trimestre.value">Trimestre {{ trimestre.trimestre }} ({{ trimestre.annee }})</option>
               </TomSelect>
               <p class="text-red-500 text-[12px] mt-1" v-if="erreurPlanDeDecaissement?.[index]?.trimestre">
                 {{ erreurPlanDeDecaissement[index].trimestre }}
@@ -1658,7 +1679,7 @@ export default {
         <!-- Affiche montantRestantADeecaisser en fonction de loaderListePlan -->
         <div class="col-span-12 mt-4">
           <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 class="text-lg font-semibold mb-3 text-blue-800">Résumé financier</h3>
+            <h3 class="text-lg font-semibold mb-3 text-blue-800">Résumé financier dfds</h3>
             <div v-if="loaderListePlan" class="flex justify-center items-center py-4">
               <LoaderSnipper />
             </div>
