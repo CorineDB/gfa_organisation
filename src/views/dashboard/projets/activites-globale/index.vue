@@ -88,6 +88,7 @@ export default {
       showModalCloturerActivite: false,
       cloturerModal: false,
       loadingCloturer: false,
+      loaderStatut: {},
       erreurPlanDeDecaissement: null,
       activiteId: null,
       dureeId: null,
@@ -849,7 +850,8 @@ export default {
     },
 
     changerStatut(item, statut = 2) {
-      this.loaderStatut = true;
+      const loaderKey = item.id + '_' + statut;
+      this.loaderStatut = { ...this.loaderStatut, [loaderKey]: true };
 
       const nouveauStatut = statut; //item.statut === 0 ? 2 : 0;
 
@@ -859,7 +861,7 @@ export default {
 
       this.changerStatutActivite({ statut: payLoad, id: item.id })
         .then((response) => {
-          this.loaderStatut = false;
+          this.loaderStatut = { ...this.loaderStatut, [loaderKey]: false };
           if (response.status == 200 || response.status == 201) {
             toast.success("Statut changé avec succès");
 
@@ -872,7 +874,7 @@ export default {
           }
         })
         .catch((error) => {
-          this.loaderStatut = false;
+          this.loaderStatut = { ...this.loaderStatut, [loaderKey]: false };
 
           console.log(error);
           toast.error(error.response.data.message);
@@ -1215,10 +1217,9 @@ export default {
                     <DropdownContent>
                       <DropdownItem v-if="verifyPermission('modifier-une-activite')" @click="modifierActivite(item)"> <Edit2Icon class="w-4 h-4 mr-2" /> Modifier </DropdownItem>
                       <DropdownItem v-if="verifyPermission('prolonger-une-activite')" @click="ouvrirModalProlongerActivite(item)"> <CalendarIcon class="w-4 h-4 mr-2" /> Prolonger </DropdownItem>
-                      <DropdownItem title="cliquer pour marquer l'activité comme terminer" v-if="verifyPermission('modifier-une-activite') && item.statut == 0" @click="changerStatut(item, 2)"> <CalendarIcon class="w-4 h-4 mr-2" /> Terminer </DropdownItem>
-                      <DropdownItem title="cliquer pour marquer l'activité comme pas démarré" v-if="verifyPermission('modifier-une-activite') && item.statut == 0" @click="changerStatut(item, -1)"> <CalendarIcon class="w-4 h-4 mr-2" /> Pas Démarrer </DropdownItem>
-
-                      <DropdownItem title="cliquer pour démarré l'activité" v-else-if="verifyPermission('modifier-une-activite') && item.statut !== 0" @click="changerStatut(item, 0)"> <CalendarIcon class="w-4 h-4 mr-2" /> Démarrer </DropdownItem>
+                      <DropdownItem title="cliquer pour marquer l'activité comme terminer" v-if="verifyPermission('modifier-une-activite') && item.statut == 0" @click="changerStatut(item, 2)"> <CalendarIcon class="w-4 h-4 mr-2" /> Terminer <LoaderIcon v-if="loaderStatut[item.id + '_2']" class="w-4 h-4 ml-2 animate-spin" /> </DropdownItem>
+                      <DropdownItem title="cliquer pour marquer l'activité comme pas démarré" v-if="verifyPermission('modifier-une-activite') && item.statut == 0" @click="changerStatut(item, -1)"> <CalendarIcon class="w-4 h-4 mr-2" /> Pas Démarrer <LoaderIcon v-if="loaderStatut[item.id + '_-1']" class="w-4 h-4 ml-2 animate-spin" /> </DropdownItem>
+                      <DropdownItem title="cliquer pour démarré l'activité" v-else-if="verifyPermission('modifier-une-activite') && item.statut !== 0" @click="changerStatut(item, 0)"> <CalendarIcon class="w-4 h-4 mr-2" /> Démarrer <LoaderIcon v-if="loaderStatut[item.id + '_0']" class="w-4 h-4 ml-2 animate-spin" /> </DropdownItem>
 
                       <DropdownItem v-if="verifyPermission('creer-un-plan-de-decaissement')" @click="ouvrirModalPlanDeDecaissementActivite(item)"> <CalendarIcon class="w-4 h-4 mr-2" /> Plan de decaissement </DropdownItem>
 

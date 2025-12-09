@@ -50,7 +50,7 @@ const info2 = ref({
   mainTitle: "FICHE SYNTHESE SCORE DE PERCEPTION GOUVERNANCE",
   tableTitles: {
     'tableOPI': 'Tableau 1',
-    'TabulatorSynthesePerception': 'Tableau 2',
+    'tableSynthesePerception': 'Tableau 2',
      
   },
   orientation: "portrait", // Peut surcharger l'orientation
@@ -177,7 +177,7 @@ onMounted(async () => {
             <div class="flex justify-end my-4 sm:flex-row sm:items-end xl:items-start">
               <div class="flex mt-5 sm:mt-0">
                 <ExportationSynthesePerception v-if="!isLoadingData && currentPerception" :org="authUser?.nom" :pointfocal="`${authUser?.profil?.nom_point_focal} ${authUser?.profil?.prenom_point_focal}`" :dateevaluation="currentPerception?.evaluatedAt" :current-perception="currentPerception" class="mr-3" />
-                <button @click="generateMultiTablePDF(['tableOPI' , 'TabulatorSynthesePerception'] , 'FICHE_SYNTHESE_SCORE_DE_PERCEPTION_GOUVERNANCE' , 'A4' , info2)" class="btn btn-primary text-left">Télécharger PDF</button>
+                <button @click="generateMultiTablePDF(['tableOPI' , 'tableSynthesePerception'] , 'FICHE_SYNTHESE_SCORE_DE_PERCEPTION_GOUVERNANCE' , 'A4' , info2)" class="btn btn-primary text-left">Télécharger PDF</button>
               </div>
             </div>
             <table id="tableOPI" class="w-full mt-12 text-sm border-collapse table-fixed">
@@ -199,7 +199,7 @@ onMounted(async () => {
               </tbody>
             </table>
             <!-- Tableau de synthese Perception -->
-            <TabulatorSynthesePerception id="TabulatorSynthesePerception"  :data="currentPerception?.synthese" :indicegouvernace="currentPerception?.indice_de_gouvernance" />
+            <TabulatorSynthesePerception :data="currentPerception?.synthese" :indicegouvernace="currentPerception?.indice_de_gouvernance" />
           </TabPanel>
         </TabPanels>
         <LoaderSnipper v-if="isLoadingData" />
