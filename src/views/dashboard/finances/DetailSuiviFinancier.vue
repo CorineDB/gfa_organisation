@@ -142,6 +142,8 @@ const createData = async () => {
       }
     });
 };
+
+
 const getDatas = async () => {
   isLoadingData.value = true;
   await SuiviFinancier.getSuiviByActivite(route.params.id, filter.value)
@@ -156,6 +158,8 @@ const getDatas = async () => {
     });
   initTabulator();
 };
+
+
 const updateData = async () => {
   isLoading.value = true;
   await SuiviFinancier.update(idSelect.value, payload)
@@ -177,6 +181,8 @@ const updateData = async () => {
       }
     });
 };
+
+
 const submitData = () => (isCreate.value ? createData() : updateData());
 const deleteData = async () => {
   isLoading.value = true;
@@ -193,6 +199,9 @@ const deleteData = async () => {
       toast.error("Une erreur est survenue, ressayer");
     });
 };
+
+
+
 const initTabulator = () => {
   tabulator.value = new Tabulator("#tabulator", {
     data: datas.value,
@@ -253,6 +262,9 @@ const initTabulator = () => {
     ],
   });
 };
+
+
+
 const applyFilter = () => {
   if (tabulator.value) {
     const query = searchValue.value.toLowerCase();
@@ -266,11 +278,13 @@ const handleEdit = (params) => {
   idSelect.value = params.id;
   payload.activiteId = params.id;
   payload.trimestre = params.trimestre;
-  payload.annee = params.annee;
+  payload.annee = parseInt(params.annee);
   payload.consommer = params.consommer;
   // payload.consommer = params.consommer;
 
   showModalCreate.value = true;
+
+  debugger;
 };
 const handleDelete = (params) => {
   idSelect.value = params.id;
@@ -381,10 +395,13 @@ onMounted(() => {
           </div> -->
 
           <div class="col-span-12 mt-4">
-            <label class="form-label">Sélectionnez l'année de décaissement</label>
-            <TomSelect v-model="payload.annee" :options="{ placeholder: 'Selectionez une année' }" class="w-full">
-              <option v-for="(year, index) in years" :key="index" :value="year">{{ year }}</option>
-            </TomSelect>
+            <pre>{{ years }}</pre>
+            <label class="form-label">Sélectionnez l'année de décaissement {{ payload.annee }} </label>
+            <v-select class="w-full" v-model="payload.annee" :options="years" :placeholder="'Selectionez une année'">
+              <template #search="{ attributes, events }">
+                <input class="vs__search form-input" id="annee" name="annee" :required="!payload.annee" v-bind="attributes" v-on="events" />
+              </template>
+            </v-select>
             <p class="text-red-500 text-[12px] -mt-2 col-span-12" v-if="erreurSuiviFinancier?.[index]?.trimestre">
               {{ erreurSuiviFinancier[index].annee }}
             </p>
