@@ -26,6 +26,7 @@ function determineContentType(payLoad) {
 const config = {
   baseURL: `${API_BASE_URL}/api/`,
   timeout: 60 * 100000000, // Timeout
+  withCredentials: true, // Enable cookies for cross-origin requests
   headers: {
     common: {
       Accept: "application/json",
@@ -33,6 +34,7 @@ const config = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, X-Token-Auth, Authorization",
+      "X-Requested-With": "XMLHttpRequest", // Required for Sanctum
     },
   },
 };
@@ -48,7 +50,7 @@ const httpClient = axios.create(config);
  * Ajout du token d'authentification si disponible
  */
 const authInterceptor = (config) => {
-  
+
 
   let token = store.getters["auths/GET_ACCESS_TOKEN"];
   if (token) {
@@ -58,19 +60,19 @@ const authInterceptor = (config) => {
 
   // Protection spéciale pour FormData - supprimer Content-Type si présent
   if (config.data instanceof FormData && config.headers['Content-Type']) {
-    
+
     delete config.headers['Content-Type'];
   }
 
   // Réinitialisation des erreurs
   store.commit(SET_ERRORS_MESSAGE, { message: null, errors: [] });
 
- 
+
 
   return config;
 };
 
- 
+
 /** Ajout des interceptors à l'instance Axios */
 httpClient.interceptors.request.use(authInterceptor);
 

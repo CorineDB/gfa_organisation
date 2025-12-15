@@ -10,7 +10,7 @@ import AuthService from "@/services/modules/auth.service";
 
 export default {
 
-    async [FETCH_AUTHENTICATE_USER] ({ commit }) {
+    async [FETCH_AUTHENTICATE_USER]({ commit }) {
 
         const { data, status } = await AuthService.getCurrentUser()
 
@@ -21,25 +21,28 @@ export default {
         return { data: data.data, status }
     },
 
-    async [LOGIN] ({commit}, payload) {
+    async [LOGIN]({ commit }, payload) {
+
+        // Get CSRF cookie first for Sanctum authentication
+        await ApiService.get("../sanctum/csrf-cookie");
 
         const { data, status } = await AuthService.login(payload)
 
         let response = data.data
 
         if (status === 200 || status === 201) {
-            if(response.hasOwnProperty("utilisateur")){
+            if (response.hasOwnProperty("utilisateur")) {
                 commit(SET_AUTH_DATA, response.utilisateur)
             }
 
-            if(response.hasOwnProperty("access_token"))
+            if (response.hasOwnProperty("access_token"))
                 commit(SET_ACCESS_TOKEN, response.access_token)
         }
 
         return { data: response, status }
     },
 
-    async [LOGOUT] ({ commit }) {
+    async [LOGOUT]({ commit }) {
 
         const { status } = await AuthService.logout()
 
@@ -48,5 +51,5 @@ export default {
 
         return { status }
     }
-    
+
 }
