@@ -31,9 +31,6 @@ const config = {
     common: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, X-Token-Auth, Authorization",
       "X-Requested-With": "XMLHttpRequest", // Required for Sanctum
     },
   },

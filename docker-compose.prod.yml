@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  frontend_organisation_admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-https://dms-redevabilite.com}
+        VITE_PUSHER_APP_KEY: ${VITE_PUSHER_APP_KEY:-ae75f3a73201ef37c668}
+        VITE_PUSHER_APP_CLUSTER: ${VITE_PUSHER_APP_CLUSTER:-eu}
+        VITE_PUSHER_BASE_URL: ${VITE_PUSHER_BASE_URL:-https://dms-redevabilite.com}
+    image: gfa_frontend_organisation:prod
+    container_name: gfa_frontend_organisation_prod
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env.prod
+
+networks:
+  default:
+    name: gfa_se_backend_webapp_gfa-network
+    external: true

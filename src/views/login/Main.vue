@@ -165,8 +165,7 @@ import { useSimpleMenuStore } from "@/stores/simple-menu";
 import { useSideMenuStore } from "@/stores/side-menu";
 
 //import Vmodal from '@/components/Vmodal'
-import axios from "axios";
-//import { httpClient as axios } from "@/plugins/http-client";
+import { httpClient } from "@/plugins/http-client";
 import VButton from "@/components/news/VButton.vue";
 import { API_BASE_URL } from "@/services/configs/environment.js";
 import { toast } from "vue3-toastify";
@@ -233,9 +232,9 @@ export default {
         const identifiant = {};
         identifiant.email = this.login;
         identifiant.password = this.password;
-        const datas = await axios.get(`${this.base_url}/sanctum/csrf-cookie`);
+        const datas = await httpClient.get(`${this.base_url}/sanctum/csrf-cookie`);
         // const datas = true;
-        if (datas.status == 204) {
+        if (datas.status == 204 || datas.status == 200) {
           await this.authentification(identifiant)
             .then((response, status) => {
               // this.simpleMenuStore.setMenu();
@@ -249,7 +248,7 @@ export default {
                 if (haveProject !== null) {
                   this.$router.push("/dashboard/gfa");
                 } else {
-                  this.$router.push("dashboard/enquetes");
+                  this.$router.push("/dashboard/enquetes");
                 }
               }
             })
