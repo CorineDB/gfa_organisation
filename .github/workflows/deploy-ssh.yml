@@ -1,0 +1,51 @@
+name: Deploy Organisation Frontend to Staging
+
+on:
+  push:
+    branches: [organisation]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    
+    steps:
+      - name: Deploy Organisation Frontend
+        run: |
+          echo "🚀 Starting organisation frontend deployment..."
+          
+          # Create deployment directory if it doesn't exist
+          if [ ! -d "/var/www/html/gfa/organisation" ]; then
+            echo "📁 Creating deployment directory..."
+            sudo mkdir -p /var/www/html/gfa/organisation
+            sudo chown -R pc-1:pc-1 /var/www/html/gfa/organisation
+          fi
+          
+          # Navigate to deployment directory
+          cd /var/www/html/gfa/organisation
+          
+          # Clone repository if not already cloned
+          if [ ! -d ".git" ]; then
+            echo "📦 Cloning repository..."
+            git clone ${{ secrets.ORG_REPO_URL }} .
+            git checkout organisation
+          fi
+          
+          # Pull latest changes
+          echo "📥 Pulling latest code..."
+          git pull origin organisation
+          
+          # Fix permissions
+          echo "🔧 Fixing permissions..."
+          sudo chown -R pc-1:pc-1 .
+          
+          # Deploy with Docker
+          echo "🐳 Deploying with Docker..."
+          sudo docker-compose -f docker-compose.staging.yml down
+          sudo VITE_API_BASE_URL="https://dms-redevabilite.dev" \
+               VITE_PUSHER_BASE_URL="https://dms-redevabilite.dev" \
+               docker-compose -f docker-compose.staging.yml up -d --build
+          
+          # Check status
+          echo "✅ Deployment complete!"
+          sudo docker-compose -f docker-compose.staging.yml ps
